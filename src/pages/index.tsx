@@ -1,56 +1,30 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import { Layout } from '@/components/layout'
-import { Paper } from '@material-ui/core'
+import { useState } from 'react'
+import { Layout } from '@/components/Layout'
 import { makeStyles } from '@material-ui/core/styles'
+import { InputField } from '@/components/InputField'
+import { Header } from '@/components/Header'
+import { ResultArea, Results } from '@/components/ResultArea'
 
 const useStyles = makeStyles({
-  container: {
-    minHeight: '100vh',
-    padding: '0 0.5rem',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  main: {
-    padding: '5rem 0',
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   title: {
-    margin: 0,
+    margin: 10,
     lineHeight: 1.15,
     fontSize: '4rem',
   },
-  description: {
-    lineHeight: '1.5',
-    fontSize: '1.5rem',
-  },
 })
+
 const IndexPage = () => {
+  const [selected, setSelected] = useState({})
+  const [results, setResults] = useState<Results>({})
   const classes = useStyles()
+  const title = '著者検索👌'
   return (
     <Layout>
-      <div className={classes.container}>
-        <Head>
-          <title>NextJS Typescript Starter</title>
-          <link rel="icon" href="/favicon.png" />
-        </Head>
-
-        <div className={classes.main}>
-          <h1 className={classes.title}>NextJS Typescript Starter</h1>
-          <p className={classes.description}>
-            Read{' '}
-            <Link href="https://github.com/Rasukarusan/nextjs-typescript-starter">
-              <a target="_blank">github</a>
-            </Link>
-          </p>
-        </div>
-      </div>
+      <Header title={title} />
+      <h1 className={classes.title}>{title}</h1>
+      <InputField setResults={setResults} />
+      <h1 className={classes.title}>結果</h1>
+      <ResultArea results={results} />
     </Layout>
   )
 }
