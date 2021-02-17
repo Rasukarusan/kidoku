@@ -42,7 +42,7 @@ export interface Item {
 
 export const InputField = ({ setResults }) => {
   const [timer, setTimer] = useState(null)
-  const getBook = async (title: string): Promise<Item[]> => {
+  const search = async (title: string): Promise<Item[]> => {
     return axios
       .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
       .then((res) => res.data.items)
@@ -55,7 +55,7 @@ export const InputField = ({ setResults }) => {
       const results = {}
       await Promise.all(
         titles.map(async (title) => {
-          results[title] = await getBook(title)
+          results[title] = await search(title)
         })
       )
       setResults(results)
