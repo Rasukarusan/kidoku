@@ -16,10 +16,15 @@ const useStyles = makeStyles({
 })
 
 const IndexPage = () => {
+  const [titles, setTitles] = useState<string[]>([])
   const [selectList, setSelectList] = useState<SelectList>({})
   const [results, setResults] = useState<Results>({})
   const classes = useStyles()
   const title = '著者検索'
+
+  const updateTitles = (newTitles: string[]) => {
+    setTitles(newTitles)
+  }
 
   const updateResults = (newResults: Results) => {
     setResults(newResults)
@@ -36,11 +41,11 @@ const IndexPage = () => {
       <Typography variant="h2" className={classes.title}>
         {title}
       </Typography>
-
-      <InputField setResults={updateResults} />
-      <CopyField selectList={selectList} />
+      <InputField setTitles={updateTitles} setResults={updateResults} />
+      <CopyField titles={titles} selectList={selectList} />
       <ResultArea
         results={results}
+        titles={titles}
         selectList={selectList}
         updateSelectList={updateSelectList}
       />

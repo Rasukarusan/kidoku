@@ -40,7 +40,7 @@ export interface Item {
   volumeInfo: VolumeInfo
 }
 
-export const InputField = ({ setResults }) => {
+export const InputField = ({ setTitles, setResults }) => {
   const [timer, setTimer] = useState(null)
   const search = async (title: string): Promise<Item[]> => {
     return axios
@@ -51,7 +51,7 @@ export const InputField = ({ setResults }) => {
   const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const titles = event.target.value.split('\n').filter((v) => v !== '')
     if (timer) clearTimeout(timer)
-    const t = setTimeout(async () => {
+    const newTimer = setTimeout(async () => {
       const results = {}
       await Promise.all(
         titles.map(async (title) => {
@@ -59,11 +59,10 @@ export const InputField = ({ setResults }) => {
         })
       )
       setResults(results)
+      setTitles(titles)
     }, 200)
-    setTimer(t)
+    setTimer(newTimer)
   }
-
-  const handleOnBlur = async (event: React.FocusEvent<HTMLInputElement>) => {}
 
   return (
     <TextField
@@ -74,7 +73,6 @@ export const InputField = ({ setResults }) => {
       rows={10}
       variant="outlined"
       onChange={handleOnChange}
-      onBlur={handleOnBlur}
     />
   )
 }
