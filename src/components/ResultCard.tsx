@@ -39,46 +39,55 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 export interface Props {
+  selectList: SelectList
+  updateSelectList: (newSelectList: SelectList) => void
+  searchWord: string
   title: string
   description?: string
   imageUrl: string
   authors?: string[]
 }
 
+export interface SelectList {
+  [key: string]: string
+}
+
 export const ResultCard: React.FC<Props> = ({
+  selectList,
+  updateSelectList,
+  searchWord,
   title,
   description,
   imageUrl,
   authors,
 }) => {
   const classes = useStyles()
-  const [check, setCheck] = React.useState(false)
-
-  const handleOnClick = () => {
-    setCheck(!check)
-  }
-
   const truncate = (str: string, len: number) => {
-    if (!str) return 'no description'
+    if (!str) return '-'
     return str.length <= len ? str : str.substr(0, len) + '...'
   }
 
   return (
-    <Card className={classes.root} onClick={handleOnClick}>
+    <Card
+      className={classes.root}
+      onClick={() => updateSelectList({ ...selectList, [searchWord]: title })}
+    >
       <Tooltip title={title}>
-        <CardHeader
-          avatar={
-            <Checkbox
-              icon={<CircleUnchecked />}
-              checkedIcon={<CircleChecked />}
-              checked={check}
-            />
-          }
-          title={title}
-          subheader={Array.isArray(authors) ? authors.join(',') : '-'}
-          className={classes.header}
-          classes={{ title: classes.title, subheader: classes.subheader }}
-        />
+        <div>
+          <CardHeader
+            avatar={
+              <Checkbox
+                icon={<CircleUnchecked />}
+                checkedIcon={<CircleChecked />}
+                checked={selectList[searchWord] === title}
+              />
+            }
+            subheader={Array.isArray(authors) ? authors.join(',') : '-'}
+            className={classes.header}
+            title={title}
+            classes={{ title: classes.title, subheader: classes.subheader }}
+          />
+        </div>
       </Tooltip>
       <CardMedia
         component="img"
@@ -88,7 +97,7 @@ export const ResultCard: React.FC<Props> = ({
       />
       <CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
-          {truncate(description, 40)}
+          {truncate(description, 30)}
         </Typography>
       </CardContent>
     </Card>

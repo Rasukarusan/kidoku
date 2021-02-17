@@ -1,10 +1,5 @@
-import { useState } from 'react'
 import axios from 'axios'
-import Head from 'next/head'
-import { Layout } from '@/components/Layout'
-import { TextField, Typography } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import { ResultCard } from '@/components/ResultCard'
+import { TextField } from '@material-ui/core'
 
 interface ImageLinks {
   smallThumbnail: string
@@ -51,11 +46,7 @@ export const InputField = ({ setResults }) => {
       .then((res) => res.data.items)
   }
 
-  const handleOnChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {}
-
-  const handleOnBlur = async (event: React.FocusEvent<HTMLInputElement>) => {
+  const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const titles = event.target.value.split('\n').filter((v) => v !== '')
     const results = {}
     await Promise.all(
@@ -65,6 +56,8 @@ export const InputField = ({ setResults }) => {
     )
     setResults(results)
   }
+
+  const handleOnBlur = async (event: React.FocusEvent<HTMLInputElement>) => {}
 
   return (
     <TextField

@@ -21,37 +21,47 @@ export interface Results {
   [key: string]: Item[]
 }
 
-export const ResultArea = ({ results }) => {
+export const ResultArea = ({ results, selectList, updateSelectList }) => {
   const classes = useStyles()
+
   return (
     <div>
-      {Object.keys(results).map((key, i) => (
-        <div key={`${i}-${key}`}>
-          <Typography
-            color="primary"
-            variant="h5"
-            className={classes.resultTitle}
-          >
-            『{key}』の検索結果
-          </Typography>
-          <div className={classes.resultArea}>
-            {results[key].map((item) => (
-              <div className={classes.resultItem} key={item.volumeInfo.title}>
-                <ResultCard
-                  title={item.volumeInfo.title}
-                  imageUrl={
-                    item.volumeInfo.imageLinks
-                      ? item.volumeInfo.imageLinks.thumbnail
-                      : '/no-image.png'
-                  }
-                  description={item.volumeInfo.description}
-                  authors={item.volumeInfo.authors}
-                />
-              </div>
-            ))}
+      {Object.keys(results).map((key, i) => {
+        if (!selectList[key]) {
+          console.log(selectList)
+          selectList[key] = results[key][0].volumeInfo.title
+        }
+        return (
+          <div key={`${i}-${key}`}>
+            <Typography
+              color="primary"
+              variant="h5"
+              className={classes.resultTitle}
+            >
+              『{key}』の検索結果
+            </Typography>
+            <div className={classes.resultArea}>
+              {results[key].map((item: Item) => (
+                <div className={classes.resultItem} key={item.volumeInfo.title}>
+                  <ResultCard
+                    selectList={selectList}
+                    updateSelectList={updateSelectList}
+                    searchWord={key}
+                    title={item.volumeInfo.title}
+                    imageUrl={
+                      item.volumeInfo.imageLinks
+                        ? item.volumeInfo.imageLinks.thumbnail
+                        : '/no-image.png'
+                    }
+                    description={item.volumeInfo.description}
+                    authors={item.volumeInfo.authors}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
