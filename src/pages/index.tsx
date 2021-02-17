@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Layout } from '@/components/Layout'
 import { makeStyles } from '@material-ui/core/styles'
-import { Typography, TextField } from '@material-ui/core'
+import { Typography } from '@material-ui/core'
 import { InputField } from '@/components/InputField'
 import { Header } from '@/components/Header'
 import { ResultArea, Results } from '@/components/ResultArea'
 import { SelectList } from '@/components/ResultCard'
+import { CopyField } from '@/components/CopyField'
 
 const useStyles = makeStyles({
   title: {
@@ -29,14 +30,6 @@ const IndexPage = () => {
     setSelectList(newSelectList)
   }
 
-  const getList = () => {
-    let list = ''
-    Object.keys(selectList).forEach((key) => {
-      list += key + '\t' + selectList[key].authors + '\n'
-    })
-    return list
-  }
-
   return (
     <Layout>
       <Header title={title} />
@@ -45,14 +38,7 @@ const IndexPage = () => {
       </Typography>
 
       <InputField setResults={updateResults} />
-      <TextField
-        style={{ width: '50%' }}
-        defaultValue={getList()}
-        multiline
-        rows={10}
-        disabled
-        variant="outlined"
-      />
+      <CopyField selectList={selectList} />
       <ResultArea
         results={results}
         selectList={selectList}
