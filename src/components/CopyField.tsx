@@ -1,12 +1,17 @@
 import { useState, useRef } from 'react'
 import { TextField, Snackbar } from '@material-ui/core'
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert'
+import { SelectList } from '@/components/ResultCard'
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />
 }
 
-export const CopyField = ({ titles, selectList }) => {
+interface Props {
+  titles: string[]
+  selectList: SelectList
+}
+export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
   const field = useRef<HTMLTextAreaElement>(null)
   const getList = () => {
     let list = ''

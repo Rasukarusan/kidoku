@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { TextField } from '@material-ui/core'
 import { useState } from 'react'
+import { Results } from './ResultArea'
 
 interface ImageLinks {
   smallThumbnail: string
@@ -40,7 +41,11 @@ export interface Item {
   volumeInfo: VolumeInfo
 }
 
-export const InputField = ({ setTitles, setResults }) => {
+interface Props {
+  setTitles: (newTitles: string[]) => void
+  setResults: (newResults: Results) => void
+}
+export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   const [timer, setTimer] = useState(null)
   const search = async (title: string): Promise<Item[]> => {
     return axios
