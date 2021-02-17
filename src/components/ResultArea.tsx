@@ -22,7 +22,12 @@ export interface Results {
   [key: string]: Item[]
 }
 
-export const ResultArea = ({ results, selectList, updateSelectList }) => {
+export const ResultArea = ({
+  results,
+  titles,
+  selectList,
+  updateSelectList,
+}) => {
   const classes = useStyles()
 
   useEffect(() => {
@@ -40,36 +45,36 @@ export const ResultArea = ({ results, selectList, updateSelectList }) => {
   })
   return (
     <div>
-      {Object.keys(results).map((key, i) => {
+      {titles.map((title: string, i: number) => {
         return (
-          <div key={`${i}-${key}`}>
+          <div key={`${i}-${title}`}>
             <Typography
               color="primary"
               variant="h5"
               className={classes.resultTitle}
             >
-              『{key}』の検索結果
+              『{title}』の検索結果
             </Typography>
             <div className={classes.resultArea}>
-              {Array.isArray(results[key]) &&
-                results[key].map((item: Item) => (
+              {Array.isArray(results[title]) &&
+                results[title].map((item: Item, index: number) => (
                   <div
                     className={classes.resultItem}
-                    key={item.volumeInfo.title}
+                    key={`${index}- ${item.volumeInfo.title}`}
                   >
                     <ResultCard
                       selectList={
-                        selectList[key]
+                        selectList[title]
                           ? selectList
                           : {
-                              [key]: {
-                                title: results[key][0].volumeInfo.title,
-                                authors: results[key][0].volumeInfo.authors,
+                              [title]: {
+                                title: results[title][0].volumeInfo.title,
+                                authors: results[title][0].volumeInfo.authors,
                               },
                             }
                       }
                       updateSelectList={updateSelectList}
-                      searchWord={key}
+                      searchWord={title}
                       title={item.volumeInfo.title}
                       imageUrl={
                         item.volumeInfo.imageLinks

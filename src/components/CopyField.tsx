@@ -6,12 +6,13 @@ function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />
 }
 
-export const CopyField = ({ selectList }) => {
+export const CopyField = ({ titles, selectList }) => {
   const field = useRef<HTMLTextAreaElement>(null)
   const getList = () => {
     let list = ''
-    Object.keys(selectList).forEach((key) => {
-      list += key + '\t' + selectList[key].authors + '\n'
+    titles.forEach((title: string) => {
+      const authors = title in selectList ? selectList[title].authors : '-'
+      list += title + '\t' + authors + '\n'
     })
     return list
   }
@@ -35,10 +36,14 @@ export const CopyField = ({ selectList }) => {
       </Snackbar>
       <TextField
         inputRef={field}
-        style={{ width: '50%' }}
+        style={{
+          width: '50%',
+          display:
+            Object.keys(selectList).length === 0 ? 'none' : 'inline-flex',
+        }}
         defaultValue={fieldValue}
         multiline
-        rows={10}
+        rows={Object.keys(selectList).length === 0 ? 1 : 10}
         disabled
         variant="outlined"
         onClick={handleOnClick}
