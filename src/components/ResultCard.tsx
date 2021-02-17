@@ -49,7 +49,7 @@ export interface Props {
 }
 
 export interface SelectList {
-  [key: string]: string
+  [key: string]: { title: string; authors: string[] }
 }
 
 export const ResultCard: React.FC<Props> = ({
@@ -70,7 +70,9 @@ export const ResultCard: React.FC<Props> = ({
   return (
     <Card
       className={classes.root}
-      onClick={() => updateSelectList({ ...selectList, [searchWord]: title })}
+      onClick={() =>
+        updateSelectList({ ...selectList, [searchWord]: { title, authors } })
+      }
     >
       <Tooltip title={title}>
         <div>
@@ -79,7 +81,7 @@ export const ResultCard: React.FC<Props> = ({
               <Checkbox
                 icon={<CircleUnchecked />}
                 checkedIcon={<CircleChecked />}
-                checked={selectList[searchWord] === title}
+                checked={selectList[searchWord].title === title}
               />
             }
             subheader={Array.isArray(authors) ? authors.join(',') : '-'}

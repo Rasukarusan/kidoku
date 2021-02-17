@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Layout } from '@/components/Layout'
 import { makeStyles } from '@material-ui/core/styles'
-import { Typography } from '@material-ui/core'
+import { Typography, TextField } from '@material-ui/core'
 import { InputField } from '@/components/InputField'
 import { Header } from '@/components/Header'
 import { ResultArea, Results } from '@/components/ResultArea'
@@ -20,8 +20,21 @@ const IndexPage = () => {
   const classes = useStyles()
   const title = '著者検索'
 
+  const updateResults = (newResults: Results) => {
+    setResults(newResults)
+    setSelectList({})
+  }
+
   const updateSelectList = (newSelectList: SelectList) => {
     setSelectList(newSelectList)
+  }
+
+  const getList = () => {
+    let list = ''
+    Object.keys(selectList).forEach((key) => {
+      list += key + '\t' + selectList[key].authors + '\n'
+    })
+    return list
   }
 
   return (
@@ -31,7 +44,15 @@ const IndexPage = () => {
         {title}
       </Typography>
 
-      <InputField setResults={setResults} />
+      <InputField setResults={updateResults} />
+      <TextField
+        style={{ width: '50%' }}
+        defaultValue={getList()}
+        multiline
+        rows={10}
+        disabled
+        variant="outlined"
+      />
       <ResultArea
         results={results}
         selectList={selectList}
