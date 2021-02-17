@@ -1,30 +1,42 @@
 import { useState } from 'react'
 import { Layout } from '@/components/Layout'
 import { makeStyles } from '@material-ui/core/styles'
+import { Typography } from '@material-ui/core'
 import { InputField } from '@/components/InputField'
 import { Header } from '@/components/Header'
 import { ResultArea, Results } from '@/components/ResultArea'
+import { SelectList } from '@/components/ResultCard'
 
 const useStyles = makeStyles({
   title: {
     margin: 10,
-    lineHeight: 1.15,
-    fontSize: '4rem',
+    fontWeight: 'bold',
   },
 })
 
 const IndexPage = () => {
-  const [selected, setSelected] = useState({})
+  const [selectList, setSelectList] = useState<SelectList>({})
   const [results, setResults] = useState<Results>({})
   const classes = useStyles()
-  const title = '著者検索👌'
+  const title = '著者検索'
+
+  const updateSelectList = (newSelectList: SelectList) => {
+    setSelectList(newSelectList)
+  }
+
   return (
     <Layout>
       <Header title={title} />
-      <h1 className={classes.title}>{title}</h1>
+      <Typography variant="h2" className={classes.title}>
+        {title}
+      </Typography>
+
       <InputField setResults={setResults} />
-      <h1 className={classes.title}>結果</h1>
-      <ResultArea results={results} />
+      <ResultArea
+        results={results}
+        selectList={selectList}
+        updateSelectList={updateSelectList}
+      />
     </Layout>
   )
 }
