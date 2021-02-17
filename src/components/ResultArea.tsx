@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { ResultCard } from '@/components/ResultCard'
+import { ResultCard, SelectList } from '@/components/ResultCard'
 import { Item } from '@/components/InputField'
 
 const useStyles = makeStyles({
@@ -22,7 +22,13 @@ export interface Results {
   [key: string]: Item[]
 }
 
-export const ResultArea = ({
+interface Props {
+  results: Results
+  titles: string[]
+  selectList: SelectList
+  updateSelectList: (newSelectList: SelectList) => void
+}
+export const ResultArea: React.FC<Props> = ({
   results,
   titles,
   selectList,
