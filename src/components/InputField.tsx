@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { TextField } from '@material-ui/core'
+import { useState } from 'react'
 
 interface ImageLinks {
   smallThumbnail: string
@@ -40,6 +41,7 @@ export interface Item {
 }
 
 export const InputField = ({ setResults }) => {
+  const [timer, setTimer] = useState(null)
   const getBook = async (title: string): Promise<Item[]> => {
     return axios
       .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
@@ -48,19 +50,24 @@ export const InputField = ({ setResults }) => {
 
   const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const titles = event.target.value.split('\n').filter((v) => v !== '')
-    const results = {}
-    await Promise.all(
-      titles.map(async (title) => {
-        results[title] = await getBook(title)
-      })
-    )
-    setResults(results)
+    if (timer) clearTimeout(timer)
+    const t = setTimeout(async () => {
+      const results = {}
+      await Promise.all(
+        titles.map(async (title) => {
+          results[title] = await getBook(title)
+        })
+      )
+      setResults(results)
+    }, 200)
+    setTimer(t)
   }
 
   const handleOnBlur = async (event: React.FocusEvent<HTMLInputElement>) => {}
 
   return (
     <TextField
+      style={{ width: '50%' }}
       label="本のタイトルを1行ずつ入力"
       multiline
       fullWidth
