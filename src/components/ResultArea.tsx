@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { ResultCard } from '@/components/ResultCard'
@@ -24,13 +25,22 @@ export interface Results {
 export const ResultArea = ({ results, selectList, updateSelectList }) => {
   const classes = useStyles()
 
+  useEffect(() => {
+    Object.keys(results).map((key) => {
+      if (!selectList[key]) {
+        updateSelectList({
+          ...selectList,
+          [key]: {
+            title: results[key][0].volumeInfo.title,
+            authors: results[key][0].volumeInfo.authors,
+          },
+        })
+      }
+    })
+  })
   return (
     <div>
       {Object.keys(results).map((key, i) => {
-        if (!selectList[key]) {
-          console.log(selectList)
-          selectList[key] = results[key][0].volumeInfo.title
-        }
         return (
           <div key={`${i}-${key}`}>
             <Typography
@@ -41,23 +51,36 @@ export const ResultArea = ({ results, selectList, updateSelectList }) => {
               『{key}』の検索結果
             </Typography>
             <div className={classes.resultArea}>
-              {results[key].map((item: Item) => (
-                <div className={classes.resultItem} key={item.volumeInfo.title}>
-                  <ResultCard
-                    selectList={selectList}
-                    updateSelectList={updateSelectList}
-                    searchWord={key}
-                    title={item.volumeInfo.title}
-                    imageUrl={
-                      item.volumeInfo.imageLinks
-                        ? item.volumeInfo.imageLinks.thumbnail
-                        : '/no-image.png'
-                    }
-                    description={item.volumeInfo.description}
-                    authors={item.volumeInfo.authors}
-                  />
-                </div>
-              ))}
+              {Array.isArray(results[key]) &&
+                results[key].map((item: Item) => (
+                  <div
+                    className={classes.resultItem}
+                    key={item.volumeInfo.title}
+                  >
+                    <ResultCard
+                      selectList={
+                        selectList[key]
+                          ? selectList
+                          : {
+                              [key]: {
+                                title: results[key][0].volumeInfo.title,
+                                authors: results[key][0].volumeInfo.authors,
+                              },
+                            }
+                      }
+                      updateSelectList={updateSelectList}
+                      searchWord={key}
+                      title={item.volumeInfo.title}
+                      imageUrl={
+                        item.volumeInfo.imageLinks
+                          ? item.volumeInfo.imageLinks.thumbnail
+                          : '/no-image.png'
+                      }
+                      description={item.volumeInfo.description}
+                      authors={item.volumeInfo.authors}
+                    />
+                  </div>
+                ))}
             </div>
           </div>
         )
