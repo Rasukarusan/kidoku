@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Layout } from '@/components/Layout'
 import { makeStyles } from '@material-ui/core/styles'
-import { Typography } from '@material-ui/core'
+import { Typography, Grid } from '@material-ui/core'
 import { InputField } from '@/components/InputField'
 import { Header } from '@/components/Header'
 import { ResultArea, Results } from '@/components/ResultArea'
@@ -41,8 +41,15 @@ const IndexPage = () => {
       <Typography variant="h2" className={classes.title}>
         {title}
       </Typography>
-      <InputField setTitles={updateTitles} setResults={updateResults} />
-      <CopyField titles={titles} selectList={selectList} />
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <InputField setTitles={updateTitles} setResults={updateResults} />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <CopyField titles={titles} selectList={selectList} />
+        </Grid>
+      </Grid>
+
       <ResultArea
         results={results}
         titles={titles}
