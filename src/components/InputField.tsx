@@ -71,7 +71,6 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
 
   return (
     <TextField
-      style={{ width: '50%' }}
       label="本のタイトルを1行ずつ入力"
       multiline
       fullWidth

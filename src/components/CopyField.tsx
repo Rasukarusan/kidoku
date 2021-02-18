@@ -42,10 +42,10 @@ export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
       <TextField
         inputRef={field}
         style={{
-          width: '50%',
           display:
             Object.keys(selectList).length === 0 ? 'none' : 'inline-flex',
         }}
+        fullWidth
         defaultValue={fieldValue}
         multiline
         rows={Object.keys(selectList).length === 0 ? 1 : 10}
