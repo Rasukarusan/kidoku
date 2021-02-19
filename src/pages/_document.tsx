@@ -5,7 +5,7 @@ import { ServerStyleSheets } from '@material-ui/core/styles'
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html lang="en">
+      <Html lang="ja">
         <Head>
           {/* PWA primary color */}
           <meta name="theme-color" />
@@ -13,6 +13,7 @@ export default class MyDocument extends Document {
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           />
+          <link rel="stylesheet" href="/fonts/fonts.css" />
         </Head>
         <body>
           <Main />
