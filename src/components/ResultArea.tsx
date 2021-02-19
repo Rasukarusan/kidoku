@@ -44,6 +44,7 @@ export const ResultArea: React.FC<Props> = ({
           [key]: {
             title: results[key][0].volumeInfo.title,
             authors: results[key][0].volumeInfo.authors,
+            categories: results[key][0].volumeInfo.categories,
           },
         })
       }
@@ -76,6 +77,8 @@ export const ResultArea: React.FC<Props> = ({
                               [title]: {
                                 title: results[title][0].volumeInfo.title,
                                 authors: results[title][0].volumeInfo.authors,
+                                categories:
+                                  results[title][0].volumeInfo.categories,
                               },
                             }
                       }
@@ -89,6 +92,7 @@ export const ResultArea: React.FC<Props> = ({
                       }
                       description={item.volumeInfo.description}
                       authors={item.volumeInfo.authors}
+                      categories={item.volumeInfo.categories}
                     />
                   </div>
                 ))}
