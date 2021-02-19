@@ -46,10 +46,11 @@ export interface Props {
   description?: string
   imageUrl: string
   authors?: string[]
+  categories?: string[]
 }
 
 export interface SelectList {
-  [key: string]: { title: string; authors: string[] }
+  [key: string]: { title: string; authors: string[], categories: string[] }
 }
 
 export const ResultCard: React.FC<Props> = ({
@@ -60,6 +61,7 @@ export const ResultCard: React.FC<Props> = ({
   description,
   imageUrl,
   authors,
+  categories,
 }) => {
   const classes = useStyles()
   const truncate = (str: string, len: number) => {
@@ -71,7 +73,7 @@ export const ResultCard: React.FC<Props> = ({
     <Card
       className={classes.root}
       onClick={() =>
-        updateSelectList({ ...selectList, [searchWord]: { title, authors } })
+        updateSelectList({ ...selectList, [searchWord]: { title, authors, categories } })
       }
     >
       <Tooltip title={title}>
