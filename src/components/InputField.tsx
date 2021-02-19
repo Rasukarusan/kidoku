@@ -2,6 +2,15 @@ import axios from 'axios'
 import { TextField } from '@material-ui/core'
 import { useState } from 'react'
 import { Results } from './ResultArea'
+import { makeStyles } from '@material-ui/core/styles'
+
+const useStyles = makeStyles({
+  root: {
+    '& label': {
+      fontFamily: 'Stick-Regular'
+    },
+  }
+})
 
 interface ImageLinks {
   smallThumbnail: string
@@ -46,6 +55,7 @@ interface Props {
   setResults: (newResults: Results) => void
 }
 export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
+  const classes = useStyles()
   const [timer, setTimer] = useState(null)
   const search = async (title: string): Promise<Item[]> => {
     return axios
@@ -71,6 +81,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
 
   return (
     <TextField
+      className={classes.root}
       label="本のタイトルを1行ずつ入力"
       multiline
       fullWidth

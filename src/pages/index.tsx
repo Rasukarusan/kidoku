@@ -11,7 +11,7 @@ import { CopyField } from '@/components/CopyField'
 const useStyles = makeStyles({
   title: {
     margin: 10,
-    fontWeight: 'bold',
+    fontFamily: 'Stick-Regular',
   },
 })
 
@@ -20,7 +20,7 @@ const IndexPage = () => {
   const [selectList, setSelectList] = useState<SelectList>({})
   const [results, setResults] = useState<Results>({})
   const classes = useStyles()
-  const title = '著者検索'
+  const title = '著者検索 neo'
 
   const updateTitles = (newTitles: string[]) => {
     setTitles(newTitles)
