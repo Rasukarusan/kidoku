@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
-import { Typography } from '@material-ui/core'
+import { Typography, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { ResultCard, SelectList } from '@/components/ResultCard'
 import { Item } from '@/components/InputField'
+import { OpenInNew } from '@material-ui/icons'
 
 const useStyles = makeStyles({
   resultArea: {
@@ -15,6 +16,9 @@ const useStyles = makeStyles({
   resultTitle: {
     paddingTop: 20,
     paddingBottom: 10,
+    display: 'flex',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
 })
 
@@ -55,13 +59,20 @@ export const ResultArea: React.FC<Props> = ({
       {titles.map((title: string, i: number) => {
         return (
           <div key={`${i}-${title}`}>
-            <Typography
-              color="primary"
-              variant="h5"
-              className={classes.resultTitle}
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href={`https://www.amazon.co.jp/s?k=${title}`}
             >
-              『{title}』の検索結果
-            </Typography>
+              <Typography
+                color="primary"
+                variant="h5"
+                className={classes.resultTitle}
+              >
+                『{title}』の検索結果
+                <OpenInNew style={{ paddingLeft: 5 }} />
+              </Typography>
+            </Link>
             <div className={classes.resultArea}>
               {Array.isArray(results[title]) &&
                 results[title].map((item: Item, index: number) => (

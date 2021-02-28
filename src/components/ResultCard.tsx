@@ -29,9 +29,6 @@ const useStyles = makeStyles((theme: Theme) =>
     subheader: {
       color: theme.palette.primary.light,
     },
-    header: {
-      // cursor: 'pointer',
-    },
     media: {
       height: 150,
       objectFit: 'contain',
@@ -50,7 +47,7 @@ export interface Props {
 }
 
 export interface SelectList {
-  [key: string]: { title: string; authors: string[], categories: string[] }
+  [key: string]: { title: string; authors: string[]; categories: string[] }
 }
 
 export const ResultCard: React.FC<Props> = ({
@@ -73,7 +70,10 @@ export const ResultCard: React.FC<Props> = ({
     <Card
       className={classes.root}
       onClick={() =>
-        updateSelectList({ ...selectList, [searchWord]: { title, authors, categories } })
+        updateSelectList({
+          ...selectList,
+          [searchWord]: { title, authors, categories },
+        })
       }
     >
       <Tooltip title={title}>
@@ -87,7 +87,6 @@ export const ResultCard: React.FC<Props> = ({
               />
             }
             subheader={Array.isArray(authors) ? authors.join(',') : '-'}
-            className={classes.header}
             title={title}
             classes={{ title: classes.title, subheader: classes.subheader }}
           />
