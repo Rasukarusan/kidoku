@@ -16,9 +16,10 @@ export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
   const getList = () => {
     let list = ''
     titles.forEach((title: string) => {
+      const formalTitle = title in selectList ? selectList[title].title : '-'
       const authors = title in selectList ? selectList[title].authors : '-'
       const categories = title in selectList ? selectList[title].categories : '-'
-      list += title + '\t' + authors + '\t' + categories + '\n'
+      list += formalTitle + '\t' + authors + '\t' + categories + '\n'
     })
     return list
   }
