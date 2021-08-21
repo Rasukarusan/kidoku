@@ -2,16 +2,26 @@ import { useState, useRef } from 'react'
 import { TextField, Snackbar } from '@material-ui/core'
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert'
 import { SelectList } from '@/components/ResultCard'
+import { makeStyles } from '@material-ui/core/styles'
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />
 }
+
+const useStyles = makeStyles({
+  root: {
+    '& label': {
+      fontFamily: 'Stick-Regular',
+    },
+  },
+})
 
 interface Props {
   titles: string[]
   selectList: SelectList
 }
 export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
+  const classes = useStyles()
   const field = useRef<HTMLTextAreaElement>(null)
   const getList = () => {
     let list = ''
@@ -43,6 +53,8 @@ export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
         </Alert>
       </Snackbar>
       <TextField
+        className={classes.root}
+        label="クリックしてコピー"
         inputRef={field}
         style={{
           display:
