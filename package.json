@@ -11,7 +11,6 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
     "axios": "^0.27.2",
-    "eslint-plugin-react": "^7.20.6",
     "next": "^12.0.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -27,6 +26,7 @@
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.30.0",
     "prettier": "^2.0.5"
   }
 }
