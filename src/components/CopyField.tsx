@@ -63,7 +63,7 @@ export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
         fullWidth
         defaultValue={fieldValue}
         multiline
-        rows={Object.keys(selectList).length === 0 ? 1 : 10}
+        minRows={Object.keys(selectList).length === 0 ? 1 : 10}
         disabled
         variant="outlined"
         onClick={handleOnClick}

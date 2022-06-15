@@ -85,7 +85,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
       label="本のタイトルを1行ずつ入力"
       multiline
       fullWidth
-      rows={10}
+      minRows={10}
       variant="outlined"
       onChange={handleOnChange}
     />
