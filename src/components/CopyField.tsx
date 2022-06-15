@@ -45,7 +45,7 @@ export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
     <>
       <Snackbar
         open={open}
-        autoHideDuration={1000}
+        autoHideDuration={5000}
         onClose={() => setOpen(false)}
       >
         <Alert onClose={() => setOpen(false)} severity="success">
