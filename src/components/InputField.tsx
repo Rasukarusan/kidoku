@@ -25,7 +25,7 @@ interface VolumeInfo {
   contentVersion: string
   description?: string
   imageLinks?: ImageLinks
-  industryIdentifiers: any
+  industryIdentifiers: Record<string, string>
   infoLink: string
   language: string
   maturityRating: string
@@ -33,19 +33,19 @@ interface VolumeInfo {
   printType: string
   publishedDate: string
   publisher: string
-  readingModes: any
+  readingModes: Record<string, string>
   subtitle: string
   title: string
 }
 
 export interface Item {
-  // TODO: volumeInfo以外は使わないのでanyにしておく
-  accessInfo: any
+  // TODO: volumeInfo以外は使わないのでRecord<string, string>にしておく
+  accessInfo: Record<string, string>
   etag: string
   id: string
   kind: string
-  saleInfo: any
-  searchInfo: any
+  saleInfo: Record<string, string>
+  searchInfo: Record<string, string>
   selfLink: string
   volumeInfo: VolumeInfo
 }
