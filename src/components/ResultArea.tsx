@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { Typography, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { ResultCard, SelectList } from '@/components/ResultCard'
-import { Item } from '@/components/InputField'
+import { Item } from './types'
 import { OpenInNew } from '@material-ui/icons'
 
 const useStyles = makeStyles({
