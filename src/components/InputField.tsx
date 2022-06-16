@@ -24,6 +24,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   const [timer, setTimer] = useState(null)
   const [options, setOptions] = useState([])
   const [value, setValue] = useState('')
+  const [suggestWord, setSuggestWord] = useState('')
   const search = async (title: string): Promise<Item[]> => {
     return axios
       .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
@@ -47,7 +48,8 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
     const titles = event.target.value.split('\n').filter((v) => v !== '')
     const lastTitle = titles.slice(-1)[0]
     suggest(lastTitle)
-    setValue(lastTitle)
+    setSuggestWord(lastTitle)
+    setValue(event.target.value)
     if (timer) clearTimeout(timer)
     const newTimer = setTimeout(async () => {
       const results = {}
@@ -72,9 +74,18 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
         minRows={10}
         variant="outlined"
         onChange={handleOnChange}
+        value={value}
       />
       <Autocomplete
-        value={value}
+        open={true}
+        value={suggestWord}
+        onChange={(event, newValue) => {
+          const values = value
+            .split('\n')
+            .filter((v) => v !== '')
+            .slice(0, -1)
+          setValue([...values, newValue].join('\n'))
+        }}
         onInputChange={(event, newInputValue) => {
           console.log('hoge', newInputValue)
           suggest(newInputValue)
