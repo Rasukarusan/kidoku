@@ -37,7 +37,6 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
       `https://completion.amazon.co.jp/api/2017/suggestions?limit=11&prefix=${keyword}&suggestion-type=WIDGET&suggestion-type=KEYWORD&page-type=Gateway&alias=aps&site-variant=desktop&version=3&event=onKeyPress&wc=&lop=ja_JP&avg-ks-time=995&fb=1&plain-mid=6&client-info=amazon-search-ui`
     )
     axios.get(url).then((res) => {
-      console.log(res.data.suggestions)
       const suggestions = res.data.suggestions.map(
         (suggestion) => suggestion.value
       )
@@ -86,7 +85,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
             .split('\n')
             .filter((v) => v !== '')
             .slice(0, -1)
-          setValue([...values, `${newValue}\n`].join('\n'))
+          setValue([...values, newValue].join('\n'))
           setOptions([])
           setOpenSuggest(false)
         }}
