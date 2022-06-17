@@ -47,10 +47,11 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
 
   const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const titles = event.target.value.split('\n').filter((v) => v !== '')
-    const lastTitle = titles.slice(-1)[0]
+    const lastTitle = event.target.value.split('\n').slice(-1)[0]
     suggest(lastTitle)
     setSuggestWord(lastTitle)
     setValue(event.target.value)
+
     if (timer) clearTimeout(timer)
     const newTimer = setTimeout(async () => {
       const results = {}
