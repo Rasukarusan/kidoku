@@ -25,6 +25,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   const [options, setOptions] = useState([])
   const [value, setValue] = useState('')
   const [suggestWord, setSuggestWord] = useState('')
+  const [openSuggest, setOpenSuggest] = useState(false)
   const search = async (title: string): Promise<Item[]> => {
     return axios
       .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
@@ -41,6 +42,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
         (suggestion) => suggestion.value
       )
       setOptions(suggestions)
+      setOpenSuggest(suggestions && suggestions.length > 0)
     })
   }
 
@@ -77,18 +79,19 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
         value={value}
       />
       <Autocomplete
-        open={true}
+        open={openSuggest}
         value={suggestWord}
         onChange={(event, newValue) => {
           const values = value
             .split('\n')
             .filter((v) => v !== '')
             .slice(0, -1)
-          setValue([...values, newValue].join('\n'))
+          setValue([...values, `${newValue}\n`].join('\n'))
+          setOptions([])
+          setOpenSuggest(false)
         }}
         onInputChange={(event, newInputValue) => {
-          console.log('hoge', newInputValue)
-          suggest(newInputValue)
+          console.log('change!', newInputValue)
         }}
         id="controllable-states-demo"
         options={options}
