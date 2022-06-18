@@ -107,6 +107,8 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
         value={value}
       />
       <Autocomplete
+        id="suggestion"
+        freeSolo={true}
         open={openSuggest}
         value={suggestWord}
         onChange={(event, newValue) => {
@@ -117,11 +119,8 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
           setValue([...values, newValue].join('\n'))
           setOptions([])
           setOpenSuggest(false)
+          highlightIndex = -1
         }}
-        onInputChange={(event, newInputValue) => {
-          console.log('change!', newInputValue)
-        }}
-        id="controllable-states-demo"
         options={options}
         filterOptions={(options) => options}
         renderInput={(params) => (
