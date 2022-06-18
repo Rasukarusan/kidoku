@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Item } from './types'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import { useKey, usePrevious } from 'react-use'
+import { getSuggestions, highlightSuggest, searchBooks } from './util'
 
 const useStyles = makeStyles({
   root: {
@@ -34,35 +35,13 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   useKey('ArrowDown', () => setIndex((index) => index + 1))
   useKey('ArrowUp', () => setIndex((index) => index - 1))
   useEffect(() => {
-    const prefixId = 'suggestion-option-'
-    const current = document.getElementById(`${prefixId}-${index}`)
-    const prev = document.getElementById(`${prefixId}-${prevIndex}`)
-    if (current) {
-      current.dataset.focus = 'true'
-    }
-    if (prev) {
-      prev.dataset.focus = 'false'
-    }
+    highlightSuggest(index, prevIndex)
   }, [index])
 
-  const search = async (title: string): Promise<Item[]> => {
-    return axios
-      .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
-      .then((res) => res.data.items)
-  }
-
   const suggest = async (keyword: string) => {
-    console.log('suggest')
-    const url = encodeURI(
-      `https://completion.amazon.co.jp/api/2017/suggestions?limit=11&prefix=${keyword}&suggestion-type=WIDGET&suggestion-type=KEYWORD&page-type=Gateway&alias=aps&site-variant=desktop&version=3&event=onKeyPress&wc=&lop=ja_JP&avg-ks-time=995&fb=1&plain-mid=6&client-info=amazon-search-ui`
-    )
-    axios.get(url).then((res) => {
-      const suggestions = res.data.suggestions.map(
-        (suggestion) => suggestion.value
-      )
-      setOptions(suggestions)
-      setOpenSuggest(suggestions && suggestions.length > 0)
-    })
+    const suggestions = await getSuggestions(keyword)
+    setOptions(suggestions)
+    setOpenSuggest(suggestions && suggestions.length > 0)
   }
 
   const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +56,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
       const results = {}
       await Promise.all(
         titles.map(async (title) => {
-          results[title] = await search(title)
+          results[title] = await searchBooks(title)
         })
       )
       setResults(results)
