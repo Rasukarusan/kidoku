@@ -5,7 +5,7 @@ import { Results } from './ResultArea'
 import { makeStyles } from '@material-ui/core/styles'
 import { Item } from './types'
 import Autocomplete from '@material-ui/lab/Autocomplete'
-import { useKey } from 'react-use'
+import { useKey, usePrevious } from 'react-use'
 
 const useStyles = makeStyles({
   root: {
@@ -21,8 +21,6 @@ interface Props {
 }
 
 export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
-  useKey('ArrowDown', () => keyEvent('down'))
-  useKey('ArrowUp', () => keyEvent('up'))
   const classes = useStyles()
   const [timer, setTimer] = useState(null)
   const [options, setOptions] = useState([])
@@ -30,28 +28,22 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   const [suggestWord, setSuggestWord] = useState('')
   const [openSuggest, setOpenSuggest] = useState(false)
 
-  // FIXME: useKeyで指定した関数内でstateの更新ができない。
-  let highlightIndex = -1
-  const keyEvent = (key: string) => {
-    const prevIndex = highlightIndex
-    highlightIndex = key === 'down' ? highlightIndex + 1 : highlightIndex - 1
-    if (highlightIndex < -1) {
-      highlightIndex = -1
+  // 選択中のサジェストのインデックス
+  const [index, setIndex] = useState(-1)
+  const prevIndex = usePrevious(index)
+  useKey('ArrowDown', () => setIndex((index) => index + 1))
+  useKey('ArrowUp', () => setIndex((index) => index - 1))
+  useEffect(() => {
+    const prefixId = 'suggestion-option-'
+    const current = document.getElementById(`${prefixId}-${index}`)
+    const prev = document.getElementById(`${prefixId}-${prevIndex}`)
+    if (current) {
+      current.dataset.focus = 'true'
     }
-    console.log({ highlightIndex })
-    const suggestion = document.getElementById(
-      `suggestion-option-${highlightIndex}`
-    )
-    const prevSuggestion = document.getElementById(
-      `suggestion-option-${prevIndex}`
-    )
-    if (suggestion) {
-      suggestion.dataset.focus = 'true'
+    if (prev) {
+      prev.dataset.focus = 'false'
     }
-    if (prevSuggestion) {
-      prevSuggestion.dataset.focus = 'false'
-    }
-  }
+  }, [index])
 
   const search = async (title: string): Promise<Item[]> => {
     return axios
@@ -96,6 +88,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
 
   return (
     <>
+      <div>{index}</div>
       <TextField
         className={classes.root}
         label="本のタイトルを1行ずつ入力"
@@ -119,7 +112,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
           setValue([...values, newValue].join('\n'))
           setOptions([])
           setOpenSuggest(false)
-          highlightIndex = -1
+          setIndex(-1)
         }}
         options={options}
         filterOptions={(options) => options}
