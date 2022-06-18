@@ -1,10 +1,11 @@
 import axios from 'axios'
 import { TextField } from '@material-ui/core'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Results } from './ResultArea'
 import { makeStyles } from '@material-ui/core/styles'
 import { Item } from './types'
 import Autocomplete from '@material-ui/lab/Autocomplete'
+import { useKey } from 'react-use'
 
 const useStyles = makeStyles({
   root: {
@@ -20,19 +21,45 @@ interface Props {
 }
 
 export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
+  useKey('ArrowDown', () => keyEvent('down'))
+  useKey('ArrowUp', () => keyEvent('up'))
   const classes = useStyles()
   const [timer, setTimer] = useState(null)
   const [options, setOptions] = useState([])
   const [value, setValue] = useState('')
   const [suggestWord, setSuggestWord] = useState('')
   const [openSuggest, setOpenSuggest] = useState(false)
+  let highlightIndex = -1
+
+  const keyEvent = (key: string) => {
+    const prevIndex = highlightIndex
+    highlightIndex = key === 'down' ? highlightIndex + 1 : highlightIndex - 1
+    if (highlightIndex < -1) {
+      highlightIndex = -1
+    }
+    console.log({ highlightIndex })
+    const suggestion = document.getElementById(
+      `suggestion-option-${highlightIndex}`
+    )
+    const prevSuggestion = document.getElementById(
+      `suggestion-option-${prevIndex}`
+    )
+    if (suggestion) {
+      suggestion.dataset.focus = 'true'
+    }
+    if (prevSuggestion) {
+      prevSuggestion.dataset.focus = 'false'
+    }
+  }
+
   const search = async (title: string): Promise<Item[]> => {
     return axios
       .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
       .then((res) => res.data.items)
   }
 
-  const suggest = (keyword: string) => {
+  const suggest = async (keyword: string) => {
+    console.log('suggest')
     const url = encodeURI(
       `https://completion.amazon.co.jp/api/2017/suggestions?limit=11&prefix=${keyword}&suggestion-type=WIDGET&suggestion-type=KEYWORD&page-type=Gateway&alias=aps&site-variant=desktop&version=3&event=onKeyPress&wc=&lop=ja_JP&avg-ks-time=995&fb=1&plain-mid=6&client-info=amazon-search-ui`
     )
