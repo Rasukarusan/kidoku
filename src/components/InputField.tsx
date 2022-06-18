@@ -29,8 +29,9 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   const [value, setValue] = useState('')
   const [suggestWord, setSuggestWord] = useState('')
   const [openSuggest, setOpenSuggest] = useState(false)
-  let highlightIndex = -1
 
+  // FIXME: useKeyで指定した関数内でstateの更新ができない。
+  let highlightIndex = -1
   const keyEvent = (key: string) => {
     const prevIndex = highlightIndex
     highlightIndex = key === 'down' ? highlightIndex + 1 : highlightIndex - 1
