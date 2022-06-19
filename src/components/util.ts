@@ -21,18 +21,3 @@ export const getSuggestions = async (keyword: string) => {
     .get(url)
     .then((res) => res.data.suggestions.map((suggestion) => suggestion.value))
 }
-
-/**
- * サジェストハイライト
- */
-export const highlightSuggest = (index: number, prevIndex: number) => {
-  const prefixId = 'suggestion-option'
-  const current = document.getElementById(`${prefixId}-${index}`)
-  const prev = document.getElementById(`${prefixId}-${prevIndex}`)
-  if (current) {
-    current.dataset.focus = 'true'
-  }
-  if (prev) {
-    prev.dataset.focus = 'false'
-  }
-}
