@@ -7,10 +7,22 @@ import { useKey } from 'react-use'
 import { getSuggestions, searchBooks } from './util'
 
 const useStyles = makeStyles({
-  root: {
+  input: {
     '& label': {
       fontFamily: 'Stick-Regular',
     },
+  },
+  suggestTextField: {
+    '& .MuiInput-underline:before': {
+      borderBottomColor: 'transparent',
+    },
+    '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+      borderBottomColor: 'transparent',
+    },
+  },
+  suggestInput: {
+    color: 'transparent',
+    marginTop: '-35px',
   },
 })
 
@@ -94,7 +106,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
     <>
       <TextField
         inputRef={inputRef}
-        className={classes.root}
+        className={classes.input}
         label="本のタイトルを1行ずつ入力"
         multiline
         fullWidth
@@ -119,15 +131,27 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
         }}
         options={options}
         filterOptions={(options) => options}
+        closeIcon={<></>}
         renderInput={(params) => (
-          <div>
-            <TextField
-              {...params}
-              variant="outlined"
-              inputRef={suggestRef}
-              onChange={onSuggestChange}
-            />
-          </div>
+          <TextField
+            {...params}
+            className={classes.suggestTextField}
+            defaultValue="hoge"
+            inputRef={suggestRef}
+            onChange={onSuggestChange}
+            inputProps={{
+              ...params.inputProps,
+              className: classes.suggestInput,
+              underline: {
+                '&&&:before': {
+                  borderBottom: 'none',
+                },
+                '&&:after': {
+                  borderBottom: 'none',
+                },
+              },
+            }}
+          />
         )}
       />
     </>
