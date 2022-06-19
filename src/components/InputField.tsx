@@ -49,7 +49,10 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
     inputRef.current.focus()
   })
 
-  const suggest = async (keyword: string) => {
+  /**
+   * サジェスト取得しポップアップを表示状態にする
+   */
+  const getSuggest = async (keyword: string) => {
     const suggestions = await getSuggestions(keyword)
     setOptions(suggestions)
     setOpenSuggest(suggestions && suggestions.length > 0)
@@ -58,24 +61,9 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const titles = event.target.value.split('\n').filter((v) => v !== '')
     const lastTitle = event.target.value.split('\n').slice(-1)[0]
-    console.log(lastTitle)
 
-    // ENTERを押下した場合
-    const suggestPopup = document.getElementById('suggestion-popup')
-    if (suggestPopup && lastTitle === '') {
-      document.querySelectorAll('.MuiAutocomplete-option').forEach((item) => {
-        const option = document.getElementById(item.id)
-        if (option.dataset.focus === 'true') {
-          const values = titles.slice(0, -1)
-          setValue([...values, item.textContent].join('\n'))
-          setOptions([])
-          setOpenSuggest(false)
-        }
-      })
-      return
-    }
-
-    suggest(lastTitle)
+    getSuggest(lastTitle)
+    // タイトル入力とサジェストのテキストフィールドを同期
     setSuggestWord(lastTitle)
     setValue(event.target.value)
 
