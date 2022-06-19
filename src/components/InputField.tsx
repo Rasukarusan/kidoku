@@ -1,12 +1,10 @@
-import axios from 'axios'
 import { TextField } from '@material-ui/core'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Results } from './ResultArea'
 import { makeStyles } from '@material-ui/core/styles'
-import { Item } from './types'
 import Autocomplete from '@material-ui/lab/Autocomplete'
-import { useKey, usePrevious } from 'react-use'
-import { getSuggestions, highlightSuggest, searchBooks } from './util'
+import { useKey } from 'react-use'
+import { getSuggestions, searchBooks } from './util'
 
 const useStyles = makeStyles({
   root: {
@@ -28,15 +26,28 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
   const [value, setValue] = useState('')
   const [suggestWord, setSuggestWord] = useState('')
   const [openSuggest, setOpenSuggest] = useState(false)
+  const inputRef = useRef(null)
+  const suggestRef = useRef(null)
 
   // 選択中のサジェストのインデックス
-  const [index, setIndex] = useState(-1)
-  const prevIndex = usePrevious(index)
-  useKey('ArrowDown', () => setIndex((index) => index + 1))
-  useKey('ArrowUp', () => setIndex((index) => index - 1))
-  useEffect(() => {
-    highlightSuggest(index, prevIndex)
-  }, [index])
+  useKey('ArrowDown', () => {
+    const suggestPopup = document.getElementById('suggestion-popup')
+    if (suggestPopup) {
+      suggestRef.current.focus()
+      inputRef.current.blur()
+    }
+  })
+  useKey('ArrowUp', () => {
+    const suggestPopup = document.getElementById('suggestion-popup')
+    if (suggestPopup) {
+      suggestRef.current.focus()
+      inputRef.current.blur()
+    }
+  })
+
+  useKey('Enter', () => {
+    inputRef.current.focus()
+  })
 
   const suggest = async (keyword: string) => {
     const suggestions = await getSuggestions(keyword)
@@ -59,7 +70,6 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
           setValue([...values, item.textContent].join('\n'))
           setOptions([])
           setOpenSuggest(false)
-          setIndex(-1)
         }
       })
       return
@@ -83,10 +93,19 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
     setTimer(newTimer)
   }
 
+  /**
+   * サジェスト選択中に単語を全部消したらフォーカスをもとに戻す
+   */
+  const onSuggestChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value === '') {
+      inputRef.current.focus()
+    }
+  }
+
   return (
     <>
-      <div>{index}</div>
       <TextField
+        inputRef={inputRef}
         className={classes.root}
         label="本のタイトルを1行ずつ入力"
         multiline
@@ -109,13 +128,17 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
           setValue([...values, newValue].join('\n'))
           setOptions([])
           setOpenSuggest(false)
-          setIndex(-1)
         }}
         options={options}
         filterOptions={(options) => options}
         renderInput={(params) => (
           <div>
-            <TextField {...params} variant="outlined" />
+            <TextField
+              {...params}
+              variant="outlined"
+              inputRef={suggestRef}
+              onChange={onSuggestChange}
+            />
           </div>
         )}
       />
