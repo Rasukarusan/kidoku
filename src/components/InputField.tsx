@@ -136,20 +136,11 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
           <TextField
             {...params}
             className={classes.suggestTextField}
-            defaultValue="hoge"
             inputRef={suggestRef}
             onChange={onSuggestChange}
             inputProps={{
               ...params.inputProps,
               className: classes.suggestInput,
-              underline: {
-                '&&&:before': {
-                  borderBottom: 'none',
-                },
-                '&&:after': {
-                  borderBottom: 'none',
-                },
-              },
             }}
           />
         )}
