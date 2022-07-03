@@ -4,9 +4,9 @@ import { Box, Typography, Link } from '@material-ui/core'
 
 const useStyles = makeStyles({
   link: {
-    verticalAlign: 'middle',
     display: 'flex',
-    textAlign: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
   },
 })
 export const SheetLink: React.FC = () => {
