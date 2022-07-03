@@ -40,7 +40,7 @@ export interface Item {
   volumeInfo: VolumeInfo
 }
 
-interface CopyItem {
+export interface CopyItem {
   title: string
   authors: string[]
   categories: string[]

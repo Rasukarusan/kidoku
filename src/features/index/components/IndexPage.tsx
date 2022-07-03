@@ -1,7 +1,7 @@
 import { useState, Suspense } from 'react'
 import { Container, Grid, CircularProgress, Box } from '@material-ui/core'
 import { H2 } from '@/components/Label/H2'
-import { Results, CopyList } from '../types'
+import { Results, CopyList, CopyItem } from '../types'
 import { InputField, Area as ResultArea, CopyField } from './'
 import { Loading } from './Loading'
 
@@ -20,8 +20,8 @@ export const IndexPage = () => {
     setCopyList({})
   }
 
-  const updateCopyList = (newCopyList: CopyList) => {
-    setCopyList(newCopyList)
+  const updateCopyList = (key: string, item: CopyItem) => {
+    setCopyList({ ...copyList, [key]: item })
   }
 
   return (
@@ -35,14 +35,12 @@ export const IndexPage = () => {
           <CopyField titles={titles} copyList={copyList} />
         </Grid>
       </Grid>
-      <Suspense fallback={<Loading />}>
-        <ResultArea
-          results={results}
-          titles={titles}
-          copyList={copyList}
-          updateCopyList={updateCopyList}
-        />
-      </Suspense>
+      <ResultArea
+        results={results}
+        titles={titles}
+        copyList={copyList}
+        updateCopyList={updateCopyList}
+      />
     </Container>
   )
 }

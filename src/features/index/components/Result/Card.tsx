@@ -13,7 +13,8 @@ import {
   CheckCircleOutline as CircleChecked,
   RadioButtonUnchecked as CircleUnchecked,
 } from '@material-ui/icons'
-import { CopyList, VolumeInfo } from '../../types'
+import { CopyItem, VolumeInfo } from '../../types'
+import { truncate } from '../../util'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,34 +37,24 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 export interface Props {
-  copyList: CopyList
-  updateCopyList: (newCopyList: CopyList) => void
+  isChecked: boolean
+  updateCopyList: (key: string, item: CopyItem) => void
   searchWord: string
   volumeInfo: VolumeInfo
 }
 
 export const Card: React.FC<Props> = ({
-  copyList,
+  isChecked,
   updateCopyList,
   searchWord,
   volumeInfo,
 }) => {
   const classes = useStyles()
   const { title, description, authors, categories, imageLinks } = volumeInfo
-  const truncate = (str: string, len: number) => {
-    if (!str) return '-'
-    return str.length <= len ? str : str.substr(0, len) + '...'
-  }
-
   return (
     <MuiCard
       className={classes.root}
-      onClick={() =>
-        updateCopyList({
-          ...copyList,
-          [searchWord]: { title, authors, categories },
-        })
-      }
+      onClick={() => updateCopyList(searchWord, { title, authors, categories })}
     >
       <Tooltip title={title}>
         <div>
@@ -72,7 +63,7 @@ export const Card: React.FC<Props> = ({
               <Checkbox
                 icon={<CircleUnchecked />}
                 checkedIcon={<CircleChecked />}
-                checked={copyList[searchWord].title === title}
+                checked={isChecked}
               />
             }
             subheader={Array.isArray(authors) ? authors.join(',') : '-'}
