@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { OpenInNew } from '@material-ui/icons'
 import { Typography, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Results, Item, SelectList } from '../../types'
+import { Results, Item, CopyList } from '../../types'
 import { Card } from './Card'
 
 const useStyles = makeStyles({
@@ -25,22 +25,22 @@ const useStyles = makeStyles({
 interface Props {
   results: Results
   titles: string[]
-  selectList: SelectList
-  updateSelectList: (newSelectList: SelectList) => void
+  copyList: CopyList
+  updateCopyList: (newCopyList: CopyList) => void
 }
 export const Area: React.FC<Props> = ({
   results,
   titles,
-  selectList,
-  updateSelectList,
+  copyList,
+  updateCopyList,
 }) => {
   const classes = useStyles()
 
   useEffect(() => {
     Object.keys(results).map((key) => {
-      if (!selectList[key]) {
-        updateSelectList({
-          ...selectList,
+      if (!copyList[key]) {
+        updateCopyList({
+          ...copyList,
           [key]: {
             title: results[key][0].volumeInfo.title,
             authors: results[key][0].volumeInfo.authors,
@@ -77,9 +77,9 @@ export const Area: React.FC<Props> = ({
                     key={`${index}- ${item.volumeInfo.title}`}
                   >
                     <Card
-                      selectList={
-                        selectList[title]
-                          ? selectList
+                      copyList={
+                        copyList[title]
+                          ? copyList
                           : {
                               [title]: {
                                 title: results[title][0].volumeInfo.title,
@@ -89,7 +89,7 @@ export const Area: React.FC<Props> = ({
                               },
                             }
                       }
-                      updateSelectList={updateSelectList}
+                      updateCopyList={updateCopyList}
                       searchWord={title}
                       title={item.volumeInfo.title}
                       imageUrl={

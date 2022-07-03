@@ -13,7 +13,7 @@ import {
   CheckCircleOutline as CircleChecked,
   RadioButtonUnchecked as CircleUnchecked,
 } from '@material-ui/icons'
-import { SelectList } from '../../types'
+import { CopyList } from '../../types'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -36,8 +36,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 export interface Props {
-  selectList: SelectList
-  updateSelectList: (newSelectList: SelectList) => void
+  copyList: CopyList
+  updateCopyList: (newCopyList: CopyList) => void
   searchWord: string
   title: string
   description?: string
@@ -47,8 +47,8 @@ export interface Props {
 }
 
 export const Card: React.FC<Props> = ({
-  selectList,
-  updateSelectList,
+  copyList,
+  updateCopyList,
   searchWord,
   title,
   description,
@@ -66,8 +66,8 @@ export const Card: React.FC<Props> = ({
     <MuiCard
       className={classes.root}
       onClick={() =>
-        updateSelectList({
-          ...selectList,
+        updateCopyList({
+          ...copyList,
           [searchWord]: { title, authors, categories },
         })
       }
@@ -79,7 +79,7 @@ export const Card: React.FC<Props> = ({
               <Checkbox
                 icon={<CircleUnchecked />}
                 checkedIcon={<CircleChecked />}
-                checked={selectList[searchWord].title === title}
+                checked={copyList[searchWord].title === title}
               />
             }
             subheader={Array.isArray(authors) ? authors.join(',') : '-'}

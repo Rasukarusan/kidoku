@@ -40,6 +40,11 @@ export interface Item {
   volumeInfo: VolumeInfo
 }
 
-export interface SelectList {
-  [key: string]: { title: string; authors: string[]; categories: string[] }
+interface CopyItem {
+  title: string
+  authors: string[]
+  categories: string[]
+}
+export interface CopyList {
+  [key: string]: CopyItem
 }

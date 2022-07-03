@@ -74,6 +74,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
     const titles = event.target.value.split('\n').filter((v) => v !== '')
     const lastTitle = event.target.value.split('\n').slice(-1)[0]
 
+    // サジェスト取得
     getSuggest(lastTitle)
     // タイトル入力とサジェストのテキストフィールドを同期
     setSuggestWord(lastTitle)

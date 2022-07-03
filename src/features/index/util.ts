@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Item } from './types'
+import { Item, CopyList } from './types'
 
 /**
  * 書籍検索
@@ -20,4 +20,15 @@ export const getSuggestions = async (keyword: string) => {
   return axios
     .get(url)
     .then((res) => res.data.suggestions.map((suggestion) => suggestion.value))
+}
+
+export const getCopyText = (titles: string[], copyList: CopyList): string => {
+  let text = ''
+  titles.forEach((title: string) => {
+    const formalTitle = title in copyList ? copyList[title].title : '-'
+    const authors = title in copyList ? copyList[title].authors : '-'
+    const categories = title in copyList ? copyList[title].categories : '-'
+    text += formalTitle + '\t' + authors + '\t' + categories + '\n'
+  })
+  return text
 }
