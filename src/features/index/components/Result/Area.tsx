@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { OpenInNew } from '@material-ui/icons'
 import { Typography, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Results, Item, CopyList } from '../../types'
+import { Results, Item, CopyList, CopyItem } from '../../types'
 import { Card } from './Card'
 
 const useStyles = makeStyles({
@@ -26,7 +26,7 @@ interface Props {
   results: Results
   titles: string[]
   copyList: CopyList
-  updateCopyList: (newCopyList: CopyList) => void
+  updateCopyList: (key: string, item: CopyItem) => void
 }
 export const Area: React.FC<Props> = ({
   results,
@@ -35,17 +35,12 @@ export const Area: React.FC<Props> = ({
   updateCopyList,
 }) => {
   const classes = useStyles()
+
   useEffect(() => {
     Object.keys(results).map((key) => {
       if (!copyList[key]) {
-        updateCopyList({
-          ...copyList,
-          [key]: {
-            title: results[key][0].volumeInfo.title,
-            authors: results[key][0].volumeInfo.authors,
-            categories: results[key][0].volumeInfo.categories,
-          },
-        })
+        const { title, authors, categories } = results[key][0].volumeInfo
+        updateCopyList(key, { title, authors, categories })
       }
     })
   })
@@ -76,17 +71,10 @@ export const Area: React.FC<Props> = ({
                     key={`${index}- ${item.volumeInfo.title}`}
                   >
                     <Card
-                      copyList={
+                      isChecked={
                         copyList[title]
-                          ? copyList
-                          : {
-                              [title]: {
-                                title: results[title][0].volumeInfo.title,
-                                authors: results[title][0].volumeInfo.authors,
-                                categories:
-                                  results[title][0].volumeInfo.categories,
-                              },
-                            }
+                          ? copyList[title].title === item.volumeInfo.title
+                          : false
                       }
                       updateCopyList={updateCopyList}
                       searchWord={title}
