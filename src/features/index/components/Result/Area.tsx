@@ -21,7 +21,6 @@ const useStyles = makeStyles({
     flexWrap: 'wrap',
   },
 })
-
 interface Props {
   results: Results
   titles: string[]
