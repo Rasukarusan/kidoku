@@ -1,14 +1,15 @@
-import { useState } from 'react'
-import { Container } from '@material-ui/core'
-import { Grid } from '@material-ui/core'
+import { useState, Suspense } from 'react'
+import { Container, Grid, CircularProgress, Box } from '@material-ui/core'
 import { H2 } from '@/components/Label/H2'
-import { Results, SelectList } from '../types'
+import { Results, CopyList } from '../types'
 import { InputField, Area as ResultArea, CopyField } from './'
+import { Loading } from './Loading'
 
 export const IndexPage = () => {
   const [titles, setTitles] = useState<string[]>([])
-  const [selectList, setSelectList] = useState<SelectList>({})
+  const [copyList, setCopyList] = useState<CopyList>({})
   const [results, setResults] = useState<Results>({})
+  const [loading, setLoading] = useState(true)
 
   const updateTitles = (newTitles: string[]) => {
     setTitles(newTitles)
@@ -16,11 +17,11 @@ export const IndexPage = () => {
 
   const updateResults = (newResults: Results) => {
     setResults(newResults)
-    setSelectList({})
+    setCopyList({})
   }
 
-  const updateSelectList = (newSelectList: SelectList) => {
-    setSelectList(newSelectList)
+  const updateCopyList = (newCopyList: CopyList) => {
+    setCopyList(newCopyList)
   }
 
   return (
@@ -31,15 +32,17 @@ export const IndexPage = () => {
           <InputField setTitles={updateTitles} setResults={updateResults} />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <CopyField titles={titles} selectList={selectList} />
+          <CopyField titles={titles} copyList={copyList} />
         </Grid>
       </Grid>
-      <ResultArea
-        results={results}
-        titles={titles}
-        selectList={selectList}
-        updateSelectList={updateSelectList}
-      />
+      <Suspense fallback={<Loading />}>
+        <ResultArea
+          results={results}
+          titles={titles}
+          copyList={copyList}
+          updateCopyList={updateCopyList}
+        />
+      </Suspense>
     </Container>
   )
 }

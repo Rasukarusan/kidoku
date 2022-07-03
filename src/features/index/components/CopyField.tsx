@@ -1,12 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { TextField, Snackbar } from '@material-ui/core'
-import MuiAlert, { AlertProps } from '@material-ui/lab/Alert'
+import MuiAlert from '@material-ui/lab/Alert'
 import { makeStyles } from '@material-ui/core/styles'
-import { SelectList } from '../types'
-
-function Alert(props: AlertProps) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />
-}
+import { CopyList } from '../types'
+import { getCopyText } from '../util'
 
 const useStyles = makeStyles({
   root: {
@@ -18,27 +15,21 @@ const useStyles = makeStyles({
 
 interface Props {
   titles: string[]
-  selectList: SelectList
+  copyList: CopyList
 }
-export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
+export const CopyField: React.FC<Props> = ({ titles, copyList }) => {
   const classes = useStyles()
-  const field = useRef<HTMLTextAreaElement>(null)
-  const getList = () => {
-    let list = ''
-    titles.forEach((title: string) => {
-      const formalTitle = title in selectList ? selectList[title].title : '-'
-      const authors = title in selectList ? selectList[title].authors : '-'
-      const categories =
-        title in selectList ? selectList[title].categories : '-'
-      list += formalTitle + '\t' + authors + '\t' + categories + '\n'
-    })
-    return list
-  }
-  const fieldValue = getList()
-
+  const [text, setText] = useState('')
   const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    const text = getCopyText(titles, copyList)
+    setText(text)
+  }, [titles, copyList])
+
   const handleOnClick = () => {
-    navigator.clipboard.writeText(fieldValue)
+    navigator.clipboard.writeText(text)
     setOpen(true)
   }
   return (
@@ -48,22 +39,26 @@ export const CopyField: React.FC<Props> = ({ titles, selectList }) => {
         autoHideDuration={5000}
         onClose={() => setOpen(false)}
       >
-        <Alert onClose={() => setOpen(false)} severity="success">
+        <MuiAlert
+          onClose={() => setOpen(false)}
+          severity="success"
+          elevation={6}
+          variant="filled"
+        >
           Copied!
-        </Alert>
+        </MuiAlert>
       </Snackbar>
       <TextField
         className={classes.root}
         label="クリックしてコピー"
-        inputRef={field}
+        inputRef={ref}
         style={{
-          display:
-            Object.keys(selectList).length === 0 ? 'none' : 'inline-flex',
+          display: Object.keys(copyList).length === 0 ? 'none' : 'inline-flex',
         }}
         fullWidth
-        defaultValue={fieldValue}
+        defaultValue={text}
         multiline
-        minRows={Object.keys(selectList).length === 0 ? 1 : 10}
+        minRows={Object.keys(copyList).length === 0 ? 1 : 10}
         disabled
         variant="outlined"
         onClick={handleOnClick}
