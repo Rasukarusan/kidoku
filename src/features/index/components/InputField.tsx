@@ -1,10 +1,10 @@
-import { TextField } from '@material-ui/core'
 import { useRef, useState } from 'react'
-import { Results } from './ResultArea'
+import { useKey } from 'react-use'
+import { TextField } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import Autocomplete from '@material-ui/lab/Autocomplete'
-import { useKey } from 'react-use'
-import { getSuggestions, searchBooks } from './util'
+import { Results } from '../types'
+import { getSuggestions, searchBooks } from '../util'
 
 const useStyles = makeStyles({
   input: {

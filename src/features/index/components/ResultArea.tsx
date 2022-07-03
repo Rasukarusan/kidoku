@@ -1,9 +1,9 @@
 import { useEffect } from 'react'
+import { OpenInNew } from '@material-ui/icons'
 import { Typography, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { ResultCard, SelectList } from '@/components/ResultCard'
-import { Item } from './types'
-import { OpenInNew } from '@material-ui/icons'
+import { ResultCard, SelectList } from './'
+import { Results, Item } from '../types'
 
 const useStyles = makeStyles({
   resultArea: {
@@ -21,10 +21,6 @@ const useStyles = makeStyles({
     flexWrap: 'wrap',
   },
 })
-
-export interface Results {
-  [key: string]: Item[]
-}
 
 interface Props {
   results: Results

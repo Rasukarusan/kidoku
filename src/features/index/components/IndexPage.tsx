@@ -1,12 +1,9 @@
 import { useState } from 'react'
-import { Layout } from '@/components/Layout'
+import { Container } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Typography, Grid } from '@material-ui/core'
-import { InputField } from '@/components/InputField'
-import { Header } from '@/components/Header'
-import { ResultArea, Results } from '@/components/ResultArea'
-import { SelectList } from '@/components/ResultCard'
-import { CopyField } from '@/components/CopyField'
+import { InputField, Header, ResultArea, SelectList, CopyField } from './'
+import { Results } from '../types'
 
 const useStyles = makeStyles({
   title: {
@@ -15,7 +12,7 @@ const useStyles = makeStyles({
   },
 })
 
-const IndexPage = () => {
+export const IndexPage = () => {
   const [titles, setTitles] = useState<string[]>([])
   const [selectList, setSelectList] = useState<SelectList>({})
   const [results, setResults] = useState<Results>({})
@@ -36,7 +33,7 @@ const IndexPage = () => {
   }
 
   return (
-    <Layout>
+    <Container fixed>
       <Header title={title} />
       <Typography variant="h2" className={classes.title}>
         {title}
@@ -56,7 +53,6 @@ const IndexPage = () => {
         selectList={selectList}
         updateSelectList={updateSelectList}
       />
-    </Layout>
+    </Container>
   )
 }
-export default IndexPage

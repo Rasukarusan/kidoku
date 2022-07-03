@@ -1,3 +1,7 @@
+export interface Results {
+  [key: string]: Item[]
+}
+
 interface ImageLinks {
   smallThumbnail: string
   thumbnail: string
