@@ -46,10 +46,6 @@ export interface Props {
   categories?: string[]
 }
 
-export interface SelectList {
-  [key: string]: { title: string; authors: string[]; categories: string[] }
-}
-
 export const ResultCard: React.FC<Props> = ({
   selectList,
   updateSelectList,

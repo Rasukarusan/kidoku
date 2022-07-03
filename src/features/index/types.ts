@@ -39,3 +39,7 @@ export interface Item {
   selfLink: string
   volumeInfo: VolumeInfo
 }
+
+export interface SelectList {
+  [key: string]: { title: string; authors: string[]; categories: string[] }
+}

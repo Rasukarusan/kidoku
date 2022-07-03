@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { OpenInNew } from '@material-ui/icons'
 import { Typography, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { ResultCard, SelectList } from './'
+import { Card, SelectList } from './'
 import { Results, Item } from '../types'
 
 const useStyles = makeStyles({
@@ -28,7 +28,7 @@ interface Props {
   selectList: SelectList
   updateSelectList: (newSelectList: SelectList) => void
 }
-export const ResultArea: React.FC<Props> = ({
+export const Area: React.FC<Props> = ({
   results,
   titles,
   selectList,
@@ -76,7 +76,7 @@ export const ResultArea: React.FC<Props> = ({
                     className={classes.resultItem}
                     key={`${index}- ${item.volumeInfo.title}`}
                   >
-                    <ResultCard
+                    <Card
                       selectList={
                         selectList[title]
                           ? selectList

@@ -17,11 +17,12 @@ export default function MyApp(props) {
   return (
     <>
       <Head>
-        <title>My page</title>
+        <title>著者検索 neo</title>
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
+        <link rel="icon" href="/favicon.png" />
       </Head>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
