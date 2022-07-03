@@ -3,17 +3,17 @@ import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import {
   Tooltip,
   Checkbox,
-  Card,
+  Card as MuiCard,
   CardHeader,
   CardMedia,
   CardContent,
+  Typography,
 } from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
-
 import {
   CheckCircleOutline as CircleChecked,
   RadioButtonUnchecked as CircleUnchecked,
 } from '@material-ui/icons'
+import { SelectList } from '../../types'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,7 +46,7 @@ export interface Props {
   categories?: string[]
 }
 
-export const ResultCard: React.FC<Props> = ({
+export const Card: React.FC<Props> = ({
   selectList,
   updateSelectList,
   searchWord,
@@ -63,7 +63,7 @@ export const ResultCard: React.FC<Props> = ({
   }
 
   return (
-    <Card
+    <MuiCard
       className={classes.root}
       onClick={() =>
         updateSelectList({
@@ -99,6 +99,6 @@ export const ResultCard: React.FC<Props> = ({
           {truncate(description, 30)}
         </Typography>
       </CardContent>
-    </Card>
+    </MuiCard>
   )
 }

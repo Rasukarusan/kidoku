@@ -2,18 +2,18 @@ import { useEffect } from 'react'
 import { OpenInNew } from '@material-ui/icons'
 import { Typography, Link } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Card, SelectList } from './'
-import { Results, Item } from '../types'
+import { Results, Item, SelectList } from '../../types'
+import { Card } from './Card'
 
 const useStyles = makeStyles({
-  resultArea: {
+  area: {
     display: 'flex',
     overflowX: 'scroll',
   },
-  resultItem: {
+  item: {
     display: 'inline-block',
   },
-  resultTitle: {
+  title: {
     paddingTop: 20,
     paddingBottom: 10,
     display: 'flex',
@@ -63,17 +63,17 @@ export const Area: React.FC<Props> = ({
               <Typography
                 color="primary"
                 variant="h5"
-                className={classes.resultTitle}
+                className={classes.title}
               >
                 『{title}』の検索結果
                 <OpenInNew style={{ paddingLeft: 5 }} />
               </Typography>
             </Link>
-            <div className={classes.resultArea}>
+            <div className={classes.area}>
               {Array.isArray(results[title]) &&
                 results[title].map((item: Item, index: number) => (
                   <div
-                    className={classes.resultItem}
+                    className={classes.item}
                     key={`${index}- ${item.volumeInfo.title}`}
                   >
                     <Card

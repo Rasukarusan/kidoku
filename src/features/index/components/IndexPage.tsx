@@ -9,7 +9,6 @@ export const IndexPage = () => {
   const [titles, setTitles] = useState<string[]>([])
   const [selectList, setSelectList] = useState<SelectList>({})
   const [results, setResults] = useState<Results>({})
-  const title = '著者検索 neo'
 
   const updateTitles = (newTitles: string[]) => {
     setTitles(newTitles)
@@ -26,7 +25,7 @@ export const IndexPage = () => {
 
   return (
     <Container fixed>
-      <H2 title={title} />
+      <H2 title="著者検索 neo" />
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <InputField setTitles={updateTitles} setResults={updateResults} />

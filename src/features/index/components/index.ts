@@ -1,3 +1,3 @@
 export * from './CopyField'
 export * from './InputField'
-export * from './ResultArea/Area'
+export * from './Result/Area'
