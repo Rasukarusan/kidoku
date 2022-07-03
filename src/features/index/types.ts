@@ -7,7 +7,7 @@ interface ImageLinks {
   thumbnail: string
 }
 
-interface VolumeInfo {
+export interface VolumeInfo {
   allowAnonLogging: boolean
   authors?: string[]
   canonicalVolumeLink: string
