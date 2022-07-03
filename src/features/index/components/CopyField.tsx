@@ -50,15 +50,12 @@ export const CopyField: React.FC<Props> = ({ titles, copyList }) => {
       </Snackbar>
       <TextField
         className={classes.root}
-        label="クリックしてコピー"
+        placeholder="クリックしてコピー"
         inputRef={ref}
-        style={{
-          display: Object.keys(copyList).length === 0 ? 'none' : 'inline-flex',
-        }}
         fullWidth
         defaultValue={text}
         multiline
-        minRows={Object.keys(copyList).length === 0 ? 1 : 10}
+        minRows={10}
         disabled
         variant="outlined"
         onClick={handleOnClick}
