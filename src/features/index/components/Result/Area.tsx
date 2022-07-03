@@ -35,7 +35,6 @@ export const Area: React.FC<Props> = ({
   updateCopyList,
 }) => {
   const classes = useStyles()
-
   useEffect(() => {
     Object.keys(results).map((key) => {
       if (!copyList[key]) {
@@ -91,15 +90,7 @@ export const Area: React.FC<Props> = ({
                       }
                       updateCopyList={updateCopyList}
                       searchWord={title}
-                      title={item.volumeInfo.title}
-                      imageUrl={
-                        item.volumeInfo.imageLinks
-                          ? item.volumeInfo.imageLinks.thumbnail
-                          : '/no-image.png'
-                      }
-                      description={item.volumeInfo.description}
-                      authors={item.volumeInfo.authors}
-                      categories={item.volumeInfo.categories}
+                      volumeInfo={item.volumeInfo}
                     />
                   </div>
                 ))}
