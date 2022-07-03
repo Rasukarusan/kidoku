@@ -1,22 +1,14 @@
 import { useState } from 'react'
 import { Container } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import { Typography, Grid } from '@material-ui/core'
-import { InputField, Header, ResultArea, SelectList, CopyField } from './'
-import { Results } from '../types'
-
-const useStyles = makeStyles({
-  title: {
-    margin: 10,
-    fontFamily: 'Stick-Regular',
-  },
-})
+import { Grid } from '@material-ui/core'
+import { H2 } from '@/components/Label/H2'
+import { Results, SelectList } from '../types'
+import { InputField, Area as ResultArea, CopyField } from './'
 
 export const IndexPage = () => {
   const [titles, setTitles] = useState<string[]>([])
   const [selectList, setSelectList] = useState<SelectList>({})
   const [results, setResults] = useState<Results>({})
-  const classes = useStyles()
   const title = '著者検索 neo'
 
   const updateTitles = (newTitles: string[]) => {
@@ -34,10 +26,7 @@ export const IndexPage = () => {
 
   return (
     <Container fixed>
-      <Header title={title} />
-      <Typography variant="h2" className={classes.title}>
-        {title}
-      </Typography>
+      <H2 title={title} />
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <InputField setTitles={updateTitles} setResults={updateResults} />
@@ -46,7 +35,6 @@ export const IndexPage = () => {
           <CopyField titles={titles} selectList={selectList} />
         </Grid>
       </Grid>
-
       <ResultArea
         results={results}
         titles={titles}

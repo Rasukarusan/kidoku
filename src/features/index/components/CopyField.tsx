@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react'
 import { TextField, Snackbar } from '@material-ui/core'
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert'
-import { SelectList } from '@/components/ResultCard'
 import { makeStyles } from '@material-ui/core/styles'
+import { SelectList } from '../types'
 
 function Alert(props: AlertProps) {
   return <MuiAlert elevation={6} variant="filled" {...props} />
