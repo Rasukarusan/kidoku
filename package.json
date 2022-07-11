@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "next",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/** --ext .ts,.tsx",
