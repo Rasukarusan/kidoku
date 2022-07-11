@@ -5,12 +5,4 @@ module.exports = {
     config.resolve.alias['@'] = path.join(__dirname, 'src')
     return config
   },
-  async rewrites() {
-    return [
-      {
-        source: '/',
-        destination: '/index',
-      },
-    ]
-  },
 }
