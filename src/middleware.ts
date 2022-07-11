@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const config = {
-  matcher: '/',
+  matcher: '/sheet',
 }
 
 export function middleware(req: NextRequest) {
@@ -12,7 +12,10 @@ export function middleware(req: NextRequest) {
     const authValue = basicAuth.split(' ')[1]
     const [user, pwd] = atob(authValue).split(':')
 
-    if (user === '4dmin' && pwd === 'testpwd123') {
+    if (
+      user === process.env.BASIC_AUTH_USER &&
+      pwd === process.env.BASIC_AUTH_PASS
+    ) {
       return NextResponse.next()
     }
   }
