@@ -132,13 +132,14 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
         }}
         options={options}
         filterOptions={(options) => options}
-        closeIcon={<></>}
+        clearIcon={<></>}
         renderInput={(params) => (
           <TextField
             {...params}
             className={classes.suggestTextField}
             inputRef={suggestRef}
             onChange={onSuggestChange}
+            variant="standard"
             inputProps={{
               ...params.inputProps,
               className: classes.suggestInput,
