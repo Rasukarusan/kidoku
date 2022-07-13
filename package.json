@@ -7,9 +7,14 @@
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.9.0",
+    "@mui/styles": "^5.9.0",
     "axios": "^0.27.2",
     "ky": "^0.31.0",
     "next": "^12.2.2",
