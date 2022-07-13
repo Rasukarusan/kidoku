@@ -1,4 +1,4 @@
-import { Container } from '@material-ui/core'
+import { Container } from '@mui/material'
 import { H2 } from '@/components/Label/H2'
 import { ReadingRecord } from '../types'
 

@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react'
 import { useKey } from 'react-use'
-import { TextField } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { TextField } from '@mui/material'
+import { makeStyles } from '@mui/styles'
+import { Autocomplete } from '@mui/material'
 import { Results } from '../types'
 import { getSuggestions, searchBooks } from '../util'
 
@@ -43,14 +43,14 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
 
   // 選択中のサジェストのインデックス
   useKey('ArrowDown', () => {
-    const suggestPopup = document.getElementById('suggestion-popup')
+    const suggestPopup = document.getElementById('suggestion-listbox')
     if (suggestPopup) {
       suggestRef.current.focus()
       inputRef.current.blur()
     }
   })
   useKey('ArrowUp', () => {
-    const suggestPopup = document.getElementById('suggestion-popup')
+    const suggestPopup = document.getElementById('suggestion-listbox')
     if (suggestPopup) {
       suggestRef.current.focus()
       inputRef.current.blur()

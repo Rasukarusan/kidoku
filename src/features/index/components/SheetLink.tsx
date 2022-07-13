@@ -1,6 +1,6 @@
-import { makeStyles } from '@material-ui/core/styles'
-import { OpenInNew } from '@material-ui/icons'
-import { Box, Typography, Link } from '@material-ui/core'
+import { makeStyles } from '@mui/styles'
+import { OpenInNew } from '@mui/icons-material'
+import { Box, Typography, Link } from '@mui/material'
 
 const useStyles = makeStyles({
   link: {
