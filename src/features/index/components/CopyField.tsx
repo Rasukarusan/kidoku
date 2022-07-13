@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { TextField, Snackbar } from '@material-ui/core'
-import MuiAlert from '@material-ui/lab/Alert'
-import { makeStyles } from '@material-ui/core/styles'
+import { TextField, Snackbar, Alert } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { CopyList } from '../types'
 import { getCopyText } from '../util'
 
@@ -39,14 +38,14 @@ export const CopyField: React.FC<Props> = ({ titles, copyList }) => {
         autoHideDuration={5000}
         onClose={() => setOpen(false)}
       >
-        <MuiAlert
+        <Alert
           onClose={() => setOpen(false)}
           severity="success"
           elevation={6}
           variant="filled"
         >
           Copied!
-        </MuiAlert>
+        </Alert>
       </Snackbar>
       <TextField
         className={classes.root}

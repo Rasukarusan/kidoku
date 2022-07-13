@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { OpenInNew } from '@material-ui/icons'
-import { Typography, Link } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
+import { OpenInNew } from '@mui/icons-material'
+import { Typography, Link } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { Results, Item, CopyList, CopyItem } from '../../types'
 import { Card } from './Card'
 

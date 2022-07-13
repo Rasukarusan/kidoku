@@ -1,5 +1,5 @@
 import React from 'react'
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
+import { makeStyles, createStyles } from '@mui/styles'
 import {
   Tooltip,
   Checkbox,
@@ -8,15 +8,16 @@ import {
   CardMedia,
   CardContent,
   Typography,
-} from '@material-ui/core'
+} from '@mui/material'
 import {
   CheckCircleOutline as CircleChecked,
   RadioButtonUnchecked as CircleUnchecked,
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import { CopyItem, VolumeInfo } from '../../types'
 import { truncate } from '../../util'
+import { theme as Theme } from '@/pages/theme'
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: typeof Theme) =>
   createStyles({
     root: {
       width: 200,

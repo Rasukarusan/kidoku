@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Container, Grid } from '@material-ui/core'
+import { Container, Grid } from '@mui/material'
 import { H2 } from '@/components/Label/H2'
 import { Results, CopyList, CopyItem } from '../types'
 import { SheetLink, InputField, Area as ResultArea, CopyField } from './'
