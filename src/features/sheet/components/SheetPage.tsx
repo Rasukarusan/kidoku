@@ -4,6 +4,7 @@ import { Container, Tab, Box } from '@mui/material'
 import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { ReadingRecord } from '../types'
+import { Card } from './Card'
 
 interface Props {
   data: ReadingRecord
@@ -36,13 +37,17 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           <div>
             <b>{key}</b>
           </div>
-          {data[key].map((book) => {
-            return (
-              <div key={book.title}>
-                {book.title},{book.author}
-              </div>
-            )
-          })}
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start',
+            }}
+          >
+            {data[key].map((book) => (
+              <Card key={book.title} record={book} />
+            ))}
+          </Box>
         </div>
       ))}
     </Container>
