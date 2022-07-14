@@ -17,13 +17,20 @@ import {
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
+import OpenInNewSharpIcon from '@mui/icons-material/OpenInNewSharp'
 
 const pages = [
-  { title: '読書記録', href: '/sheet/' + dayjs().format('YYYY'), target: '' },
+  {
+    title: '読書記録',
+    href: '/sheet/' + dayjs().format('YYYY'),
+    target: '',
+    icon: null,
+  },
   {
     title: 'シート',
     href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=789903411',
     target: '_blank',
+    icon: <OpenInNewSharpIcon />,
   },
 ]
 
@@ -147,9 +154,9 @@ export const Header = () => {
                     sx={{
                       my: 2,
                       color: 'white',
-                      display: 'block',
                       fontFamily: 'Stick-Regular',
                     }}
+                    endIcon={page.icon}
                   >
                     {page.title}
                   </Button>
