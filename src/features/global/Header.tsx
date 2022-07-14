@@ -48,7 +48,7 @@ export const Header = () => {
   return (
     <>
       <AppBar position="fixed" color="primary" sx={{ boxShadow: 'none' }}>
-        <Container maxWidth="xl">
+        <Container maxWidth="lg">
           <Toolbar disableGutters>
             <AutoStoriesIcon
               sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}
