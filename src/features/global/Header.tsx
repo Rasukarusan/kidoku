@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
+import dayjs from 'dayjs'
 import { makeStyles } from '@mui/styles'
 import {
   AppBar,
@@ -18,7 +19,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 
 const pages = [
-  { title: '読書記録', href: '/sheet', target: '' },
+  { title: '読書記録', href: '/sheet/' + dayjs().format('YYYY'), target: '' },
   {
     title: 'シート',
     href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=789903411',
