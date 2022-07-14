@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Head from 'next/head'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
-import { theme , Header } from '@/features/global'
+import { theme, Header } from '@/features/global'
 
 export default function MyApp(props) {
   const { Component, pageProps } = props
