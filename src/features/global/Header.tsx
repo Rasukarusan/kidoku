@@ -46,126 +46,129 @@ export const Header = () => {
   }
 
   return (
-    <AppBar position="static" color="primary" sx={{ boxShadow: 'none' }}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <AutoStoriesIcon
-            sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}
-          />
-          <Link href="/">
-            <Typography
-              variant="h6"
-              noWrap
-              component="a"
-              href="/"
-              sx={{
-                mr: 2,
-                display: { xs: 'none', md: 'flex' },
-                fontWeight: 700,
-                letterSpacing: '.3rem',
-                color: 'inherit',
-                textDecoration: 'none',
-                fontFamily: 'Stick-Regular',
-              }}
-            >
-              著者検索neo
-            </Typography>
-          </Link>
+    <>
+      <AppBar position="fixed" color="primary" sx={{ boxShadow: 'none' }}>
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            <AutoStoriesIcon
+              sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}
+            />
+            <Link href="/">
+              <Typography
+                variant="h6"
+                noWrap
+                component="a"
+                href="/"
+                sx={{
+                  mr: 2,
+                  display: { xs: 'none', md: 'flex' },
+                  fontWeight: 700,
+                  letterSpacing: '.3rem',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  fontFamily: 'Stick-Regular',
+                }}
+              >
+                著者検索neo
+              </Typography>
+            </Link>
 
-          {/* スマホ用ハンバーガーメニュー  */}
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
+            {/* スマホ用ハンバーガーメニュー  */}
+            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: { xs: 'block', md: 'none' },
+                }}
+              >
+                {pages.map((page) => (
+                  <MenuItem key={page.title} onClick={handleCloseNavMenu}>
+                    <Link href={page.href}>
+                      <a
+                        style={{
+                          textDecoration: 'none',
+                          fontFamily: 'Stick-Regular ',
+                        }}
+                        target={page.target}
+                      >
+                        {page.title}
+                      </a>
+                    </Link>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+            {/* end スマホ用ハンバーガーメニュー  */}
+
+            <AutoStoriesIcon
+              sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}
+            />
+            <Link href="/">
+              <Typography
+                variant="h5"
+                noWrap
+                component="a"
+                href="/"
+                sx={{
+                  mr: 2,
+                  display: { xs: 'flex', md: 'none' },
+                  flexGrow: 1,
+                  fontFamily: 'Stick-Regular',
+                  fontWeight: 700,
+                  letterSpacing: '.3rem',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+              >
+                著者検索neo
+              </Typography>
+            </Link>
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
-                <MenuItem key={page.title} onClick={handleCloseNavMenu}>
-                  <Link href={page.href}>
-                    <a
-                      style={{
-                        textDecoration: 'none',
-                        fontFamily: 'Stick-Regular ',
+                <Link href={page.href} key={page.title}>
+                  <a style={{ textDecoration: 'none' }} target={page.target}>
+                    <Button
+                      key={page.title}
+                      onClick={handleCloseNavMenu}
+                      sx={{
+                        my: 2,
+                        color: 'white',
+                        fontFamily: 'Stick-Regular',
                       }}
-                      target={page.target}
+                      endIcon={page.icon}
                     >
                       {page.title}
-                    </a>
-                  </Link>
-                </MenuItem>
+                    </Button>
+                  </a>
+                </Link>
               ))}
-            </Menu>
-          </Box>
-          {/* end スマホ用ハンバーガーメニュー  */}
-
-          <AutoStoriesIcon
-            sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}
-          />
-          <Link href="/">
-            <Typography
-              variant="h5"
-              noWrap
-              component="a"
-              href="/"
-              sx={{
-                mr: 2,
-                display: { xs: 'flex', md: 'none' },
-                flexGrow: 1,
-                fontFamily: 'Stick-Regular',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
-                color: 'inherit',
-                textDecoration: 'none',
-              }}
-            >
-              著者検索neo
-            </Typography>
-          </Link>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Link href={page.href}>
-                <a style={{ textDecoration: 'none' }} target={page.target}>
-                  <Button
-                    key={page.title}
-                    onClick={handleCloseNavMenu}
-                    sx={{
-                      my: 2,
-                      color: 'white',
-                      fontFamily: 'Stick-Regular',
-                    }}
-                    endIcon={page.icon}
-                  >
-                    {page.title}
-                  </Button>
-                </a>
-              </Link>
-            ))}
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+      <div style={{ marginBottom: '70px' }}></div>
+    </>
   )
 }
