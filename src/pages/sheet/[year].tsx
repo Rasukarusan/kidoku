@@ -10,6 +10,7 @@ export const getStaticProps = async ({ params }: Props) => {
   return {
     props: {
       data,
+      year: params.year.toString(),
     },
     revalidate: 60 * 60 * 24,
   }
