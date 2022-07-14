@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Link from 'next/link'
 import { makeStyles } from '@mui/styles'
 import {
   AppBar,
@@ -16,59 +17,54 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 
-const pages = ['読書記録', 'シート']
-
-const useStyles = makeStyles({
-  title: {
-    margin: 10,
-    fontFamily: 'Stick-Regular',
+const pages = [
+  { title: '読書記録', href: '/sheet', target: '' },
+  {
+    title: 'シート',
+    href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=789903411',
+    target: '_blank',
   },
-})
+]
 
+// レスポンシブヘッダー
 export const Header = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null)
-  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget)
   }
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget)
-  }
-
   const handleCloseNavMenu = () => {
     setAnchorElNav(null)
   }
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null)
-  }
-
   return (
-    <AppBar position="static">
+    <AppBar position="static" color="primary" sx={{ boxShadow: 'none' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <AutoStoriesIcon
             sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }}
           />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-              fontFamily: 'Stick-Regular',
-            }}
-          >
-            著者検索neo
-          </Typography>
+          <Link href="/">
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              href="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+                fontFamily: 'Stick-Regular',
+              }}
+            >
+              著者検索neo
+            </Typography>
+          </Link>
 
+          {/* スマホ用ハンバーガーメニュー  */}
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
@@ -99,52 +95,65 @@ export const Header = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography
-                    textAlign="center"
-                    sx={{ fontFamily: 'Stick-Regular' }}
-                  >
-                    {page}
-                  </Typography>
+                <MenuItem key={page.title} onClick={handleCloseNavMenu}>
+                  <Link href={page.href}>
+                    <a
+                      style={{
+                        textDecoration: 'none',
+                        fontFamily: 'Stick-Regular ',
+                      }}
+                      target={page.target}
+                    >
+                      {page.title}
+                    </a>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
+          {/* end スマホ用ハンバーガーメニュー  */}
+
           <AutoStoriesIcon
             sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}
           />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'Stick-Regular',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            著者検索neo
-          </Typography>
+          <Link href="/">
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              href="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'flex', md: 'none' },
+                flexGrow: 1,
+                fontFamily: 'Stick-Regular',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+              著者検索neo
+            </Typography>
+          </Link>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{
-                  my: 2,
-                  color: 'white',
-                  display: 'block',
-                  fontFamily: 'Stick-Regular',
-                }}
-              >
-                {page}
-              </Button>
+              <Link href={page.href}>
+                <a style={{ textDecoration: 'none' }} target={page.target}>
+                  <Button
+                    key={page.title}
+                    onClick={handleCloseNavMenu}
+                    sx={{
+                      my: 2,
+                      color: 'white',
+                      display: 'block',
+                      fontFamily: 'Stick-Regular',
+                    }}
+                  >
+                    {page.title}
+                  </Button>
+                </a>
+              </Link>
             ))}
           </Box>
         </Toolbar>
