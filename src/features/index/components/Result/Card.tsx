@@ -15,7 +15,7 @@ import {
 } from '@mui/icons-material'
 import { CopyItem, VolumeInfo } from '../../types'
 import { truncate } from '../../util'
-import { theme as Theme } from '@/pages/theme'
+import { theme as Theme } from '@/features/global/theme'
 
 const useStyles = makeStyles((theme: typeof Theme) =>
   createStyles({
