@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Container, Grid } from '@mui/material'
 import { H2 } from '@/components/Label/H2'
 import { Results, CopyList, CopyItem } from '../types'
-import { SheetLink, InputField, Area as ResultArea, CopyField } from './'
+import { InputField, Area as ResultArea, CopyField } from './'
+
 export const IndexPage = () => {
   const [titles, setTitles] = useState<string[]>([])
   const [copyList, setCopyList] = useState<CopyList>({})
@@ -22,23 +23,24 @@ export const IndexPage = () => {
   }
 
   return (
-    <Container fixed>
-      <H2 title="著者検索 neo" />
-      <SheetLink />
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <InputField setTitles={updateTitles} setResults={updateResults} />
+    <>
+      <Container fixed>
+        <H2 title="検索" />
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <InputField setTitles={updateTitles} setResults={updateResults} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <CopyField titles={titles} copyList={copyList} />
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={6}>
-          <CopyField titles={titles} copyList={copyList} />
-        </Grid>
-      </Grid>
-      <ResultArea
-        results={results}
-        titles={titles}
-        copyList={copyList}
-        updateCopyList={updateCopyList}
-      />
-    </Container>
+        <ResultArea
+          results={results}
+          titles={titles}
+          copyList={copyList}
+          updateCopyList={updateCopyList}
+        />
+      </Container>
+    </>
   )
 }
