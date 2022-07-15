@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import { makeStyles } from '@mui/styles'
 import {
   AppBar,
   Box,
@@ -10,9 +9,7 @@ import {
   Typography,
   Menu,
   Container,
-  Avatar,
   Button,
-  Tooltip,
   MenuItem,
 } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
