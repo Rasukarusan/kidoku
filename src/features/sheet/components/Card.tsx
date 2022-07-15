@@ -2,17 +2,13 @@ import React from 'react'
 import { makeStyles, createStyles } from '@mui/styles'
 import {
   Tooltip,
-  Checkbox,
   Card as MuiCard,
   CardHeader,
   CardMedia,
   CardContent,
   Typography,
 } from '@mui/material'
-import {
-  CheckCircleOutline as CircleChecked,
-  RadioButtonUnchecked as CircleUnchecked,
-} from '@mui/icons-material'
+
 import { theme as Theme } from '@/features/global/theme'
 import { Record } from '../types'
 
