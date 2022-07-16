@@ -57,7 +57,7 @@ export const Card: React.FC<Props> = ({
       title,
       authors,
       categories,
-      imageLink: imageLinks.thumbnail,
+      imageLink: imageLinks ? imageLinks.thumbnail : '/no-image.png',
     })
   }
   return (
