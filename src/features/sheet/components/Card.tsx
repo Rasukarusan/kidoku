@@ -18,13 +18,12 @@ const useStyles = makeStyles((theme: typeof Theme) =>
       width: 200,
       height: 300,
       cursor: 'pointer',
-      boxShadow: `3px 3px 3px ${theme.palette.secondary.main};`,
       margin: 5,
     },
     title: {
       fontSize: '16px',
       color: theme.palette.primary.main,
-      whiteSpace: 'nowrap',
+      whiteSpace: 'normal',
     },
     subheader: {
       fontSize: '14px',
@@ -43,8 +42,6 @@ export interface Props {
 export const Card: React.FC<Props> = ({ record }) => {
   const classes = useStyles()
   const { title, author, category, image, impression, memo } = record
-  console.log(record)
-  console.log(image)
   return (
     <MuiCard className={classes.root}>
       <Tooltip title={title}>
