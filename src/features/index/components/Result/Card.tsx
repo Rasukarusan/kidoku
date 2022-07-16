@@ -52,11 +52,16 @@ export const Card: React.FC<Props> = ({
 }) => {
   const classes = useStyles()
   const { title, description, authors, categories, imageLinks } = volumeInfo
+  const onClick = () => {
+    updateCopyList(searchWord, {
+      title,
+      authors,
+      categories,
+      imageLink: imageLinks.thumbnail,
+    })
+  }
   return (
-    <MuiCard
-      className={classes.root}
-      onClick={() => updateCopyList(searchWord, { title, authors, categories })}
-    >
+    <MuiCard className={classes.root} onClick={onClick}>
       <Tooltip title={title}>
         <div>
           <CardHeader

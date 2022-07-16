@@ -44,6 +44,7 @@ export interface CopyItem {
   title: string
   authors: string[]
   categories: string[]
+  imageLink: string
 }
 export interface CopyList {
   [key: string]: CopyItem
