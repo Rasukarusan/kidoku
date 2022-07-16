@@ -38,8 +38,14 @@ export const Area: React.FC<Props> = ({
   useEffect(() => {
     Object.keys(results).map((key) => {
       if (!copyList[key]) {
-        const { title, authors, categories } = results[key][0].volumeInfo
-        updateCopyList(key, { title, authors, categories })
+        const { title, authors, categories, imageLinks } =
+          results[key][0].volumeInfo
+        updateCopyList(key, {
+          title,
+          authors,
+          categories,
+          imageLink: imageLinks.thumbnail,
+        })
       }
     })
   })

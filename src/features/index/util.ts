@@ -33,7 +33,8 @@ export const getCopyText = (titles: string[], copyList: CopyList): string => {
     const formalTitle = title in copyList ? copyList[title].title : '-'
     const authors = title in copyList ? copyList[title].authors : '-'
     const categories = title in copyList ? copyList[title].categories : '-'
-    text += formalTitle + '\t' + authors + '\t' + categories + '\n'
+    const imageLink = title in copyList ? copyList[title].imageLink : '-'
+    text += formalTitle + '\t' + authors + '\t' + categories + '\t' + imageLink + '\n'
   })
   return text
 }
