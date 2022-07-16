@@ -42,7 +42,9 @@ export interface Props {
 
 export const Card: React.FC<Props> = ({ record }) => {
   const classes = useStyles()
-  const { title, author, category, impression, memo } = record
+  const { title, author, category, image, impression, memo } = record
+  console.log(record)
+  console.log(image)
   return (
     <MuiCard className={classes.root}>
       <Tooltip title={title}>
@@ -57,7 +59,7 @@ export const Card: React.FC<Props> = ({ record }) => {
       <CardMedia
         component="img"
         className={classes.media}
-        image="/no-image.png"
+        image={!image ? '/no-image.png' : image}
         title={title}
       />
       <CardContent>

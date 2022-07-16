@@ -2,6 +2,7 @@ export interface Record {
   title: string
   author: string
   category: string
+  image: string
   impression: string // 感想 ex.) ◎
   memo: string
 }
