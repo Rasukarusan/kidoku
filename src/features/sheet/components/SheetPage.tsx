@@ -98,7 +98,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
                     <>
                       <div>{hoverBook.title}</div>
                       <div>{hoverBook.author}</div>
-                      <div>{hoverBook.memo}</div>
                     </>
                   )}
                 </Box>
