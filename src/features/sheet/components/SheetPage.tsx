@@ -38,7 +38,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
 
   const handleImageLeave = () => {
     setOpen(false)
-    setHoverBook(null)
   }
 
   const [open, setOpen] = useState(false)
