@@ -66,8 +66,10 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
    */
   const getSuggest = async (keyword: string) => {
     const suggestions = await getSuggestions(keyword)
-    setOptions(suggestions)
-    setOpenSuggest(suggestions && suggestions.length > 0)
+    // 重複を削除
+    const s = Array.from(new Set(suggestions))
+    setOptions(s)
+    setOpenSuggest(s && s.length > 0)
   }
 
   const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
