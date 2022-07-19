@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { motion } from 'framer-motion'
+import { motion, useAnimation } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
 import {
   Container,
@@ -14,6 +14,7 @@ import {
 import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { ReadingRecord, Record } from '../types'
+import { createRef, useRef } from 'react'
 
 const useStyles = makeStyles({
   image: {
@@ -46,25 +47,45 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   }
 
   const handleImageHover = (event) => {
-    setAnchorEl(event.currentTarget)
-    setOpen(true)
     setHoverBook(JSON.parse(event.currentTarget.dataset.book))
   }
 
-  const handleImageLeave = () => {
-    setOpen(false)
-  }
+  const handleImageLeave = () => {}
+  const imgRefs = useRef([])
+  data.forEach((_, i) => {
+    imgRefs.current[i] = createRef()
+  })
 
-  const [open, setOpen] = useState(false)
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const canBeOpen = open && Boolean(anchorEl)
-  const id = canBeOpen ? 'transition-popper' : undefined
-
+  const controls = useAnimation()
   const [anime, setAnime] = useState(false)
+  const onClick = (e) => {
+    setAnime(!anime)
+    if (anime) {
+      controls.start({
+        x: '100%',
+        backgroundColor: '#f00',
+        transition: { duration: 0.3 },
+      })
+    } else {
+    }
+    const imgs = document.getElementsByTagName('img')
+    console.log(imgs[0].getBoundingClientRect())
+  }
+  const onDrag = (event, info, index) => {
+    console.log(info)
+    // console.log(info.point.x, info.point.y)
+    const currentX = info.point.x
+    const imgs = document.getElementsByTagName('img')
+    const positions = []
+    for (var i = 0; i < imgs.length; i++) {
+      positions[i] = imgs[i].getBoundingClientRect().x
+    }
+    console.log(positions)
+  }
   return (
     <Container fixed>
       <H2 title="読書シート" />
-      <button onClick={() => setAnime(!anime)}>{anime ? 'ON' : 'OFF'}</button>
+      <button onClick={onClick}>{anime ? 'ON' : 'OFF'}</button>
       <TabContext value={tab}>
         <Box
           sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
@@ -88,15 +109,20 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
             return (
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
                 <motion.img
-                  whileTap={{
-                    rotateX: '120deg',
-                    rotateY: '90deg',
-                    rotateZ: '190deg',
-                    scale: 2.0,
-                    translateX: '40%',
-                    // transition: { repeat: 0 },
-                  }}
+                  ref={imgRefs.current[i]}
+                  animate={controls}
+                  whileHover={
+                    {
+                      // rotateX: '120deg',
+                      // rotateY: '90deg',
+                      // rotateZ: '190deg',
+                      // scale: 2.0,
+                      // translateX: '40%',
+                      // transition: { repeat: 0 },
+                    }
+                  }
                   drag
+                  onDrag={(event, info) => onDrag(event, info, i)}
                   dragConstraints={{
                     top: -1000,
                     left: -1000,
