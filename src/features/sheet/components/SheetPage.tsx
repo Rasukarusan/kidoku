@@ -1,7 +1,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { motion } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
-import { Container, Grid, Tab, Box, Fade, Popper } from '@mui/material'
+import {
+  Container,
+  Grid,
+  Tab,
+  Box,
+  Fade,
+  Popper,
+  duration,
+} from '@mui/material'
 import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { ReadingRecord, Record } from '../types'
@@ -11,6 +20,12 @@ const useStyles = makeStyles({
     '&:hover': {
       cursor: 'pointer',
     },
+  },
+  box: {
+    width: '200px',
+    height: '200px',
+    borderRadius: '50%',
+    background: 'blue',
   },
 })
 
@@ -45,9 +60,11 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const canBeOpen = open && Boolean(anchorEl)
   const id = canBeOpen ? 'transition-popper' : undefined
 
+  const [anime, setAnime] = useState(false)
   return (
     <Container fixed>
       <H2 title="読書シート" />
+      <button onClick={() => setAnime(!anime)}>{anime ? 'ON' : 'OFF'}</button>
       <TabContext value={tab}>
         <Box
           sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
@@ -70,7 +87,22 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           {data.map((book, i) => {
             return (
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
-                <img
+                <motion.img
+                  whileTap={{
+                    rotateX: '120deg',
+                    rotateY: '90deg',
+                    rotateZ: '190deg',
+                    scale: 2.0,
+                    translateX: '40%',
+                    // transition: { repeat: 0 },
+                  }}
+                  drag
+                  dragConstraints={{
+                    top: -1000,
+                    left: -1000,
+                    right: 1000,
+                    bottom: 1000,
+                  }}
                   className={classes.image}
                   src={book.image}
                   width={128}
@@ -82,28 +114,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
               </Grid>
             )
           })}
-
-          <Popper id={id} open={open} anchorEl={anchorEl} transition>
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={350}>
-                <Box
-                  sx={{
-                    border: 1,
-                    p: 1,
-                    bgcolor: 'background.paper',
-                    width: '500px',
-                  }}
-                >
-                  {hoverBook && (
-                    <>
-                      <div>{hoverBook.title}</div>
-                      <div>{hoverBook.author}</div>
-                    </>
-                  )}
-                </Box>
-              </Fade>
-            )}
-          </Popper>
         </Grid>
       </Box>
     </Container>
