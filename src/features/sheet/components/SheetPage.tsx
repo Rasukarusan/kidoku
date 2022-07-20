@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { motion, useAnimation } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
@@ -35,6 +35,9 @@ interface Props {
   year: string
 }
 
+let prePositionsX = []
+let prePositionsY = []
+
 export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const classes = useStyles()
   const router = useRouter()
@@ -56,36 +59,48 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
     imgRefs.current[i] = createRef()
   })
 
-  const controls = useAnimation()
-  const [anime, setAnime] = useState(false)
-  const onClick = (e) => {
-    setAnime(!anime)
-    if (anime) {
-      controls.start({
-        x: '100%',
-        backgroundColor: '#f00',
-        transition: { duration: 0.3 },
-      })
-    } else {
-    }
+  useEffect(() => {
+    setInterval(() => {
+      getPositions()
+    }, 1000)
+  }, [])
+
+  const getPositions = () => {
     const imgs = document.getElementsByTagName('img')
-    console.log(imgs[0].getBoundingClientRect())
-  }
-  const onDrag = (event, info, index) => {
-    console.log(info)
-    // console.log(info.point.x, info.point.y)
-    const currentX = info.point.x
-    const imgs = document.getElementsByTagName('img')
-    const positions = []
+    const positionsX = []
+    const positionsY = []
     for (var i = 0; i < imgs.length; i++) {
-      positions[i] = imgs[i].getBoundingClientRect().x
+      positionsX[i] = imgs[i].getBoundingClientRect().x
+      positionsY[i] = imgs[i].getBoundingClientRect().y
     }
-    console.log(positions)
+
+    // 現在動いている要素のインデックスを取得
+    if (prePositionsX.length !== 0) {
+      // 前回と位置が違う = 現在動いている
+      const draggingImgsX = positionsX
+        .map((v, i) => {
+          if (!prePositionsX.includes(v)) return i
+        })
+        .filter((v) => v >= 0)
+    }
+    if (prePositionsY.length !== 0) {
+      const draggingImgsY = positionsX
+        .map((v, i) => {
+          if (!prePositionsY.includes(v)) return i
+        })
+        .filter((v) => v >= 0)
+    }
+    prePositionsX = positionsX
+    prePositionsY = positionsY
   }
+
+  const onDrag = (event, info, index) => {
+    const currentX = info.point.x
+  }
+
   return (
     <Container fixed>
       <H2 title="読書シート" />
-      <button onClick={onClick}>{anime ? 'ON' : 'OFF'}</button>
       <TabContext value={tab}>
         <Box
           sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
@@ -110,7 +125,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
                 <motion.img
                   ref={imgRefs.current[i]}
-                  animate={controls}
                   whileHover={
                     {
                       // rotateX: '120deg',
