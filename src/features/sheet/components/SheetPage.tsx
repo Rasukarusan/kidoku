@@ -54,15 +54,11 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   }
 
   const handleImageLeave = () => {}
-  const imgRefs = useRef([])
-  data.forEach((_, i) => {
-    imgRefs.current[i] = createRef()
-  })
 
   useEffect(() => {
     setInterval(() => {
       getPositions()
-    }, 1000)
+    }, 100)
   }, [])
 
   const getPositions = () => {
@@ -74,6 +70,8 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
       positionsY[i] = imgs[i].getBoundingClientRect().y
     }
 
+    let boomX = false
+    let boomY = false
     // 現在動いている要素のインデックスを取得
     if (prePositionsX.length !== 0) {
       // 前回と位置が違う = 現在動いている
@@ -82,13 +80,34 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           if (!prePositionsX.includes(v)) return i
         })
         .filter((v) => v >= 0)
+      draggingImgsX.forEach((i) => {
+        const x = positionsX[i]
+        delete positionsX[i]
+        boomX = positionsX
+          .filter((v) => v)
+          .some((v) => v - 30 <= x && x <= v + 30)
+      })
     }
     if (prePositionsY.length !== 0) {
-      const draggingImgsY = positionsX
+      const draggingImgsY = positionsY
         .map((v, i) => {
           if (!prePositionsY.includes(v)) return i
         })
         .filter((v) => v >= 0)
+      draggingImgsY.forEach((i) => {
+        const y = positionsY[i]
+        delete positionsY[i]
+        boomY = positionsY
+          .filter((v) => v)
+          .some((v) => v - 30 <= y && y <= v + 30)
+        const isBoom = boomX && boomY
+        if (isBoom) {
+          const imgs = document.getElementsByTagName('img')
+          imgs[i].style.opacity = '0.1'
+        } else {
+          imgs[i].style.opacity = '1'
+        }
+      })
     }
     prePositionsX = positionsX
     prePositionsY = positionsY
@@ -124,7 +143,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
             return (
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
                 <motion.img
-                  ref={imgRefs.current[i]}
                   whileHover={
                     {
                       // rotateX: '120deg',
