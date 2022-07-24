@@ -1,11 +1,19 @@
-import { useMemo } from 'react'
-import { Treemap, Tooltip, Legend, TooltipProps } from 'recharts'
+import { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import {
+  ResponsiveContainer,
+  Treemap,
+  Tooltip,
+  Legend,
+  TooltipProps,
+} from 'recharts'
 import {
   ValueType,
   NameType,
 } from 'recharts/src/component/DefaultTooltipContent'
 import { ReadingRecord } from '../types'
 import { theme } from '@/features/global/theme'
+import { TreemapItem } from './TreemapItem'
 
 interface Props {
   records: ReadingRecord
@@ -37,6 +45,12 @@ const CustomTooltip = ({
   )
 }
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max)
+}
+
 export const TreemapGraph: React.FC<Props> = ({ records }) => {
   const data = useMemo(() => {
     const categories = {}
@@ -56,17 +70,50 @@ export const TreemapGraph: React.FC<Props> = ({ records }) => {
     return data
   }, [records])
 
+  const initialAnimates = useMemo(() => {
+    const animates: boolean[] = new Array(data.length).fill(false)
+    return animates
+  }, [records])
+
+  const [animates, setAnimates] = useState(initialAnimates)
+
+  const onClick = (e) => {
+    console.log(e)
+  }
+
+  const onMouseEnter = (node, e) => {
+    const newAnimates = [...initialAnimates]
+    newAnimates[node.root.index] = true
+    setAnimates(newAnimates)
+  }
+
+  const onMouseLeave = (node, e) => {
+    setAnimates([...initialAnimates])
+  }
+
   return (
-    <Treemap
-      width={400}
-      height={250}
-      data={data}
-      dataKey="size"
-      stroke="#fff"
-      fill={theme.palette.secondary.dark}
-      animationDuration={800}
+    <motion.div
+      style={{ width: '100%', height: '300px' }}
+      whileHover={{
+        scale: 1.0,
+        rotate: 0,
+      }}
     >
-      <Tooltip content={<CustomTooltip />} />
-    </Treemap>
+      <ResponsiveContainer width="100%" height="100%">
+        <Treemap
+          data={data}
+          dataKey="size"
+          stroke="#fff"
+          fill="#8889DD"
+          animationDuration={1500}
+          onClick={onClick}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          content={<TreemapItem animates={animates} />}
+        >
+          <Tooltip content={<CustomTooltip />} />
+        </Treemap>
+      </ResponsiveContainer>
+    </motion.div>
   )
 }
