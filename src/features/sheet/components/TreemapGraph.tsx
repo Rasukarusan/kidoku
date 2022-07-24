@@ -7,10 +7,6 @@ import {
   Legend,
   TooltipProps,
 } from 'recharts'
-import {
-  ValueType,
-  NameType,
-} from 'recharts/src/component/DefaultTooltipContent'
 import { ReadingRecord } from '../types'
 import { theme } from '@/features/global/theme'
 import { TreemapItem } from './TreemapItem'
@@ -28,11 +24,7 @@ interface Data {
   }[]
 }
 
-const CustomTooltip = ({
-  active,
-  payload,
-  label,
-}: TooltipProps<ValueType, NameType>) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
   if (!(active && payload && payload.length)) return null
   const data = payload[0].payload
   return (
@@ -44,12 +36,6 @@ const CustomTooltip = ({
       <p className="desc" style={{ color: 'white' }}></p>
     </div>
   )
-}
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max)
 }
 
 export const TreemapGraph: React.FC<Props> = ({ records }) => {
