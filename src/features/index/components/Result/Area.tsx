@@ -37,7 +37,7 @@ export const Area: React.FC<Props> = ({
 
   useEffect(() => {
     Object.keys(results).map((key) => {
-      if (!copyList[key]) {
+      if (!copyList[key] && results[key]) {
         const { title, authors, categories, imageLinks } =
           results[key][0].volumeInfo
         updateCopyList(key, {
