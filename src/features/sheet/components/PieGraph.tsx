@@ -46,6 +46,10 @@ export const PieGraph: React.FC<Props> = ({ records }) => {
     // console.log(entry)
     return `${entry.name} ${Math.floor(entry.percent * 100)}%`
   }
+
+  const onClick = (entry, index) => {
+    console.log(entry, index)
+  }
   return (
     <motion.div
       style={{ width: '100%', height: '300px' }}
@@ -70,6 +74,7 @@ export const PieGraph: React.FC<Props> = ({ records }) => {
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
+                onClick={() => onClick(entry, index)}
               />
             ))}
           </Pie>
