@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useMemo } from 'react'
 import { Box } from '@mui/material'
 import {
@@ -46,7 +47,13 @@ export const Graph: React.FC<Props> = ({ records }) => {
     return `${entry.name} ${Math.floor(entry.percent * 100)}%`
   }
   return (
-    <Box sx={{ width: '100%', height: '300px' }}>
+    <motion.div
+      style={{ width: '100%', height: '300px' }}
+      whileHover={{
+        scale: 1.2,
+        rotate: 360,
+      }}
+    >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -69,6 +76,6 @@ export const Graph: React.FC<Props> = ({ records }) => {
           <Tooltip />
         </PieChart>
       </ResponsiveContainer>
-    </Box>
+    </motion.div>
   )
 }
