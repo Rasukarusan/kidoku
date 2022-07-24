@@ -28,6 +28,15 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const [tab, setTab] = useState(year)
   const [auth, setAuth] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
+
+  useEffect(() => {
+    fetch('/api/auth')
+      .then((res) => res.json())
+      .then((res) => {
+        setAuth(res)
+      })
+  }, [])
+
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue)
     router.push(`/sheet/${newValue}`)
@@ -98,7 +107,7 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
         }}
         disableRestoreFocus
       >
-        <PopoverView info={anchorEl?.dataset.book} />
+        <PopoverView info={anchorEl?.dataset.book} isAuth={auth} />
       </Popover>
     </Container>
   )
