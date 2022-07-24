@@ -35,9 +35,6 @@ interface Props {
   year: string
 }
 
-let prePositionsX = []
-let prePositionsY = []
-
 export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const classes = useStyles()
   const router = useRouter()
@@ -53,69 +50,7 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
     setHoverBook(JSON.parse(event.currentTarget.dataset.book))
   }
 
-  const handleImageLeave = () => {}
-
-  useEffect(() => {
-    setInterval(() => {
-      getPositions()
-    }, 100)
-  }, [])
-
-  const getPositions = () => {
-    const imgs = document.getElementsByTagName('img')
-    const positionsX = []
-    const positionsY = []
-    for (var i = 0; i < imgs.length; i++) {
-      positionsX[i] = imgs[i].getBoundingClientRect().x
-      positionsY[i] = imgs[i].getBoundingClientRect().y
-    }
-
-    let boomX = false
-    let boomY = false
-    // 現在動いている要素のインデックスを取得
-    if (prePositionsX.length !== 0) {
-      // 前回と位置が違う = 現在動いている
-      const draggingImgsX = positionsX
-        .map((v, i) => {
-          if (!prePositionsX.includes(v)) return i
-        })
-        .filter((v) => v >= 0)
-      draggingImgsX.forEach((i) => {
-        const x = positionsX[i]
-        delete positionsX[i]
-        boomX = positionsX
-          .filter((v) => v)
-          .some((v) => v - 30 <= x && x <= v + 30)
-      })
-    }
-    if (prePositionsY.length !== 0) {
-      const draggingImgsY = positionsY
-        .map((v, i) => {
-          if (!prePositionsY.includes(v)) return i
-        })
-        .filter((v) => v >= 0)
-      draggingImgsY.forEach((i) => {
-        const y = positionsY[i]
-        delete positionsY[i]
-        boomY = positionsY
-          .filter((v) => v)
-          .some((v) => v - 30 <= y && y <= v + 30)
-        const isBoom = boomX && boomY
-        if (isBoom) {
-          const imgs = document.getElementsByTagName('img')
-          imgs[i].style.opacity = '0.1'
-        } else {
-          imgs[i].style.opacity = '1'
-        }
-      })
-    }
-    prePositionsX = positionsX
-    prePositionsY = positionsY
-  }
-
-  const onDrag = (event, info, index) => {
-    const currentX = info.point.x
-  }
+  const handleImageLeave = (event) => {}
 
   return (
     <Container fixed>
@@ -143,23 +78,8 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
             return (
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
                 <motion.img
-                  whileHover={
-                    {
-                      // rotateX: '120deg',
-                      // rotateY: '90deg',
-                      // rotateZ: '190deg',
-                      // scale: 2.0,
-                      // translateX: '40%',
-                      // transition: { repeat: 0 },
-                    }
-                  }
-                  drag
-                  onDrag={(event, info) => onDrag(event, info, i)}
-                  dragConstraints={{
-                    top: -1000,
-                    left: -1000,
-                    right: 1000,
-                    bottom: 1000,
+                  whileHover={{
+                    scale: 1.2,
                   }}
                   className={classes.image}
                   src={book.image}
