@@ -22,7 +22,7 @@ interface Data {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
 
-export const Graph: React.FC<Props> = ({ records }) => {
+export const PieGraph: React.FC<Props> = ({ records }) => {
   const data = useMemo(() => {
     const categories = {}
     records.forEach((record) => {
@@ -51,7 +51,7 @@ export const Graph: React.FC<Props> = ({ records }) => {
       style={{ width: '100%', height: '300px' }}
       whileHover={{
         scale: 1.2,
-        rotate: 360,
+        rotate: 0,
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
