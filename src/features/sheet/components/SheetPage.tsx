@@ -8,6 +8,7 @@ import { H2 } from '@/components/Label/H2'
 import { ReadingRecord, Record } from '../types'
 import { createRef, useRef } from 'react'
 import { PopoverView } from './PopoverView'
+import { Graph } from './Graph'
 
 const useStyles = makeStyles({
   image: {
@@ -72,6 +73,7 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           width: '100%',
         }}
       >
+        <Graph records={data} />
         <Grid container rowSpacing={1} columnSpacing={{ xs: 2, sm: 2, md: 3 }}>
           {data.map((book, i) => {
             return (
