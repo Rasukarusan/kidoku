@@ -78,11 +78,11 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           width: '100%',
         }}
       >
-        <Grid container>
-          <Grid item xs={6} sm={6} md={6}>
+        <Grid container sx={{ paddingBottom: 3 }}>
+          <Grid item xs={12} sm={6} md={6}>
             <PieGraph records={data} />
           </Grid>
-          <Grid item xs={6} sm={6} md={6}>
+          <Grid item xs={12} sm={6} md={6}>
             <TreemapGraph records={data} />
           </Grid>
         </Grid>
