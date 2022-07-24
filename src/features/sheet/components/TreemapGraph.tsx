@@ -24,6 +24,7 @@ interface Data {
   children: {
     name: string
     size: number
+    percent: number
   }[]
 }
 
@@ -33,11 +34,11 @@ const CustomTooltip = ({
   label,
 }: TooltipProps<ValueType, NameType>) => {
   if (!(active && payload && payload.length)) return null
-
+  const data = payload[0].payload
   return (
     <div className="custom-tooltip">
       <p className="label" style={{ color: 'white', fontWeight: 400 }}>
-        {`${payload[0].payload.name}：${payload[0].value}冊`}
+        {`${data.value}冊 (${Math.floor(data.percent)}%)`}
       </p>
       <p className="intro">{label}</p>
       <p className="desc" style={{ color: 'white' }}></p>
@@ -64,8 +65,13 @@ export const TreemapGraph: React.FC<Props> = ({ records }) => {
       }
     })
     const data: Data[] = []
-    Object.keys(categories).forEach((key) => {
-      data.push({ name: key, children: [{ name: key, size: categories[key] }] })
+    Object.keys(categories).forEach((name) => {
+      const size = categories[name]
+      const percent = (size / records.length) * 100
+      data.push({
+        name,
+        children: [{ name, size, percent }],
+      })
     })
     return data
   }, [records])
@@ -104,7 +110,6 @@ export const TreemapGraph: React.FC<Props> = ({ records }) => {
           data={data}
           dataKey="size"
           stroke="#fff"
-          fill="#8889DD"
           animationDuration={1500}
           onClick={onClick}
           onMouseEnter={onMouseEnter}

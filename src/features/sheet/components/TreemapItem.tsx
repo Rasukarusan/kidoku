@@ -4,7 +4,16 @@ import { motion } from 'framer-motion'
 export const TreemapItem = (props) => {
   const { depth, x, y, width, height, index, name, animates } = props
 
-  const bgColors = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042']
+  const bgColors = [
+    '#0088FE',
+    '#00C49F',
+    '#FFBB28',
+    '#0C8CC2',
+    '#F73E58',
+    '#507C8F',
+    '#FF8042',
+    '#27F5C1',
+  ]
   return (
     <g>
       <rect
