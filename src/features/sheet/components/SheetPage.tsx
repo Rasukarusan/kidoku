@@ -2,31 +2,18 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { motion, useAnimation } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
-import {
-  Container,
-  Grid,
-  Tab,
-  Box,
-  Fade,
-  Popper,
-  duration,
-} from '@mui/material'
+import { Container, Grid, Tab, Box, Popover, Typography } from '@mui/material'
 import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { ReadingRecord, Record } from '../types'
 import { createRef, useRef } from 'react'
+import { PopoverView } from './PopoverView'
 
 const useStyles = makeStyles({
   image: {
     '&:hover': {
       cursor: 'pointer',
     },
-  },
-  box: {
-    width: '200px',
-    height: '200px',
-    borderRadius: '50%',
-    background: 'blue',
   },
 })
 
@@ -39,18 +26,21 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const classes = useStyles()
   const router = useRouter()
   const [tab, setTab] = useState(year)
-  const [hoverBook, setHoverBook] = useState<Record>(null)
-
+  const [auth, setAuth] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue)
     router.push(`/sheet/${newValue}`)
   }
 
   const handleImageHover = (event) => {
-    setHoverBook(JSON.parse(event.currentTarget.dataset.book))
+    const book = event.currentTarget.dataset.book
+    setAnchorEl(event.currentTarget)
   }
 
-  const handleImageLeave = (event) => {}
+  const handleImageLeave = (event) => {
+    setAnchorEl(null)
+  }
 
   return (
     <Container fixed>
@@ -94,6 +84,22 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           })}
         </Grid>
       </Box>
+      <Popover
+        id="mouse-over-popover"
+        sx={{
+          pointerEvents: 'none',
+        }}
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        onClose={handleImageLeave}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        disableRestoreFocus
+      >
+        <PopoverView info={anchorEl?.dataset.book} />
+      </Popover>
     </Container>
   )
 }
