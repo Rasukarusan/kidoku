@@ -6,7 +6,7 @@ import { makeStyles } from '@mui/styles'
 import { Container, Grid, Tab, Box, Popover } from '@mui/material'
 import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
-import { ReadingRecord } from '../types'
+import { Record } from '../types'
 import { PopoverView, BarGraph } from './'
 
 const TreemapGraph = dynamic(
@@ -23,13 +23,14 @@ const useStyles = makeStyles({
 })
 
 interface Props {
-  data: ReadingRecord
+  data: Record[]
   year: string
 }
 
 export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const classes = useStyles()
   const router = useRouter()
+  const [currentData, setCurrentData] = useState<Record[]>(data)
   const [tab, setTab] = useState(year)
   const [auth, setAuth] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
@@ -41,6 +42,10 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
         setAuth(res)
       })
   }, [])
+
+  const setShowData = (newData: Record[]) => {
+    setCurrentData(newData)
+  }
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue)
@@ -79,14 +84,14 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
       >
         <Grid container sx={{ paddingBottom: 3 }}>
           <Grid item xs={12} sm={6} md={6}>
-            <BarGraph records={data} />
+            <BarGraph records={currentData} />
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
-            <TreemapGraph records={data} />
+            <TreemapGraph records={currentData} />
           </Grid>
         </Grid>
         <Grid container rowSpacing={1} columnSpacing={{ xs: 2, sm: 2, md: 3 }}>
-          {data.map((book, i) => {
+          {currentData.map((book, i) => {
             return (
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
                 <motion.img
