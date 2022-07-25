@@ -14,7 +14,9 @@ https://app.rasukarusan.com
 ## Auth
 
 1. create hash
-https://app.rasukarusan.com/api/hash?pass=YOUR_PASS
+
+https://app.rasukarusan.com/api/hash?pass=
 
 2. authentication
+
 https://app.rasukarusan.com/api/auth
