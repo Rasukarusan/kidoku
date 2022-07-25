@@ -18,6 +18,7 @@ import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { Record } from '../types'
 import { BarGraph } from './'
+import SmsIcon from '@mui/icons-material/Sms'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -112,7 +113,8 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           {currentData.map((book, i) => {
             return (
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
-                <motion.img
+                <motion.div
+                  style={{ position: 'relative' }}
                   initial={{ opacity: 0 }}
                   animate={{
                     opacity: 1,
@@ -123,15 +125,29 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
                   whileHover={{
                     scale: 1.2,
                   }}
-                  className={classes.image}
-                  src={book.image}
-                  width={128}
-                  height={186}
-                  onMouseEnter={handleImageHover}
-                  onMouseLeave={handleImageLeave}
-                  data-book={JSON.stringify(book)}
-                  onClick={onClickImage}
-                />
+                >
+                  <img
+                    className={classes.image}
+                    src={book.image}
+                    width={128}
+                    height={186}
+                    onMouseEnter={handleImageHover}
+                    onMouseLeave={handleImageLeave}
+                    data-book={JSON.stringify(book)}
+                    onClick={onClickImage}
+                  />
+                  {book?.memo !== '[期待]\n\n[感想]' && book?.memo !== '' && (
+                    <p
+                      style={{
+                        position: 'absolute',
+                        top: '-30px',
+                        right: '25px',
+                      }}
+                    >
+                      <SmsIcon />
+                    </p>
+                  )}
+                </motion.div>
               </Grid>
             )
           })}
