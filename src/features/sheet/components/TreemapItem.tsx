@@ -3,7 +3,8 @@ import { theme } from '@/features/global/theme'
 import { bgColors } from '../util'
 
 export const TreemapItem = (props) => {
-  const { depth, x, y, width, height, index, name, hovers, clicks } = props
+  const { depth, x, y, width, height, index, name, hovers, activeIndex } = props
+  const isClicked = index === activeIndex
 
   return (
     <g>
@@ -20,11 +21,13 @@ export const TreemapItem = (props) => {
       />
       {depth === 1 ? (
         <motion.text
-          animate={hovers[index] || clicks[index] ? { scale: 2.0 } : null}
+          animate={
+            hovers[index] || isClicked ? { scale: 2.0, fontWeight: 700 } : null
+          }
           x={x + width / 2}
           y={y + height / 2 + 9}
           textAnchor="middle"
-          fill={clicks[index] ? theme.palette.primary.main : '#fff'}
+          fill="#fff"
           stroke="none"
           fontSize={18}
         >
@@ -35,7 +38,7 @@ export const TreemapItem = (props) => {
         <text
           x={x + 4}
           y={y + 22}
-          fill={clicks[index] ? theme.palette.primary.main : '#fff'}
+          fill="#fff"
           stroke="none"
           fontSize={18}
           fillOpacity={0.5}
