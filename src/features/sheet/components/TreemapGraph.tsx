@@ -62,35 +62,40 @@ export const TreemapGraph: React.FC<Props> = ({ records }) => {
     return data
   }, [records])
 
-  const initialAnimates = useMemo(() => {
-    const animates: boolean[] = new Array(data.length).fill(false)
-    return animates
+  const initialHovers = useMemo(() => {
+    const hovers: boolean[] = new Array(data.length).fill(false)
+    return hovers
   }, [records])
 
-  const [animates, setAnimates] = useState(initialAnimates)
+  const initialClicks = useMemo(() => {
+    const hovers: boolean[] = new Array(data.length).fill(false)
+    return hovers
+  }, [records])
 
-  const onClick = (e) => {
-    console.log(e)
+  // 各タイルのホバー状態
+  const [hovers, setHovers] = useState(initialHovers)
+
+  // 各タイルのクリック状態
+  const [clicks, setClicks] = useState(initialClicks)
+
+  const onClick = (node) => {
+    const newClicks = [...clicks]
+    newClicks[node.root.index] = !clicks[node.root.index]
+    setClicks(newClicks)
   }
 
   const onMouseEnter = (node, e) => {
-    const newAnimates = [...initialAnimates]
-    newAnimates[node.root.index] = true
-    setAnimates(newAnimates)
+    const newHovers = [...initialHovers]
+    newHovers[node.root.index] = true
+    setHovers(newHovers)
   }
 
   const onMouseLeave = (node, e) => {
-    setAnimates([...initialAnimates])
+    setHovers([...initialHovers])
   }
 
   return (
-    <motion.div
-      style={{ width: '100%', height: '300px' }}
-      whileHover={{
-        scale: 1.0,
-        rotate: 0,
-      }}
-    >
+    <div style={{ width: '100%', height: '300px' }}>
       <ResponsiveContainer width="100%" height="100%">
         <Treemap
           data={data}
@@ -100,11 +105,11 @@ export const TreemapGraph: React.FC<Props> = ({ records }) => {
           onClick={onClick}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
-          content={<TreemapItem animates={animates} />}
+          content={<TreemapItem hovers={hovers} clicks={clicks} />}
         >
           <Tooltip content={<CustomTooltip />} />
         </Treemap>
       </ResponsiveContainer>
-    </motion.div>
+    </div>
   )
 }

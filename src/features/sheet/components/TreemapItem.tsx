@@ -1,8 +1,9 @@
 import { Component } from 'react'
 import { motion } from 'framer-motion'
+import { theme } from '@/features/global/theme'
 
 export const TreemapItem = (props) => {
-  const { depth, x, y, width, height, index, name, animates } = props
+  const { depth, x, y, width, height, index, name, hovers, clicks } = props
 
   const bgColors = [
     '#0088FE',
@@ -16,7 +17,7 @@ export const TreemapItem = (props) => {
   ]
   return (
     <g>
-      <rect
+      <motion.rect
         x={x}
         y={y}
         width={width}
@@ -29,11 +30,11 @@ export const TreemapItem = (props) => {
       />
       {depth === 1 ? (
         <motion.text
-          animate={animates[index] ? { scale: 2.0 } : null}
+          animate={hovers[index] || clicks[index] ? { scale: 2.0 } : null}
           x={x + width / 2}
           y={y + height / 2 + 9}
           textAnchor="middle"
-          fill="#fff"
+          fill={clicks[index] ? theme.palette.primary.main : '#fff'}
           stroke="none"
           fontSize={18}
         >
@@ -44,7 +45,7 @@ export const TreemapItem = (props) => {
         <text
           x={x + 4}
           y={y + 22}
-          fill="#fff"
+          fill={clicks[index] ? theme.palette.primary.main : '#fff'}
           stroke="none"
           fontSize={18}
           fillOpacity={0.5}
