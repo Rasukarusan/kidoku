@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Tooltip,
   ResponsiveContainer,
@@ -8,9 +8,11 @@ import {
   CartesianGrid,
   Bar,
   Line,
+  Cell,
 } from 'recharts'
 import { ReadingRecord, Record } from '../types'
 import { theme } from '@/features/global'
+import { bgColors, getRandomColor } from '../util'
 
 interface Props {
   records: ReadingRecord
@@ -61,6 +63,12 @@ export const BarGraph: React.FC<Props> = ({ records }) => {
     return data
   }, [records])
 
+  const onClick = (data, index) => {
+    setActiveIndex(index)
+  }
+
+  const [activeIndex, setActiveIndex] = useState(null)
+
   return (
     <div style={{ width: '100%', height: '350px' }}>
       <ResponsiveContainer width="100%" height="100%">
@@ -72,12 +80,16 @@ export const BarGraph: React.FC<Props> = ({ records }) => {
           <YAxis />
           <CartesianGrid stroke="#f5f5f5" />
           <Tooltip formatter={formatter} />
-          <Bar dataKey="sum" barSize={30} fill={theme.palette.primary.main} />
-          <Line
-            type="monotone"
-            dataKey="count"
-            stroke={theme.palette.secondary.main}
-          />
+          <Bar dataKey="sum" barSize={30} onClick={onClick}>
+            {data.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                cursor="pointer"
+                fill={index === activeIndex ? '#00C49F' : '#507C8F'}
+              />
+            ))}
+          </Bar>
+          <Line type="monotone" dataKey="count" stroke="#00C49F" />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
