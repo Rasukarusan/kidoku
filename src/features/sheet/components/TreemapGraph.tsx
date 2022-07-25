@@ -68,9 +68,14 @@ export const TreemapGraph: React.FC<Props> = ({ records, setShowData }) => {
 
   const onClick = (node) => {
     const index = node.root.index
-    setActiveIndex(index)
-    const showData = records.filter(record => record.category === node.name)
-    setShowData(showData)
+    if (index === activeIndex) {
+      setActiveIndex(null)
+      setShowData(records)
+    } else {
+      setActiveIndex(index)
+      const showData = records.filter(record => record.category === node.name)
+      setShowData(showData)
+    }
   }
 
   const onMouseEnter = (node, e) => {
