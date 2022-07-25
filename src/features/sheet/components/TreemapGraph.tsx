@@ -5,6 +5,7 @@ import { TreemapItem } from './TreemapItem'
 
 interface Props {
   records: Record[]
+  setShowData: (newData: Record[]) => void
 }
 
 interface Data {
@@ -30,7 +31,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export const TreemapGraph: React.FC<Props> = ({ records }) => {
+export const TreemapGraph: React.FC<Props> = ({ records, setShowData }) => {
   const data = useMemo(() => {
     const categories = {}
     records.forEach((record) => {
@@ -59,21 +60,17 @@ export const TreemapGraph: React.FC<Props> = ({ records }) => {
     return hovers
   }, [records])
 
-  const initialClicks = useMemo(() => {
-    const hovers: boolean[] = new Array(data.length).fill(false)
-    return hovers
-  }, [records])
-
   // 各タイルのホバー状態
   const [hovers, setHovers] = useState(initialHovers)
 
-  // 各タイルのクリック状態
-  const [clicks, setClicks] = useState(initialClicks)
+  // クリックしているタイルのインデックス
+  const [activeIndex, setActiveIndex] = useState(null)
 
   const onClick = (node) => {
-    const newClicks = [...clicks]
-    newClicks[node.root.index] = !clicks[node.root.index]
-    setClicks(newClicks)
+    const index = node.root.index
+    setActiveIndex(index)
+    const showData = records.filter(record => record.category === node.name)
+    setShowData(showData)
   }
 
   const onMouseEnter = (node, e) => {
@@ -97,7 +94,7 @@ export const TreemapGraph: React.FC<Props> = ({ records }) => {
           onClick={onClick}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
-          content={<TreemapItem hovers={hovers} clicks={clicks} />}
+          content={<TreemapItem hovers={hovers} activeIndex={activeIndex} />}
         >
           <Tooltip content={<CustomTooltip />} />
         </Treemap>
