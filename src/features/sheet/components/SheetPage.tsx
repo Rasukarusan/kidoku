@@ -8,7 +8,7 @@ import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { ReadingRecord, Record } from '../types'
 import { createRef, useRef } from 'react'
-import { PopoverView, PieGraph } from './'
+import { PopoverView, BarGraph } from './'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -80,7 +80,7 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
       >
         <Grid container sx={{ paddingBottom: 3 }}>
           <Grid item xs={12} sm={6} md={6}>
-            <PieGraph records={data} />
+            <BarGraph records={data} />
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
             <TreemapGraph records={data} />
