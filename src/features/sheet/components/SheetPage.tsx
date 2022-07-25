@@ -41,12 +41,16 @@ interface Props {
 export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const classes = useStyles()
   const router = useRouter()
-  const [currentData, setCurrentData] = useState<Record[]>(data)
+  const [currentData, setCurrentData] = useState<Record[]>([])
   const [tab, setTab] = useState(year)
   const [auth, setAuth] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
   const [open, setOpen] = useState(false)
   const [book, setBook] = useState<Record>(null)
+
+  useEffect(() => {
+    setCurrentData(data)
+  }, [data])
 
   useEffect(() => {
     fetch('/api/auth')
