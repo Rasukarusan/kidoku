@@ -14,7 +14,12 @@ export const PopoverView: React.FC<Props> = ({ info, isAuth }) => {
       <div>{book.title}</div>
       <div>{book.author}</div>
       <div>{book.category}</div>
-      {isAuth && <><br /><div>{book.memo}</div></>}
+      {isAuth && (
+        <>
+          <br />
+          <div>{book.memo}</div>
+        </>
+      )}
     </Box>
   )
 }

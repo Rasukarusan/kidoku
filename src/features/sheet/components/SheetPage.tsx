@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
-import { motion, useAnimation } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
-import { Container, Grid, Tab, Box, Popover, Typography } from '@mui/material'
+import { Container, Grid, Tab, Box, Popover } from '@mui/material'
 import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
-import { ReadingRecord, Record } from '../types'
-import { createRef, useRef } from 'react'
+import { ReadingRecord } from '../types'
 import { PopoverView, BarGraph } from './'
 
 const TreemapGraph = dynamic(

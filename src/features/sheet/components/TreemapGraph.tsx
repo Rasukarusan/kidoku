@@ -1,14 +1,6 @@
 import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import {
-  ResponsiveContainer,
-  Treemap,
-  Tooltip,
-  Legend,
-  TooltipProps,
-} from 'recharts'
+import { ResponsiveContainer, Treemap, Tooltip } from 'recharts'
 import { ReadingRecord } from '../types'
-import { theme } from '@/features/global/theme'
 import { TreemapItem } from './TreemapItem'
 
 interface Props {

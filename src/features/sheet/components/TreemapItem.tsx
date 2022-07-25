@@ -1,4 +1,3 @@
-import { Component } from 'react'
 import { motion } from 'framer-motion'
 import { theme } from '@/features/global/theme'
 
