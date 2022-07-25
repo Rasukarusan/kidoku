@@ -1,15 +1,7 @@
 import { motion } from 'framer-motion'
 import { useMemo } from 'react'
-import { Box } from '@mui/material'
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { ReadingRecord, Record } from '../types'
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { ReadingRecord } from '../types'
 
 interface Props {
   records: ReadingRecord

@@ -1,8 +1,5 @@
-import { motion } from 'framer-motion'
 import { useMemo } from 'react'
-import { Box } from '@mui/material'
 import {
-  Legend,
   Tooltip,
   ResponsiveContainer,
   ComposedChart,
