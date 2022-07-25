@@ -3,11 +3,21 @@ import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
-import { Container, Grid, Tab, Box, Popover } from '@mui/material'
+import {
+  Container,
+  Grid,
+  Tab,
+  Box,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  Typography,
+} from '@mui/material'
 import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { Record } from '../types'
-import { PopoverView, BarGraph } from './'
+import { BarGraph } from './'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -34,6 +44,8 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const [tab, setTab] = useState(year)
   const [auth, setAuth] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
+  const [open, setOpen] = useState(false)
+  const [book, setBook] = useState<Record>(null)
 
   useEffect(() => {
     fetch('/api/auth')
@@ -59,6 +71,11 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
 
   const handleImageLeave = (event) => {
     setAnchorEl(null)
+  }
+
+  const onClickImage = (event) => {
+    setBook(JSON.parse(event.currentTarget.dataset.book))
+    setOpen(true)
   }
 
   return (
@@ -113,12 +130,29 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
                   onMouseEnter={handleImageHover}
                   onMouseLeave={handleImageLeave}
                   data-book={JSON.stringify(book)}
+                  onClick={onClickImage}
                 />
               </Grid>
             )
           })}
         </Grid>
       </Box>
+      <Dialog onClose={() => setOpen(false)} open={open}>
+        <DialogTitle>{book?.title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ marginRight: '0 auto' }}>
+            <a
+              href={encodeURI(`https://www.amazon.co.jp/s?k=${book?.title}`)}
+              target="_blank"
+            >
+              amazon
+            </a>
+          </DialogContentText>
+          <DialogContentText>{book?.author}</DialogContentText>
+          <DialogContentText>{book?.category}</DialogContentText>
+          {auth && <DialogContentText>{book?.memo}</DialogContentText>}
+        </DialogContent>
+      </Dialog>
     </Container>
   )
 }
