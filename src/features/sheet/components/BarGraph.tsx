@@ -10,12 +10,12 @@ import {
   Line,
   Cell,
 } from 'recharts'
-import { ReadingRecord, Record } from '../types'
+import { Record } from '../types'
 import { theme } from '@/features/global'
 import { bgColors, getRandomColor } from '../util'
 
 interface Props {
-  records: ReadingRecord
+  records: Record[]
 }
 
 interface Data {

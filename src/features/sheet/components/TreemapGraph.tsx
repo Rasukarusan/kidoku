@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import { ResponsiveContainer, Treemap, Tooltip } from 'recharts'
-import { ReadingRecord } from '../types'
+import { Record } from '../types'
 import { TreemapItem } from './TreemapItem'
 
 interface Props {
-  records: ReadingRecord
+  records: Record[]
 }
 
 interface Data {
