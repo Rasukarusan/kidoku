@@ -16,13 +16,14 @@ import { bgColors, getRandomColor } from '../util'
 
 interface Props {
   records: Record[]
+  setShowData: (newData: Record[]) => void
 }
 
 interface Data {
   name: string
   count: number
   sum: number
-  children: Record
+  children: Record[]
 }
 
 const formatter = (value, name, props) => {
@@ -30,7 +31,7 @@ const formatter = (value, name, props) => {
   return [`${value}冊`, label]
 }
 
-export const BarGraph: React.FC<Props> = ({ records }) => {
+export const BarGraph: React.FC<Props> = ({ records, setShowData }) => {
   const data = useMemo(() => {
     const months = {}
     records.forEach((record) => {
@@ -63,8 +64,15 @@ export const BarGraph: React.FC<Props> = ({ records }) => {
     return data
   }, [records])
 
-  const onClick = (data, index) => {
-    setActiveIndex(index)
+  const onClick = (node, index) => {
+    if (index === activeIndex) {
+      setActiveIndex(null)
+      setShowData(records)
+    } else {
+      setActiveIndex(index)
+      const newData = data.filter((v) => v.name === node.name)[0].children
+      setShowData(newData)
+    }
   }
 
   const [activeIndex, setActiveIndex] = useState(null)
