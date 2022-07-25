@@ -80,14 +80,15 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
       <Box
         sx={{
           width: '100%',
+          marginBottom: '100px',
         }}
       >
         <Grid container sx={{ paddingBottom: 3 }}>
           <Grid item xs={12} sm={6} md={6}>
-            <BarGraph records={data} setShowData={setShowData}/>
+            <BarGraph records={data} setShowData={setShowData} />
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
-            <TreemapGraph records={data} setShowData={setShowData}/>
+            <TreemapGraph records={data} setShowData={setShowData} />
           </Grid>
         </Grid>
         <Grid container rowSpacing={1} columnSpacing={{ xs: 2, sm: 2, md: 3 }}>
@@ -95,6 +96,13 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
             return (
               <Grid key={book.title + i} item xs={4} sm={3} md={2}>
                 <motion.img
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: 1,
+                    transition: {
+                      duration: 1,
+                    },
+                  }}
                   whileHover={{
                     scale: 1.2,
                   }}
@@ -111,22 +119,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           })}
         </Grid>
       </Box>
-      <Popover
-        id="mouse-over-popover"
-        sx={{
-          pointerEvents: 'none',
-        }}
-        open={!!anchorEl}
-        anchorEl={anchorEl}
-        onClose={handleImageLeave}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        disableRestoreFocus
-      >
-        <PopoverView info={anchorEl?.dataset.book} isAuth={auth} />
-      </Popover>
     </Container>
   )
 }
