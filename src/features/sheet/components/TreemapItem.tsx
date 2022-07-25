@@ -1,19 +1,10 @@
 import { motion } from 'framer-motion'
 import { theme } from '@/features/global/theme'
+import { bgColors } from '../util'
 
 export const TreemapItem = (props) => {
   const { depth, x, y, width, height, index, name, hovers, clicks } = props
 
-  const bgColors = [
-    '#0088FE',
-    '#00C49F',
-    '#FFBB28',
-    '#0C8CC2',
-    '#F73E58',
-    '#507C8F',
-    '#FF8042',
-    '#27F5C1',
-  ]
   return (
     <g>
       <motion.rect
