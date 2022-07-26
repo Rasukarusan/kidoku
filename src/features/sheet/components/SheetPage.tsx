@@ -18,6 +18,7 @@ import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { Record } from '../types'
 import { BarGraph } from './'
+import { getYears } from '../util'
 import SmsIcon from '@mui/icons-material/Sms'
 
 const TreemapGraph = dynamic(
@@ -91,11 +92,11 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
         >
           <TabList onChange={handleChange} aria-label="readgin records">
-            <Tab label="2022" value="2022" />
-            <Tab label="2021" value="2021" />
-            <Tab label="2020" value="2020" />
-            <Tab label="2019" value="2019" />
-            <Tab label="2018" value="2018" />
+            {getYears()
+              .reverse()
+              .map((year) => (
+                <Tab label={year} value={year} />
+              ))}
           </TabList>
         </Box>
       </TabContext>

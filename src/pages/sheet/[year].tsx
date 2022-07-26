@@ -1,4 +1,5 @@
 import { SheetPage } from '@/features/sheet/components/SheetPage'
+import { getYears } from '@/features/sheet/util'
 export default SheetPage
 
 type Props = { params: { year: number } }
@@ -16,7 +17,13 @@ export const getStaticProps = async ({ params }: Props) => {
   }
 }
 
-export const getStaticPaths = async () => ({
-  paths: [],
-  fallback: 'blocking', // キャッシュが存在しない場合はSSR
-})
+export const getStaticPaths = async () => {
+  const years = getYears()
+  const paths = years.map((year) => {
+    return { params: { year } }
+  })
+  return {
+    paths,
+    fallback: 'blocking', // キャッシュが存在しない場合はSSR
+  }
+}
