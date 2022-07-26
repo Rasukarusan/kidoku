@@ -249,6 +249,7 @@ export const Header = () => {
                 autoComplete="off"
                 margin="dense"
                 id="password"
+                label="Password"
                 type="password"
                 fullWidth
                 variant="standard"
