@@ -167,7 +167,7 @@ export const Header = () => {
                 {auth ? (
                   <MenuItem onClick={handleClickLogout}>ログアウト</MenuItem>
                 ) : (
-                  <MenuItem onClick={handleClickLogout}>ログイン</MenuItem>
+                  <MenuItem onClick={handleClickLogin}>ログイン</MenuItem>
                 )}
               </Menu>
             </Box>
