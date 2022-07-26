@@ -141,17 +141,19 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
                     data-book={JSON.stringify(book)}
                     onClick={onClickImage}
                   />
-                  {book?.memo !== '[期待]\n\n[感想]' && book?.memo !== '' && (
-                    <p
-                      style={{
-                        position: 'absolute',
-                        top: '-30px',
-                        right: '25px',
-                      }}
-                    >
-                      <SmsIcon />
-                    </p>
-                  )}
+                  {auth &&
+                    book?.memo !== '[期待]\n\n[感想]' &&
+                    book?.memo !== '' && (
+                      <p
+                        style={{
+                          position: 'absolute',
+                          top: '-30px',
+                          right: '25px',
+                        }}
+                      >
+                        <SmsIcon />
+                      </p>
+                    )}
                 </motion.div>
               </Grid>
             )
