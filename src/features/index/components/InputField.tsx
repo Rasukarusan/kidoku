@@ -138,6 +138,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
         renderInput={(params) => (
           <TextField
             {...params}
+            autoComplete="off"
             className={classes.suggestTextField}
             inputRef={suggestRef}
             onChange={onSuggestChange}
