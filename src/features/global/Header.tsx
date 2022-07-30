@@ -14,7 +14,6 @@ import {
   MenuItem,
   Dialog,
   DialogContent,
-  DialogTitle,
   TextField,
   DialogActions,
 } from '@mui/material'
@@ -167,7 +166,7 @@ export const Header = () => {
                 {auth ? (
                   <MenuItem onClick={handleClickLogout}>ログアウト</MenuItem>
                 ) : (
-                  <MenuItem onClick={handleClickLogin}>ログイン</MenuItem>
+                  <MenuItem onClick={() => setOpen(true)}>ログイン</MenuItem>
                 )}
               </Menu>
             </Box>
@@ -257,8 +256,8 @@ export const Header = () => {
               />
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setOpen(false)}>Cancel</Button>
-              <Button onClick={handleClickLogin}>Login</Button>
+              <Button onClick={() => setOpen(false)}>キャンセル</Button>
+              <Button onClick={handleClickLogin}>ログイン</Button>
             </DialogActions>
           </Dialog>
         </Container>
