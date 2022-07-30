@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import { theme } from '@/features/global/theme'
 import { bgColors } from '../util'
 
 export const TreemapItem = (props) => {
