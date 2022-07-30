@@ -17,6 +17,7 @@ interface Data {
   }[]
 }
 
+// eslint-disable-next-line
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!(active && payload && payload.length)) return null
   const data = payload[0].payload
@@ -73,7 +74,7 @@ export const TreemapGraph: React.FC<Props> = ({ records, setShowData }) => {
       setShowData(records)
     } else {
       setActiveIndex(index)
-      const showData = records.filter(record => record.category === node.name)
+      const showData = records.filter((record) => record.category === node.name)
       setShowData(showData)
     }
   }
