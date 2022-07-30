@@ -4,15 +4,12 @@ import {
   ResponsiveContainer,
   ComposedChart,
   XAxis,
-  YAxis,
   CartesianGrid,
   Bar,
   Line,
   Cell,
 } from 'recharts'
 import { Record } from '../types'
-import { theme } from '@/features/global'
-import { bgColors, getRandomColor } from '../util'
 
 interface Props {
   records: Record[]
@@ -85,7 +82,6 @@ export const BarGraph: React.FC<Props> = ({ records, setShowData }) => {
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         >
           <XAxis dataKey="name" />
-          <YAxis />
           <CartesianGrid stroke="#f5f5f5" />
           <Tooltip formatter={formatter} />
           <Bar dataKey="sum" barSize={30} onClick={onClick}>
