@@ -12,9 +12,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  Typography,
+  Tabs,
 } from '@mui/material'
-import { TabContext, TabList } from '@mui/lab'
 import { H2 } from '@/components/Label/H2'
 import { Record } from '../types'
 import { BarGraph } from './'
@@ -87,19 +86,23 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   return (
     <Container fixed>
       <H2 title="読書シート" />
-      <TabContext value={tab}>
-        <Box
-          sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
+      <Box
+        sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tabs
+          variant="scrollable"
+          scrollButtons="auto"
+          onChange={handleChange}
+          aria-label="readgin records"
+          value={tab}
         >
-          <TabList onChange={handleChange} aria-label="readgin records">
-            {getYears()
-              .reverse()
-              .map((year) => (
-                <Tab label={year} value={year} />
-              ))}
-          </TabList>
-        </Box>
-      </TabContext>
+          {getYears()
+            .reverse()
+            .map((year) => (
+              <Tab key={year} label={year} value={year} />
+            ))}
+        </Tabs>
+      </Box>
       <Box
         sx={{
           width: '100%',
@@ -167,6 +170,7 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
             <a
               href={encodeURI(`https://www.amazon.co.jp/s?k=${book?.title}`)}
               target="_blank"
+              rel="noreferrer"
             >
               amazon
             </a>
