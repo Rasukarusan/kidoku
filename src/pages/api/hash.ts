@@ -1,6 +1,7 @@
 import nookies from 'nookies'
 import crypto from 'crypto'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { COOKIE_KEY_HASH } from '@/libs/constants'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const pass = req.query.pass as string
@@ -8,7 +9,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json('passを指定してください')
   }
   const hashHex = crypto.createHash('sha256').update(pass, 'utf8').digest('hex')
-  nookies.set({ res }, 'myhash', hashHex, {
+  nookies.set({ res }, COOKIE_KEY_HASH, hashHex, {
     maxAge: 10 * 12 * 30 * 24 * 60 * 60, // 10年間
     path: '/',
   })
