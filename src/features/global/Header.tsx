@@ -1,4 +1,3 @@
-import nookies from 'nookies'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -68,12 +67,7 @@ export const Header = () => {
   // TODO: refactor
   const handleClickLogin = () => {
     fetch(`/api/hash?pass=${pass}`)
-      .then((res) => res.json())
       .then((res) => {
-        nookies.set(null, 'myhash', res, {
-          maxAge: 10 * 12 * 30 * 24 * 60 * 60, // 10年間
-          path: '/',
-        })
         fetch(`/api/auth`)
           .then((res) => res.json())
           .then((res) => {
