@@ -4,7 +4,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/** --ext .ts,.tsx",
-    "lint:fix": "yarn lint --fix"
+    "lint:fix": "yarn lint --fix",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@emotion/react": "^11.9.3",
@@ -39,6 +40,8 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.30.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "prettier": "^2.0.5"
   }
 }
