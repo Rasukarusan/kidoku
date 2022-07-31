@@ -253,6 +253,12 @@ export const Header = () => {
                 fullWidth
                 variant="standard"
                 onChange={handleInputPass}
+                onKeyDown={(e) => {
+                  if (e.keyCode === 13) {
+                    // ENTER
+                    handleClickLogin()
+                  }
+                }}
               />
             </DialogContent>
             <DialogActions>
