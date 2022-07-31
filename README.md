@@ -15,7 +15,7 @@ https://app.rasukarusan.com
 
 1. create hash
 
-https://app.rasukarusan.com/api/hash?pass=
+https://app.rasukarusan.com/api/login?pass=
 
 2. authentication
 

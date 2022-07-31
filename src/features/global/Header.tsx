@@ -66,7 +66,7 @@ export const Header = () => {
 
   // TODO: refactor
   const handleClickLogin = () => {
-    fetch(`/api/hash?pass=${pass}`)
+    fetch(`/api/login?pass=${pass}`, { credentials: 'same-origin' })
       .then((res) => {
         fetch(`/api/auth`)
           .then((res) => res.json())
