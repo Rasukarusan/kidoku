@@ -81,7 +81,7 @@ export const Header = () => {
 
   // TODO: refactor
   const handleClickLogout = () => {
-    fetch(`/api/logout`).then((res) => {
+    fetch(`/api/logout`, { credentials: 'same-origin' }).then((res) => {
       fetch(`/api/auth`)
         .then((res) => res.json())
         .then((res) => {
