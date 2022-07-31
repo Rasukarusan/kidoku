@@ -66,9 +66,9 @@ export const Header = () => {
 
   // TODO: refactor
   const handleClickLogin = () => {
-    fetch(`/api/login?pass=${pass}`, { credentials: 'same-origin' })
+    fetch(`/api/login?pass=${pass}`, { method: 'POST' })
       .then((res) => {
-        fetch(`/api/auth`, { credentials: 'same-origin' })
+        fetch(`/api/auth`)
           .then((res) => res.json())
           .then((res) => {
             setAuth(res)
@@ -81,8 +81,8 @@ export const Header = () => {
 
   // TODO: refactor
   const handleClickLogout = () => {
-    fetch(`/api/logout`, { credentials: 'same-origin' }).then((res) => {
-      fetch(`/api/auth`, { credentials: 'same-origin' })
+    fetch(`/api/logout`, { method: 'POST' }).then((res) => {
+      fetch(`/api/auth`)
         .then((res) => res.json())
         .then((res) => {
           setAuth(res)
