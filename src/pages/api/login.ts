@@ -13,5 +13,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     maxAge: 10 * 12 * 30 * 24 * 60 * 60, // 10年間
     path: '/',
   })
-  res.status(200).json(hashHex)
+  return res.status(200).json(hashHex)
 }
