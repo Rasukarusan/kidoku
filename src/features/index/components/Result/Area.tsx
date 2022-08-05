@@ -50,7 +50,7 @@ export const Area: React.FC<Props> = ({
     })
   })
   return (
-    <div>
+    <div style={{ marginBottom: '100px' }}>
       {titles.map((title: string, i: number) => {
         return (
           <div key={`${i}-${title}`}>
