@@ -4,8 +4,10 @@ import {
   MenuItem,
   Dialog,
   DialogContent,
-  TextField,
   DialogActions,
+  TextField,
+  Snackbar,
+  Alert,
 } from '@mui/material'
 
 interface Props {
@@ -14,6 +16,7 @@ interface Props {
 
 export const SignButton: React.FC<Props> = ({ mobile }) => {
   const [open, setOpen] = useState(false)
+  const [snack, setSnack] = useState(false)
   const [pass, setPass] = useState('')
   const [auth, setAuth] = useState(false)
 
@@ -33,6 +36,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
           .then((res) => res.json())
           .then((res) => {
             setAuth(res)
+            setSnack(res)
           })
       })
       .finally(() => {
@@ -82,6 +86,21 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
           {auth ? 'ログアウト' : 'ログイン'}
         </Button>
       )}
+      <Snackbar
+        open={snack}
+        autoHideDuration={1000}
+        onClose={() => setSnack(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnack(false)}
+          severity="success"
+          elevation={6}
+          variant="filled"
+        >
+          Login Success!
+        </Alert>
+      </Snackbar>
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogContent>
           <TextField

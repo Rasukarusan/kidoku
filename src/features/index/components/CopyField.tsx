@@ -37,6 +37,7 @@ export const CopyField: React.FC<Props> = ({ titles, copyList }) => {
         open={open}
         autoHideDuration={5000}
         onClose={() => setOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert
           onClose={() => setOpen(false)}
