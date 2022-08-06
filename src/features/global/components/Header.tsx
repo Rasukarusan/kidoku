@@ -1,9 +1,18 @@
 import { useRouter } from 'next/router'
 import dayjs from 'dayjs'
-import { AppBar, Toolbar, Container } from '@mui/material'
-import OpenInNewSharpIcon from '@mui/icons-material/OpenInNewSharp'
+import {
+  Avatar,
+  Box,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Container,
+} from '@mui/material'
 import { Page } from '../types'
 import { Title, TitleSp, Menu, MenuSp } from './'
+import { theme } from '../theme'
+import OpenInNewSharpIcon from '@mui/icons-material/OpenInNewSharp'
+import GitHubIcon from '@mui/icons-material/GitHub'
 
 const pages: Page[] = [
   {
@@ -32,6 +41,19 @@ export const Header = () => {
             <MenuSp pages={pages} />
             <TitleSp />
             <Menu pages={pages} />
+            <Box sx={{ flexGrow: 0 }}>
+              <a
+                href="https://github.com/Rasukarusan/search-author-neo"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <IconButton sx={{ p: 0 }}>
+                  <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
+                    <GitHubIcon fontSize="large" />
+                  </Avatar>
+                </IconButton>
+              </a>
+            </Box>
           </Toolbar>
         </Container>
       </AppBar>
