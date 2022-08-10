@@ -6,19 +6,16 @@ import { makeStyles } from '@mui/styles'
 import {
   Container,
   Grid,
-  Tab,
   Box,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
-  Tabs,
 } from '@mui/material'
-import { H2 } from '@/components/Label/H2'
 import { Record } from '../types'
-import { BarGraph } from './'
-import { getYears } from '../util'
+import { BarGraph, Tabs } from './'
 import SmsIcon from '@mui/icons-material/Sms'
+import { Title } from './Title'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -42,7 +39,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const classes = useStyles()
   const router = useRouter()
   const [currentData, setCurrentData] = useState<Record[]>([])
-  const [tab, setTab] = useState(year)
   const [auth, setAuth] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
   const [open, setOpen] = useState(false)
@@ -64,11 +60,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
     setCurrentData(newData)
   }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setTab(newValue)
-    router.push(`/sheet/${newValue}`)
-  }
-
   const handleImageHover = (event) => {
     const book = event.currentTarget.dataset.book
     setAnchorEl(event.currentTarget)
@@ -85,23 +76,11 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
 
   return (
     <Container fixed>
-      <H2 title="読書シート" />
+      <Title />
       <Box
         sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
       >
-        <Tabs
-          variant="scrollable"
-          scrollButtons="auto"
-          onChange={handleChange}
-          aria-label="readgin records"
-          value={tab}
-        >
-          {getYears()
-            .reverse()
-            .map((year) => (
-              <Tab key={year} label={year} value={year} />
-            ))}
-        </Tabs>
+        <Tabs value={year} />
       </Box>
       <Box
         sx={{
