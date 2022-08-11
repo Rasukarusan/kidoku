@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Container, Box } from '@mui/material'
+import { Container, Box, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import { Tabs, Title } from './'
+import { Books } from './Books'
 
 interface Props {
   res: any
@@ -21,6 +22,12 @@ export const SheetTotalPage: React.FC<Props> = ({ res }) => {
         sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
       >
         <Tabs value="total" />
+      </Box>
+      <Box>
+        <Typography variant="h1" component="h2">
+          {res.length}冊
+        </Typography>
+        <Books books={res} />
       </Box>
     </Container>
   )
