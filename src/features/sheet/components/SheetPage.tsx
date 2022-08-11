@@ -43,19 +43,19 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
       <Box
         sx={{
           width: '100%',
-          marginBottom: '100px',
+          marginBottom: '50px',
         }}
       >
-        <Grid container sx={{ paddingBottom: 3 }}>
+        <Grid container>
           <Grid item xs={12} sm={6} md={6}>
             <BarGraph records={data} setShowData={setShowData} />
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
             <TreemapGraph records={data} setShowData={setShowData} />
           </Grid>
-          <Books books={currentData} />
         </Grid>
       </Box>
+      <Books books={currentData} />
     </Container>
   )
 }
