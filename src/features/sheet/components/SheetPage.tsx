@@ -1,34 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
-import { motion } from 'framer-motion'
-import { makeStyles } from '@mui/styles'
-import {
-  Container,
-  Grid,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-} from '@mui/material'
+import { Container, Grid, Box } from '@mui/material'
 import { Record } from '../types'
 import { BarGraph, Tabs } from './'
-import SmsIcon from '@mui/icons-material/Sms'
 import { Title } from './Title'
+import { Books } from './Books'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
   { ssr: false }
 )
-
-const useStyles = makeStyles({
-  image: {
-    '&:hover': {
-      cursor: 'pointer',
-    },
-  },
-})
 
 interface Props {
   data: Record[]
@@ -36,10 +18,8 @@ interface Props {
 }
 
 export const SheetPage: React.FC<Props> = ({ data, year }) => {
-  const classes = useStyles()
   const router = useRouter()
   const [currentData, setCurrentData] = useState<Record[]>([])
-  const [auth, setAuth] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
   const [open, setOpen] = useState(false)
   const [book, setBook] = useState<Record>(null)
@@ -48,30 +28,8 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
     setCurrentData(data)
   }, [data])
 
-  useEffect(() => {
-    fetch('/api/auth')
-      .then((res) => res.json())
-      .then((res) => {
-        setAuth(res)
-      })
-  }, [])
-
   const setShowData = (newData: Record[]) => {
     setCurrentData(newData)
-  }
-
-  const handleImageHover = (event) => {
-    const book = event.currentTarget.dataset.book
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleImageLeave = (event) => {
-    setAnchorEl(null)
-  }
-
-  const onClickImage = (event) => {
-    setBook(JSON.parse(event.currentTarget.dataset.book))
-    setOpen(true)
   }
 
   return (
@@ -95,70 +53,9 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           <Grid item xs={12} sm={6} md={6}>
             <TreemapGraph records={data} setShowData={setShowData} />
           </Grid>
-        </Grid>
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 2, sm: 2, md: 3 }}>
-          {currentData.map((book, i) => {
-            return (
-              <Grid key={book.title + i} item xs={4} sm={3} md={2}>
-                <motion.div
-                  style={{ position: 'relative' }}
-                  initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: 1,
-                    transition: {
-                      duration: 1,
-                    },
-                  }}
-                  whileHover={{
-                    scale: 1.2,
-                  }}
-                >
-                  <img
-                    className={classes.image}
-                    src={book.image}
-                    width={128}
-                    height={186}
-                    onMouseEnter={handleImageHover}
-                    onMouseLeave={handleImageLeave}
-                    data-book={JSON.stringify(book)}
-                    onClick={onClickImage}
-                  />
-                  {auth &&
-                    book?.memo !== '[期待]\n\n[感想]' &&
-                    book?.memo !== '' && (
-                      <p
-                        style={{
-                          position: 'absolute',
-                          top: '-30px',
-                          right: '25px',
-                        }}
-                      >
-                        <SmsIcon />
-                      </p>
-                    )}
-                </motion.div>
-              </Grid>
-            )
-          })}
+          <Books books={currentData} />
         </Grid>
       </Box>
-      <Dialog onClose={() => setOpen(false)} open={open}>
-        <DialogTitle>{book?.title}</DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ marginRight: '0 auto' }}>
-            <a
-              href={encodeURI(`https://www.amazon.co.jp/s?k=${book?.title}`)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              amazon
-            </a>
-          </DialogContentText>
-          <DialogContentText>{book?.author}</DialogContentText>
-          <DialogContentText>{book?.category}</DialogContentText>
-          {auth && <DialogContentText>{book?.memo}</DialogContentText>}
-        </DialogContent>
-      </Dialog>
     </Container>
   )
 }
