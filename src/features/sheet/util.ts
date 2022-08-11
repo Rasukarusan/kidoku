@@ -21,7 +21,7 @@ export const getRandomColor = (): string => {
 }
 
 export const getYears = (): string[] => {
-  const from = 2018 // 読書シートが存在する最初の年
+  const from = 2016 // 読書シートが存在する最初の年
   const to = parseInt(dayjs().format('YYYY')) // 今年
   const years = []
   for (let year = from; year <= to; year++) {
