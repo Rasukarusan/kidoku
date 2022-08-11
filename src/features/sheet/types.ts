@@ -10,3 +10,7 @@ export interface Record {
   impression: string // 感想 ex.) ◎
   memo: string
 }
+
+export interface TotalRecord extends Record {
+  year: string
+}
