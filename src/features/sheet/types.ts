@@ -14,3 +14,14 @@ export interface Record {
 export interface TotalRecord extends Record {
   year: string
 }
+
+export interface Category {
+  name: string
+  count: number
+  percent: number
+}
+
+export interface Year {
+  year: string
+  count: number
+}

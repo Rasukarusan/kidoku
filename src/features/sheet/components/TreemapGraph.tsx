@@ -62,7 +62,7 @@ export const TreemapGraph: React.FC<Props> = ({ records, setShowData }) => {
   }, [records])
 
   // 各タイルのホバー状態
-  const [hovers, setHovers] = useState(initialHovers)
+  const [hovers, setHovers] = useState<boolean[]>(initialHovers)
 
   // クリックしているタイルのインデックス
   const [activeIndex, setActiveIndex] = useState(null)
