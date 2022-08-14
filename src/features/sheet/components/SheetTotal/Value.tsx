@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { getRandomColor } from '../../util'
 
 interface Props {
   value: number
@@ -19,11 +20,14 @@ export const Value: React.FC<Props> = ({ value, unit }) => {
     }, 10)
   }, [value])
   return (
-    <div style={{ fontWeight: 700, fontSize: '80px' }}>
+    <motion.div
+      style={{ fontWeight: 700, fontSize: '80px' }}
+      whileHover={{ scale: 1.5, color: getRandomColor() }}
+    >
       <motion.span animate={{ opacity: [0.1, 0.3, 0.6, 1] }}>
         {count}
       </motion.span>
       {unit}
-    </div>
+    </motion.div>
   )
 }
