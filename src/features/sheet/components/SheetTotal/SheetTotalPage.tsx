@@ -3,7 +3,7 @@ import { Container, Box } from '@mui/material'
 import { useRouter } from 'next/router'
 import { Tabs, Title } from '../'
 import { Category, Record, Year } from '../../types'
-import { CategoryMap, Value } from './'
+import { CategoryMap, Value, Rankings } from './'
 import { YearsGraph } from './YearsGraph'
 
 interface Props {
@@ -41,6 +41,11 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <YearsGraph years={years} />
         </div>
+      </Box>
+
+      <Box sx={{ textAlign: 'center', marginBottom: '40px' }}>
+        <h2>年間ベスト書籍</h2>
+        <Rankings />
       </Box>
     </Container>
   )
