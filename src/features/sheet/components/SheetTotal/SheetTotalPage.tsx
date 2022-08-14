@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Container, Box } from '@mui/material'
+import { Container } from '@mui/material'
 import { useRouter } from 'next/router'
 import { Tabs } from '../'
 import { Category, Record, Year } from '../../types'
@@ -21,31 +21,35 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
 
   return (
     <Container fixed>
-      <Box
-        sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
+      <div
+        style={{
+          marginBottom: '16px',
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
       >
         <Tabs value="total" />
-      </Box>
-      <Box sx={{ textAlign: 'center', marginBottom: '40px' }}>
+      </div>
+      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="累計読書数" />
         <Value value={res.length} unit="冊" />
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <CategoryMap categories={categories} />
         </div>
-      </Box>
+      </div>
 
-      <Box sx={{ textAlign: 'center', marginBottom: '40px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="年間平均読書数" />
         <Value value={Math.ceil(res.length / 7)} unit="冊" />
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <YearsGraph years={years} />
         </div>
-      </Box>
+      </div>
 
-      <Box sx={{ textAlign: 'center', marginBottom: '40px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="年間ベスト書籍" />
         <Rankings />
-      </Box>
+      </div>
     </Container>
   )
 }
