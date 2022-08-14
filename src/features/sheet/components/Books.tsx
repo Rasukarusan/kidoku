@@ -52,6 +52,13 @@ export const Books: React.FC<Props> = ({ books }) => {
     setBook(JSON.parse(event.currentTarget.dataset.book))
     setOpen(true)
   }
+
+  const getDataBook = (book: Record): string => {
+    if (!auth) {
+      delete book.memo
+    }
+    return JSON.stringify(book)
+  }
   return (
     <>
       <Grid container rowSpacing={1} columnSpacing={{ xs: 2, sm: 2, md: 3 }}>
@@ -78,7 +85,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                   height={186}
                   onMouseEnter={handleImageHover}
                   onMouseLeave={handleImageLeave}
-                  data-book={JSON.stringify(book)}
+                  data-book={getDataBook(book)}
                   onClick={onClickImage}
                 />
                 {auth &&
