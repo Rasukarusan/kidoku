@@ -1,4 +1,5 @@
 export * from './SheetTotalPage'
+export * from './Title'
 export * from './Value'
 export * from './CategoryMap'
 export * from './YearsGraph'

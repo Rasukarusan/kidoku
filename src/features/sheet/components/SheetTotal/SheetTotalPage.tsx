@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Container, Box } from '@mui/material'
 import { useRouter } from 'next/router'
-import { Tabs, Title } from '../'
+import { Tabs } from '../'
 import { Category, Record, Year } from '../../types'
-import { CategoryMap, Value, Rankings } from './'
+import { CategoryMap, Title, Value, Rankings } from './'
 import { YearsGraph } from './YearsGraph'
 
 interface Props {
@@ -21,14 +21,13 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
 
   return (
     <Container fixed>
-      <Title />
       <Box
         sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
       >
         <Tabs value="total" />
       </Box>
       <Box sx={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h2>累計読書数</h2>
+        <Title text="累計読書数" />
         <Value value={res.length} unit="冊" />
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <CategoryMap categories={categories} />
@@ -36,7 +35,7 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
       </Box>
 
       <Box sx={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h2>年間平均読書数</h2>
+        <Title text="年間平均読書数" />
         <Value value={Math.ceil(res.length / 7)} unit="冊" />
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <YearsGraph years={years} />
@@ -44,7 +43,7 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
       </Box>
 
       <Box sx={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h2>年間ベスト書籍</h2>
+        <Title text="年間ベスト書籍" />
         <Rankings />
       </Box>
     </Container>
