@@ -10,22 +10,18 @@ const useStyles = makeStyles({
     padding: '0.25em 3em',
     borderTop: 'solid 2px black',
     borderBottom: 'solid 2px black',
-    '&::before': {
+    '&::before,&::after': {
       content: "''",
       position: 'absolute',
       top: '-7px',
       width: '2px',
       height: 'calc(100% + 14px)',
       backgroundColor: 'black',
+    },
+    '&::before': {
       left: '7px',
     },
     '&::after': {
-      content: "''",
-      position: 'absolute',
-      top: '-7px',
-      width: '2px',
-      height: 'calc(100% + 14px)',
-      backgroundColor: 'black',
       right: '7px',
     },
   },
