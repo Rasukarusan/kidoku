@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
+import Image from 'next/image'
 import {
   Grid,
   Dialog,
@@ -10,6 +11,7 @@ import {
 } from '@mui/material'
 import { Record } from '../types'
 import SmsIcon from '@mui/icons-material/Sms'
+
 const useStyles = makeStyles({
   image: {
     '&:hover': {
@@ -69,9 +71,9 @@ export const Books: React.FC<Props> = ({ books }) => {
                   scale: 1.2,
                 }}
               >
-                <img
+                <Image
                   className={classes.image}
-                  src={book.image}
+                  src={book.image === '-' ? '/no-image.png' : book.image}
                   width={128}
                   height={186}
                   onMouseEnter={handleImageHover}
