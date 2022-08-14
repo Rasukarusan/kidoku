@@ -1,5 +1,5 @@
-import { SheetTotalPage } from '@/features/sheet/components/SheetTotalPage'
-import { Record as IRecord } from '@/features/sheet/types'
+import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
+import { Category, Year } from '@/features/sheet/types'
 import { getYears } from '@/features/sheet/util'
 export default SheetTotalPage
 
@@ -20,12 +20,39 @@ const getAll = async () => {
   )
 }
 
-type Props = Record<string, IRecord>
 export const getStaticProps = async () => {
-  const res = await getAll()
+  const res = await getAll().then((res) => res.flat())
+  // データの整形。カテゴリ名をKey, 冊数をValueとしたオブジェクトを生成
+  const category_count: Record<string, number> = {}
+  res.flat().forEach((book) => {
+    if (category_count[book.category]) {
+      category_count[book.category] = category_count[book.category] + 1
+    } else {
+      category_count[book.category] = 1
+    }
+  })
+  // カテゴリ配列作成
+  const categories: Category[] = []
+  Object.keys(category_count).forEach((category) => {
+    const count = category_count[category]
+    categories.push({
+      name: category,
+      count,
+      percent: Math.floor((count / res.length) * 100),
+    })
+  })
+
+  // 年ごとの読書数
+  const years: Year[] = getYears().map((year, i) => {
+    const count = res.filter((r) => r.year == year).length
+    return { year, count }
+  })
+
   return {
     props: {
-      res: res.flat(),
+      res,
+      categories,
+      years,
     },
     revalidate: 60 * 60 * 24,
   }
