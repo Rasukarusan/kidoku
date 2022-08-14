@@ -54,6 +54,5 @@ export const getStaticProps = async () => {
       categories,
       years,
     },
-    revalidate: 60 * 60 * 24,
   }
 }
