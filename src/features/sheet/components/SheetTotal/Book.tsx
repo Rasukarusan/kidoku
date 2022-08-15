@@ -1,10 +1,7 @@
 import Image from 'next/image'
 import { makeStyles } from '@mui/styles'
-
+import { Box } from '@mui/material'
 const useStyles = makeStyles({
-  container: {
-    width: '30%',
-  },
   image: {
     boxShadow: '0 5px 15px rgb(0 0 0 / 15%)',
   },
@@ -45,12 +42,18 @@ export const Book: React.FC<BookProps> = ({ rank, image, link, name }) => {
   const color =
     rank === 1 ? classes.gold : rank === 2 ? classes.silver : classes.bronze
   return (
-    <div className={classes.container}>
+    <Box
+      sx={{
+        width: { xs: '100%', sm: '30%' },
+        order: { xs: rank, sm: rank % 3 },
+        marginBottom: { xs: '20px', sm: '0px' },
+      }}
+    >
       <div className={`${classes.rank} ${color}`}>{rank}位</div>
       <a className={classes.link} href={link} target="_blank" rel="noreferrer">
         <Image className={classes.image} src={image} width={128} height={186} />
         <div>{name}</div>
       </a>
-    </div>
+    </Box>
   )
 }
