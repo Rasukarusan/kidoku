@@ -26,10 +26,8 @@ interface Props {
 export const Books: React.FC<Props> = ({ books }) => {
   const classes = useStyles()
   const [auth, setAuth] = useState(false)
-  const [currentData, setCurrentData] = useState<Record[]>([])
-  const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
   const [open, setOpen] = useState(false)
-  const [book, setBook] = useState<Record>(null)
+  const [selectBook, setSelectBook] = useState<Record>(null)
 
   useEffect(() => {
     fetch('/api/auth')
@@ -39,26 +37,11 @@ export const Books: React.FC<Props> = ({ books }) => {
       })
   }, [])
 
-  const handleImageHover = (event) => {
-    const book = event.currentTarget.dataset.book
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleImageLeave = (event) => {
-    setAnchorEl(null)
-  }
-
-  const onClickImage = (event) => {
-    setBook(JSON.parse(event.currentTarget.dataset.book))
+  const onClickImage = (book: Record) => {
+    setSelectBook(book)
     setOpen(true)
   }
 
-  const getDataBook = (book: Record): string => {
-    if (!auth) {
-      delete book.memo
-    }
-    return JSON.stringify(book)
-  }
   return (
     <>
       <Grid container rowSpacing={1} columnSpacing={{ xs: 2, sm: 2, md: 3 }}>
@@ -83,10 +66,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                   src={book.image === '-' ? '/no-image.png' : book.image}
                   width={128}
                   height={186}
-                  onMouseEnter={handleImageHover}
-                  onMouseLeave={handleImageLeave}
-                  data-book={getDataBook(book)}
-                  onClick={onClickImage}
+                  onClick={() => onClickImage(book)}
                 />
                 {auth &&
                   book?.memo !== '[期待]\n\n[感想]' &&
@@ -108,20 +88,22 @@ export const Books: React.FC<Props> = ({ books }) => {
       </Grid>
 
       <Dialog onClose={() => setOpen(false)} open={open}>
-        <DialogTitle>{book?.title}</DialogTitle>
+        <DialogTitle>{selectBook?.title}</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ marginRight: '0 auto' }}>
             <a
-              href={encodeURI(`https://www.amazon.co.jp/s?k=${book?.title}`)}
+              href={encodeURI(
+                `https://www.amazon.co.jp/s?k=${selectBook?.title}`
+              )}
               target="_blank"
               rel="noreferrer"
             >
               amazon
             </a>
           </DialogContentText>
-          <DialogContentText>{book?.author}</DialogContentText>
-          <DialogContentText>{book?.category}</DialogContentText>
-          {auth && <DialogContentText>{book?.memo}</DialogContentText>}
+          <DialogContentText>{selectBook?.author}</DialogContentText>
+          <DialogContentText>{selectBook?.category}</DialogContentText>
+          {auth && <DialogContentText>{selectBook?.memo}</DialogContentText>}
         </DialogContent>
       </Dialog>
     </>
