@@ -39,7 +39,7 @@ export const RankingItem: React.FC<Props> = ({ year, books }) => {
       <span className={classes.title}>{year}</span>
       <Box
         sx={{
-          display: 'flex',
+          display: { xs: 'block', sm: 'flex' },
           justifyContent: 'space-around',
           marginTop: '30px',
         }}
