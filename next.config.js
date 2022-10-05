@@ -1,6 +1,7 @@
+const withPlugins = require('next-compose-plugins')
 const path = require('path')
 
-module.exports = {
+const nextConfig = {
   images: {
     domains: [
       'books.google.com',
@@ -15,3 +16,13 @@ module.exports = {
     return config
   },
 }
+
+/**
+ * webpack-bundle-analyzer
+ */
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+const nextPlugins = [withBundleAnalyzer]
+
+module.exports = withPlugins(nextPlugins, nextConfig)
