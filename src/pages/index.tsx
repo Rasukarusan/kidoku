@@ -1,7 +1,7 @@
 import { IndexPage } from '@/features/index/components/IndexPage'
 export default IndexPage
 
-export async function getStaticProps(context) {
+export const getServerSideProps = async () => {
   return {
     props: {},
   }
