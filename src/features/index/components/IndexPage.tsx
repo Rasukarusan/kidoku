@@ -25,7 +25,7 @@ export const IndexPage = () => {
   return (
     <>
       <Container fixed>
-        <H2 title="検索" />
+        <H2 title="けんさく" />
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <InputField setTitles={updateTitles} setResults={updateResults} />

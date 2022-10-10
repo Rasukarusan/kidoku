@@ -19,7 +19,7 @@ export const Menu: React.FC<Props> = ({ pages }) => {
                 sx={{
                   my: 2,
                   color: 'white',
-                  fontFamily: 'Stick-Regular',
+                  fontFamily: 'Nico Moji',
                 }}
                 endIcon={page.icon}
               >

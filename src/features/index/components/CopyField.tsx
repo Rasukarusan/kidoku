@@ -7,7 +7,7 @@ import { getCopyText } from '../util'
 const useStyles = makeStyles({
   root: {
     '& label': {
-      fontFamily: 'Stick-Regular',
+      fontFamily: 'Nico Moji',
     },
   },
 })
