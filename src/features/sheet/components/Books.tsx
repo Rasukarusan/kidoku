@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
 import Image from 'next/image'
@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import { Record } from '../types'
 import SmsIcon from '@mui/icons-material/Sms'
+import { Memo } from './Memo'
 
 const useStyles = makeStyles({
   image: {
@@ -103,7 +104,11 @@ export const Books: React.FC<Props> = ({ books }) => {
           </DialogContentText>
           <DialogContentText>{selectBook?.author}</DialogContentText>
           <DialogContentText>{selectBook?.category}</DialogContentText>
-          {auth && <DialogContentText>{selectBook?.memo}</DialogContentText>}
+          {auth && (
+            <DialogContentText>
+              <Memo memo={selectBook?.memo} />
+            </DialogContentText>
+          )}
         </DialogContent>
       </Dialog>
     </>
