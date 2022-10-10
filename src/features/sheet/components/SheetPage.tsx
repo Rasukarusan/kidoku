@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 import { Container, Grid, Box } from '@mui/material'
 import { Record } from '../types'
 import { BarGraph, Tabs } from './'
-import { Title } from './Title'
 import { Books } from './Books'
 
 const TreemapGraph = dynamic(
@@ -34,7 +33,6 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
 
   return (
     <Container fixed>
-      <Title />
       <Box
         sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
       >
