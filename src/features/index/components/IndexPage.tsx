@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Container, Grid } from '@mui/material'
-import { H2 } from '@/components/Label/H2'
 import { Results, CopyList, CopyItem } from '../types'
 import { InputField, Area as ResultArea, CopyField } from './'
 
@@ -24,8 +23,7 @@ export const IndexPage = () => {
 
   return (
     <>
-      <Container fixed>
-        <H2 title="けんさく" />
+      <Container fixed sx={{ paddingTop: '32px' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <InputField setTitles={updateTitles} setResults={updateResults} />
