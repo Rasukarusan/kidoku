@@ -16,7 +16,7 @@ export const TitleSp: React.FC = () => {
             mr: 2,
             display: { xs: 'flex', md: 'none' },
             flexGrow: 1,
-            fontFamily: 'Stick-Regular',
+            fontFamily: 'Nico Moji',
             fontWeight: 700,
             letterSpacing: '.3rem',
             color: 'inherit',

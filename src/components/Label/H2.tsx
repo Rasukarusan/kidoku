@@ -4,7 +4,7 @@ import { Typography } from '@mui/material'
 const useStyles = makeStyles({
   title: {
     margin: 10,
-    fontFamily: 'Stick-Regular',
+    fontFamily: 'Nico Moji',
   },
 })
 

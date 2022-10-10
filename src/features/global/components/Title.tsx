@@ -19,7 +19,7 @@ export const Title: React.FC = () => {
             letterSpacing: '.3rem',
             color: 'inherit',
             textDecoration: 'none',
-            fontFamily: 'Stick-Regular',
+            fontFamily: 'Nico Moji',
           }}
         >
           著者検索neo

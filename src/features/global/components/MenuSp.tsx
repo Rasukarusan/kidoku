@@ -56,7 +56,7 @@ export const MenuSp: React.FC<Props> = ({ pages }) => {
               <a
                 style={{
                   textDecoration: 'none',
-                  fontFamily: 'Stick-Regular ',
+                  fontFamily: 'Nico Moji ',
                 }}
                 target={page.target}
               >

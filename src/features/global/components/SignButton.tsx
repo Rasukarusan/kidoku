@@ -79,7 +79,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
           sx={{
             my: 2,
             color: 'white',
-            fontFamily: 'Stick-Regular',
+            fontFamily: 'Nico Moji',
           }}
           endIcon={null}
         >

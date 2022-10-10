@@ -16,7 +16,7 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 
 const pages: Page[] = [
   {
-    title: '読書記録',
+    title: 'どくしょきろく',
     href: '/sheet/' + dayjs().format('YYYY'),
     target: '',
     icon: null,
