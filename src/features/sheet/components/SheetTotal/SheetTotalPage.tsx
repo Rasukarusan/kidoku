@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Container } from '@mui/material'
 import { useRouter } from 'next/router'
-import { Tabs, Title as PageTitle } from '../'
+import { Tabs } from '../'
 import { Category, Record, Year } from '../../types'
 import { CategoryMap, Title, Value, Rankings } from './'
 import { YearsGraph } from './YearsGraph'
@@ -21,7 +21,6 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
 
   return (
     <Container fixed>
-      <PageTitle />
       <div
         style={{
           marginBottom: '16px',
