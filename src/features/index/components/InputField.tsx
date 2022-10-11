@@ -9,7 +9,7 @@ import { getSuggestions, searchBooks } from '../util'
 const useStyles = makeStyles({
   input: {
     '& label': {
-      fontFamily: 'Nico Moji',
+      // fontFamily: 'Nico Moji',
     },
   },
   suggestTextField: {
@@ -110,7 +110,7 @@ export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
       <TextField
         inputRef={inputRef}
         className={classes.input}
-        label="タイトルを1ぎょうずつにゅうりょく"
+        label="タイトルを1行ずつ入力"
         multiline
         fullWidth
         rows={10}
