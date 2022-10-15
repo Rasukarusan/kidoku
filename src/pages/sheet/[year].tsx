@@ -1,12 +1,11 @@
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { getYears } from '@/features/sheet/util'
+import { GAS_ENDPOINT } from '@/libs/constants'
 export default SheetPage
 
 type Props = { params: { year: number } }
 export const getStaticProps = async ({ params }: Props) => {
-  const host =
-    'https://script.google.com/macros/s/AKfycbysWI09TGg0c72WkK8AvwA5D_f3CHG9olPlwxcfzi0qMyYEwEVA_c62n19f-zFMnkKG/exec'
-  const res = await fetch(host + `?year=${params.year}`)
+  const res = await fetch(GAS_ENDPOINT + `?year=${params.year}`)
   const data = await res.json()
   return {
     props: {
