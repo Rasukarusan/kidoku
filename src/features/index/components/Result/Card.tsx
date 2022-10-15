@@ -13,7 +13,7 @@ import {
   CheckCircleOutline as CircleChecked,
   RadioButtonUnchecked as CircleUnchecked,
 } from '@mui/icons-material'
-import { VolumeInfo } from '../../types'
+import { Item } from '../../types'
 import { truncate } from '../../util'
 import { theme as Theme } from '@/features/global/theme'
 import { selectItemsAtom } from '@/store/selectItems'
@@ -40,30 +40,21 @@ const useStyles = makeStyles((theme: typeof Theme) =>
   })
 )
 export interface Props {
-  isChecked: boolean
+  row: number
   searchWord: string
-  volumeInfo: VolumeInfo
+  item: Item
 }
 
-export const Card: React.FC<Props> = ({
-  isChecked,
-  searchWord,
-  volumeInfo,
-}) => {
+export const Card: React.FC<Props> = ({ row, searchWord, item }) => {
   const classes = useStyles()
-  const { title, description, authors, categories, imageLinks } = volumeInfo
+  const { title, description, authors, imageLinks } = item.volumeInfo
   const [selectItems, setSelectItems] = useRecoilState(selectItemsAtom)
   const onClick = () => {
-    setSelectItems({
-      ...selectItems,
-      [searchWord]: {
-        title,
-        authors,
-        categories,
-        imageLink: imageLinks ? imageLinks.thumbnail : '/no-image.png',
-      },
-    })
+    const newSelectItems = [...selectItems]
+    newSelectItems[row] = item
+    setSelectItems(newSelectItems)
   }
+
   return (
     <MuiCard className={classes.root} onClick={onClick}>
       <Tooltip title={title}>
@@ -73,7 +64,7 @@ export const Card: React.FC<Props> = ({
               <Checkbox
                 icon={<CircleUnchecked />}
                 checkedIcon={<CircleChecked />}
-                checked={isChecked}
+                checked={selectItems[row]?.id === item.id}
               />
             }
             subheader={Array.isArray(authors) ? authors.join(',') : '-'}
