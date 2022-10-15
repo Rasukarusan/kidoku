@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles'
 import { Results, Item } from '../../types'
 import { Card } from './Card'
 import { useRecoilState } from 'recoil'
-import { copyListAtom } from '@/store/copyList'
+import { selectItemsAtom } from '@/store/selectItems'
 
 const useStyles = makeStyles({
   area: {
@@ -29,15 +29,15 @@ interface Props {
 }
 export const Area: React.FC<Props> = ({ results, titles }) => {
   const classes = useStyles()
-  const [copyList, setCopyList] = useRecoilState(copyListAtom)
+  const [selectItems, setSelectItems] = useRecoilState(selectItemsAtom)
 
   useEffect(() => {
     Object.keys(results).map((key) => {
-      if (!copyList[key] && results[key]) {
+      if (!selectItems[key] && results[key]) {
         const { title, authors, categories, imageLinks } =
           results[key][0].volumeInfo
-        setCopyList({
-          ...copyList,
+        setSelectItems({
+          ...selectItems,
           [key]: {
             title,
             authors,
@@ -76,8 +76,8 @@ export const Area: React.FC<Props> = ({ results, titles }) => {
                   >
                     <Card
                       isChecked={
-                        copyList[title]
-                          ? copyList[title].title === item.volumeInfo.title
+                        selectItems[title]
+                          ? selectItems[title].title === item.volumeInfo.title
                           : false
                       }
                       searchWord={title}

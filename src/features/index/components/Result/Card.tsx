@@ -16,7 +16,7 @@ import {
 import { VolumeInfo } from '../../types'
 import { truncate } from '../../util'
 import { theme as Theme } from '@/features/global/theme'
-import { copyListAtom } from '@/store/copyList'
+import { selectItemsAtom } from '@/store/selectItems'
 import { useRecoilState } from 'recoil'
 
 const useStyles = makeStyles((theme: typeof Theme) =>
@@ -52,10 +52,10 @@ export const Card: React.FC<Props> = ({
 }) => {
   const classes = useStyles()
   const { title, description, authors, categories, imageLinks } = volumeInfo
-  const [copyList, setCopyList] = useRecoilState(copyListAtom)
+  const [selectItems, setSelectItems] = useRecoilState(selectItemsAtom)
   const onClick = () => {
-    setCopyList({
-      ...copyList,
+    setSelectItems({
+      ...selectItems,
       [searchWord]: {
         title,
         authors,
