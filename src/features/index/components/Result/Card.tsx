@@ -54,9 +54,13 @@ export const Card: React.FC<Props> = ({ row, searchWord, item }) => {
     newSelectItems[row] = item
     setSelectItems(newSelectItems)
   }
-
+  const isCheck = selectItems[row]?.id === item.id
   return (
-    <MuiCard className={classes.root} onClick={onClick}>
+    <MuiCard
+      className={classes.root}
+      onClick={onClick}
+      sx={{ background: isCheck ? 'rgba(50, 65, 72, 0.2)' : '' }}
+    >
       <Tooltip title={title}>
         <div>
           <CardHeader
@@ -64,7 +68,7 @@ export const Card: React.FC<Props> = ({ row, searchWord, item }) => {
               <Checkbox
                 icon={<CircleUnchecked />}
                 checkedIcon={<CircleChecked />}
-                checked={selectItems[row]?.id === item.id}
+                checked={isCheck}
               />
             }
             subheader={Array.isArray(authors) ? authors.join(',') : '-'}
