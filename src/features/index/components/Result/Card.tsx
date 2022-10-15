@@ -13,9 +13,11 @@ import {
   CheckCircleOutline as CircleChecked,
   RadioButtonUnchecked as CircleUnchecked,
 } from '@mui/icons-material'
-import { CopyItem, VolumeInfo } from '../../types'
+import { VolumeInfo } from '../../types'
 import { truncate } from '../../util'
 import { theme as Theme } from '@/features/global/theme'
+import { copyListAtom } from '@/store/copyList'
+import { useRecoilState } from 'recoil'
 
 const useStyles = makeStyles((theme: typeof Theme) =>
   createStyles({
@@ -39,25 +41,27 @@ const useStyles = makeStyles((theme: typeof Theme) =>
 )
 export interface Props {
   isChecked: boolean
-  updateCopyList: (key: string, item: CopyItem) => void
   searchWord: string
   volumeInfo: VolumeInfo
 }
 
 export const Card: React.FC<Props> = ({
   isChecked,
-  updateCopyList,
   searchWord,
   volumeInfo,
 }) => {
   const classes = useStyles()
   const { title, description, authors, categories, imageLinks } = volumeInfo
+  const [copyList, setCopyList] = useRecoilState(copyListAtom)
   const onClick = () => {
-    updateCopyList(searchWord, {
-      title,
-      authors,
-      categories,
-      imageLink: imageLinks ? imageLinks.thumbnail : '/no-image.png',
+    setCopyList({
+      ...copyList,
+      [searchWord]: {
+        title,
+        authors,
+        categories,
+        imageLink: imageLinks ? imageLinks.thumbnail : '/no-image.png',
+      },
     })
   }
   return (
