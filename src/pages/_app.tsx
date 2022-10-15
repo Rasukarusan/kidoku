@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider } from '@mui/material/styles'
 import { theme, Header } from '@/features/global'
 import { LoadingTopBar } from '@/features/global/components/LoadingTopBar'
+import { RecoilRoot } from 'recoil'
 
 export default function MyApp(props) {
   const { Component, pageProps } = props
@@ -29,11 +30,13 @@ export default function MyApp(props) {
       </Head>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
-      <ThemeProvider theme={theme}>
-        <LoadingTopBar />
-        <Header />
-        <Component {...pageProps} />
-      </ThemeProvider>
+      <RecoilRoot>
+        <ThemeProvider theme={theme}>
+          <LoadingTopBar />
+          <Header />
+          <Component {...pageProps} />
+        </ThemeProvider>
+      </RecoilRoot>
     </>
   )
 }
