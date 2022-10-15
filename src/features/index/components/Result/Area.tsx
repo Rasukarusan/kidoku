@@ -1,11 +1,11 @@
-import { useEffect } from 'react'
+import { selectItemsAtom } from '@/store/selectItems'
 import { OpenInNew } from '@mui/icons-material'
 import { Typography, Link } from '@mui/material'
 import { makeStyles } from '@mui/styles'
+import { useEffect } from 'react'
+import { useRecoilState } from 'recoil'
 import { Results, Item } from '../../types'
 import { Card } from './Card'
-import { useRecoilState } from 'recoil'
-import { selectItemsAtom } from '@/store/selectItems'
 
 const useStyles = makeStyles({
   area: {
@@ -15,7 +15,7 @@ const useStyles = makeStyles({
   item: {
     display: 'inline-block',
   },
-  title: {
+  searchWord: {
     paddingTop: 20,
     paddingBottom: 10,
     display: 'flex',
@@ -25,64 +25,52 @@ const useStyles = makeStyles({
 })
 interface Props {
   results: Results
-  titles: string[]
+  searchWords: string[]
 }
-export const Area: React.FC<Props> = ({ results, titles }) => {
+export const Area: React.FC<Props> = ({ results, searchWords }) => {
   const classes = useStyles()
   const [selectItems, setSelectItems] = useRecoilState(selectItemsAtom)
 
+  /**
+   * 検索結果の一番最初をデフォルトでチェック状態とする
+   *
+   * UX向上のため。大体検索結果の最初が求めているもので、一々チェックするのが面倒なので省略。
+   */
   useEffect(() => {
-    Object.keys(results).map((key) => {
-      if (!selectItems[key] && results[key]) {
-        const { title, authors, categories, imageLinks } =
-          results[key][0].volumeInfo
-        setSelectItems({
-          ...selectItems,
-          [key]: {
-            title,
-            authors,
-            categories,
-            imageLink: imageLinks ? imageLinks.thumbnail : '/no-image.png',
-          },
-        })
+    const newSelectItems = searchWords.map((searchWord: string, i: number) => {
+      if (typeof selectItems[i] === 'undefined') {
+        return results[searchWord][0]
+      } else {
+        return selectItems[i]
       }
     })
-  })
+    setSelectItems(newSelectItems)
+  }, [results])
+
   return (
     <div style={{ marginBottom: '100px' }}>
-      {titles.map((title: string, i: number) => {
+      {searchWords.map((searchWord: string, i: number) => {
         return (
-          <div key={`${i}-${title}`}>
+          <div key={`${i}-${searchWord}`}>
             <Link
               target="_blank"
               rel="noreferrer"
-              href={`https://www.amazon.co.jp/s?k=${title}`}
+              href={`https://www.amazon.co.jp/s?k=${searchWord}`}
             >
               <Typography
                 color="primary"
                 variant="h5"
-                className={classes.title}
+                className={classes.searchWord}
               >
-                『{title}』の検索結果
+                『{searchWord}』の検索結果
                 <OpenInNew style={{ paddingLeft: 5 }} />
               </Typography>
             </Link>
             <div className={classes.area}>
-              {Array.isArray(results[title]) &&
-                results[title].map((item: Item, index: number) => (
-                  <div
-                    className={classes.item}
-                    key={`${index}- ${item.volumeInfo.title}`}
-                  >
-                    <Card
-                      isChecked={
-                        selectItems[title]
-                          ? selectItems[title].title === item.volumeInfo.title
-                          : false
-                      }
-                      searchWord={title}
-                      volumeInfo={item.volumeInfo}
-                    />
+              {Array.isArray(results[searchWord]) &&
+                results[searchWord].map((item: Item, index: number) => (
+                  <div className={classes.item} key={item.id}>
+                    <Card row={i} searchWord={searchWord} item={item} />
                   </div>
                 ))}
             </div>

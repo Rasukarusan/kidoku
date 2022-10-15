@@ -1,5 +1,5 @@
 export interface Results {
-  [key: string]: Item[]
+  [key: string]: Item[] // keyは検索単語
 }
 
 interface ImageLinks {
@@ -11,7 +11,7 @@ export interface VolumeInfo {
   allowAnonLogging: boolean
   authors?: string[]
   canonicalVolumeLink: string
-  categories: string[]
+  categories?: string[]
   contentVersion: string
   description?: string
   imageLinks?: ImageLinks
@@ -40,12 +40,4 @@ export interface Item {
   volumeInfo: VolumeInfo
 }
 
-export interface SelectItem {
-  title: string
-  authors: string[]
-  categories: string[]
-  imageLink: string
-}
-export interface SelectItems {
-  [key: string]: SelectItem
-}
+export type SelectItems = Item[]

@@ -27,19 +27,16 @@ export const getSuggestions = async (keyword: string) => {
 /**
  * クリップボードにコピーするテキストを取得
  */
-export const getCopyText = (
-  titles: string[],
-  selectItems: SelectItems
-): string => {
+export const getCopyText = (selectItems: SelectItems): string => {
   let text = ''
-  titles.forEach((title: string) => {
-    const formalTitle = title in selectItems ? selectItems[title].title : '-'
-    const authors = title in selectItems ? selectItems[title].authors : '-'
-    const categories =
-      title in selectItems ? selectItems[title].categories : '-'
-    const imageLink = title in selectItems ? selectItems[title].imageLink : '-'
-    text +=
-      formalTitle + '\t' + authors + '\t' + categories + '\t' + imageLink + '\n'
+  const textList = selectItems.map((item) => {
+    const title = item.volumeInfo.title ?? '-'
+    const authors = item.volumeInfo.authors?.join(',') ?? '-'
+    const categories = item.volumeInfo.categories ?? '-'
+    const imageLink = item.volumeInfo.imageLinks
+      ? item.volumeInfo.imageLinks.thumbnail
+      : '/no-image.png'
+    text += title + '\t' + authors + '\t' + categories + '\t' + imageLink + '\n'
   })
   return text
 }
