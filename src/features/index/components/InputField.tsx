@@ -73,7 +73,7 @@ export const InputField: React.FC<Props> = ({ setSearchWords, setResults }) => {
   }
 
   const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const titles = event.target.value.split('\n').filter((v) => v !== '')
+    const searchWords = event.target.value.split('\n').filter((v) => v !== '')
     const lastTitle = event.target.value.split('\n').slice(-1)[0]
 
     // サジェスト取得
@@ -86,12 +86,12 @@ export const InputField: React.FC<Props> = ({ setSearchWords, setResults }) => {
     const newTimer = setTimeout(async () => {
       const results = {}
       await Promise.all(
-        titles.map(async (title) => {
-          results[title] = await searchBooks(title)
+        searchWords.map(async (searchWord) => {
+          results[searchWord] = await searchBooks(searchWord)
         })
       )
       setResults(results)
-      setTitles(titles)
+      setSearchWords(searchWords)
     }, 200)
     setTimer(newTimer)
   }
