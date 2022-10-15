@@ -70,7 +70,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
   return (
     <>
       {mobile ? (
-        <MenuItem onClick={onClick}>
+        <MenuItem onClick={onClick} sx={{ fontFamily: 'Nico Moji' }}>
           {auth ? 'ログアウト' : 'ログイン'}
         </MenuItem>
       ) : (
