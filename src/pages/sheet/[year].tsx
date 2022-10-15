@@ -13,7 +13,6 @@ export const getStaticProps = async ({ params }: Props) => {
       data,
       year: params.year.toString(),
     },
-    revalidate: 60 * 60 * 24,
   }
 }
 
@@ -24,6 +23,6 @@ export const getStaticPaths = async () => {
   })
   return {
     paths,
-    fallback: 'blocking', // キャッシュが存在しない場合はSSR
+    fallback: false,
   }
 }
