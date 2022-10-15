@@ -1,6 +1,8 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import { getYears } from '@/features/sheet/util'
+import { GAS_ENDPOINT } from '@/libs/constants'
+
 export default SheetTotalPage
 
 const getAll = async () => {
@@ -8,9 +10,7 @@ const getAll = async () => {
 
   return await Promise.all(
     years.map(async (year) => {
-      const host =
-        'https://script.google.com/macros/s/AKfycbysWI09TGg0c72WkK8AvwA5D_f3CHG9olPlwxcfzi0qMyYEwEVA_c62n19f-zFMnkKG/exec'
-      const res = await fetch(host + `?year=${year}`)
+      const res = await fetch(GAS_ENDPOINT + `?year=${year}`)
       const data = await res.json()
       for (let i = 0; i < data.length; i++) {
         data[i]['year'] = year
