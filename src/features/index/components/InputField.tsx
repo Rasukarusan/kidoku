@@ -27,11 +27,11 @@ const useStyles = makeStyles({
 })
 
 interface Props {
-  setTitles: (newTitles: string[]) => void
+  setSearchWords: (newSearchWords: string[]) => void
   setResults: (newResults: Results) => void
 }
 
-export const InputField: React.FC<Props> = ({ setTitles, setResults }) => {
+export const InputField: React.FC<Props> = ({ setSearchWords, setResults }) => {
   const classes = useStyles()
   const [timer, setTimer] = useState(null)
   const [options, setOptions] = useState([])
