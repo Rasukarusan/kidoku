@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Container, Grid } from '@mui/material'
-import { Results, CopyList, CopyItem } from '../types'
+import { Results } from '../types'
 import { InputField, Area as ResultArea, CopyField } from './'
+import { useSetRecoilState } from 'recoil'
+import { copyListAtom } from '@/store/copyList'
 
 export const IndexPage = () => {
   const [titles, setTitles] = useState<string[]>([])
-  const [copyList, setCopyList] = useState<CopyList>({})
+  const setCopyList = useSetRecoilState(copyListAtom)
   const [results, setResults] = useState<Results>({})
 
   const updateTitles = (newTitles: string[]) => {
@@ -17,10 +19,6 @@ export const IndexPage = () => {
     setCopyList({})
   }
 
-  const updateCopyList = (key: string, item: CopyItem) => {
-    setCopyList({ ...copyList, [key]: item })
-  }
-
   return (
     <>
       <Container fixed sx={{ paddingTop: '32px' }}>
@@ -29,15 +27,10 @@ export const IndexPage = () => {
             <InputField setTitles={updateTitles} setResults={updateResults} />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <CopyField titles={titles} copyList={copyList} />
+            <CopyField titles={titles} />
           </Grid>
         </Grid>
-        <ResultArea
-          results={results}
-          titles={titles}
-          copyList={copyList}
-          updateCopyList={updateCopyList}
-        />
+        <ResultArea results={results} titles={titles} />
       </Container>
     </>
   )

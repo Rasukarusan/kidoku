@@ -1,7 +1,8 @@
+import { useRecoilState } from 'recoil'
 import { useState, useRef, useEffect } from 'react'
 import { TextField, Snackbar, Alert } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { CopyList } from '../types'
+import { copyListAtom } from '@/store/copyList'
 import { getCopyText } from '../util'
 
 const useStyles = makeStyles({
@@ -14,10 +15,10 @@ const useStyles = makeStyles({
 
 interface Props {
   titles: string[]
-  copyList: CopyList
 }
-export const CopyField: React.FC<Props> = ({ titles, copyList }) => {
+export const CopyField: React.FC<Props> = ({ titles }) => {
   const classes = useStyles()
+  const [copyList, setCopyList] = useRecoilState(copyListAtom)
   const [text, setText] = useState('')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLTextAreaElement>(null)

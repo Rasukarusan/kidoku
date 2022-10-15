@@ -2,8 +2,10 @@ import { useEffect } from 'react'
 import { OpenInNew } from '@mui/icons-material'
 import { Typography, Link } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { Results, Item, CopyList, CopyItem } from '../../types'
+import { Results, Item } from '../../types'
 import { Card } from './Card'
+import { useRecoilState } from 'recoil'
+import { copyListAtom } from '@/store/copyList'
 
 const useStyles = makeStyles({
   area: {
@@ -24,27 +26,24 @@ const useStyles = makeStyles({
 interface Props {
   results: Results
   titles: string[]
-  copyList: CopyList
-  updateCopyList: (key: string, item: CopyItem) => void
 }
-export const Area: React.FC<Props> = ({
-  results,
-  titles,
-  copyList,
-  updateCopyList,
-}) => {
+export const Area: React.FC<Props> = ({ results, titles }) => {
   const classes = useStyles()
+  const [copyList, setCopyList] = useRecoilState(copyListAtom)
 
   useEffect(() => {
     Object.keys(results).map((key) => {
       if (!copyList[key] && results[key]) {
         const { title, authors, categories, imageLinks } =
           results[key][0].volumeInfo
-        updateCopyList(key, {
-          title,
-          authors,
-          categories,
-          imageLink: imageLinks ? imageLinks.thumbnail : '/no-image.png',
+        setCopyList({
+          ...copyList,
+          [key]: {
+            title,
+            authors,
+            categories,
+            imageLink: imageLinks ? imageLinks.thumbnail : '/no-image.png',
+          },
         })
       }
     })
@@ -81,7 +80,6 @@ export const Area: React.FC<Props> = ({
                           ? copyList[title].title === item.volumeInfo.title
                           : false
                       }
-                      updateCopyList={updateCopyList}
                       searchWord={title}
                       volumeInfo={item.volumeInfo}
                     />
