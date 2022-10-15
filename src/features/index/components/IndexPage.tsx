@@ -3,11 +3,11 @@ import { Container, Grid } from '@mui/material'
 import { Results } from '../types'
 import { InputField, Area as ResultArea, CopyField } from './'
 import { useSetRecoilState } from 'recoil'
-import { copyListAtom } from '@/store/copyList'
+import { selectItemsAtom } from '@/store/selectItems'
 
 export const IndexPage = () => {
   const [titles, setTitles] = useState<string[]>([])
-  const setCopyList = useSetRecoilState(copyListAtom)
+  const setSelectItems = useSetRecoilState(selectItemsAtom)
   const [results, setResults] = useState<Results>({})
 
   const updateTitles = (newTitles: string[]) => {
@@ -16,7 +16,7 @@ export const IndexPage = () => {
 
   const updateResults = (newResults: Results) => {
     setResults(newResults)
-    setCopyList({})
+    setSelectItems({})
   }
 
   return (

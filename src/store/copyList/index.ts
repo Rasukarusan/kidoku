@@ -1,1 +1,0 @@
-export { copyListAtom } from './atom'

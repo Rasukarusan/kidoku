@@ -2,7 +2,7 @@ import { useRecoilState } from 'recoil'
 import { useState, useRef, useEffect } from 'react'
 import { TextField, Snackbar, Alert } from '@mui/material'
 import { makeStyles } from '@mui/styles'
-import { copyListAtom } from '@/store/copyList'
+import { selectItemsAtom } from '@/store/selectItems'
 import { getCopyText } from '../util'
 
 const useStyles = makeStyles({
@@ -18,15 +18,16 @@ interface Props {
 }
 export const CopyField: React.FC<Props> = ({ titles }) => {
   const classes = useStyles()
-  const [copyList, setCopyList] = useRecoilState(copyListAtom)
+  const [selectItems, setSelectItems] = useRecoilState(selectItemsAtom)
   const [text, setText] = useState('')
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLTextAreaElement>(null)
+  console.log(selectItems)
 
   useEffect(() => {
-    const text = getCopyText(titles, copyList)
+    const text = getCopyText(titles, selectItems)
     setText(text)
-  }, [titles, copyList])
+  }, [titles, selectItems])
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(text)

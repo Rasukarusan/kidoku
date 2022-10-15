@@ -1,5 +1,5 @@
 import { ApiClient } from '@/libs/apiClient'
-import { Item, CopyList } from './types'
+import { Item, SelectItems } from './types'
 
 /**
  * 書籍検索
@@ -27,13 +27,17 @@ export const getSuggestions = async (keyword: string) => {
 /**
  * クリップボードにコピーするテキストを取得
  */
-export const getCopyText = (titles: string[], copyList: CopyList): string => {
+export const getCopyText = (
+  titles: string[],
+  selectItems: SelectItems
+): string => {
   let text = ''
   titles.forEach((title: string) => {
-    const formalTitle = title in copyList ? copyList[title].title : '-'
-    const authors = title in copyList ? copyList[title].authors : '-'
-    const categories = title in copyList ? copyList[title].categories : '-'
-    const imageLink = title in copyList ? copyList[title].imageLink : '-'
+    const formalTitle = title in selectItems ? selectItems[title].title : '-'
+    const authors = title in selectItems ? selectItems[title].authors : '-'
+    const categories =
+      title in selectItems ? selectItems[title].categories : '-'
+    const imageLink = title in selectItems ? selectItems[title].imageLink : '-'
     text +=
       formalTitle + '\t' + authors + '\t' + categories + '\t' + imageLink + '\n'
   })
