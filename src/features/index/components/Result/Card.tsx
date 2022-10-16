@@ -59,7 +59,9 @@ export const Card: React.FC<Props> = ({ row, searchWord, item }) => {
     <MuiCard
       className={classes.root}
       onClick={onClick}
-      sx={{ background: isCheck ? 'rgba(50, 65, 72, 0.2)' : '' }}
+      sx={{
+        background: isCheck ? 'rgba(245, 88, 194, 0.2)' : '',
+      }}
     >
       <Tooltip title={title}>
         <div>
