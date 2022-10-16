@@ -27,7 +27,7 @@ const pages: Page[] = [
     href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=789903411',
     target: '_blank',
     icon: <OpenInNewSharpIcon />,
-    auth: false,
+    auth: true,
   },
   {
     title: 'せってい',
