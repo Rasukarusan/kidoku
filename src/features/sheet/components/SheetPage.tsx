@@ -5,6 +5,7 @@ import { Container, Grid, Box } from '@mui/material'
 import { Record } from '../types'
 import { BarGraph, Tabs } from './'
 import { Books } from './Books'
+import { AddButton } from './AddButton'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -53,7 +54,9 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           </Grid>
         </Grid>
       </Box>
-      <Books books={currentData} />
+      <Books books={currentData}>
+        <AddButton />
+      </Books>
     </Container>
   )
 }
