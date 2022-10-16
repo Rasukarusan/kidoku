@@ -20,12 +20,21 @@ const pages: Page[] = [
     href: '/sheet/' + dayjs().format('YYYY'),
     target: '',
     icon: null,
+    auth: false,
   },
   {
     title: 'シート',
     href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=789903411',
     target: '_blank',
     icon: <OpenInNewSharpIcon />,
+    auth: false,
+  },
+  {
+    title: 'せってい',
+    href: 'https://vercel.com/rasukarusan/search-author-neo',
+    target: '_blank',
+    icon: <OpenInNewSharpIcon />,
+    auth: true,
   },
 ]
 
