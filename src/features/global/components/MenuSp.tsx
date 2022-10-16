@@ -1,15 +1,18 @@
 import Link from 'next/link'
+import { useRecoilValue } from 'recoil'
 import { useState } from 'react'
 import { Box, IconButton, Menu, MenuItem } from '@mui/material'
 import { Page } from '../types'
 import { SignButton } from './'
 import MenuIcon from '@mui/icons-material/Menu'
+import { isLoginAtom } from '@/store/isLogin'
 
 interface Props {
   pages: Page[]
 }
 
 export const MenuSp: React.FC<Props> = ({ pages }) => {
+  const isLogin = useRecoilValue(isLoginAtom)
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -50,21 +53,25 @@ export const MenuSp: React.FC<Props> = ({ pages }) => {
           display: { xs: 'block', md: 'none' },
         }}
       >
-        {pages.map((page) => (
-          <MenuItem key={page.title} onClick={handleCloseNavMenu}>
-            <Link href={page.href}>
-              <a
-                style={{
-                  textDecoration: 'none',
-                  fontFamily: 'Nico Moji ',
-                }}
-                target={page.target}
-              >
-                {page.title}
-              </a>
-            </Link>
-          </MenuItem>
-        ))}
+        {pages.map((page) => {
+          if (page.auth && !isLogin) return null
+
+          return (
+            <MenuItem key={page.title} onClick={handleCloseNavMenu}>
+              <Link href={page.href}>
+                <a
+                  style={{
+                    textDecoration: 'none',
+                    fontFamily: 'Nico Moji ',
+                  }}
+                  target={page.target}
+                >
+                  {page.title}
+                </a>
+              </Link>
+            </MenuItem>
+          )
+        })}
         <SignButton mobile={true} />
       </Menu>
     </Box>
