@@ -1,7 +1,10 @@
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useState } from 'react'
+import { useRecoilValue } from 'recoil'
 import { motion } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
 import Image from 'next/image'
+import SmsIcon from '@mui/icons-material/Sms'
+import { isLoginAtom } from '@/store/isLogin'
 import {
   Grid,
   Dialog,
@@ -10,7 +13,6 @@ import {
   DialogContentText,
 } from '@mui/material'
 import { Record } from '../types'
-import SmsIcon from '@mui/icons-material/Sms'
 import { Memo } from './Memo'
 
 const useStyles = makeStyles({
@@ -26,17 +28,9 @@ interface Props {
 }
 export const Books: React.FC<Props> = ({ books }) => {
   const classes = useStyles()
-  const [auth, setAuth] = useState(false)
+  const isLogin = useRecoilValue(isLoginAtom)
   const [open, setOpen] = useState(false)
   const [selectBook, setSelectBook] = useState<Record>(null)
-
-  useEffect(() => {
-    fetch('/api/auth')
-      .then((res) => res.json())
-      .then((res) => {
-        setAuth(res)
-      })
-  }, [])
 
   const onClickImage = (book: Record) => {
     setSelectBook(book)
@@ -69,7 +63,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                   height={186}
                   onClick={() => onClickImage(book)}
                 />
-                {auth &&
+                {isLogin &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
                     <p
@@ -104,7 +98,7 @@ export const Books: React.FC<Props> = ({ books }) => {
           </DialogContentText>
           <DialogContentText>{selectBook?.author}</DialogContentText>
           <DialogContentText>{selectBook?.category}</DialogContentText>
-          {auth && (
+          {isLogin && (
             <DialogContentText>
               <Memo memo={selectBook?.memo} />
             </DialogContentText>

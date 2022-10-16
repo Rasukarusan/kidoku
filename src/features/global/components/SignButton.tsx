@@ -1,3 +1,4 @@
+import { useRecoilState } from 'recoil'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -9,6 +10,7 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material'
+import { isLoginAtom } from '@/store/isLogin'
 
 interface Props {
   mobile: boolean
@@ -18,13 +20,13 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
   const [open, setOpen] = useState(false)
   const [snack, setSnack] = useState(false)
   const [pass, setPass] = useState('')
-  const [auth, setAuth] = useState(false)
+  const [isLogin, setIsLogin] = useRecoilState(isLoginAtom)
 
   useEffect(() => {
     fetch('/api/auth')
       .then((res) => res.json())
       .then((res) => {
-        setAuth(res)
+        setIsLogin(res)
       })
   }, [])
 
@@ -35,7 +37,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
         fetch(`/api/auth`)
           .then((res) => res.json())
           .then((res) => {
-            setAuth(res)
+            setIsLogin(res)
             setSnack(res)
           })
       })
@@ -50,13 +52,13 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
       fetch(`/api/auth`)
         .then((res) => res.json())
         .then((res) => {
-          setAuth(res)
+          setIsLogin(res)
         })
     })
   }
 
   const onClick = () => {
-    if (auth) {
+    if (isLogin) {
       logout()
     } else {
       setOpen(true)
@@ -71,7 +73,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
     <>
       {mobile ? (
         <MenuItem onClick={onClick} sx={{ fontFamily: 'Nico Moji' }}>
-          {auth ? 'ログアウト' : 'ログイン'}
+          {isLogin ? 'ログアウト' : 'ログイン'}
         </MenuItem>
       ) : (
         <Button
@@ -83,7 +85,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
           }}
           endIcon={null}
         >
-          {auth ? 'ログアウト' : 'ログイン'}
+          {isLogin ? 'ログアウト' : 'ログイン'}
         </Button>
       )}
       <Snackbar
