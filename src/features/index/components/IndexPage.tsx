@@ -17,23 +17,6 @@ export const IndexPage = () => {
 
   return (
     <>
-      <button
-        onClick={async () => {
-          const body = { name: 'hogeeee' }
-          const res = await fetch('/api/write', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-          })
-            .then((res) => res.json())
-            .then((json) => json)
-          console.log(res)
-        }}
-      >
-        submit
-      </button>
       <Container fixed sx={{ paddingTop: '32px' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>

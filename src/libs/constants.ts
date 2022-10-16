@@ -1,3 +1,3 @@
 export const COOKIE_KEY_HASH = 'myhash'
 export const GAS_ENDPOINT =
-  'https://script.google.com/macros/s/AKfycbx__WWuR033gweOHccNyCgyBQVgwWtuLg-CWZSA88TBse9nXMAuvqAf4Cbl3RDOiO4w/exec'
+  'https://script.google.com/macros/s/AKfycbxHOl9gg8rmVt0HSUitFXFkXqh-j-erQdp7isvqzfX5Sg7P8cFA5J2ImiLJEJiY2WFM/exec'
