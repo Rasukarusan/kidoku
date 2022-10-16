@@ -5,4 +5,5 @@ export interface Page {
   href: string
   target: string
   icon?: ReactElement
+  auth: boolean
 }
