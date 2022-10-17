@@ -1,19 +1,12 @@
 import { useRecoilValue } from 'recoil'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Snackbar, Alert } from '@mui/material'
-import { selectItemsAtom } from '@/store/selectItems'
-import { getCopyText } from '../util'
+import { selectItemsCopyTextSelector } from '@/store/selectItems/selector'
 
 export const CopyField: React.FC = () => {
-  const selectItems = useRecoilValue(selectItemsAtom)
-  const [text, setText] = useState('')
+  const text = useRecoilValue(selectItemsCopyTextSelector)
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLTextAreaElement>(null)
-
-  useEffect(() => {
-    const text = getCopyText(selectItems)
-    setText(text)
-  }, [selectItems])
 
   const handleOnClick = () => {
     navigator.clipboard.writeText(text)

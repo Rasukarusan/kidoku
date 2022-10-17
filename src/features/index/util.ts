@@ -1,5 +1,5 @@
 import { ApiClient } from '@/libs/apiClient'
-import { Item, SelectItems } from './types'
+import { Item } from './types'
 
 /**
  * 書籍検索
@@ -22,23 +22,6 @@ export const getSuggestions = async (keyword: string) => {
   return client
     .get(url)
     .then((res) => res.data.suggestions.map((suggestion) => suggestion.value))
-}
-
-/**
- * クリップボードにコピーするテキストを取得
- */
-export const getCopyText = (selectItems: SelectItems): string => {
-  let text = ''
-  const textList = selectItems.map((item) => {
-    const title = item.volumeInfo.title ?? '-'
-    const authors = item.volumeInfo.authors?.join(',') ?? '-'
-    const categories = item.volumeInfo.categories ?? '-'
-    const imageLink = item.volumeInfo.imageLinks
-      ? item.volumeInfo.imageLinks.thumbnail
-      : '/no-image.png'
-    text += title + '\t' + authors + '\t' + categories + '\t' + imageLink + '\n'
-  })
-  return text
 }
 
 /**
