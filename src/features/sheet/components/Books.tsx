@@ -25,9 +25,8 @@ const useStyles = makeStyles({
 
 interface Props {
   books: Record[]
-  children: React.ReactNode
 }
-export const Books: React.FC<Props> = ({ books, children }) => {
+export const Books: React.FC<Props> = ({ books }) => {
   const classes = useStyles()
   const isLogin = useRecoilValue(isLoginAtom)
   const [open, setOpen] = useState(false)
@@ -81,7 +80,6 @@ export const Books: React.FC<Props> = ({ books, children }) => {
             </Grid>
           )
         })}
-        {children}
       </Grid>
 
       <Dialog onClose={() => setOpen(false)} open={open}>
