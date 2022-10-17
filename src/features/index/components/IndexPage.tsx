@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Container, Grid } from '@mui/material'
 import { Results } from '../types'
-import { InputField, Area as ResultArea, CopyField } from './'
+import { InputField, Area as ResultArea, CopyField, AddButton } from './'
 
 export const IndexPage = () => {
   const [searchWords, setSearchWords] = useState<string[]>([])
@@ -27,6 +27,7 @@ export const IndexPage = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <CopyField />
+            {searchWords.length > 0 && <AddButton />}
           </Grid>
         </Grid>
         <ResultArea results={results} searchWords={searchWords} />
