@@ -2,14 +2,6 @@ import { selector } from 'recoil'
 import { selectItemsAtom } from './atom'
 import { SelectItems } from '@/features/index/types'
 
-export const selectItemsCopyTextSelector = selector({
-  key: 'selectItemsCopyTextSelector',
-  get: ({ get }) => {
-    const selectItems = get(selectItemsAtom)
-    return getCopyText(selectItems)
-  },
-})
-
 /**
  * クリップボードにコピーするテキストを取得
  */
@@ -26,3 +18,39 @@ const getCopyText = (selectItems: SelectItems): string => {
   })
   return text
 }
+
+/**
+ * クリップボードにコピーする用のテキストに変換
+ */
+export const selectItemsCopyTextSelector = selector({
+  key: 'selectItemsCopyTextSelector',
+  get: ({ get }) => {
+    const selectItems = get(selectItemsAtom)
+    return getCopyText(selectItems)
+  },
+})
+
+/**
+ * GASにPOSTするためのリクエストボディに変換
+ */
+export const selectItemsBodySelector = selector({
+  key: 'selectItemsBodySelector',
+  get: ({ get }) => {
+    const selectItems = get(selectItemsAtom)
+    const body = getCopyText(selectItems)
+      .split('\n')
+      .filter((v) => v)
+      .map((item) => {
+        const info = item.split('\t')
+        const [title, author, category, image] = info
+        return {
+          year: 2022,
+          title,
+          author,
+          category,
+          image,
+        }
+      })
+    return body
+  },
+})
