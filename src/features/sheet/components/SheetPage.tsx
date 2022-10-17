@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import { Container, Grid, Box } from '@mui/material'
 import { Record } from '../types'
@@ -18,11 +17,8 @@ interface Props {
 }
 
 export const SheetPage: React.FC<Props> = ({ data, year }) => {
-  const router = useRouter()
   const [currentData, setCurrentData] = useState<Record[]>([])
-  const [anchorEl, setAnchorEl] = useState<HTMLImageElement | null>(null)
   const [open, setOpen] = useState(false)
-  const [book, setBook] = useState<Record>(null)
 
   useEffect(() => {
     setCurrentData(data)
