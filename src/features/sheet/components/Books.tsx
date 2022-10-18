@@ -11,9 +11,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
+  Divider,
 } from '@mui/material'
 import { Record } from '../types'
 import { Memo } from './Memo'
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
+import CategoryIcon from '@mui/icons-material/Category'
 
 const useStyles = makeStyles({
   image: {
@@ -83,25 +86,37 @@ export const Books: React.FC<Props> = ({ books }) => {
       </Grid>
 
       <Dialog onClose={() => setOpen(false)} open={open}>
-        <DialogTitle>{selectBook?.title}</DialogTitle>
+        <DialogTitle>
+          <a
+            href={encodeURI(
+              `https://www.amazon.co.jp/s?k=${selectBook?.title}`
+            )}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {selectBook?.title}
+          </a>
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ marginRight: '0 auto' }}>
-            <a
-              href={encodeURI(
-                `https://www.amazon.co.jp/s?k=${selectBook?.title}`
-              )}
-              target="_blank"
-              rel="noreferrer"
-            >
-              amazon
-            </a>
+          <DialogContentText
+            sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}
+          >
+            <PeopleAltIcon sx={{ marginRight: '5px' }} />
+            {selectBook?.author}
           </DialogContentText>
-          <DialogContentText>{selectBook?.author}</DialogContentText>
-          <DialogContentText>{selectBook?.category}</DialogContentText>
+          <DialogContentText
+            sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}
+          >
+            <CategoryIcon sx={{ marginRight: '5px' }} />
+            {selectBook?.category}
+          </DialogContentText>
           {isLogin && (
-            <DialogContentText>
-              <Memo memo={selectBook?.memo} />
-            </DialogContentText>
+            <>
+              <Divider sx={{ margin: '15px 0px' }} />
+              <DialogContentText>
+                <Memo memo={selectBook?.memo} />
+              </DialogContentText>
+            </>
           )}
         </DialogContent>
       </Dialog>
