@@ -6,6 +6,8 @@ import { ThemeProvider } from '@mui/material/styles'
 import { theme, Header } from '@/features/global'
 import { LoadingTopBar } from '@/features/global/components/LoadingTopBar'
 import { RecoilRoot } from 'recoil'
+import { DefaultSeo } from 'next-seo'
+import SEO from '../../next-seo.config'
 
 export default function MyApp(props) {
   const { Component, pageProps } = props
@@ -21,7 +23,6 @@ export default function MyApp(props) {
   return (
     <>
       <Head>
-        <title>著者検索 neo</title>
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
@@ -30,6 +31,7 @@ export default function MyApp(props) {
       </Head>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
+      <DefaultSeo {...SEO} />
       <RecoilRoot>
         <ThemeProvider theme={theme}>
           <LoadingTopBar />
