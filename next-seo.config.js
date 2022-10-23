@@ -17,4 +17,7 @@ export default {
     ],
     siteName: '著者検索 neo',
   },
+  twitter: {
+    cardType: 'summary_large_image',
+  },
 }
