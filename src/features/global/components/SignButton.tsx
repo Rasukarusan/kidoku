@@ -11,6 +11,11 @@ import {
   Alert,
 } from '@mui/material'
 import { isLoginAtom } from '@/store/isLogin'
+import {
+  login as apiLogin,
+  logout as apiLogout,
+  auth as apiAuth,
+} from '../util'
 
 interface Props {
   mobile: boolean
@@ -23,46 +28,26 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
   const [isLogin, setIsLogin] = useRecoilState(isLoginAtom)
 
   useEffect(() => {
-    fetch('/api/auth')
-      .then((res) => res.json())
-      .then((res) => {
-        setIsLogin(res)
-      })
+    ;(async () => {
+      const res = await apiAuth()
+      setIsLogin(res)
+    })()
   }, [])
 
-  // TODO: refactor
-  const login = () => {
-    fetch(`/api/login?pass=${pass}`, { method: 'POST' })
-      .then((res) => {
-        fetch(`/api/auth`)
-          .then((res) => res.json())
-          .then((res) => {
-            setIsLogin(res)
-            setSnack(res)
-          })
-      })
-      .finally(() => {
-        setOpen(false)
-      })
+  const login = async () => {
+    const res = await apiLogin(pass)
+    setIsLogin(res)
+    setSnack(true)
+    setOpen(false)
   }
 
-  // TODO: refactor
-  const logout = () => {
-    fetch(`/api/logout`, { method: 'POST' }).then((res) => {
-      fetch(`/api/auth`)
-        .then((res) => res.json())
-        .then((res) => {
-          setIsLogin(res)
-        })
-    })
+  const logout = async () => {
+    await apiLogout()
+    setIsLogin(false)
   }
 
   const onClick = () => {
-    if (isLogin) {
-      logout()
-    } else {
-      setOpen(true)
-    }
+    isLogin ? logout() : setOpen(true)
   }
 
   const handleInputPass = (event) => {
@@ -96,11 +81,11 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
       >
         <Alert
           onClose={() => setSnack(false)}
-          severity="success"
+          severity={isLogin ? 'success' : 'error'}
           elevation={6}
           variant="filled"
         >
-          Login Success!
+          {isLogin ? 'Login Success!' : 'Login Failed'}
         </Alert>
       </Snackbar>
       <Dialog open={open} onClose={() => setOpen(false)}>
