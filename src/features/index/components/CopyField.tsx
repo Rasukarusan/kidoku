@@ -47,6 +47,9 @@ export const CopyField: React.FC = () => {
           padding: 10px;
           font-size: 1rem;
           cursor: pointer;
+          background: transparent;
+          border-color: rgba(0, 0, 0, 0.23);
+          border-radius: 4px;
         }
         textarea:focus {
           outline: none;
