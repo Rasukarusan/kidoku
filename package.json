@@ -17,6 +17,7 @@
     "@mui/material": "^5.9.0",
     "@mui/styles": "^5.9.0",
     "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12",
     "dayjs": "^1.11.3",
     "framer-motion": "^6.5.1",
     "next": "^12.3.1",
