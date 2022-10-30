@@ -30,6 +30,7 @@ export default async function handler(
   const html = await fetch(
     'https://www.amazon.co.jp/s?k=%E3%83%9E%E3%83%B3%E3%82%AC%E3%81%A7%E3%82%8F%E3%81%8B%E3%82%8B+%E3%82%B7%E3%83%B3%E3%83%97%E3%83%AB%E3%81%A7%E6%AD%A3%E3%81%97%E3%81%84%E3%81%8A%E9%87%91%E3%81%AE%E5%A2%97%E3%82%84%E3%81%97%E6%96%B9'
   ).then((res) => res.text())
+  console.log('html => ', html)
   // 大体上位5件以内に見つかるので、処理速度向上のため絞る
   const { links, images } = await downloadAmazonImages(html, 5)
 
@@ -43,6 +44,7 @@ export default async function handler(
       })
     fs.unlinkSync(image)
   })
+  console.log('diffs => ', diffs)
   const i = diffs.indexOf(Math.min(...diffs))
   fs.unlinkSync(target)
 
