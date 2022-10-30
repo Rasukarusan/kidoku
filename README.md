@@ -2,9 +2,7 @@
 
 https://app.rasukarusan.com
 
-<img width="1437" alt="image" src="https://user-images.githubusercontent.com/17779386/174613267-fca6e902-a39e-4774-aca5-3696c72aaec1.png">
-
-![demo.gif](https://user-images.githubusercontent.com/17779386/183230719-1214b4ee-59c2-488f-ab73-a3c378e9f02c.gif)
+![image](https://user-images.githubusercontent.com/17779386/198881209-21a64164-a012-4a36-87eb-bad138d589c4.png)
 
 ## 機能
 
@@ -21,7 +19,7 @@ https://app.rasukarusan.com
 ## 技術
 
 - Next.js
-- Prisma
-- PlanetScale
 - Mui
 - Framer Motion
+- Recoil
+- SWR
