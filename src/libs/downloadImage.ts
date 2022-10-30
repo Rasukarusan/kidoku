@@ -2,6 +2,8 @@ import axios from 'axios'
 import fs from 'fs'
 import * as cheerio from 'cheerio'
 
+export const ASSET_PATH = '/tmp/'
+
 export async function downloadImage(url, filepath) {
   const response = await axios({
     url,
@@ -30,7 +32,7 @@ export const downloadAmazonImages = async (html: string, limit: number) => {
       const title = $(v).attr('alt')
       const link = 'https://www.amazon.co.jp' + $(v).parents('a').attr('href')
       links.push(link)
-      requests.push(downloadImage(imageURL, `${title}.jpg`))
+      requests.push(downloadImage(imageURL, `${ASSET_PATH}${title}.jpg`))
     })
   return { links, images: await Promise.all(requests) }
 }
