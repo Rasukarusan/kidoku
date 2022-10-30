@@ -31,6 +31,7 @@ export const downloadAmazonImages = async (html: string, limit: number) => {
       const imageURL = $(v).attr('src')
       const title = $(v).attr('alt')
       const link = 'https://www.amazon.co.jp' + $(v).parents('a').attr('href')
+      console.log(title, link)
       links.push(link)
       requests.push(downloadImage(imageURL, `${ASSET_PATH}${title}.jpg`))
     })

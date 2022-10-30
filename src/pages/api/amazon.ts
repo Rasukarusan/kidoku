@@ -33,6 +33,7 @@ export default async function handler(
   console.log('html => ', html)
   // 大体上位5件以内に見つかるので、処理速度向上のため絞る
   const { links, images } = await downloadAmazonImages(html, 5)
+  console.log(links, images)
 
   // 画像差分が一番小さいものを抽出
   const diffs = []
