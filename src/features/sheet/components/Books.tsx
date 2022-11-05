@@ -57,7 +57,7 @@ export const Books: React.FC<Props> = ({ books }) => {
             <Grid key={book.title + i} item xs={4} sm={3} md={2}>
               <div className="relative bg-white">
                 <img
-                  className="hover:cursor-pointer"
+                  className="hover:cursor-pointer shadow"
                   src={book.image === '-' ? '/no-image.png' : book.image}
                   width={128}
                   height={186}
