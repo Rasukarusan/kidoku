@@ -21,8 +21,8 @@ interface Props {
 }
 
 export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
-  if (!book) return null
   const isLogin = useRecoilValue(isLoginAtom)
+  if (!book) return null
   return (
     <Dialog onClose={onClose} open={open}>
       <DialogTitle>
@@ -50,9 +50,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
         {isLogin && (
           <>
             <Divider sx={{ margin: '15px 0px' }} />
-            <DialogContentText>
-              <Memo memo={book.memo} />
-            </DialogContentText>
+            <Memo memo={book.memo} />
           </>
         )}
       </DialogContent>
