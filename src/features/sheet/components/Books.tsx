@@ -16,6 +16,7 @@ import { Memo } from './Memo'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import { HoverBook } from './HoverBook'
+import { BookDetailDialog } from './BookDetailDialog'
 
 interface Props {
   books: Record[]
@@ -85,42 +86,11 @@ export const Books: React.FC<Props> = ({ books }) => {
           )
         })}
       </Grid>
-
-      <Dialog onClose={() => setOpen(false)} open={open}>
-        <DialogTitle>
-          <a
-            href={encodeURI(
-              `https://www.amazon.co.jp/s?k=${selectBook?.title}`
-            )}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {selectBook?.title}
-          </a>
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText
-            sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}
-          >
-            <PeopleAltIcon sx={{ marginRight: '5px' }} />
-            {selectBook?.author}
-          </DialogContentText>
-          <DialogContentText
-            sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}
-          >
-            <CategoryIcon sx={{ marginRight: '5px' }} />
-            {selectBook?.category}
-          </DialogContentText>
-          {isLogin && (
-            <>
-              <Divider sx={{ margin: '15px 0px' }} />
-              <DialogContentText>
-                <Memo memo={selectBook?.memo} />
-              </DialogContentText>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <BookDetailDialog
+        open={open}
+        book={selectBook}
+        onClose={() => setOpen(false)}
+      />
     </>
   )
 }
