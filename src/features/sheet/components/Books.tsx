@@ -30,6 +30,7 @@ export const Books: React.FC<Props> = ({ books }) => {
   const onClickImage = (book: Record) => {
     setSelectBook(book)
     setOpen(true)
+    setHovers(initialHovers)
   }
 
   const onMouseEnter = (i: number) => {
@@ -73,7 +74,11 @@ export const Books: React.FC<Props> = ({ books }) => {
                     </p>
                   )}
                 {hovers[i] && (
-                  <HoverBook book={book} onMouseLeave={onMouseLeave} />
+                  <HoverBook
+                    book={book}
+                    onMouseLeave={onMouseLeave}
+                    onClick={onClickImage}
+                  />
                 )}
               </div>
             </Grid>
