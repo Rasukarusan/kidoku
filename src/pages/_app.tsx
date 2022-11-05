@@ -8,6 +8,7 @@ import { LoadingTopBar } from '@/features/global/components/LoadingTopBar'
 import { RecoilRoot } from 'recoil'
 import { DefaultSeo } from 'next-seo'
 import SEO from '../../next-seo.config'
+import './global.css'
 
 export default function MyApp(props) {
   const { Component, pageProps } = props
