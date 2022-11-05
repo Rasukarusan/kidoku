@@ -1,8 +1,6 @@
 import { Fragment, useState } from 'react'
 import { useRecoilValue } from 'recoil'
-import { motion } from 'framer-motion'
 import { makeStyles } from '@mui/styles'
-import Image from 'next/image'
 import SmsIcon from '@mui/icons-material/Sms'
 import { isLoginAtom } from '@/store/isLogin'
 import {
@@ -17,6 +15,7 @@ import { Record } from '../types'
 import { Memo } from './Memo'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
+import { HoverBook } from './HoverBook'
 
 const useStyles = makeStyles({
   image: {
@@ -30,14 +29,33 @@ interface Props {
   books: Record[]
 }
 export const Books: React.FC<Props> = ({ books }) => {
+  const initialHovers = Array(books.length).fill(false)
   const classes = useStyles()
   const isLogin = useRecoilValue(isLoginAtom)
   const [open, setOpen] = useState(false)
   const [selectBook, setSelectBook] = useState<Record>(null)
+  const [hovers, setHovers] = useState(initialHovers)
 
   const onClickImage = (book: Record) => {
     setSelectBook(book)
     setOpen(true)
+  }
+
+  const onMouseEnter = (i: number) => {
+    const newHovers = [...initialHovers]
+    newHovers[i] = true
+    setHovers(newHovers)
+  }
+
+  const onMouseLeave = (i: number) => {
+    // hoverするとズーム用のコンポーネントが表示され、そちらにMouseEnterするためMouseLeaveしてしまう
+    // そうなるとEnterとLeaveが無限ループしてしまうため、Leaveする際に現在のhover[i]=trueになっているインデックスと、
+    // Leaveする際のインデックスが同じの場合はLeaveしないようにreturnするようにしている。
+    const current = hovers.findIndex((v) => v)
+    if (current === i) return
+    const newHovers = [...initialHovers]
+    newHovers[i] = false
+    setHovers(newHovers)
   }
 
   return (
@@ -46,25 +64,15 @@ export const Books: React.FC<Props> = ({ books }) => {
         {books.map((book, i) => {
           return (
             <Grid key={book.title + i} item xs={4} sm={3} md={2}>
-              <motion.div
-                style={{ position: 'relative' }}
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  transition: {
-                    duration: 1,
-                  },
-                }}
-                whileHover={{
-                  scale: 1.2,
-                }}
-              >
-                <Image
+              <div className={`book ${hovers[i] && 'book-hover'}`}>
+                <img
                   className={classes.image}
                   src={book.image === '-' ? '/no-image.png' : book.image}
                   width={128}
                   height={186}
                   onClick={() => onClickImage(book)}
+                  onMouseEnter={() => onMouseEnter(i)}
+                  onMouseLeave={() => onMouseLeave(i)}
                 />
                 {isLogin &&
                   book?.memo !== '[期待]\n\n[感想]' &&
@@ -79,13 +87,26 @@ export const Books: React.FC<Props> = ({ books }) => {
                       <SmsIcon />
                     </p>
                   )}
-              </motion.div>
+                {hovers[i] && (
+                  <HoverBook book={book} onMouseLeave={onMouseLeave} />
+                )}
+              </div>
             </Grid>
           )
         })}
+        <style jsx>{`
+          .book {
+            position: relative;
+            background: white;
+            // transition: 0.5s;
+          }
+          .book:hover {
+            // transform: scale(1.3);
+          }
+        `}</style>
       </Grid>
 
-      <Dialog onClose={() => setOpen(false)} open={open}>
+      <Dialog onClose={() => setOpen(false)} open={false}>
         <DialogTitle>
           <a
             href={encodeURI(
