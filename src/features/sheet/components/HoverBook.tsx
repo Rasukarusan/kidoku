@@ -9,16 +9,18 @@ import { truncate } from '@/utils/string'
 
 interface Props {
   book: Record
+  onClick: (book: Record) => void
   onMouseLeave: (i: number) => void
 }
 
-export const HoverBook: React.FC<Props> = ({ book, onMouseLeave }) => {
+export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
   const isLogin = useRecoilValue(isLoginAtom)
   return (
     <motion.div
       className="absolute top-0 z-10 bg-white w-[350px] border-2 border-[#507C8F] rounded p-2"
       animate={{ scale: 1.2, color: '#263238' }}
       onMouseLeave={() => onMouseLeave(-1)}
+      onClick={() => onClick(book)}
     >
       <div className="flex">
         <div className="min-w-[128px]">
