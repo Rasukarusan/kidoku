@@ -17,20 +17,11 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import { HoverBook } from './HoverBook'
 
-const useStyles = makeStyles({
-  image: {
-    '&:hover': {
-      cursor: 'pointer',
-    },
-  },
-})
-
 interface Props {
   books: Record[]
 }
 export const Books: React.FC<Props> = ({ books }) => {
   const initialHovers = Array(books.length).fill(false)
-  const classes = useStyles()
   const isLogin = useRecoilValue(isLoginAtom)
   const [open, setOpen] = useState(false)
   const [selectBook, setSelectBook] = useState<Record>(null)
@@ -64,9 +55,9 @@ export const Books: React.FC<Props> = ({ books }) => {
         {books.map((book, i) => {
           return (
             <Grid key={book.title + i} item xs={4} sm={3} md={2}>
-              <div className={`book ${hovers[i] && 'book-hover'}`}>
+              <div className="relative bg-white">
                 <img
-                  className={classes.image}
+                  className="hover:cursor-pointer"
                   src={book.image === '-' ? '/no-image.png' : book.image}
                   width={128}
                   height={186}
@@ -77,13 +68,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                 {isLogin &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
-                    <p
-                      style={{
-                        position: 'absolute',
-                        top: '-30px',
-                        right: '25px',
-                      }}
-                    >
+                    <p className="absolute top-[-30px] right-[25px]">
                       <SmsIcon />
                     </p>
                   )}
@@ -94,19 +79,9 @@ export const Books: React.FC<Props> = ({ books }) => {
             </Grid>
           )
         })}
-        <style jsx>{`
-          .book {
-            position: relative;
-            background: white;
-            // transition: 0.5s;
-          }
-          .book:hover {
-            // transform: scale(1.3);
-          }
-        `}</style>
       </Grid>
 
-      <Dialog onClose={() => setOpen(false)} open={false}>
+      <Dialog onClose={() => setOpen(false)} open={open}>
         <DialogTitle>
           <a
             href={encodeURI(
