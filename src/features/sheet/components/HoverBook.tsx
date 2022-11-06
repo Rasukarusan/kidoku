@@ -25,7 +25,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
       <div className="flex">
         <div className="min-w-[128px]">
           <img
-            className="cursor-pointer shadow"
+            className="cursor-pointer drop-shadow-lg"
             src={book.image}
             width={128}
             height={186}
