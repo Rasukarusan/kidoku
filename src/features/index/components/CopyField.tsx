@@ -36,25 +36,8 @@ export const CopyField: React.FC = () => {
         rows={13}
         readOnly
         onClick={handleOnClick}
+        className="w-full block resize-none h-[263px] p-2 cursor-pointer bg-transparent border border-[rgba(0,0,0,0.23)] rounded text-gray-500 outline-none"
       />
-      <style jsx>{`
-        textarea {
-          width: 100%;
-          display: block;
-          resize: none;
-          height: 263px;
-          color: gray;
-          padding: 10px;
-          font-size: 1rem;
-          cursor: pointer;
-          background: transparent;
-          border-color: rgba(0, 0, 0, 0.23);
-          border-radius: 4px;
-        }
-        textarea:focus {
-          outline: none;
-        }
-      `}</style>
     </div>
   )
 }
