@@ -14,6 +14,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     nookies.set({ res }, COOKIE_KEY_HASH, hash, {
       maxAge: 10 * 12 * 30 * 24 * 60 * 60, // 10年間
       path: '/',
+      httpOnly: true,
+      sameSite: 'lax',
     })
   }
   return res.status(200).json(isAuth)
