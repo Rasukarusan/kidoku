@@ -1,12 +1,11 @@
 import { useRecoilValue } from 'recoil'
 import { isLoginAtom } from '@/store/isLogin'
 import { Record } from '../types'
-import { Grid, Dialog, Divider } from '@mui/material'
+import { Dialog, Divider } from '@mui/material'
 import { Memo } from './Memo'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
-import { HoverBook } from './HoverBook'
 
 interface Props {
   book?: Record

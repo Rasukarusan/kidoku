@@ -1,11 +1,7 @@
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
-import CategoryIcon from '@mui/icons-material/Category'
 import { motion } from 'framer-motion'
 import { useRecoilValue } from 'recoil'
 import { isLoginAtom } from '@/store/isLogin'
 import { Record } from '../types'
-import { Memo } from './Memo'
-import { truncate } from '@/utils/string'
 
 interface Props {
   book: Record

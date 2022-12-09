@@ -4,7 +4,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/** --ext .ts,.tsx",
-    "lint:fix": "yarn lint --fix",
+    "lint:fix": "eslint --fix src/** --ext .ts,.tsx",
     "prepare": "husky install",
     "analyze": "ANALYZE=true next build",
     "lighthouse": "lighthouse http://localhost:3000"
