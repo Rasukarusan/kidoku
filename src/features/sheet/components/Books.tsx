@@ -1,20 +1,9 @@
 import { Fragment, useState } from 'react'
 import { useRecoilValue } from 'recoil'
-import { makeStyles } from '@mui/styles'
 import SmsIcon from '@mui/icons-material/Sms'
 import { isLoginAtom } from '@/store/isLogin'
-import {
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  Divider,
-} from '@mui/material'
+import { Grid } from '@mui/material'
 import { Record } from '../types'
-import { Memo } from './Memo'
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
-import CategoryIcon from '@mui/icons-material/Category'
 import { HoverBook } from './HoverBook'
 import { BookDetailDialog } from './BookDetailDialog'
 
