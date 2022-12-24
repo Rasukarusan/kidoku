@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Container, Grid, Box } from '@mui/material'
+import {
+  Container,
+  Grid,
+  Box,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material'
 import { Record } from '../types'
 import { BarGraph, Tabs } from './'
 import { Books } from './Books'
+import { BookRows } from './BookRows'
+import GridViewIcon from '@mui/icons-material/GridView'
+import TableRowsIcon from '@mui/icons-material/TableRows'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -18,6 +27,8 @@ interface Props {
 export const SheetPage: React.FC<Props> = ({ data, year }) => {
   const [currentData, setCurrentData] = useState<Record[]>([])
   const [open, setOpen] = useState(false)
+  // 一覧表示か書影表示か
+  const [mode, setMode] = useState<'row' | 'grid'>('grid')
 
   useEffect(() => {
     setCurrentData(data)
@@ -25,6 +36,13 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
 
   const setShowData = (newData: Record[]) => {
     setCurrentData(newData)
+  }
+
+  const handleChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newMode: 'row' | 'grid'
+  ) => {
+    setMode(newMode)
   }
 
   return (
@@ -49,7 +67,32 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
           </Grid>
         </Grid>
       </Box>
-      <Books books={currentData} />
+      <Box
+        sx={{
+          textAlign: 'center',
+          marginBottom: '20px',
+        }}
+      >
+        <ToggleButtonGroup
+          color="standard"
+          value={mode}
+          exclusive
+          onChange={handleChange}
+          aria-label="Platform"
+        >
+          <ToggleButton value="grid">
+            <GridViewIcon />
+          </ToggleButton>
+          <ToggleButton value="row">
+            <TableRowsIcon />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      {mode === 'grid' ? (
+        <Books books={currentData} />
+      ) : (
+        <BookRows books={currentData} />
+      )}
     </Container>
   )
 }
