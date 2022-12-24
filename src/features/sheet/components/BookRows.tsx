@@ -27,13 +27,16 @@ export const BookRows: React.FC<Props> = ({ books }) => {
             <th scope="col" className="py-3 px-6">
               No
             </th>
+            <th scope="col" className="py-3 px-6 hidden sm:table-cell">
+              書影
+            </th>
             <th scope="col" className="py-3 px-6">
               タイトル
             </th>
             <th scope="col" className="py-3 px-6">
               著者
             </th>
-            <th scope="col" className="py-3 px-6">
+            <th scope="col" className="py-3 px-6 hidden sm:table-cell">
               カテゴリ
             </th>
             <th scope="col" className="py-3 px-6">
@@ -54,6 +57,9 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               onClick={() => onClickImage(book)}
             >
               <td className="py-4 px-6">{i + 1}</td>
+              <td className="py-4 px-6 hidden sm:table-cell">
+                <img src={book.image} alt={book.title} width={120} />
+              </td>
               <th
                 scope="row"
                 className="py-4 px-6 font-medium text-gray-900 whitespace-nowrap"
@@ -61,10 +67,14 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                 {truncate(book.title, 20)}
               </th>
               <td className="py-4 px-6">{book.author}</td>
-              <td className="py-4 px-6">{book.category}</td>
+              <td className="py-4 px-6 hidden sm:table-cell">
+                {book.category}
+              </td>
               <td className="py-4 px-6">{book.impression}</td>
               {isLogin && (
-                <td className="py-4 px-6">{truncate(book.memo, 40)}</td>
+                <td className="py-4 px-6 whitespace-nowrap sm:whitespace-normal">
+                  {truncate(book.memo, 40)}
+                </td>
               )}
             </tr>
           ))}
