@@ -13,7 +13,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
   const isLogin = useRecoilValue(isLoginAtom)
   return (
     <motion.div
-      className="absolute top-0 z-10 bg-white w-[350px] border-2 border-[#507C8F] rounded p-2"
+      className="absolute top-0 z-10 bg-white w-[350px] border-2 border-[#507C8F] rounded p-0"
       animate={{ scale: 1.2, color: '#263238' }}
       onMouseLeave={() => onMouseLeave(-1)}
       onClick={() => onClick(book)}
@@ -28,7 +28,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
             alt=""
           />
         </div>
-        <div className="pl-2">
+        <div className="p-2">
           <div className="font-bold text-sm">{book.title}</div>
           <div className="text-xs pt-1">{book.author}</div>
           {isLogin && (
