@@ -1,9 +1,12 @@
+import { useRecoilValue } from 'recoil'
 import { useState } from 'react'
 import { Container, Grid } from '@mui/material'
+import { isLoginAtom } from '@/store/isLogin'
 import { Results } from '../types'
 import { InputField, Area as ResultArea, CopyField, AddButton } from './'
 
 export const IndexPage = () => {
+  const isLogin = useRecoilValue(isLoginAtom)
   const [searchWords, setSearchWords] = useState<string[]>([])
   const [results, setResults] = useState<Results>({})
 
@@ -27,7 +30,7 @@ export const IndexPage = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <CopyField />
-            {searchWords.length > 0 && <AddButton />}
+            {isLogin && searchWords.length > 0 && <AddButton />}
           </Grid>
         </Grid>
         <ResultArea results={results} searchWords={searchWords} />
