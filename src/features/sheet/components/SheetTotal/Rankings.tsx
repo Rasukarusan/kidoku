@@ -2,7 +2,33 @@ import { RankingItem } from './'
 
 export const Rankings: React.FC = () => {
   return (
-    <>
+    <div className="mt-8">
+      <RankingItem
+        year="2022年"
+        books={[
+          {
+            rank: 1,
+            name: '人生の法則 「欲求の4タイプ」で分かるあなたと他人',
+            image:
+              'http://books.google.com/books/content?id=qOaruAAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
+            link: 'https://www.amazon.co.jp/dp/B00GTK5IQG',
+          },
+          {
+            rank: 2,
+            name: 'お金のむこうに人がいる',
+            image:
+              'http://books.google.com/books/content?id=47mNzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
+            link: 'https://www.amazon.co.jp/dp/4478113726',
+          },
+          {
+            rank: 3,
+            name: 'プロジェクト・ヘイル・メアリー',
+            image:
+              'http://books.google.com/books/content?id=AIazzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
+            link: 'https://www.amazon.co.jp/dp/B09NBZLC7J',
+          },
+        ]}
+      />
       <RankingItem
         year="2021年"
         books={[
@@ -81,6 +107,6 @@ export const Rankings: React.FC = () => {
           },
         ]}
       />
-    </>
+    </div>
   )
 }
