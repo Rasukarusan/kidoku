@@ -44,7 +44,7 @@ export const selectItemsBodySelector = selector({
         const info = item.split('\t')
         const [title, author, category, image] = info
         return {
-          year: 2022,
+          year: 2023,
           title,
           author,
           category,
