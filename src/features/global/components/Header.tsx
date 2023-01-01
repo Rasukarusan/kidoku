@@ -24,7 +24,7 @@ const pages: Page[] = [
   },
   {
     title: 'シート',
-    href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=789903411',
+    href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=932576471',
     target: '_blank',
     icon: <OpenInNewSharpIcon />,
     auth: true,
