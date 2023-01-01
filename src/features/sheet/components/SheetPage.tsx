@@ -46,7 +46,7 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
   }
 
   return (
-    <Container fixed>
+    <Container fixed sx={{ marginBottom: '32px' }}>
       <Box
         sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
       >
