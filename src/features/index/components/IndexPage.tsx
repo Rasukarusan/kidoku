@@ -9,6 +9,7 @@ export const IndexPage = () => {
   const isLogin = useRecoilValue(isLoginAtom)
   const [searchWords, setSearchWords] = useState<string[]>([])
   const [results, setResults] = useState<Results>({})
+  const [openSuggest, setOpenSuggest] = useState(false)
 
   const updateSearchWords = (newSearchWords: string[]) => {
     setSearchWords(newSearchWords)
@@ -18,14 +19,20 @@ export const IndexPage = () => {
     setResults(newResults)
   }
 
+  const onClickBody = () => {
+    setOpenSuggest(false)
+  }
+
   return (
-    <>
+    <div onClick={onClickBody}>
       <Container fixed sx={{ paddingTop: '32px' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <InputField
               setSearchWords={updateSearchWords}
               setResults={updateResults}
+              openSuggest={openSuggest}
+              setOpenSuggest={setOpenSuggest}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -35,6 +42,6 @@ export const IndexPage = () => {
         </Grid>
         <ResultArea results={results} searchWords={searchWords} />
       </Container>
-    </>
+    </div>
   )
 }
