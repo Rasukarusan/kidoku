@@ -29,15 +29,21 @@ const useStyles = makeStyles({
 interface Props {
   setSearchWords: (newSearchWords: string[]) => void
   setResults: (newResults: Results) => void
+  openSuggest: boolean
+  setOpenSuggest: (open: boolean) => void
 }
 
-export const InputField: React.FC<Props> = ({ setSearchWords, setResults }) => {
+export const InputField: React.FC<Props> = ({
+  setSearchWords,
+  setResults,
+  openSuggest,
+  setOpenSuggest,
+}) => {
   const classes = useStyles()
   const [timer, setTimer] = useState(null)
   const [options, setOptions] = useState([])
   const [value, setValue] = useState('')
   const [suggestWord, setSuggestWord] = useState('')
-  const [openSuggest, setOpenSuggest] = useState(false)
   const inputRef = useRef(null)
   const suggestRef = useRef(null)
 
