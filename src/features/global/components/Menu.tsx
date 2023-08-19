@@ -18,20 +18,23 @@ export const Menu: React.FC<Props> = ({ pages }) => {
           if (page.auth && !isLogin) return null
 
           return (
-            <Link href={page.href} key={page.title}>
-              <a style={{ textDecoration: 'none' }} target={page.target}>
-                <Button
-                  key={page.title}
-                  sx={{
-                    my: 2,
-                    color: 'white',
-                    fontFamily: 'Nico Moji',
-                  }}
-                  endIcon={page.icon}
-                >
-                  {page.title}
-                </Button>
-              </a>
+            <Link
+              href={page.href}
+              key={page.title}
+              style={{ textDecoration: 'none' }}
+              target={page.target}
+            >
+              <Button
+                key={page.title}
+                sx={{
+                  my: 2,
+                  color: 'white',
+                  fontFamily: 'Nico Moji',
+                }}
+                endIcon={page.icon}
+              >
+                {page.title}
+              </Button>
             </Link>
           )
         })}

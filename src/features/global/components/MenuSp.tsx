@@ -58,16 +58,15 @@ export const MenuSp: React.FC<Props> = ({ pages }) => {
 
           return (
             <MenuItem key={page.title} onClick={handleCloseNavMenu}>
-              <Link href={page.href}>
-                <a
-                  style={{
-                    textDecoration: 'none',
-                    fontFamily: 'Nico Moji ',
-                  }}
-                  target={page.target}
-                >
-                  {page.title}
-                </a>
+              <Link
+                href={page.href}
+                style={{
+                  textDecoration: 'none',
+                  fontFamily: 'Nico Moji ',
+                }}
+                target={page.target}
+              >
+                {page.title}
               </Link>
             </MenuItem>
           )

@@ -51,7 +51,13 @@ export const Book: React.FC<BookProps> = ({ rank, image, link, name }) => {
     >
       <div className={`${classes.rank} ${color}`}>{rank}位</div>
       <a className={classes.link} href={link} target="_blank" rel="noreferrer">
-        <Image className={classes.image} src={image} width={128} height={186} />
+        <Image
+          className={classes.image}
+          src={image}
+          width={128}
+          height={186}
+          alt=""
+        />
         <div>{name}</div>
       </a>
     </Box>

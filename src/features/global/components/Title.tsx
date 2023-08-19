@@ -6,7 +6,7 @@ export const Title: React.FC = () => {
   return (
     <>
       <AutoStoriesIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-      <Link href="/">
+      <Link href="/" legacyBehavior>
         <Typography
           variant="h6"
           noWrap
