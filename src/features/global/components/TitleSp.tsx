@@ -6,7 +6,7 @@ export const TitleSp: React.FC = () => {
   return (
     <>
       <AutoStoriesIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-      <Link href="/">
+      <Link href="/" legacyBehavior>
         <Typography
           variant="h5"
           noWrap
