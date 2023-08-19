@@ -10,6 +10,10 @@ import { DefaultSeo } from 'next-seo'
 import SEO from '../../next-seo.config'
 import './global.css'
 
+// Expectation Violation: Duplicate atom keyをログに出力させない
+import { RecoilEnv } from 'recoil'
+RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false
+
 export default function MyApp(props) {
   const { Component, pageProps } = props
 
