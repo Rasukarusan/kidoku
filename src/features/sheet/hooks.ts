@@ -5,7 +5,7 @@ export function useCountUp(value: number) {
   useEffect(() => {
     let i = 0
     // カウントアップのステップをvalueによって調整する。valueが大きい場合カウントし終わるのが長くなってしまうため。
-    const incrementStep = 50
+    const incrementStep = 10
     const interval = setInterval(() => {
       i = i + incrementStep
       setCount(i)
