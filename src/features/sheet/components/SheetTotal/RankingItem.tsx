@@ -1,6 +1,5 @@
 import { Box } from '@mui/material'
-import { Book, BookProps } from './'
-
+import { Book, BookProps } from './Book'
 import { makeStyles } from '@mui/styles'
 
 const useStyles = makeStyles({

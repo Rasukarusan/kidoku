@@ -1,4 +1,4 @@
-import { RankingItem } from './'
+import { RankingItem } from './RankingItem'
 
 export const Rankings: React.FC = () => {
   return (
