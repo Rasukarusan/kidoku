@@ -1,5 +1,6 @@
 import { useRecoilState } from 'recoil'
 import { useEffect, useState } from 'react'
+import { useSession, signIn, signOut } from 'next-auth/react'
 import {
   Button,
   MenuItem,
@@ -11,6 +12,7 @@ import {
   Alert,
 } from '@mui/material'
 import { isLoginAtom } from '@/store/isLogin'
+import { SignInWithGithubButton } from '@/components/button/SignInWithGithubButton'
 import {
   login as apiLogin,
   logout as apiLogout,
@@ -26,6 +28,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
   const [snack, setSnack] = useState(false)
   const [pass, setPass] = useState('')
   const [isLogin, setIsLogin] = useRecoilState(isLoginAtom)
+  const { data: session, status } = useSession()
 
   useEffect(() => {
     ;(async () => {
@@ -42,6 +45,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
   }
 
   const logout = async () => {
+    signOut()
     await apiLogout()
     setIsLogin(false)
   }
@@ -89,7 +93,12 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
         </Alert>
       </Snackbar>
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogContent>
+        <DialogContent dividers>
+          <SignInWithGithubButton
+            onClick={() => {
+              signIn('github')
+            }}
+          />
           <TextField
             autoFocus
             autoComplete="off"

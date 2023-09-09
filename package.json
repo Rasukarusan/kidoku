@@ -21,6 +21,7 @@
     "dayjs": "^1.11.3",
     "framer-motion": "^6.5.1",
     "next": "^13.4.19",
+    "next-auth": "^4.23.1",
     "next-compose-plugins": "^2.2.1",
     "next-seo": "^5.8.0",
     "node-fetch": "^3.2.10",
