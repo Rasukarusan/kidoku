@@ -11,5 +11,5 @@ export const logout = async (): Promise<boolean> => {
 }
 
 export const auth = async (): Promise<boolean> => {
-  return await fetch('/api/auth').then((res) => res.json())
+  return await fetch('/api/myauth').then((res) => res.json())
 }
