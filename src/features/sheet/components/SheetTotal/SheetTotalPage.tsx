@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { Container } from '@mui/material'
 import { useRouter } from 'next/router'
-import { Tabs } from '../'
+import { Tabs } from '../Tabs'
 import { Category, Record, Year } from '../../types'
-import { CategoryMap, Title, Value, Rankings } from './'
+import { Title } from './Title'
+import { Value } from './Value'
+import { Rankings } from './Rankings'
+import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
 
 interface Props {

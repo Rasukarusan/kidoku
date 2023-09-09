@@ -8,7 +8,8 @@ import {
   ToggleButton,
 } from '@mui/material'
 import { Record } from '../types'
-import { BarGraph, Tabs } from './'
+import { BarGraph } from './BarGraph'
+import { Tabs } from './Tabs'
 import { Books } from './Books'
 import { BookRows } from './BookRows'
 import GridViewIcon from '@mui/icons-material/GridView'
