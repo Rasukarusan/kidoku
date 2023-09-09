@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles'
 import { Box } from '@mui/material'
 const useStyles = makeStyles({
   image: {
+    margin: '0 auto',
     boxShadow: '0 5px 15px rgb(0 0 0 / 15%)',
   },
   rank: {
@@ -25,7 +26,6 @@ const useStyles = makeStyles({
     WebkitBackgroundClip: 'text',
   },
   link: {
-    textDecoration: 'none',
     color: '#000',
     fontWeight: 500,
   },
@@ -58,7 +58,7 @@ export const Book: React.FC<BookProps> = ({ rank, image, link, name }) => {
           height={186}
           alt=""
         />
-        <div>{name}</div>
+        <div className="mt-4">{name}</div>
       </a>
     </Box>
   )
