@@ -2,20 +2,19 @@ import Link from 'next/link'
 import { Box, Button } from '@mui/material'
 import { Page } from '../types'
 import { SignButton } from './SignButton'
-import { useRecoilValue } from 'recoil'
-import { isLoginAtom } from '@/store/isLogin'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   pages: Page[]
 }
 
 export const Menu: React.FC<Props> = ({ pages }) => {
-  const isLogin = useRecoilValue(isLoginAtom)
+  const { data: session } = useSession()
   return (
     <>
       <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
         {pages.map((page) => {
-          if (page.auth && !isLogin) return null
+          if (page.auth && !session) return null
 
           return (
             <Link

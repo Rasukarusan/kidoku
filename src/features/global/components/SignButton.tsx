@@ -1,23 +1,14 @@
-import { useRecoilState } from 'recoil'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import {
   Button,
   MenuItem,
   Dialog,
   DialogContent,
-  DialogActions,
-  TextField,
   Snackbar,
   Alert,
 } from '@mui/material'
-import { isLoginAtom } from '@/store/isLogin'
 import { SignInWithGithubButton } from '@/components/button/SignInWithGithubButton'
-import {
-  login as apiLogin,
-  logout as apiLogout,
-  auth as apiAuth,
-} from '../util'
 
 interface Props {
   mobile: boolean
@@ -27,31 +18,10 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
   const [open, setOpen] = useState(false)
   const [snack, setSnack] = useState(false)
   const [pass, setPass] = useState('')
-  const [isLogin, setIsLogin] = useRecoilState(isLoginAtom)
   const { data: session, status } = useSession()
 
-  useEffect(() => {
-    ;(async () => {
-      const res = await apiAuth()
-      setIsLogin(res)
-    })()
-  }, [])
-
-  const login = async () => {
-    const res = await apiLogin(pass)
-    setIsLogin(res)
-    setSnack(true)
-    setOpen(false)
-  }
-
-  const logout = async () => {
-    signOut()
-    await apiLogout()
-    setIsLogin(false)
-  }
-
   const onClick = () => {
-    isLogin ? logout() : setOpen(true)
+    session ? signOut() : setOpen(true)
   }
 
   const handleInputPass = (event) => {
@@ -62,7 +32,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
     <>
       {mobile ? (
         <MenuItem onClick={onClick} sx={{ fontFamily: 'Nico Moji' }}>
-          {isLogin ? 'ログアウト' : 'ログイン'}
+          {session ? 'ログアウト' : 'ログイン'}
         </MenuItem>
       ) : (
         <Button
@@ -74,7 +44,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
           }}
           endIcon={null}
         >
-          {isLogin ? 'ログアウト' : 'ログイン'}
+          {session ? 'ログアウト' : 'ログイン'}
         </Button>
       )}
       <Snackbar
@@ -85,11 +55,11 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
       >
         <Alert
           onClose={() => setSnack(false)}
-          severity={isLogin ? 'success' : 'error'}
+          severity={session ? 'success' : 'error'}
           elevation={6}
           variant="filled"
         >
-          {isLogin ? 'Login Success!' : 'Login Failed'}
+          {session ? 'Login Success!' : 'Login Failed'}
         </Alert>
       </Snackbar>
       <Dialog open={open} onClose={() => setOpen(false)}>
@@ -99,28 +69,7 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
               signIn('github')
             }}
           />
-          <TextField
-            autoFocus
-            autoComplete="off"
-            margin="dense"
-            id="password"
-            label="Password"
-            type="password"
-            fullWidth
-            variant="standard"
-            onChange={handleInputPass}
-            onKeyDown={(e) => {
-              if (e.keyCode === 13) {
-                // ENTER
-                login()
-              }
-            }}
-          />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>キャンセル</Button>
-          <Button onClick={login}>ログイン</Button>
-        </DialogActions>
       </Dialog>
     </>
   )
