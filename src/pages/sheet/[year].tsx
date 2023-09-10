@@ -1,15 +1,29 @@
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { getYears } from '@/features/sheet/util'
-import { GAS_ENDPOINT } from '@/libs/constants'
+import prisma, { parse } from '@/libs/prisma'
+import dayjs from 'dayjs'
 export default SheetPage
 
 type Props = { params: { year: number } }
 export const getStaticProps = async ({ params }: Props) => {
-  const res = await fetch(GAS_ENDPOINT + `?year=${params.year}`)
-  const data = await res.json()
+  const books = await prisma.books.findMany()
+  const data = books.map((book) => {
+    const month = dayjs(book.finished).format('M') + '月'
+    console.log(month)
+    const { title, author, category, image, impression, memo } = book
+    return {
+      month,
+      title,
+      author,
+      category,
+      image,
+      impression,
+      memo,
+    }
+  })
   return {
     props: {
-      data,
+      data: parse(data),
       year: params.year.toString(),
     },
   }

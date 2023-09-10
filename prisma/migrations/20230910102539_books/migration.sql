@@ -1,0 +1,16 @@
+-- CreateTable
+CREATE TABLE `books` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `title` VARCHAR(120) NOT NULL,
+    `author` VARCHAR(120) NOT NULL,
+    `category` VARCHAR(120) NOT NULL,
+    `image` VARCHAR(255) NOT NULL,
+    `impression` VARCHAR(5) NOT NULL,
+    `memo` TEXT NOT NULL,
+    `finished` DATETIME(0) NOT NULL,
+    `created` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updated` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -14,3 +14,18 @@ model sheets {
   created DateTime? @default(now()) @db.DateTime(0)
   updated DateTime? @default(now()) @db.DateTime(0)
 }
+
+model books {
+  id         Int      @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int
+  sheet_id   Int
+  title      String   @db.VarChar(120)
+  author     String   @db.VarChar(120)
+  category   String   @db.VarChar(120)
+  image      String   @db.VarChar(255)
+  impression String   @db.VarChar(5)
+  memo       String   @db.Text
+  finished   DateTime @db.DateTime(0)
+  created    DateTime @default(now()) @db.DateTime(0)
+  updated    DateTime @default(now()) @db.DateTime(0)
+}
