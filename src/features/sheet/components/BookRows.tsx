@@ -1,9 +1,8 @@
-import { useRecoilValue } from 'recoil'
-import { isLoginAtom } from '@/store/isLogin'
 import { truncate } from '@/utils/string'
 import { Record } from '../types'
 import { useState } from 'react'
 import { Memo } from './Memo'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   books: Record[]
@@ -11,7 +10,7 @@ interface Props {
 
 export const BookRows: React.FC<Props> = ({ books }) => {
   const [expands, setExpands] = useState(Array(books.length).fill(false))
-  const isLogin = useRecoilValue(isLoginAtom)
+  const { data: session } = useSession()
   const pc = 'hidden sm:table-cell'
 
   const onClickRow = (i: number) => {
@@ -41,7 +40,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
             <th scope="col" className="py-3 px-6 whitespace-nowrap">
               感想
             </th>
-            {isLogin && (
+            {session && (
               <th scope="col" className="py-3 px-6">
                 一言
               </th>
@@ -90,7 +89,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                 {book.category}
               </td>
               <td className={`py-4 px-6 ${pc}`}>{book.impression}</td>
-              {isLogin && (
+              {session && (
                 <td className={`py-4 px-6 whitespace-normal ${pc}`}>
                   {expands[i] ? (
                     <Memo memo={book.memo} />

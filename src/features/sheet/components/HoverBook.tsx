@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion'
-import { useRecoilValue } from 'recoil'
-import { isLoginAtom } from '@/store/isLogin'
+import { useSession } from 'next-auth/react'
 import { Record } from '../types'
 
 interface Props {
@@ -10,7 +9,8 @@ interface Props {
 }
 
 export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
-  const isLogin = useRecoilValue(isLoginAtom)
+  const { data: session } = useSession()
+
   return (
     <motion.div
       className="absolute top-0 z-10 bg-white w-[350px] border-2 border-[#507C8F] rounded p-0"
@@ -31,7 +31,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
         <div className="p-2">
           <div className="font-bold text-sm">{book.title}</div>
           <div className="text-xs pt-1">{book.author}</div>
-          {isLogin && (
+          {session && (
             <div className="text-xs mt-2 h-[80px] line-clamp-5 ">
               {book.memo}
             </div>
