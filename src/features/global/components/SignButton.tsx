@@ -8,7 +8,7 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material'
-import { SignInWithGithubButton } from '@/components/button/SignInWithGithubButton'
+import { SignInWithGoogleButton } from '@/components/button/SignInWithGoogleButton'
 
 interface Props {
   mobile: boolean
@@ -64,9 +64,9 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
       </Snackbar>
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogContent dividers>
-          <SignInWithGithubButton
+          <SignInWithGoogleButton
             onClick={() => {
-              signIn('github')
+              signIn('google')
             }}
           />
         </DialogContent>
