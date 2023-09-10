@@ -1,18 +1,17 @@
 import { Fragment, useState } from 'react'
-import { useRecoilValue } from 'recoil'
 import SmsIcon from '@mui/icons-material/Sms'
-import { isLoginAtom } from '@/store/isLogin'
 import { Grid } from '@mui/material'
 import { Record } from '../types'
 import { HoverBook } from './HoverBook'
 import { BookDetailDialog } from './BookDetailDialog'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   books: Record[]
 }
 export const Books: React.FC<Props> = ({ books }) => {
   const initialHovers = Array(books.length).fill(false)
-  const isLogin = useRecoilValue(isLoginAtom)
+  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [selectBook, setSelectBook] = useState<Record>(null)
   const [hovers, setHovers] = useState(initialHovers)
@@ -56,7 +55,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                   onMouseEnter={() => onMouseEnter(i)}
                   onMouseLeave={() => onMouseLeave(i)}
                 />
-                {isLogin &&
+                {session &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
                     <p className="absolute top-[-15px] right-[28px]">

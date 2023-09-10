@@ -1,11 +1,10 @@
-import { useRecoilValue } from 'recoil'
-import { isLoginAtom } from '@/store/isLogin'
 import { Record } from '../types'
 import { Dialog, Divider } from '@mui/material'
 import { Memo } from './Memo'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   book?: Record
@@ -14,7 +13,7 @@ interface Props {
 }
 
 export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
-  const isLogin = useRecoilValue(isLoginAtom)
+  const { data: session } = useSession()
   if (!book) return null
   return (
     <Dialog onClose={onClose} open={open}>
@@ -63,7 +62,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
             </div>
           </div>
         </div>
-        {isLogin && (
+        {session && (
           <>
             <Divider sx={{ margin: '15px 0px' }} />
             <Memo memo={book.memo} />

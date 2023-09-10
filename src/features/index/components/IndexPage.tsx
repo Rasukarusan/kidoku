@@ -1,12 +1,11 @@
-import { useRecoilValue } from 'recoil'
 import { useState } from 'react'
 import { Container, Grid } from '@mui/material'
-import { isLoginAtom } from '@/store/isLogin'
 import { Results } from '../types'
 import { InputField, Area as ResultArea, CopyField, AddButton } from './'
+import { useSession } from 'next-auth/react'
 
 export const IndexPage = () => {
-  const isLogin = useRecoilValue(isLoginAtom)
+  const { data: session } = useSession()
   const [searchWords, setSearchWords] = useState<string[]>([])
   const [results, setResults] = useState<Results>({})
   const [openSuggest, setOpenSuggest] = useState(false)
@@ -37,7 +36,7 @@ export const IndexPage = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <CopyField />
-            {isLogin && searchWords.length > 0 && <AddButton />}
+            {session && searchWords.length > 0 && <AddButton />}
           </Grid>
         </Grid>
         <ResultArea results={results} searchWords={searchWords} />
