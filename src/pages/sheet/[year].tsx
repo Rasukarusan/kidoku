@@ -9,7 +9,6 @@ export const getStaticProps = async ({ params }: Props) => {
   const books = await prisma.books.findMany()
   const data = books.map((book) => {
     const month = dayjs(book.finished).format('M') + '月'
-    console.log(month)
     const { title, author, category, image, impression, memo } = book
     return {
       month,
