@@ -13,6 +13,8 @@ model sheets {
   name    String    @db.VarChar(120)
   created DateTime? @default(now()) @db.DateTime(0)
   updated DateTime? @default(now()) @db.DateTime(0)
+
+  @@unique([user_id, name], map: "uniq_user_id_name")
 }
 
 model books {
