@@ -6,7 +6,6 @@ import prisma, { parse } from '@/libs/prisma'
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const sheets = await prisma.sheets.findMany()
-  console.log(sheets)
   return {
     props: { sheets: parse(sheets) },
   }
