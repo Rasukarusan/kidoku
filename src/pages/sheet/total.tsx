@@ -1,6 +1,5 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
-import { getYears } from '@/features/sheet/util'
 import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 
@@ -47,9 +46,14 @@ export const getStaticProps = async () => {
   })
 
   // 年ごとの読書数
-  const years: Year[] = getYears().map((year, i) => {
-    const count = res.filter((r) => r.year == year).length
-    return { year, count }
+  const sheets = await prisma.sheets.findMany({
+    where: {
+      user_id: { equals: 1 },
+    },
+  })
+  const years: Year[] = sheets.map((sheet, i) => {
+    const count = res.filter((r) => r.sheet_id == sheet.id).length
+    return { year: sheet.name, count }
   })
 
   return {

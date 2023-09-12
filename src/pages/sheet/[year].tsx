@@ -1,5 +1,4 @@
 import { SheetPage } from '@/features/sheet/components/SheetPage'
-import { getYears } from '@/features/sheet/util'
 import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 export default SheetPage
@@ -40,9 +39,13 @@ export const getStaticProps = async ({ params }: Props) => {
 }
 
 export const getStaticPaths = async () => {
-  const years = getYears()
-  const paths = years.map((year) => {
-    return { params: { year } }
+  const sheets = await prisma.sheets.findMany({
+    where: {
+      user_id: { equals: 1 },
+    },
+  })
+  const paths = sheets.map((sheet) => {
+    return { params: { year: sheet.name } }
   })
   return {
     paths,
