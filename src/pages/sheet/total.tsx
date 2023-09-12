@@ -1,23 +1,27 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import { getYears } from '@/features/sheet/util'
-import { GAS_ENDPOINT } from '@/libs/constants'
+import prisma, { parse } from '@/libs/prisma'
+import dayjs from 'dayjs'
 
 export default SheetTotalPage
 
 const getAll = async () => {
-  const years = getYears()
-
-  return await Promise.all(
-    years.map(async (year) => {
-      const res = await fetch(GAS_ENDPOINT + `?year=${year}`)
-      const data = await res.json()
-      for (let i = 0; i < data.length; i++) {
-        data[i]['year'] = year
-      }
-      return data
-    })
-  )
+  const books = await prisma.books.findMany()
+  const data = books.map((book) => {
+    const month = dayjs(book.finished).format('M') + '月'
+    const { title, author, category, image, impression, memo } = book
+    return {
+      month,
+      title,
+      author,
+      category,
+      image,
+      impression,
+      memo,
+    }
+  })
+  return parse(data)
 }
 
 export const getStaticProps = async () => {
