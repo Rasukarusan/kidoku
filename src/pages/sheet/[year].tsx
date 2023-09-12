@@ -4,9 +4,20 @@ import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 export default SheetPage
 
-type Props = { params: { year: number } }
+type Props = { params: { year: string } }
 export const getStaticProps = async ({ params }: Props) => {
-  const books = await prisma.books.findMany()
+  const sheets = await prisma.sheets.findMany({
+    where: {
+      user_id: { equals: 1 },
+    },
+  })
+  const sheet = sheets.find((sheet) => sheet.name === params.year)
+  if (!sheet) return { props: {} }
+  const books = await prisma.books.findMany({
+    where: {
+      sheet_id: { equals: sheet.id },
+    },
+  })
   const data = books.map((book) => {
     const month = dayjs(book.finished).format('M') + '月'
     const { title, author, category, image, impression, memo } = book
