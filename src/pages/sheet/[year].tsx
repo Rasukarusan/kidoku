@@ -7,7 +7,7 @@ type Props = { params: { year: string } }
 export const getStaticProps = async ({ params }: Props) => {
   const sheets = await prisma.sheets.findMany({
     where: {
-      user_id: { equals: 1 },
+      userId: '1',
     },
   })
   const sheet = sheets.find((sheet) => sheet.name === params.year)
@@ -41,7 +41,7 @@ export const getStaticProps = async ({ params }: Props) => {
 export const getStaticPaths = async () => {
   const sheets = await prisma.sheets.findMany({
     where: {
-      user_id: { equals: 1 },
+      userId: '1',
     },
   })
   const paths = sheets.map((sheet) => {

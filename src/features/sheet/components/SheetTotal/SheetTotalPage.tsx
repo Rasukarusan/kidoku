@@ -25,6 +25,7 @@ export const SheetTotalPage: React.FC<Props> = ({
     setTab(newValue)
     router.push(`/sheet/${newValue}`)
   }
+  const average = years.length === 0 ? 0 : Math.ceil(total / years.length)
 
   return (
     <Container fixed>
@@ -47,7 +48,7 @@ export const SheetTotalPage: React.FC<Props> = ({
 
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="年間平均読書数" />
-        <Value value={Math.ceil(total / years.length)} unit="冊" />
+        <Value value={average} unit="冊" />
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <YearsGraph years={years} />
         </div>

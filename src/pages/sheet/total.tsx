@@ -1,11 +1,26 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import prisma from '@/libs/prisma'
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { getServerSession } from 'next-auth/next'
 
 export default SheetTotalPage
 
-export const getStaticProps = async () => {
-  const books = await prisma.books.findMany()
+export async function getServerSideProps(context) {
+  const session = await getServerSession(context.req, context.res, authOptions)
+  if (!session) {
+    return {
+      props: {
+        total: 0,
+        categories: [],
+        years: [],
+      },
+    }
+  }
+  const userId = session.user.id
+  const books = await prisma.books.findMany({
+    where: { userId },
+  })
   // データの整形。カテゴリ名をKey, 冊数をValueとしたオブジェクトを生成
   const category_count: Record<string, number> = {}
   books.forEach((book) => {
@@ -27,7 +42,6 @@ export const getStaticProps = async () => {
   })
 
   // 年ごとの読書数
-  const userId = 1
   const result = await prisma.$queryRaw<{ name: string; count: string }[]>`
     SELECT sheets.name as name, COUNT(*) AS count
     FROM books
