@@ -1,33 +1,14 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
-import prisma, { parse } from '@/libs/prisma'
-import dayjs from 'dayjs'
+import prisma from '@/libs/prisma'
 
 export default SheetTotalPage
 
-const getAll = async () => {
-  const books = await prisma.books.findMany()
-  const data = books.map((book) => {
-    const month = dayjs(book.finished).format('M') + '月'
-    const { title, author, category, image, impression, memo } = book
-    return {
-      month,
-      title,
-      author,
-      category,
-      image,
-      impression,
-      memo,
-    }
-  })
-  return parse(data)
-}
-
 export const getStaticProps = async () => {
-  const res = await getAll().then((res) => res.flat())
+  const books = await prisma.books.findMany()
   // データの整形。カテゴリ名をKey, 冊数をValueとしたオブジェクトを生成
   const category_count: Record<string, number> = {}
-  res.flat().forEach((book) => {
+  books.forEach((book) => {
     if (category_count[book.category]) {
       category_count[book.category] = category_count[book.category] + 1
     } else {
@@ -41,24 +22,27 @@ export const getStaticProps = async () => {
     categories.push({
       name: category,
       count,
-      percent: Math.floor((count / res.length) * 100),
+      percent: Math.floor((count / books.length) * 100),
     })
   })
 
   // 年ごとの読書数
-  const sheets = await prisma.sheets.findMany({
-    where: {
-      user_id: { equals: 1 },
-    },
-  })
-  const years: Year[] = sheets.map((sheet, i) => {
-    const count = res.filter((r) => r.sheet_id == sheet.id).length
-    return { year: sheet.name, count }
+  const userId = 1
+  const result = await prisma.$queryRaw<{ name: string; count: string }[]>`
+    SELECT sheets.name as name, COUNT(*) AS count
+    FROM books
+    JOIN sheets ON sheets.id = books.sheet_id
+    WHERE books.user_id = ${userId}
+    GROUP BY books.sheet_id
+    ORDER BY sheets.order ASC;
+  `
+  const years: Year[] = result.map((sheet) => {
+    return { year: sheet.name, count: parseInt(sheet.count) }
   })
 
   return {
     props: {
-      res,
+      total: books.length,
       categories,
       years,
     },

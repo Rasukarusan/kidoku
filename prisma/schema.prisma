@@ -11,6 +11,7 @@ model sheets {
   id      Int       @id @default(autoincrement()) @db.UnsignedInt
   user_id Int
   name    String    @db.VarChar(120)
+  order   Int?      @default(1)
   created DateTime? @default(now()) @db.DateTime(0)
   updated DateTime? @default(now()) @db.DateTime(0)
 
