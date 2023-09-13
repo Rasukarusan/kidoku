@@ -1,7 +1,10 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import prisma from '@/libs/prisma'
 
 export default NextAuth({
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -16,7 +19,7 @@ export default NextAuth({
   //   },
   //   async session({ session, user, token }) {
   //     console.log(session)
-  //     session.user.id = 1
+  //     // session.user.id = 1
   //     return session
   //   },
   // },
