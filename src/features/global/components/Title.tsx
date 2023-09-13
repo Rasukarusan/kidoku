@@ -22,7 +22,7 @@ export const Title: React.FC = () => {
             fontFamily: 'Nico Moji',
           }}
         >
-          著者検索neo
+          Kidoku
         </Typography>
       </Link>
     </>
