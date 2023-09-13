@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Container } from '@mui/material'
 import { useRouter } from 'next/router'
 import { Tabs } from '../Tabs'
-import { Category, Record, Year } from '../../types'
+import { Category, Year } from '../../types'
 import { Title } from './Title'
 import { Value } from './Value'
 import { Rankings } from './Rankings'
@@ -10,11 +10,15 @@ import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
 
 interface Props {
-  res: Record[]
+  total: number
   categories: Category[]
   years: Year[]
 }
-export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
+export const SheetTotalPage: React.FC<Props> = ({
+  total,
+  categories,
+  years,
+}) => {
   const [tab, setTab] = useState('total')
   const router = useRouter()
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -35,7 +39,7 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
       </div>
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="累計読書数" />
-        <Value value={res.length} unit="冊" />
+        <Value value={total} unit="冊" />
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <CategoryMap categories={categories} />
         </div>
@@ -43,7 +47,7 @@ export const SheetTotalPage: React.FC<Props> = ({ res, categories, years }) => {
 
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="年間平均読書数" />
-        <Value value={Math.ceil(res.length / 7)} unit="冊" />
+        <Value value={Math.ceil(total / years.length)} unit="冊" />
         <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
           <YearsGraph years={years} />
         </div>
