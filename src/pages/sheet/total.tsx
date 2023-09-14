@@ -14,6 +14,7 @@ export async function getServerSideProps(context) {
         total: 0,
         categories: [],
         years: [],
+        sheets: [],
       },
     }
   }
@@ -54,11 +55,15 @@ export async function getServerSideProps(context) {
     return { year: sheet.name, count: parseInt(sheet.count) }
   })
 
+  const sheets = await prisma.sheets.findMany({
+    where: { userId },
+  })
   return {
     props: {
       total: books.length,
       categories,
       years,
+      sheets: sheets.length === 0 ? [] : sheets.map((sheet) => sheet.name),
     },
   }
 }
