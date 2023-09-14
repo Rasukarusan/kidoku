@@ -11,10 +11,7 @@ export async function getServerSideProps(context) {
   const session = await getServerSession(context.req, context.res, authOptions)
   if (!session) {
     return {
-      props: {
-        data: [],
-        year,
-      },
+      redirect: { destination: '/sheet' },
     }
   }
   const userId = session.user.id
@@ -24,10 +21,7 @@ export async function getServerSideProps(context) {
   const sheet = sheets.find((sheet) => sheet.name === year)
   if (!sheet) {
     return {
-      props: {
-        data: [],
-        year,
-      },
+      redirect: { destination: '/sheet' },
     }
   }
   const books = await prisma.books.findMany({
