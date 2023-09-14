@@ -23,9 +23,10 @@ const TreemapGraph = dynamic(
 interface Props {
   data: Record[]
   year: string
+  sheets: string[]
 }
 
-export const SheetPage: React.FC<Props> = ({ data, year }) => {
+export const SheetPage: React.FC<Props> = ({ data, year, sheets }) => {
   const [currentData, setCurrentData] = useState<Record[]>([])
   const [open, setOpen] = useState(false)
   // 一覧表示か書影表示か
@@ -51,7 +52,7 @@ export const SheetPage: React.FC<Props> = ({ data, year }) => {
       <Box
         sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
       >
-        <Tabs value={year} />
+        <Tabs sheets={sheets} value={year} />
       </Box>
       <Box
         sx={{

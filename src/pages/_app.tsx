@@ -9,6 +9,7 @@ import { DefaultSeo } from 'next-seo'
 import SEO from '../../next-seo.config'
 import './global.css'
 import { RecoilEnv } from 'recoil'
+import { SessionProvider } from 'next-auth/react'
 
 // Expectation Violation: Duplicate atom keyをログに出力させないための設定
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false
@@ -28,9 +29,11 @@ export default function MyApp(props) {
       <DefaultSeo {...SEO} />
       <RecoilRoot>
         <ThemeProvider theme={theme}>
-          <LoadingTopBar />
-          <Header />
-          <Component {...pageProps} />
+          <SessionProvider session={pageProps.session}>
+            <LoadingTopBar />
+            <Header />
+            <Component {...pageProps} />
+          </SessionProvider>
         </ThemeProvider>
       </RecoilRoot>
     </>

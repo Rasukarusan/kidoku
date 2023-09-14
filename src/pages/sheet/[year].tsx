@@ -1,27 +1,53 @@
+import prisma, { parse } from '@/libs/prisma'
+import dayjs from 'dayjs'
+import { authOptions } from '@/pages/api/auth/[...nextauth]'
+import { getServerSession } from 'next-auth/next'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
-import { getYears } from '@/features/sheet/util'
-import { GAS_ENDPOINT } from '@/libs/constants'
 export default SheetPage
 
-type Props = { params: { year: number } }
-export const getStaticProps = async ({ params }: Props) => {
-  const res = await fetch(GAS_ENDPOINT + `?year=${params.year}`)
-  const data = await res.json()
-  return {
-    props: {
-      data,
-      year: params.year.toString(),
-    },
+type Props = { params: { year: string } }
+export async function getServerSideProps(context) {
+  const { year } = context.params
+  const session = await getServerSession(context.req, context.res, authOptions)
+  if (!session) {
+    return {
+      redirect: { destination: '/sheet' },
+    }
   }
-}
-
-export const getStaticPaths = async () => {
-  const years = getYears()
-  const paths = years.map((year) => {
-    return { params: { year } }
+  const userId = session.user.id
+  const sheets = await prisma.sheets.findMany({
+    where: { userId },
+  })
+  const sheet = sheets.find((sheet) => sheet.name === year)
+  if (!sheet) {
+    return {
+      redirect: { destination: '/sheet' },
+    }
+  }
+  const books = await prisma.books.findMany({
+    where: {
+      sheet_id: sheet.id,
+      userId,
+    },
+  })
+  const data = books.map((book) => {
+    const month = dayjs(book.finished).format('M') + '月'
+    const { title, author, category, image, impression, memo } = book
+    return {
+      month,
+      title,
+      author,
+      category,
+      image,
+      impression,
+      memo,
+    }
   })
   return {
-    paths,
-    fallback: false,
+    props: {
+      data: parse(data),
+      year,
+      sheets: sheets.map((sheet) => sheet.name),
+    },
   }
 }

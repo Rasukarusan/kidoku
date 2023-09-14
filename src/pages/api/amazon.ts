@@ -45,7 +45,6 @@ export default async function handler(
       })
     fs.unlinkSync(image)
   })
-  console.log('diffs => ', diffs)
   const i = diffs.indexOf(Math.min(...diffs))
   fs.unlinkSync(target)
 

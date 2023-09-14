@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import dayjs from 'dayjs'
 import {
   Avatar,
   Box,
@@ -17,7 +16,7 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 const pages: Page[] = [
   {
     title: 'どくしょきろく',
-    href: '/sheet/' + dayjs().format('YYYY'),
+    href: '/sheet',
     target: '',
     icon: null,
     auth: false,
