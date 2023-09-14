@@ -1,4 +1,4 @@
-# 著者検索 Neo
+# Kidoku
 
 https://app.rasukarusan.com
 
@@ -19,6 +19,8 @@ https://app.rasukarusan.com
 ## 技術
 
 - Next.js
+- NextAuth
+- Prisma
 - Mui
 - Framer Motion
 - Recoil

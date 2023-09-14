@@ -1,18 +1,17 @@
 import Link from 'next/link'
-import { useRecoilValue } from 'recoil'
 import { useState } from 'react'
 import { Box, IconButton, Menu, MenuItem } from '@mui/material'
 import { Page } from '../types'
 import { SignButton } from './'
 import MenuIcon from '@mui/icons-material/Menu'
-import { isLoginAtom } from '@/store/isLogin'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   pages: Page[]
 }
 
 export const MenuSp: React.FC<Props> = ({ pages }) => {
-  const isLogin = useRecoilValue(isLoginAtom)
+  const { data: session } = useSession()
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -54,7 +53,7 @@ export const MenuSp: React.FC<Props> = ({ pages }) => {
         }}
       >
         {pages.map((page) => {
-          if (page.auth && !isLogin) return null
+          if (page.auth && !session) return null
 
           return (
             <MenuItem key={page.title} onClick={handleCloseNavMenu}>

@@ -16,6 +16,5 @@ export default async function handler(
   })
     .then((res) => res.json())
     .then((json) => json)
-  console.log(response)
   res.status(200).json(true)
 }

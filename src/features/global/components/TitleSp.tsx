@@ -23,7 +23,7 @@ export const TitleSp: React.FC = () => {
             textDecoration: 'none',
           }}
         >
-          著者検索neo
+          Kidoku
         </Typography>
       </Link>
     </>
