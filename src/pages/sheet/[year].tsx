@@ -53,6 +53,7 @@ export async function getServerSideProps(context) {
     props: {
       data: parse(data),
       year,
+      sheets: sheets.map((sheet) => sheet.name),
     },
   }
 }

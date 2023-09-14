@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { Tab, Tabs as MuiTabs } from '@mui/material'
-import { getYears } from '../util'
 
 interface Props {
+  sheets: string[]
   value: string
 }
-export const Tabs: React.FC<Props> = ({ value }) => {
+export const Tabs: React.FC<Props> = ({ value, sheets }) => {
   const [tab, setTab] = useState(value)
   const router = useRouter()
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
@@ -23,11 +23,9 @@ export const Tabs: React.FC<Props> = ({ value }) => {
       value={tab}
     >
       <Tab label="total" value="total" />
-      {getYears()
-        .reverse()
-        .map((year) => (
-          <Tab key={year} label={year} value={year} />
-        ))}
+      {sheets.map((sheet) => (
+        <Tab key={sheet} label={sheet} value={sheet} />
+      ))}
     </MuiTabs>
   )
 }
