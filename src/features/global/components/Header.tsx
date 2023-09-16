@@ -4,7 +4,7 @@ import { Page } from '../types'
 import { Title, TitleSp, Menu, MenuSp } from './'
 import { signOut, useSession } from 'next-auth/react'
 import { LoginModal } from './LoginModal'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { SettingsIcon } from '@/components/icon/SettingsIcon'
 import { ExitIcon } from '@/components/icon/ExitIcon'
@@ -26,9 +26,13 @@ export const Header = () => {
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState(false)
-  const variants = {
-    open: { opacity: 1, scale: 1, display: 'block' },
-    closed: { opacity: 0, scale: 0.95, transitionEnd: { display: 'none' } },
+  const variants: Variants = {
+    open: {
+      opacity: 1,
+      y: 0,
+      transition: { type: 'spring', stiffness: 300, damping: 24 },
+    },
+    closed: { opacity: 0, y: 20, transition: { duration: 0.2 } },
   }
 
   /**
@@ -75,6 +79,7 @@ export const Header = () => {
                       animate="open"
                       exit="closed"
                       variants={variants}
+                      // transition={{ duration: 0.3 }}
                       className="absolute z-[1000] right-4 m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
                     >
                       <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
