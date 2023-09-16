@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Head from 'next/head'
 import { ThemeProvider } from '@mui/material/styles'
-import { theme, Header } from '@/features/global'
+import { theme, Header, Footer } from '@/features/global'
 import { LoadingTopBar } from '@/features/global/components/LoadingTopBar'
 import { RecoilRoot } from 'recoil'
 import { DefaultSeo } from 'next-seo'
@@ -33,6 +33,7 @@ export default function MyApp(props) {
             <LoadingTopBar />
             <Header />
             <Component {...pageProps} />
+            <Footer />
           </SessionProvider>
         </ThemeProvider>
       </RecoilRoot>

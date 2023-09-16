@@ -24,7 +24,7 @@ export const IndexPage = () => {
 
   return (
     <div onClick={onClickBody}>
-      <Container fixed sx={{ paddingTop: '32px' }}>
+      <Container fixed sx={{ paddingTop: '32px', marginBottom: '240px' }}>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <InputField
