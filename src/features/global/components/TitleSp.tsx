@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import { Typography } from '@mui/material'
-import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 
 export const TitleSp: React.FC = () => {
   return (
     <>
-      <AutoStoriesIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
       <Link href="/" legacyBehavior>
         <Typography
           variant="h5"

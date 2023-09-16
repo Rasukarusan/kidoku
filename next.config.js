@@ -2,6 +2,7 @@ const withPlugins = require('next-compose-plugins')
 const path = require('path')
 
 const nextConfig = {
+  swcMinify: false, // framer-motionでエラーが出るのでfalseにした
   images: {
     domains: [
       'books.google.com',
