@@ -1,16 +1,10 @@
 import { useRouter } from 'next/router'
-import {
-  Avatar,
-  Box,
-  IconButton,
-  AppBar,
-  Toolbar,
-  Container,
-} from '@mui/material'
+import { AppBar, Toolbar, Container } from '@mui/material'
 import { Page } from '../types'
 import { Title, TitleSp, Menu, MenuSp } from './'
-import { theme } from '../theme'
-import GitHubIcon from '@mui/icons-material/GitHub'
+import { useSession } from 'next-auth/react'
+import { LoginModal } from './LoginModal'
+import { useState } from 'react'
 
 const pages: Page[] = [
   {
@@ -25,6 +19,8 @@ const pages: Page[] = [
 // レスポンシブヘッダー
 export const Header = () => {
   const router = useRouter()
+  const { data: session } = useSession()
+  const [open, setOpen] = useState(false)
   return (
     <>
       <AppBar position="fixed" color="primary" sx={{ boxShadow: 'none' }}>
@@ -34,19 +30,27 @@ export const Header = () => {
             <MenuSp pages={pages} />
             <TitleSp />
             <Menu pages={pages} />
-            <Box sx={{ flexGrow: 0 }}>
-              <a
-                href="https://github.com/Rasukarusan/search-author-neo"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <IconButton sx={{ p: 0 }}>
-                  <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
-                    <GitHubIcon fontSize="large" />
-                  </Avatar>
-                </IconButton>
-              </a>
-            </Box>
+            {session ? (
+              <button className="rounded-full bg-gray-200 w-[40px] h-[40px] mr-4">
+                <img
+                  src={session.user.image}
+                  alt="ユーザーアイコン"
+                  width="40"
+                  height="40"
+                  className="rounded-full"
+                />
+              </button>
+            ) : (
+              <>
+                <button
+                  className="rounded-md bg-[#4f5b62] text-sm px-5 py-2 font-bold"
+                  onClick={() => setOpen(true)}
+                >
+                  ログイン
+                </button>
+                <LoginModal open={open} onClose={() => setOpen(false)} />
+              </>
+            )}
           </Toolbar>
         </Container>
       </AppBar>
