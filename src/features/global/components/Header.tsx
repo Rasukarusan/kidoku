@@ -2,9 +2,12 @@ import { useRouter } from 'next/router'
 import { AppBar, Toolbar, Container } from '@mui/material'
 import { Page } from '../types'
 import { Title, TitleSp, Menu, MenuSp } from './'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { LoginModal } from './LoginModal'
-import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { SettingsIcon } from '@/components/icon/SettingsIcon'
+import { ExitIcon } from '@/components/icon/ExitIcon'
 
 const pages: Page[] = [
   {
@@ -19,8 +22,31 @@ const pages: Page[] = [
 // レスポンシブヘッダー
 export const Header = () => {
   const router = useRouter()
+  const dropdownRef = useRef(null)
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
+  const [openMenu, setOpenMenu] = useState(false)
+  const variants = {
+    open: { opacity: 1, scale: 1, display: 'block' },
+    closed: { opacity: 0, scale: 0.95, transitionEnd: { display: 'none' } },
+  }
+
+  /**
+   * 画面上をクリックしたらメニューを非表示
+   */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
   return (
     <>
       <AppBar position="fixed" color="primary" sx={{ boxShadow: 'none' }}>
@@ -31,19 +57,52 @@ export const Header = () => {
             <TitleSp />
             <Menu pages={pages} />
             {session ? (
-              <button className="rounded-full bg-gray-200 w-[40px] h-[40px] mr-4">
-                <img
-                  src={session.user.image}
-                  alt="ユーザーアイコン"
-                  width="40"
-                  height="40"
-                  className="rounded-full"
-                />
-              </button>
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  className="rounded-full bg-gray-200 w-[34px] h-[34px] sm:w-[40px] sm:h-[40px] sm:mr-4"
+                  onClick={() => setOpenMenu(!openMenu)}
+                >
+                  <img
+                    src={session.user.image}
+                    alt="ユーザーアイコン"
+                    className="rounded-full"
+                  />
+                </button>
+                <AnimatePresence>
+                  {openMenu && (
+                    <motion.ul
+                      initial="closed"
+                      animate="open"
+                      exit="closed"
+                      variants={variants}
+                      className="absolute z-[1000] right-4 m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
+                    >
+                      <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
+                        <SettingsIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
+                        <a
+                          className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
+                          href="#"
+                        >
+                          アカウント設定
+                        </a>
+                      </li>
+                      <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
+                        <ExitIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
+                        <button
+                          className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm text-left"
+                          onClick={() => signOut()}
+                        >
+                          ログアウト
+                        </button>
+                      </li>
+                    </motion.ul>
+                  )}
+                </AnimatePresence>
+              </div>
             ) : (
               <>
                 <button
-                  className="rounded-md bg-[#4f5b62] text-sm px-5 py-2 font-bold"
+                  className="rounded-md bg-[#4f5b62] text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2 font-bold"
                   onClick={() => setOpen(true)}
                 >
                   ログイン
