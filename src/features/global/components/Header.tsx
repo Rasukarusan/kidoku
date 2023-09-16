@@ -10,7 +10,6 @@ import {
 import { Page } from '../types'
 import { Title, TitleSp, Menu, MenuSp } from './'
 import { theme } from '../theme'
-import OpenInNewSharpIcon from '@mui/icons-material/OpenInNewSharp'
 import GitHubIcon from '@mui/icons-material/GitHub'
 
 const pages: Page[] = [
@@ -20,20 +19,6 @@ const pages: Page[] = [
     target: '',
     icon: null,
     auth: false,
-  },
-  {
-    title: 'シート',
-    href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=932576471',
-    target: '_blank',
-    icon: <OpenInNewSharpIcon />,
-    auth: true,
-  },
-  {
-    title: 'せってい',
-    href: 'https://vercel.com/rasukarusan/search-author-neo',
-    target: '_blank',
-    icon: <OpenInNewSharpIcon />,
-    auth: true,
   },
 ]
 
