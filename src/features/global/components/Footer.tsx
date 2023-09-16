@@ -8,14 +8,14 @@ export const Footer: React.FC = () => {
           <div className="mb-6 md:mb-0">
             <a href="https://app.rasukarusan.com" className="flex items-center">
               <Logo className="w-8 text-white mr-2" />
-              <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
                 Kidoku
               </span>
             </a>
           </div>
           <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3 text-sm">
             <div>
-              <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
+              <h2 className="mb-6 text-sm font-semibold tuppercase text-white">
                 Abount
               </h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
@@ -32,7 +32,7 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
             <div>
-              <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
+              <h2 className="mb-6 text-sm font-semibold uppercase text-white">
                 LINKS
               </h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
             <div>
-              <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
+              <h2 className="mb-6 text-sm font-semibold uppercase text-white">
                 Legal
               </h2>
               <ul className="text-gray-500 dark:text-gray-400 font-medium">
