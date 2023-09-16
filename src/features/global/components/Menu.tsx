@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Box, Button } from '@mui/material'
 import { Page } from '../types'
-import { SignButton } from './SignButton'
 import { useSession } from 'next-auth/react'
 
 interface Props {
@@ -37,7 +36,6 @@ export const Menu: React.FC<Props> = ({ pages }) => {
             </Link>
           )
         })}
-        <SignButton mobile={false} />
       </Box>
     </>
   )

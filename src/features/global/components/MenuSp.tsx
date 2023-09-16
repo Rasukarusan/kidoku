@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Box, IconButton, Menu, MenuItem } from '@mui/material'
 import { Page } from '../types'
-import { SignButton } from './'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useSession } from 'next-auth/react'
 
@@ -70,7 +69,6 @@ export const MenuSp: React.FC<Props> = ({ pages }) => {
             </MenuItem>
           )
         })}
-        <SignButton mobile={true} />
       </Menu>
     </Box>
   )
