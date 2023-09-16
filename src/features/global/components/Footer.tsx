@@ -1,4 +1,5 @@
 import { Logo } from '@/components/icon/Logo'
+import { useSession } from 'next-auth/react'
 
 interface ColumnProps {
   title: string
@@ -32,6 +33,7 @@ const Column: React.FC<ColumnProps> = ({ title, items }) => {
 }
 
 export const Footer: React.FC = () => {
+  const { data: session } = useSession()
   return (
     <footer className="bg-[#263238]">
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
@@ -82,6 +84,23 @@ export const Footer: React.FC = () => {
                 },
               ]}
             />
+            {session && (
+              <Column
+                title="Admin"
+                items={[
+                  {
+                    title: 'シート',
+                    href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=932576471',
+                    target: '_blank',
+                  },
+                  {
+                    title: 'Vercel',
+                    href: 'https://vercel.com/rasukarusan/search-author-neo',
+                    target: '_blank',
+                  },
+                ]}
+              />
+            )}
           </div>
         </div>
       </div>
