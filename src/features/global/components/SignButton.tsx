@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import { SignInWithGoogleButton } from '@/components/button/SignInWithGoogleButton'
 import Link from 'next/link'
+import { Logo } from '@/components/icon/Logo'
 
 interface Props {
   mobile: boolean
@@ -65,9 +66,10 @@ export const SignButton: React.FC<Props> = ({ mobile }) => {
       </Snackbar>
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogContent dividers>
-          <div className="text-center w-[400px]">
+          <div className="text-center">
             <Link href="/" legacyBehavior>
-              <div className="font-['Nico_Moji'] font-bold text-2xl tracking-[.3rem]">
+              <div className="font-['Nico_Moji'] font-bold text-2xl tracking-[.3rem] flex items-center justify-center">
+                <Logo className="w-5 mr-2" />
                 Kidoku
               </div>
             </Link>
