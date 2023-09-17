@@ -15,8 +15,7 @@ model sheets {
   order   Int?      @default(1)
   created DateTime? @default(now()) @db.DateTime(0)
   updated DateTime? @default(now()) @db.DateTime(0)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, name], map: "uniq_user_id_name")
 }
@@ -34,8 +33,7 @@ model books {
   finished   DateTime @db.DateTime(0)
   created    DateTime @default(now()) @db.DateTime(0)
   updated    DateTime @default(now()) @db.DateTime(0)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -51,8 +49,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -74,6 +71,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
+  admin         Boolean   @default(false)
   accounts      Account[]
   sessions      Session[]
   sheets        sheets[]
