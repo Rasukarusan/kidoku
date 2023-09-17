@@ -6,7 +6,12 @@ module.exports = {
     './src/features/**/*.tsx',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        main: '#263238',
+        light: '#8eacbb',
+      },
+    },
   },
   plugins: [require('@tailwindcss/line-clamp')],
 }
