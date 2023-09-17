@@ -1,13 +1,14 @@
 import { useRouter } from 'next/router'
 import { AppBar, Toolbar, Container } from '@mui/material'
 import { Page } from '../types'
-import { Title, TitleSp, Menu, MenuSp } from './'
 import { signOut, useSession } from 'next-auth/react'
 import { LoginModal } from './LoginModal'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { SettingsIcon } from '@/components/icon/SettingsIcon'
 import { ExitIcon } from '@/components/icon/ExitIcon'
+import { BookIcon } from '@/components/icon/BookIcon'
+import Link from 'next/link'
 
 const pages: Page[] = [
   {
@@ -56,10 +57,13 @@ export const Header = () => {
       <AppBar position="fixed" color="primary" sx={{ boxShadow: 'none' }}>
         <Container maxWidth="lg">
           <Toolbar disableGutters>
-            <Title />
-            <MenuSp pages={pages} />
-            <TitleSp />
-            <Menu pages={pages} />
+            <Link
+              href="/"
+              className="mr-2 font-bold tracking-[.3rem] no-underline font-['Nico_Moji'] text-xl"
+            >
+              Kidoku
+            </Link>
+            <div className="flex-grow"></div>
             {session ? (
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -79,9 +83,17 @@ export const Header = () => {
                       animate="open"
                       exit="closed"
                       variants={variants}
-                      // transition={{ duration: 0.3 }}
                       className="absolute z-[1000] right-4 m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
                     >
+                      <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
+                        <BookIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
+                        <a
+                          className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
+                          href="/sheet"
+                        >
+                          読書記録
+                        </a>
+                      </li>
                       <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
                         <SettingsIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
                         <a
