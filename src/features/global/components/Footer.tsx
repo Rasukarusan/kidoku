@@ -95,7 +95,7 @@ export const Footer: React.FC = () => {
                   },
                   {
                     title: 'Vercel',
-                    href: 'https://vercel.com/rasukarusan/search-author-neo',
+                    href: 'https://vercel.com/rasukarusan/kidoku',
                     target: '_blank',
                   },
                 ]}
