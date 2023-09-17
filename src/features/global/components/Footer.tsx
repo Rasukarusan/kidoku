@@ -84,7 +84,7 @@ export const Footer: React.FC = () => {
                 },
               ]}
             />
-            {session && (
+            {session && session.user.admin && (
               <Column
                 title="Admin"
                 items={[
