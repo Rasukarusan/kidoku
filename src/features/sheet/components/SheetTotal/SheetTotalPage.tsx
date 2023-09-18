@@ -8,6 +8,7 @@ import { Value } from './Value'
 import { Rankings } from './Rankings'
 import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   total: number
@@ -23,9 +24,12 @@ export const SheetTotalPage: React.FC<Props> = ({
 }) => {
   const [tab, setTab] = useState('total')
   const router = useRouter()
+  const { data: session } = useSession()
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue)
-    router.push(`/sheet/${newValue}`)
+    if (session) {
+      router.push(`/${session.user.name}/sheets/${newValue}`)
+    }
   }
   const average = years.length === 0 ? 0 : Math.ceil(total / years.length)
 

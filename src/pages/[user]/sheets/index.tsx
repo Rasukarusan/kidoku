@@ -8,7 +8,7 @@ export async function getServerSideProps(context) {
   const session = await getServerSession(context.req, context.res, authOptions)
   if (!session) {
     return {
-      redirect: { destination: '/sheet/total' },
+      redirect: { destination: '/' },
     }
   }
   const userId = session.user.id
@@ -22,10 +22,10 @@ export async function getServerSideProps(context) {
   })
   if (sheets.length === 0) {
     return {
-      redirect: { destination: '/sheet/total' },
+      redirect: { destination: '/' },
     }
   }
   return {
-    redirect: { destination: `/sheet/${sheets[0].name}` },
+    redirect: { destination: `/${session.user.name}/sheets/${sheets[0].name}` },
   }
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { Tab, Tabs as MuiTabs } from '@mui/material'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   sheets: string[]
@@ -9,9 +10,12 @@ interface Props {
 export const Tabs: React.FC<Props> = ({ value, sheets }) => {
   const [tab, setTab] = useState(value)
   const router = useRouter()
+  const { data: session } = useSession()
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue)
-    router.push(`/sheet/${newValue}`)
+    if (session) {
+      router.push(`/${session.user.name}/sheets/${newValue}`)
+    }
   }
 
   return (
