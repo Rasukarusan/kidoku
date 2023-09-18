@@ -24,9 +24,9 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             alt={book.title}
           />
         </div>
-        <div className="w-[50%] mr-2">
+        <div className="w-2/3 mr-2">
           <textarea
-            className="font-bold text-xl mb-2 overflow-hidden w-full mr-2"
+            className="font-bold text-xl mb-2 overflow-hidden w-full mr-2 bg-slate-100 px-2 py-1"
             value={book.title}
             onChange={(e) => {
               setBook({ ...book, title: e.target.value })
@@ -40,7 +40,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             <textarea
               value={book.author}
               rows={1}
-              className="pl-2"
+              className="pl-2 py-1 bg-slate-100 w-full"
               onChange={(e) => {
                 setBook({ ...book, author: e.target.value })
               }}
@@ -54,7 +54,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             <textarea
               value={book.category}
               rows={1}
-              className="pl-2"
+              className="pl-2 py-1 bg-slate-100 w-full"
               onChange={(e) => {
                 setBook({ ...book, category: e.target.value })
               }}
@@ -68,7 +68,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             <textarea
               value={book.impression}
               rows={1}
-              className="pl-2"
+              className="pl-2 py-1 bg-slate-100 w-full"
               onChange={(e) => {
                 setBook({ ...book, impression: e.target.value })
               }}
@@ -76,21 +76,14 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             />
           </div>
         </div>
-        <button
-          className="bg-teal-700 px-4 py-1 font-bold text-white rounded-md"
-          onClick={onClick}
-          tabIndex={6}
-        >
-          保存
-        </button>
       </div>
       {session && (
         <>
           <Divider sx={{ margin: '15px 0px' }} />
           <textarea
             value={book.memo}
-            className="w-full p-2"
-            rows={10}
+            className="w-full p-2 bg-slate-100 w-full"
+            rows={12}
             cols={80}
             onChange={(e) => {
               setBook({ ...book, memo: e.target.value })
@@ -99,6 +92,15 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
           />
         </>
       )}
+      <div className="pt-4 border-t border-1 text-center">
+        <button
+          className="hover:bg-green-700 bg-green-600 px-4 py-1 font-bold text-white rounded-md"
+          onClick={onClick}
+          tabIndex={6}
+        >
+          保存
+        </button>
+      </div>
     </div>
   )
 }
