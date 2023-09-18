@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import { AppBar, Toolbar, Container } from '@mui/material'
-import { Page } from '../types'
 import { signOut, useSession } from 'next-auth/react'
 import { LoginModal } from './LoginModal'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
@@ -9,16 +8,6 @@ import { SettingsIcon } from '@/components/icon/SettingsIcon'
 import { ExitIcon } from '@/components/icon/ExitIcon'
 import { BookIcon } from '@/components/icon/BookIcon'
 import Link from 'next/link'
-
-const pages: Page[] = [
-  {
-    title: 'どくしょきろく',
-    href: '/sheet',
-    target: '',
-    icon: null,
-    auth: false,
-  },
-]
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -87,21 +76,21 @@ export const Header = () => {
                     >
                       <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
                         <BookIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
-                        <a
+                        <Link
                           className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
-                          href="/sheet"
+                          href={`/${session.user.name}/sheets`}
                         >
                           読書記録
-                        </a>
+                        </Link>
                       </li>
                       <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
                         <SettingsIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
-                        <a
+                        <Link
                           className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
                           href="#"
                         >
                           アカウント設定
-                        </a>
+                        </Link>
                       </li>
                       <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
                         <ExitIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
