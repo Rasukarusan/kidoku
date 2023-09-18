@@ -1,6 +1,6 @@
+import { Fragment } from 'react'
 import { Record } from '../types'
 import { Divider } from '@mui/material'
-import { Memo } from './Memo'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
@@ -43,19 +43,19 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             <span className="mr-1">
               <PeopleAltIcon />
             </span>
-            {book.author}
+            <span className="pl-2">{book.author}</span>
           </div>
           <div className="flex items-center mb-2">
             <span className="mr-1">
               <CategoryIcon />
             </span>
-            {book.category}
+            <span className="pl-2">{book.category}</span>
           </div>
           <div className="flex items-center mb-2">
             <span className="mr-1">
               <InsertEmoticonIcon />
             </span>
-            {book.impression}
+            <span className="pl-2">{book.impression}</span>
           </div>
         </div>
         <button
@@ -73,4 +73,14 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
       )}
     </div>
   )
+}
+
+/**
+ * \nを<br>に変換したコンポーネント
+ */
+export const Memo = ({ memo }) => {
+  const texts = memo.split(/(\n)/).map((item, index) => {
+    return <Fragment key={index}>{item.match(/\n/) ? <br /> : item}</Fragment>
+  })
+  return <div className="p-2">{texts}</div>
 }
