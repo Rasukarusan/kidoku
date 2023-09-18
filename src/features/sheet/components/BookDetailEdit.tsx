@@ -1,6 +1,6 @@
+import { Fragment } from 'react'
 import { Record } from '../types'
 import { Divider } from '@mui/material'
-import { Memo } from './Memo'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
@@ -36,19 +36,40 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             <span className="mr-1">
               <PeopleAltIcon />
             </span>
-            {book.author}
+            <textarea
+              value={book.author}
+              rows={1}
+              className="pl-2"
+              onChange={(e) => {
+                setBook({ ...book, author: e.target.value })
+              }}
+            />
           </div>
           <div className="flex items-center mb-2">
             <span className="mr-1">
               <CategoryIcon />
             </span>
-            {book.category}
+            <textarea
+              value={book.category}
+              rows={1}
+              className="pl-2"
+              onChange={(e) => {
+                setBook({ ...book, category: e.target.value })
+              }}
+            />
           </div>
           <div className="flex items-center mb-2">
             <span className="mr-1">
               <InsertEmoticonIcon />
             </span>
-            {book.impression}
+            <textarea
+              value={book.impression}
+              rows={1}
+              className="pl-2"
+              onChange={(e) => {
+                setBook({ ...book, impression: e.target.value })
+              }}
+            />
           </div>
         </div>
         <button
@@ -61,7 +82,15 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
       {session && (
         <>
           <Divider sx={{ margin: '15px 0px' }} />
-          <Memo memo={book.memo} />
+          <textarea
+            value={book.memo}
+            className="w-full p-2"
+            rows={10}
+            cols={80}
+            onChange={(e) => {
+              setBook({ ...book, memo: e.target.value })
+            }}
+          />
         </>
       )}
     </div>

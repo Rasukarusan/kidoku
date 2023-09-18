@@ -38,7 +38,13 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   if (!newBook) return null
 
   return (
-    <Dialog onClose={onClose} open={open}>
+    <Dialog
+      onClose={() => {
+        setEdit(false)
+        onClose()
+      }}
+      open={open}
+    >
       {edit ? (
         <BookDetailEdit
           book={newBook}
