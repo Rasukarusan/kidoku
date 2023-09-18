@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Loading } from '@/components/icon/Loading'
 
 interface Props {
   name: string
@@ -6,8 +7,9 @@ interface Props {
 }
 export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   const [currentName, setCurrentName] = useState(name)
+  const [loading, setLoading] = useState(false)
   const onSubmit = async () => {
-    console.log('submit')
+    setLoading(true)
     const res = await fetch(`/api/me`, {
       method: 'PUT',
       body: JSON.stringify({ name: currentName }),
@@ -15,6 +17,7 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         Accept: 'application/json',
       },
     })
+    setLoading(false)
   }
   return (
     <div className="p-10">
@@ -38,10 +41,13 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </div>
       </div>
       <button
-        className="px-4 py-2 hover:bg-blue-500 bg-blue-400 font-bold rounded-md text-white block m-auto"
+        className="px-4 py-2 hover:bg-blue-500 bg-blue-400 font-bold rounded-md text-white block m-auto flex items-center"
         onClick={onSubmit}
       >
-        更新する
+        {loading && (
+          <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
+        )}
+        <span>更新する</span>
       </button>
       <div className="mt-60"></div>
     </div>

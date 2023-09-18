@@ -87,7 +87,7 @@ export const Header = () => {
                         <SettingsIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
                         <Link
                           className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
-                          href="#"
+                          href="/settings/profile"
                         >
                           アカウント設定
                         </Link>
