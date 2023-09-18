@@ -31,6 +31,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             onChange={(e) => {
               setBook({ ...book, title: e.target.value })
             }}
+            tabIndex={1}
           />
           <div className="flex items-center mb-2">
             <span className="mr-1">
@@ -43,6 +44,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
               onChange={(e) => {
                 setBook({ ...book, author: e.target.value })
               }}
+              tabIndex={2}
             />
           </div>
           <div className="flex items-center mb-2">
@@ -56,6 +58,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
               onChange={(e) => {
                 setBook({ ...book, category: e.target.value })
               }}
+              tabIndex={3}
             />
           </div>
           <div className="flex items-center mb-2">
@@ -69,12 +72,14 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
               onChange={(e) => {
                 setBook({ ...book, impression: e.target.value })
               }}
+              tabIndex={4}
             />
           </div>
         </div>
         <button
           className="bg-teal-700 px-4 py-1 font-bold text-white rounded-md"
           onClick={onClick}
+          tabIndex={6}
         >
           保存
         </button>
@@ -90,6 +95,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             onChange={(e) => {
               setBook({ ...book, memo: e.target.value })
             }}
+            tabIndex={5}
           />
         </>
       )}
