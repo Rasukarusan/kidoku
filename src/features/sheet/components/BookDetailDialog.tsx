@@ -54,7 +54,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
           }}
         />
       ) : (
-        <BookDetailRead book={newBook} onClick={onClickEdit} />
+        <BookDetailRead book={book} onClick={onClickEdit} />
       )}
     </Dialog>
   )

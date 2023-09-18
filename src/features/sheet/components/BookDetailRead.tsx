@@ -59,7 +59,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </div>
         </div>
         <button
-          className="bg-light px-4 py-1 font-bold text-white rounded-md"
+          className="bg-sky-600 px-4 py-1 font-bold text-white rounded-md"
           onClick={onClick}
         >
           編集
