@@ -19,6 +19,8 @@ export const BookRows: React.FC<Props> = ({ books }) => {
     newExpands[i] = !current
     setExpands(newExpands)
   }
+  const isMine =
+    session && books.length > 0 && session.user.id === books[0].userId
 
   return (
     <div className="overflow-x-auto relative mb-12">
@@ -40,7 +42,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
             <th scope="col" className="py-3 px-6 whitespace-nowrap">
               感想
             </th>
-            {session && (
+            {isMine && (
               <th scope="col" className="py-3 px-6">
                 一言
               </th>
@@ -89,7 +91,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                 {book.category}
               </td>
               <td className={`py-4 px-6 ${pc}`}>{book.impression}</td>
-              {session && (
+              {isMine && (
                 <td className={`py-4 px-6 whitespace-normal ${pc}`}>
                   {expands[i] ? (
                     <Memo memo={book.memo} />

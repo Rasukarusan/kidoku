@@ -3,6 +3,7 @@ type Month = `${month}月`
 
 export interface Record {
   id: number
+  userId: string
   month: Month
   title: string
   author: string

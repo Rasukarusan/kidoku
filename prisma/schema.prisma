@@ -67,7 +67,7 @@ model Session {
 
 model User {
   id            String    @id @default(cuid())
-  name          String?
+  name          String?   @unique(map: "uniq_name")
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?

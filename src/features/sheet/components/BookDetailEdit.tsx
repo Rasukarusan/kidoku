@@ -14,6 +14,7 @@ interface Props {
 
 export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
   const { data: session } = useSession()
+  const isMine = session?.user?.id === book.userId
   return (
     <div className="p-4">
       <div className="flex items-start">
@@ -77,7 +78,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
           </div>
         </div>
       </div>
-      {session && (
+      {isMine && (
         <>
           <Divider sx={{ margin: '15px 0px' }} />
           <textarea
@@ -90,17 +91,17 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             }}
             tabIndex={5}
           />
+          <div className="pt-4 border-t border-1 text-center">
+            <button
+              className="hover:bg-green-700 bg-green-600 px-4 py-1 font-bold text-white rounded-md"
+              onClick={onClick}
+              tabIndex={6}
+            >
+              保存
+            </button>
+          </div>
         </>
       )}
-      <div className="pt-4 border-t border-1 text-center">
-        <button
-          className="hover:bg-green-700 bg-green-600 px-4 py-1 font-bold text-white rounded-md"
-          onClick={onClick}
-          tabIndex={6}
-        >
-          保存
-        </button>
-      </div>
     </div>
   )
 }
