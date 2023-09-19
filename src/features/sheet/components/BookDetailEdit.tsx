@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { Record } from '../types'
 import { Divider } from '@mui/material'
+import { ToggleButton } from '@/components/button/ToggleButton'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
@@ -83,7 +84,7 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
           <Divider sx={{ margin: '15px 0px' }} />
           <textarea
             value={book.memo}
-            className="w-full p-2 bg-slate-100 w-full"
+            className="w-full p-2 bg-slate-100 w-full mb-2"
             rows={12}
             cols={80}
             onChange={(e) => {
@@ -91,6 +92,14 @@ export const BookDetailEdit: React.FC<Props> = ({ book, onClick, setBook }) => {
             }}
             tabIndex={5}
           />
+          <ToggleButton
+            label="メモを公開する"
+            checked={book.is_public_memo}
+            onChange={() => {
+              setBook({ ...book, is_public_memo: !book.is_public_memo })
+            }}
+          />
+
           <div className="pt-4 border-t border-1 text-center">
             <button
               className="hover:bg-green-700 bg-green-600 px-4 py-1 font-bold text-white rounded-md"
