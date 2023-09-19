@@ -11,6 +11,7 @@ export interface Record {
   image: string
   impression: string // 感想 ex.) ◎
   memo: string
+  is_public_memo: boolean
 }
 
 export interface TotalRecord extends Record {

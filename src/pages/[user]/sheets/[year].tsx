@@ -36,8 +36,17 @@ export async function getServerSideProps(context) {
   })
   const data = books.map((book) => {
     const month = dayjs(book.finished).format('M') + '月'
-    const { id, userId, title, author, category, image, impression } = book
-    const memo = isMine ? book.memo : undefined
+    const {
+      id,
+      userId,
+      title,
+      author,
+      category,
+      image,
+      impression,
+      is_public_memo,
+    } = book
+    const memo = isMine || is_public_memo ? book.memo : ''
     return {
       id,
       userId,
@@ -48,6 +57,7 @@ export async function getServerSideProps(context) {
       image,
       impression,
       memo,
+      is_public_memo,
     }
   })
   return {

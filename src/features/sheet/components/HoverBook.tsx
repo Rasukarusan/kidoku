@@ -10,6 +10,7 @@ interface Props {
 
 export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
   const { data: session } = useSession()
+  const isMine = session?.user?.id === book.userId
 
   return (
     <motion.div
@@ -31,7 +32,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
         <div className="p-2">
           <div className="font-bold text-sm">{book.title}</div>
           <div className="text-xs pt-1">{book.author}</div>
-          {session && (
+          {(isMine || book.is_public_memo) && (
             <div className="text-xs mt-2 h-[80px] line-clamp-5 ">
               {book.memo}
             </div>

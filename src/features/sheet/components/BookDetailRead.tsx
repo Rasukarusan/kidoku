@@ -60,19 +60,21 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </div>
         </div>
       </div>
-      {isMine && (
+      {(isMine || book.is_public_memo) && (
         <>
           <Divider sx={{ margin: '15px 0px' }} />
           <Memo memo={book.memo} />
-          <div className="pt-4 border-t border-1 text-center">
-            <button
-              className="bg-blue-400 hover:bg-blue-500 px-4 py-1 font-bold text-white rounded-md"
-              onClick={onClick}
-            >
-              編集
-            </button>
-          </div>
         </>
+      )}
+      {isMine && (
+        <div className="pt-4 border-t border-1 text-center">
+          <button
+            className="bg-blue-400 hover:bg-blue-500 px-4 py-1 font-bold text-white rounded-md"
+            onClick={onClick}
+          >
+            編集
+          </button>
+        </div>
       )}
     </div>
   )
