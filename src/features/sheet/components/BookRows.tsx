@@ -42,11 +42,9 @@ export const BookRows: React.FC<Props> = ({ books }) => {
             <th scope="col" className="py-3 px-6 whitespace-nowrap">
               感想
             </th>
-            {isMine && (
-              <th scope="col" className="py-3 px-6">
-                一言
-              </th>
-            )}
+            <th scope="col" className="py-3 px-6">
+              一言
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -91,7 +89,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                 {book.category}
               </td>
               <td className={`py-4 px-6 ${pc}`}>{book.impression}</td>
-              {isMine && (
+              {(isMine || book.is_public_memo) && (
                 <td className={`py-4 px-6 whitespace-normal ${pc}`}>
                   {expands[i] ? (
                     <Memo memo={book.memo} />
