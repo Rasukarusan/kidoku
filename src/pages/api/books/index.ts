@@ -17,7 +17,8 @@ export default async (req, res) => {
     if (!book) {
       res.status(401).json({ result: false })
     }
-    const { title, author, category, image, impression, memo } = body
+    const { title, author, category, image, impression, memo, is_public_memo } =
+      body
     const success = await prisma.books.update({
       where: { id, userId },
       data: {
@@ -27,6 +28,7 @@ export default async (req, res) => {
         image,
         impression,
         memo,
+        is_public_memo,
       },
     })
     res.status(200).json({ result: true })
