@@ -53,7 +53,7 @@ export const Header = () => {
               Kidoku
             </Link>
             <div className="flex-grow"></div>
-            {session ? (
+            {session && (
               <div className="relative" ref={dropdownRef}>
                 <button
                   className="rounded-full bg-gray-200 w-[34px] h-[34px] sm:w-[40px] sm:h-[40px] sm:mr-4"
@@ -105,7 +105,8 @@ export const Header = () => {
                   )}
                 </AnimatePresence>
               </div>
-            ) : (
+            )}
+            {session === null && (
               <>
                 <button
                   className="rounded-md bg-[#4f5b62] text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2 font-bold"
