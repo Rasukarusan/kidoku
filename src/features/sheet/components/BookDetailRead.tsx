@@ -13,6 +13,7 @@ interface Props {
 
 export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   const { data: session } = useSession()
+  const isMine = session?.user?.id === book.userId
   return (
     <div className="p-4">
       <div className="flex items-start">
@@ -59,20 +60,20 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </div>
         </div>
       </div>
-      {session && (
+      {isMine && (
         <>
           <Divider sx={{ margin: '15px 0px' }} />
           <Memo memo={book.memo} />
+          <div className="pt-4 border-t border-1 text-center">
+            <button
+              className="bg-blue-400 hover:bg-blue-500 px-4 py-1 font-bold text-white rounded-md"
+              onClick={onClick}
+            >
+              編集
+            </button>
+          </div>
         </>
       )}
-      <div className="pt-4 border-t border-1 text-center">
-        <button
-          className="bg-blue-400 hover:bg-blue-500 px-4 py-1 font-bold text-white rounded-md"
-          onClick={onClick}
-        >
-          編集
-        </button>
-      </div>
     </div>
   )
 }
@@ -81,6 +82,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
  * \nを<br>に変換したコンポーネント
  */
 export const Memo = ({ memo }) => {
+  if (!memo) return null
   const texts = memo.split(/(\n)/).map((item, index) => {
     return <Fragment key={index}>{item.match(/\n/) ? <br /> : item}</Fragment>
   })

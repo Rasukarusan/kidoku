@@ -56,6 +56,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                   onMouseLeave={() => onMouseLeave(i)}
                 />
                 {session &&
+                  session.user.id === book.userId &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
                     <p className="absolute top-[-15px] right-[28px]">
