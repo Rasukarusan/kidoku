@@ -13,7 +13,7 @@ import {
   CheckCircleOutline as CircleChecked,
   RadioButtonUnchecked as CircleUnchecked,
 } from '@mui/icons-material'
-import { Item } from '../../types'
+import { Item } from '@/types/search'
 import { truncate } from '../../util'
 import { theme as Theme } from '@/features/global/theme'
 import { selectItemsAtom } from '@/store/selectItems'

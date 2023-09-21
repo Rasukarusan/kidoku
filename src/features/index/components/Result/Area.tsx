@@ -4,7 +4,8 @@ import { Typography, Link } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
-import { Results, Item } from '../../types'
+import { Item } from '@/types/search'
+import { Results } from '../../types'
 import { Card } from './Card'
 
 const useStyles = makeStyles({
