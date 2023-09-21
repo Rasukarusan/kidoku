@@ -4,7 +4,7 @@ import { TextField } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { Autocomplete } from '@mui/material'
 import { Results } from '../types'
-import { getSuggestions, searchBooks } from '../util'
+import { getSuggestions, searchBooks } from '@/utils/search'
 
 const useStyles = makeStyles({
   input: {
