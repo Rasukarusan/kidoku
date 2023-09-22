@@ -13,7 +13,6 @@ export default async (req, res) => {
     if (req.method === 'POST') {
       const body = JSON.parse(req.body)
       const { title, description, author, image, category } = body
-      console.log(title, author, image)
       const sheet = await prisma.sheets.findFirst({
         where: { userId },
         orderBy: [
