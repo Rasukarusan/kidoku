@@ -27,7 +27,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   const onClickSave = async () => {
     setEdit(false)
     const res = await fetch(`/api/books`, {
-      method: 'POST',
+      method: 'PUT',
       body: JSON.stringify(newBook),
       headers: {
         Accept: 'application/json',

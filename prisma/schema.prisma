@@ -21,20 +21,19 @@ model sheets {
 }
 
 model books {
-  id             Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId         String   @map("user_id")
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId         String    @map("user_id")
   sheet_id       Int
-  title          String   @db.VarChar(120)
-  author         String   @db.VarChar(120)
-  category       String   @db.VarChar(120)
-  image          String   @db.VarChar(255)
-  impression     String   @db.VarChar(5)
-  memo           String   @db.Text
-  is_public_memo Boolean? @default(false)
-  finished       DateTime @db.DateTime(0)
-  created        DateTime @default(now()) @db.DateTime(0)
-  updated        DateTime @default(now()) @db.DateTime(0)
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String    @db.VarChar(120)
+  author         String    @db.VarChar(120)
+  category       String    @db.VarChar(120)
+  image          String    @db.VarChar(255)
+  impression     String    @db.VarChar(5)
+  memo           String    @db.Text
+  is_public_memo Boolean   @default(false)
+  finished       DateTime? @db.DateTime(0)
+  created        DateTime  @default(now()) @db.DateTime(0)
+  updated        DateTime  @default(now()) @db.DateTime(0)
 }
 
 model Account {
@@ -76,7 +75,6 @@ model User {
   accounts      Account[]
   sessions      Session[]
   sheets        sheets[]
-  books         books[]
 
   @@map("users")
 }
