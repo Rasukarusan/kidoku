@@ -39,7 +39,7 @@ export const SearchBox: React.FC<Props> = ({ words }) => {
           <input
             type="search"
             name="q"
-            className="py-2 text-sm bg-white rounded-md pl-10 pr-2 focus:outline-none text-gray-900 w-96 appearance-none"
+            className="py-2 text-sm bg-white rounded-md pl-10 pr-2 text-gray-900 w-96 appearance-none cursor-pointer"
             placeholder="Search..."
             autoComplete="off"
             onFocus={() => {
