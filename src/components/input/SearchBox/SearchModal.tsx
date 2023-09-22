@@ -3,6 +3,7 @@ import { Item } from '@/types/search'
 import { searchBooks } from '@/utils/search'
 import { truncate } from '@/utils/string'
 import { useEffect, useRef, useState } from 'react'
+import { useReward } from 'react-rewards'
 
 interface Props {
   open: boolean
@@ -637,6 +638,8 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const [results, setResults] = useState<Item[]>(items)
   const [selectId, setSelectId] = useState('')
   const [loading, setLoading] = useState(false)
+  const { reward, isAnimating } = useReward('rewardId', 'confetti')
+
   useEffect(() => {
     ref.current?.focus()
   }, [open])
@@ -665,6 +668,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
         Accept: 'application/json',
       },
     })
+    reward()
     setSelectId('')
     setLoading(false)
   }
@@ -748,12 +752,12 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           <button
             className="font-bold text-white flex items-center disabled:font-medium"
             onClick={onClickAdd}
-            disabled={selectId === ''}
+            disabled={selectId === '' || isAnimating}
           >
             {loading && (
               <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
             )}
-            <span>追加する</span>
+            <span id="rewardId">追加する</span>
           </button>
         </div>
       </div>
