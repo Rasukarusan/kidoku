@@ -633,7 +633,7 @@ const items: Item[] = [
 ]
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const ref = useRef<HTMLInputElement>(null)
-  const [results, setResults] = useState<Item[]>(items)
+  const [results, setResults] = useState<Item[]>([])
   const [selectId, setSelectId] = useState('')
   useEffect(() => {
     ref.current?.focus()
@@ -648,7 +648,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   }
 
   const onClickAdd = async () => {
-    const book = items.filter((item) => item.id === selectId).pop()
+    const book = results.filter((item) => item.id === selectId).pop()
     if (!book) return
     const { title, description, authors, imageLinks, categories } =
       book.volumeInfo
