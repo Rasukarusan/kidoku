@@ -8,7 +8,7 @@ import { SettingsIcon } from '@/components/icon/SettingsIcon'
 import { ExitIcon } from '@/components/icon/ExitIcon'
 import { BookIcon } from '@/components/icon/BookIcon'
 import Link from 'next/link'
-import { SearchBox } from '@/components/input/SearchBox'
+import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 
 // レスポンシブヘッダー
 export const Header = () => {
