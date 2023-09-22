@@ -8,6 +8,7 @@ import { SettingsIcon } from '@/components/icon/SettingsIcon'
 import { ExitIcon } from '@/components/icon/ExitIcon'
 import { BookIcon } from '@/components/icon/BookIcon'
 import Link from 'next/link'
+import { SearchBox } from '@/components/input/SearchBox'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -48,10 +49,11 @@ export const Header = () => {
           <Toolbar disableGutters>
             <Link
               href="/"
-              className="mr-2 font-bold tracking-[.3rem] no-underline font-['Nico_Moji'] text-xl"
+              className="mr-8 font-bold tracking-[.3rem] no-underline font-['Nico_Moji'] text-xl"
             >
               Kidoku
             </Link>
+            <SearchBox words="" />
             <div className="flex-grow"></div>
             {session && (
               <div className="relative" ref={dropdownRef}>
