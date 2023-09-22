@@ -1,3 +1,4 @@
+import { Loading } from '@/components/icon/Loading'
 import { Item } from '@/types/search'
 import { searchBooks } from '@/utils/search'
 import { truncate } from '@/utils/string'
@@ -633,8 +634,9 @@ const items: Item[] = [
 ]
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const ref = useRef<HTMLInputElement>(null)
-  const [results, setResults] = useState<Item[]>([])
+  const [results, setResults] = useState<Item[]>(items)
   const [selectId, setSelectId] = useState('')
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
     ref.current?.focus()
   }, [open])
@@ -648,6 +650,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   }
 
   const onClickAdd = async () => {
+    setLoading(true)
     const book = results.filter((item) => item.id === selectId).pop()
     if (!book) return
     const { title, description, authors, imageLinks, categories } =
@@ -662,6 +665,8 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
         Accept: 'application/json',
       },
     })
+    setSelectId('')
+    setLoading(false)
   }
 
   if (!open) return null
@@ -735,13 +740,20 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             )
           })}
         </div>
-        <div className="bg-gray-200 w-full text-center h-[50px] flex items-center justify-center">
+        <div
+          className={`w-full text-center h-[50px] flex items-center justify-center ${
+            selectId ? 'bg-blue-600' : 'bg-gray-400'
+          }`}
+        >
           <button
-            className="font-bold text-gray-700 disabled:text-gray-400"
+            className="font-bold text-white flex items-center disabled:font-medium"
             onClick={onClickAdd}
             disabled={selectId === ''}
           >
-            追加
+            {loading && (
+              <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
+            )}
+            <span>追加する</span>
           </button>
         </div>
       </div>
