@@ -634,6 +634,11 @@ const items: Item[] = [
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const ref = useRef<HTMLInputElement>(null)
   const [results, setResults] = useState<Item[]>(items)
+  const [selectId, setSelectId] = useState('')
+  useEffect(() => {
+    ref.current?.focus()
+  }, [open])
+
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchWord = e.target.value
     if (searchWord) {
@@ -642,9 +647,22 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     }
   }
 
-  useEffect(() => {
-    ref.current?.focus()
-  }, [open])
+  const onClickAdd = async () => {
+    const book = items.filter((item) => item.id === selectId).pop()
+    if (!book) return
+    const { title, description, authors, imageLinks, categories } =
+      book.volumeInfo
+    const author = authors ? authors.join(',') : '-'
+    const category = categories ? categories.join(',') : '-'
+    const image = imageLinks ? imageLinks.thumbnail : '/no-image.png'
+    const res = await fetch(`/api/books`, {
+      method: 'POST',
+      body: JSON.stringify({ title, description, author, image, category }),
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+  }
 
   if (!open) return null
 
@@ -693,10 +711,15 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             const { title, description, authors, imageLinks } = item.volumeInfo
             return (
               <div
-                className="w-[200px] h-[300px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer"
+                className="w-[200px] max-h-[300px] h-[300px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer"
                 key={item.id}
+                style={{
+                  background:
+                    selectId === item.id ? 'rgba(245, 88, 194, 0.2)' : 'white',
+                }}
+                onClick={() => setSelectId(item.id)}
               >
-                <div className="font-bold mb-1">{truncate(title, 20)}</div>
+                <div className="font-bold mb-1">{truncate(title, 15)}</div>
                 <div className="text-xs mb-1">
                   {Array.isArray(authors)
                     ? truncate(authors.join(','), 12)
@@ -712,8 +735,14 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             )
           })}
         </div>
-        <div className="bg-gray-200 w-full text-center">
-          <button className="m-auto">追加</button>
+        <div className="bg-gray-200 w-full text-center h-[50px] flex items-center justify-center">
+          <button
+            className="font-bold text-gray-700 disabled:text-gray-400"
+            onClick={onClickAdd}
+            disabled={selectId === ''}
+          >
+            追加
+          </button>
         </div>
       </div>
     </div>
