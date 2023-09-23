@@ -160,7 +160,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           )}
           <div
             className={`w-full text-center h-[50px] flex items-center justify-center shrink-0 ${
-              selectItem ? 'bg-blue-600' : 'bg-gray-400'
+              selectItem ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400'
             }`}
           >
             <button
