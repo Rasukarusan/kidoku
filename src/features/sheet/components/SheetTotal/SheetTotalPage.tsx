@@ -15,12 +15,14 @@ interface Props {
   categories: Category[]
   years: Year[]
   sheets: string[]
+  username: string
 }
 export const SheetTotalPage: React.FC<Props> = ({
   total,
   categories,
   years,
   sheets,
+  username,
 }) => {
   const [tab, setTab] = useState('total')
   const router = useRouter()
@@ -42,7 +44,7 @@ export const SheetTotalPage: React.FC<Props> = ({
           borderColor: 'divider',
         }}
       >
-        <Tabs value="total" sheets={sheets} />
+        <Tabs value="total" sheets={sheets} username={username} />
       </div>
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="累計読書数" />

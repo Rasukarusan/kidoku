@@ -1,24 +1,20 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import prisma from '@/libs/prisma'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { getServerSession } from 'next-auth/next'
 
 export default SheetTotalPage
 
 export async function getServerSideProps(context) {
-  const session = await getServerSession(context.req, context.res, authOptions)
-  if (!session) {
+  const { user: username } = context.params
+  const user = await prisma.user.findUnique({
+    where: { name: username },
+  })
+  if (!user) {
     return {
-      props: {
-        total: 0,
-        categories: [],
-        years: [],
-        sheets: [],
-      },
+      notFound: true,
     }
   }
-  const userId = session.user.id
+  const userId = user.id
   const books = await prisma.books.findMany({
     where: { userId },
   })
@@ -64,6 +60,7 @@ export async function getServerSideProps(context) {
       categories,
       years,
       sheets: sheets.length === 0 ? [] : sheets.map((sheet) => sheet.name),
+      username,
     },
   }
 }
