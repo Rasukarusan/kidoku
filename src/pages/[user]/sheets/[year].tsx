@@ -31,7 +31,9 @@ export async function getStaticProps(context) {
     },
   })
   const data = books.map((book) => {
-    const month = dayjs(book.finished).format('M') + '月'
+    const month = book.finished
+      ? dayjs(book.finished).format('M') + '月'
+      : dayjs().format('M') + '月' // まだ読み終わっていない場合は今月とする
     const {
       id,
       userId,
