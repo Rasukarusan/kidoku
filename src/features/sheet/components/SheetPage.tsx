@@ -27,9 +27,15 @@ interface Props {
   data: Record[]
   year: string
   sheets: string[]
+  username: string
 }
 
-export const SheetPage: React.FC<Props> = ({ data, year, sheets }) => {
+export const SheetPage: React.FC<Props> = ({
+  data,
+  year,
+  sheets,
+  username,
+}) => {
   const { data: session } = useSession()
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
   const { data: res } = useSWR(`/api/books/${year}`, fetcher, {
@@ -45,8 +51,10 @@ export const SheetPage: React.FC<Props> = ({ data, year, sheets }) => {
       data.length > 0 && session && session.user.id === data[0].userId
     if (isMine) {
       setCurrentData(res.books)
+    } else {
+      setCurrentData(data)
     }
-  }, [res, session])
+  }, [res, session, data])
 
   const setShowData = (newData: Record[]) => {
     setCurrentData(newData)
@@ -64,7 +72,7 @@ export const SheetPage: React.FC<Props> = ({ data, year, sheets }) => {
       <Box
         sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
       >
-        <Tabs sheets={sheets} value={year} />
+        <Tabs sheets={sheets} value={year} username={username} />
       </Box>
       <Box
         sx={{

@@ -63,6 +63,7 @@ export async function getStaticProps(context) {
       data: parse(data),
       year,
       sheets: sheets.map((sheet) => sheet.name),
+      username,
     },
     revalidate: 300,
   }
