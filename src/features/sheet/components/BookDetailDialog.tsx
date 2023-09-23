@@ -32,6 +32,18 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
 
   const onClickSave = async () => {
     setLoading(true)
+    // 更新前と差分があるかをチェック
+    let isDiff = false
+    Object.keys(book).forEach((key) => {
+      if (book[key] !== newBook[key]) {
+        isDiff = true
+      }
+    })
+    if (!isDiff) {
+      setLoading(false)
+      setEdit(false)
+      return
+    }
     const res = await fetch(`/api/books`, {
       method: 'PUT',
       body: JSON.stringify(newBook),
