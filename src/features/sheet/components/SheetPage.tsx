@@ -1,3 +1,4 @@
+import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
@@ -14,6 +15,8 @@ import { Books } from './Books'
 import { BookRows } from './BookRows'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
+import { fetcher } from '@/libs/swr'
+import { useSession } from 'next-auth/react'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -27,14 +30,23 @@ interface Props {
 }
 
 export const SheetPage: React.FC<Props> = ({ data, year, sheets }) => {
-  const [currentData, setCurrentData] = useState<Record[]>([])
+  const { data: session } = useSession()
+  // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
+  const { data: res } = useSWR(`/api/books/${year}`, fetcher, {
+    fallbackData: { result: true, books: data },
+  })
+  const [currentData, setCurrentData] = useState<Record[]>(data)
   const [open, setOpen] = useState(false)
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
 
   useEffect(() => {
-    setCurrentData(data)
-  }, [data])
+    const isMine =
+      data.length > 0 && session && session.user.id === data[0].userId
+    if (isMine) {
+      setCurrentData(res.books)
+    }
+  }, [res, session])
 
   const setShowData = (newData: Record[]) => {
     setCurrentData(newData)
