@@ -69,11 +69,18 @@ export async function getStaticProps(context) {
   }
 }
 export async function getStaticPaths() {
+  const users = await prisma.user.findMany({
+    select: { name: true, sheets: { select: { name: true } } },
+  })
+  const paths = users
+    .map((user) => {
+      return user.sheets.map((sheet) => {
+        return { params: { user: user.name, year: sheet.name } }
+      })
+    })
+    .flat()
   return {
-    paths: [
-      { params: { user: 'Rasukarusan', year: '2023' } },
-      { params: { user: 'Rasukarusan', year: '2022' } },
-    ],
+    paths,
     fallback: 'blocking', // キャッシュが存在しない場合はSSR
   }
 }
