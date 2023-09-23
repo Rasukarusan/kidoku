@@ -1,12 +1,15 @@
 import prisma from '@/libs/prisma'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
+// import { setTimeout } from 'timers/promises'
 
 export default async (req, res) => {
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session) {
-      return res.status(401).json({ result: false })
+      return res
+        .status(401)
+        .json({ result: false, message: 'ログインしてください' })
     }
     const userId = session.user.id
 
@@ -22,8 +25,12 @@ export default async (req, res) => {
         ],
       })
       if (!sheet) {
-        return res.status(400).json({ result: false })
+        return res.status(400).json({
+          result: false,
+          message: '本の追加に失敗しました。シートがありません。',
+        })
       }
+      // await setTimeout(500)
       const result = await prisma.books.create({
         data: {
           sheet_id: sheet.id,
@@ -37,7 +44,10 @@ export default async (req, res) => {
           finished: null,
         },
       })
-      return res.status(200).json({ result: true })
+      return res.status(200).json({
+        result: true,
+        message: `『${title}』を「${sheet.name}」に追加しました`,
+      })
     } else if (req.method === 'PUT') {
       const body = JSON.parse(req.body)
       const id = body.id
