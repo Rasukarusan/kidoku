@@ -1,12 +1,13 @@
 import { IndexPage } from '@/features/index/components/IndexPage'
 export default IndexPage
 
-import type { GetServerSideProps } from 'next'
 import prisma, { parse } from '@/libs/prisma'
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const sheets = await prisma.sheets.findMany()
+export const getStaticProps = async (ctx) => {
+  const users = await prisma.user.findMany({
+    select: { name: true, image: true },
+  })
   return {
-    props: { sheets: parse(sheets) },
+    props: { users: parse(users) },
   }
 }
