@@ -1,19 +1,15 @@
 import prisma from '@/libs/prisma'
-import { authOptions } from '@/pages/api/auth/[...nextauth]'
-import { getServerSession } from 'next-auth/next'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 export default SheetPage
 
 export async function getServerSideProps(context) {
-  const session = await getServerSession(context.req, context.res, authOptions)
-  if (!session) {
-    return {
-      redirect: { destination: '/' },
-    }
-  }
-  const userId = session.user.id
+  const { user: username } = context.params
   const sheets = await prisma.sheets.findMany({
-    where: { userId },
+    where: { user: { name: username } },
+    select: {
+      name: true,
+      user: { select: { name: true } },
+    },
     orderBy: [
       {
         order: 'desc',
@@ -26,6 +22,6 @@ export async function getServerSideProps(context) {
     }
   }
   return {
-    redirect: { destination: `/${session.user.name}/sheets/${sheets[0].name}` },
+    redirect: { destination: `/${username}/sheets/${sheets[0].name}` },
   }
 }

@@ -1,46 +1,40 @@
-import { useState } from 'react'
-import { Container, Grid } from '@mui/material'
-import { Results } from '../types'
-import { InputField, Area as ResultArea, CopyField, AddButton } from './'
-import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 
-export const IndexPage = () => {
-  const { data: session } = useSession()
-  const [searchWords, setSearchWords] = useState<string[]>([])
-  const [results, setResults] = useState<Results>({})
-  const [openSuggest, setOpenSuggest] = useState(false)
-
-  const updateSearchWords = (newSearchWords: string[]) => {
-    setSearchWords(newSearchWords)
-  }
-
-  const updateResults = (newResults: Results) => {
-    setResults(newResults)
-  }
-
-  const onClickBody = () => {
-    setOpenSuggest(false)
-  }
-
+interface Props {
+  users: { name: string; image: string }[]
+}
+export const IndexPage = ({ users }) => {
   return (
-    <div onClick={onClickBody}>
-      <Container fixed sx={{ paddingTop: '32px', marginBottom: '240px' }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <InputField
-              setSearchWords={updateSearchWords}
-              setResults={updateResults}
-              openSuggest={openSuggest}
-              setOpenSuggest={setOpenSuggest}
+    <div className="p-20 mb-60">
+      {users.map((user, i) => (
+        <Link
+          key={user.name}
+          href={`/${user.name}/sheets`}
+          className="m-10 flex"
+        >
+          <div className="mr-4">
+            <img
+              src={user.image}
+              alt=""
+              className="rounded-full w-[100px] h-[100px] mb-2"
             />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <CopyField />
-            {session && searchWords.length > 0 && <AddButton />}
-          </Grid>
-        </Grid>
-        <ResultArea results={results} searchWords={searchWords} />
-      </Container>
+            <div className="font-bold text-center">{user.name}</div>
+          </div>
+          <div className="p-4">
+            <div className="font-bold mb-2">
+              累計：
+              <span className={`${i === 0 ? 'text-red-600' : 'text-gray-700'}`}>
+                366
+              </span>
+              冊
+            </div>
+            <div className="font-bold mb-2">
+              カテゴリ：ビジネス35%、哲学30%、技術20%
+            </div>
+            <div className="font-bold mb-2">年間平均読書数：46冊</div>
+          </div>
+        </Link>
+      ))}
     </div>
   )
 }
