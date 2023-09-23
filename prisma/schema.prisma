@@ -16,6 +16,7 @@ model sheets {
   created DateTime? @default(now()) @db.DateTime(0)
   updated DateTime? @default(now()) @db.DateTime(0)
   user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  books   books[]
 
   @@unique([userId, name], map: "uniq_user_id_name")
 }
@@ -34,6 +35,7 @@ model books {
   finished       DateTime? @db.DateTime(0)
   created        DateTime  @default(now()) @db.DateTime(0)
   updated        DateTime  @default(now()) @db.DateTime(0)
+  sheet          sheets    @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
 }
 
 model Account {
