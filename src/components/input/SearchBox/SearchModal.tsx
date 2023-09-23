@@ -60,10 +60,10 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
       onClick={onClose}
     >
       <div
-        className="w-2/3 bg-white h-3/4 rounded-md overflow-y-hidden"
+        className="w-2/3 bg-white h-3/4 rounded-md overflow-y-hidden flex-col relative flex"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center border-b-[#f1f5f9] border-b pt-2 px-2">
+        <div className="flex items-center border-b-[#f1f5f9] border-b pt-2 px-2 shrink-0">
           <div className="relative text-gray-600 w-full">
             <span className="absolute inset-y-0 left-0 flex items-center pl-2">
               <button
@@ -94,18 +94,18 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             />
           </div>
         </div>
-        <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full mb-4 max-h-[60vh]">
+        <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full">
           {results.map((item: Item, i: number) => {
             const { title, description, authors, imageLinks } = item.volumeInfo
             return (
               <div
-                className="w-[200px] max-h-[300px] h-[300px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer"
+                className={`w-[200px] max-h-[300px] h-[300px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
+                  selectId === item.id
+                    ? 'bg-pink-200 hover:bg-pink-200'
+                    : 'bg-white'
+                }`}
                 key={item.id}
-                style={{
-                  background:
-                    selectId === item.id ? 'rgba(245, 88, 194, 0.2)' : 'white',
-                }}
-                onClick={() => setSelectId(item.id)}
+                onClick={() => setSelectId(selectId === item.id ? '' : item.id)}
               >
                 <div className="font-bold mb-1">{truncate(title, 15)}</div>
                 <div className="text-xs mb-1">
@@ -124,7 +124,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           })}
         </div>
         <div
-          className={`w-full text-center h-[50px] flex items-center justify-center ${
+          className={`w-full text-center h-[50px] flex items-center justify-center shrink-0 ${
             selectId ? 'bg-blue-600' : 'bg-gray-400'
           }`}
         >
