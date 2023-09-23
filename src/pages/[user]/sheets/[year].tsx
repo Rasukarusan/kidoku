@@ -29,33 +29,30 @@ export async function getStaticProps(context) {
       sheet_id: sheet.id,
       userId,
     },
+    select: {
+      id: true,
+      userId: true,
+      title: true,
+      author: true,
+      category: true,
+      image: true,
+      impression: true,
+      memo: true,
+      is_public_memo: true,
+      finished: true,
+      created: false,
+      updated: false,
+    },
   })
   const data = books.map((book) => {
     const month = book.finished
       ? dayjs(book.finished).format('M') + '月'
       : dayjs().format('M') + '月' // まだ読み終わっていない場合は今月とする
-    const {
-      id,
-      userId,
-      title,
-      author,
-      category,
-      image,
-      impression,
-      is_public_memo,
-    } = book
-    const memo = is_public_memo ? book.memo : ''
+    const memo = book.is_public_memo ? book.memo : ''
     return {
-      id,
-      userId,
       month,
-      title,
-      author,
-      category,
-      image,
-      impression,
       memo,
-      is_public_memo,
+      ...book,
     }
   })
   return {
