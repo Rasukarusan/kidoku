@@ -15,68 +15,70 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
   return (
-    <div className="p-4">
-      <div className="flex items-start">
-        <div className="w-1/3 mr-4">
-          <a
-            href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <img
-              className="mx-auto my-0 drop-shadow-lg"
-              src={book.image}
-              alt={book.title}
-            />
-          </a>
-        </div>
-        <div className="w-2/3 mr-2">
-          <div className="font-bold text-xl mb-2">
+    <>
+      <div className="p-4">
+        <div className="flex items-start">
+          <div className="w-1/3 mr-4">
             <a
               href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
               target="_blank"
               rel="noreferrer"
             >
-              {book.title}
+              <img
+                className="mx-auto my-0 drop-shadow-lg"
+                src={book.image}
+                alt={book.title}
+              />
             </a>
           </div>
-          <div className="flex items-center mb-2">
-            <span className="mr-1">
-              <PeopleAltIcon />
-            </span>
-            <span className="pl-2">{book.author}</span>
-          </div>
-          <div className="flex items-center mb-2">
-            <span className="mr-1">
-              <CategoryIcon />
-            </span>
-            <span className="pl-2">{book.category}</span>
-          </div>
-          <div className="flex items-center mb-2">
-            <span className="mr-1">
-              <InsertEmoticonIcon />
-            </span>
-            <span className="pl-2">{book.impression}</span>
+          <div className="w-2/3 mr-2">
+            <div className="font-bold text-xl mb-2">
+              <a
+                href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {book.title}
+              </a>
+            </div>
+            <div className="flex items-center mb-2">
+              <span className="mr-1">
+                <PeopleAltIcon />
+              </span>
+              <span className="pl-2">{book.author}</span>
+            </div>
+            <div className="flex items-center mb-2">
+              <span className="mr-1">
+                <CategoryIcon />
+              </span>
+              <span className="pl-2">{book.category}</span>
+            </div>
+            <div className="flex items-center mb-2">
+              <span className="mr-1">
+                <InsertEmoticonIcon />
+              </span>
+              <span className="pl-2">{book.impression}</span>
+            </div>
           </div>
         </div>
+        {(isMine || book.is_public_memo) && (
+          <>
+            <Divider sx={{ margin: '15px 0px' }} />
+            <Memo memo={book.memo} />
+          </>
+        )}
       </div>
-      {(isMine || book.is_public_memo) && (
-        <>
-          <Divider sx={{ margin: '15px 0px' }} />
-          <Memo memo={book.memo} />
-        </>
-      )}
       {isMine && (
-        <div className="pt-4 border-t border-1 text-center">
+        <div className="border-t border-1 text-center w-full">
           <button
-            className="bg-blue-400 hover:bg-blue-500 px-4 py-1 font-bold text-white rounded-md"
+            className="bg-blue-600 hover:bg-blue-700 px-4 py-1 font-bold text-white h-12 w-full"
             onClick={onClick}
           >
-            編集
+            編集する
           </button>
         </div>
       )}
-    </div>
+    </>
   )
 }
 
