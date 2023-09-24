@@ -1,38 +1,13 @@
 import { YearlyTopBook } from './types'
 import { uniq } from '@/utils/array'
-import { makeStyles } from '@mui/styles'
 import { Book } from './Book'
-
-const useStyles = makeStyles({
-  title: {
-    fontSize: '30px',
-    position: 'relative',
-    padding: '0.25em 3em',
-    borderTop: 'solid 2px black',
-    borderBottom: 'solid 2px black',
-    '&::before,&::after': {
-      content: "''",
-      position: 'absolute',
-      top: '-7px',
-      width: '2px',
-      height: 'calc(100% + 14px)',
-      backgroundColor: 'black',
-    },
-    '&::before': {
-      left: '7px',
-    },
-    '&::after': {
-      right: '7px',
-    },
-  },
-})
+import { Fragment } from 'react'
 
 interface Props {
   yearlyTopBooks: YearlyTopBook[]
 }
 
 export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
-  const classes = useStyles()
   // 年は降順、順位は昇順で並び替える
   const books = yearlyTopBooks
     .map((book) => {
@@ -57,16 +32,40 @@ export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
       {years.map((year) => {
         const yearBooks = books.filter((book) => book.year === year)
         return (
-          <>
-            <span className={classes.title}>{year}</span>
+          <Fragment key={year}>
+            <span className="title">{year}</span>
             <div className="block sm:flex justify-around mt-8">
               {yearBooks.map((book, i) => (
                 <Book key={`${book.title}-${i}`} book={book} />
               ))}
             </div>
-          </>
+          </Fragment>
         )
       })}
+      <style jsx>{`
+        .title {
+          font-size: 30px;
+          position: relative;
+          padding: 0.25em 3em;
+          border-top: solid 2px black;
+          border-bottom: solid 2px black;
+        }
+        .title::before,
+        .title::after {
+          content: '';
+          position: absolute;
+          top: -7px;
+          width: 2px;
+          height: calc(100% + 14px);
+          background-color: black;
+        }
+        .title::before {
+          left: 7px;
+        }
+        .title::after {
+          right: 7px;
+        }
+      `}</style>
     </div>
   )
 }

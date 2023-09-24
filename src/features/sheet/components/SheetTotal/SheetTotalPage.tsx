@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Container } from '@mui/material'
 import { useRouter } from 'next/router'
 import { Tabs } from '../Tabs'
 import { Category, Year } from '../../types'
@@ -10,6 +9,7 @@ import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
 import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from './types'
+import { Container } from '@/components/layout/Container'
 
 interface Props {
   total: number
