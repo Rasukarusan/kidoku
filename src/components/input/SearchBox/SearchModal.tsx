@@ -102,7 +102,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                 type="search"
                 name="q"
                 className="py-2 text-sm bg-white rounded-md pl-12 pr-2 h-12 focus:outline-none text-gray-900 w-full appearance-none"
-                placeholder="本のタイトルを検索"
+                placeholder="本を追加"
                 autoComplete="off"
                 onChange={onChange}
               />

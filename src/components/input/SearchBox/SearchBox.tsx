@@ -40,7 +40,7 @@ export const SearchBox: React.FC<Props> = ({ words }) => {
             type="search"
             name="q"
             className="py-2 text-sm bg-white rounded-md pl-10 pr-2 text-gray-900 w-96 appearance-none cursor-pointer"
-            placeholder="本のタイトルを検索"
+            placeholder="本を追加"
             autoComplete="off"
             onFocus={() => {
               setOpen(true)
