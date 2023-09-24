@@ -77,7 +77,7 @@ export const SheetPage: React.FC<Props> = ({
   }
 
   return (
-    <Container>
+    <Container className="mb-12">
       <div className="border-b border-gray-200 mb-8">
         <Tabs sheets={sheets} value={year} username={username} />
       </div>

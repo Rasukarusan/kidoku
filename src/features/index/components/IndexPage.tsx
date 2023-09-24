@@ -1,3 +1,4 @@
+import { Container } from '@/components/layout/Container'
 import Link from 'next/link'
 
 interface Props {
@@ -5,7 +6,7 @@ interface Props {
 }
 export const IndexPage = ({ users }) => {
   return (
-    <div className="p-20 mb-60">
+    <Container className="p-6">
       {users.map((user, i) => (
         <Link
           key={user.name}
@@ -35,6 +36,6 @@ export const IndexPage = ({ users }) => {
           </div>
         </Link>
       ))}
-    </div>
+    </Container>
   )
 }

@@ -36,7 +36,7 @@ export const SheetTotalPage: React.FC<Props> = ({
   const average = years.length === 0 ? 0 : Math.ceil(total / years.length)
 
   return (
-    <Container fixed>
+    <Container>
       <div className="border-b border-gray-200 mb-8">
         <Tabs value="total" sheets={sheets} username={username} />
       </div>
