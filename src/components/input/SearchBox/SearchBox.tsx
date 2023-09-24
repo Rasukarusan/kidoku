@@ -1,11 +1,7 @@
 import { useState } from 'react'
 import { SearchModal } from './SearchModal'
 
-interface Props {
-  words: string
-}
-
-export const SearchBox: React.FC<Props> = ({ words }) => {
+export const SearchBox: React.FC = () => {
   const [open, setOpen] = useState(false)
   return (
     <>

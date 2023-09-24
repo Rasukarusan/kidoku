@@ -53,7 +53,7 @@ export const Header = () => {
             >
               Kidoku
             </Link>
-            <SearchBox words="" />
+            <SearchBox />
             <div className="flex-grow"></div>
             {session && (
               <div className="relative" ref={dropdownRef}>
