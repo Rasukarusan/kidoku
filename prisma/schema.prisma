@@ -22,20 +22,21 @@ model sheets {
 }
 
 model books {
-  id             Int       @id @default(autoincrement()) @db.UnsignedInt
-  userId         String    @map("user_id")
-  sheet_id       Int
-  title          String    @db.VarChar(120)
-  author         String    @db.VarChar(120)
-  category       String    @db.VarChar(120)
-  image          String    @db.VarChar(255)
-  impression     String    @db.VarChar(5)
-  memo           String    @db.Text
-  is_public_memo Boolean   @default(false)
-  finished       DateTime? @db.DateTime(0)
-  created        DateTime  @default(now()) @db.DateTime(0)
-  updated        DateTime  @default(now()) @db.DateTime(0)
-  sheet          sheets    @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
+  id               Int             @id @default(autoincrement()) @db.UnsignedInt
+  userId           String          @map("user_id")
+  sheet_id         Int
+  title            String          @db.VarChar(120)
+  author           String          @db.VarChar(120)
+  category         String          @db.VarChar(120)
+  image            String          @db.VarChar(255)
+  impression       String          @db.VarChar(5)
+  memo             String          @db.Text
+  is_public_memo   Boolean         @default(false)
+  finished         DateTime?       @db.DateTime(0)
+  created          DateTime        @default(now()) @db.DateTime(0)
+  updated          DateTime        @default(now()) @db.DateTime(0)
+  sheet            sheets          @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
+  yearly_top_books YearlyTopBook[]
 }
 
 model Account {
@@ -68,15 +69,16 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?   @unique(map: "uniq_name")
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  admin         Boolean   @default(false)
-  accounts      Account[]
-  sessions      Session[]
-  sheets        sheets[]
+  id               String          @id @default(cuid())
+  name             String?         @unique(map: "uniq_name")
+  email            String?         @unique
+  emailVerified    DateTime?       @map("email_verified")
+  image            String?
+  admin            Boolean         @default(false)
+  accounts         Account[]
+  sessions         Session[]
+  sheets           sheets[]
+  yearly_top_books YearlyTopBook[]
 
   @@map("users")
 }
@@ -88,4 +90,18 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verificationtokens")
+}
+
+model YearlyTopBook {
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId  String   @map("user_id")
+  book_id Int
+  order   Int      @default(1)
+  year    String   @db.VarChar(120)
+  created DateTime @default(now()) @db.DateTime(0)
+  updated DateTime @default(now()) @db.DateTime(0)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book    books    @relation(fields: [book_id], references: [id], onDelete: Cascade)
+
+  @@map("yearly_top_books")
 }

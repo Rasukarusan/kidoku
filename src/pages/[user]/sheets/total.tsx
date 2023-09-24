@@ -54,6 +54,15 @@ export async function getServerSideProps(context) {
   const sheets = await prisma.sheets.findMany({
     where: { userId },
   })
+
+  const yearlyTopBooks = await prisma.yearlyTopBook.findMany({
+    where: { userId },
+    select: {
+      year: true,
+      order: true,
+      book: { select: { title: true, author: true, image: true } },
+    },
+  })
   return {
     props: {
       total: books.length,
@@ -61,6 +70,7 @@ export async function getServerSideProps(context) {
       years,
       sheets: sheets.length === 0 ? [] : sheets.map((sheet) => sheet.name),
       username,
+      yearlyTopBooks,
     },
   }
 }

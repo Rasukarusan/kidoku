@@ -9,6 +9,7 @@ import { Rankings } from './Rankings'
 import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
 import { useSession } from 'next-auth/react'
+import { YearlyTopBook } from './types'
 
 interface Props {
   total: number
@@ -16,6 +17,7 @@ interface Props {
   years: Year[]
   sheets: string[]
   username: string
+  yearlyTopBooks: YearlyTopBook[]
 }
 export const SheetTotalPage: React.FC<Props> = ({
   total,
@@ -23,6 +25,7 @@ export const SheetTotalPage: React.FC<Props> = ({
   years,
   sheets,
   username,
+  yearlyTopBooks,
 }) => {
   const [tab, setTab] = useState('total')
   const router = useRouter()
@@ -54,7 +57,7 @@ export const SheetTotalPage: React.FC<Props> = ({
         </div>
 
         <Title text="年間ベスト書籍" />
-        <Rankings />
+        <Rankings yearlyTopBooks={yearlyTopBooks} />
       </div>
     </Container>
   )
