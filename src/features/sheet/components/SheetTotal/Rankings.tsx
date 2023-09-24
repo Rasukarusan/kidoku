@@ -1,4 +1,4 @@
-import { YearlyTopBook } from './types'
+import { YearlyTopBook } from '@/types/book'
 import { uniq } from '@/utils/array'
 import { Book } from './Book'
 import { Fragment } from 'react'

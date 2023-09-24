@@ -55,12 +55,22 @@ export async function getStaticProps(context) {
       ...book,
     }
   })
+  const yearlyTopBooks = await prisma.yearlyTopBook.findMany({
+    where: { userId, year },
+    select: {
+      year: true,
+      order: true,
+      book: { select: { title: true, author: true, image: true } },
+    },
+    orderBy: { order: 'asc' },
+  })
   return {
     props: {
       data: parse(data),
       year,
       sheets: sheets.map((sheet) => sheet.name),
       username,
+      yearlyTopBooks,
     },
     revalidate: 300,
   }

@@ -8,7 +8,7 @@ import { Rankings } from './Rankings'
 import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
 import { useSession } from 'next-auth/react'
-import { YearlyTopBook } from './types'
+import { YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
 
 interface Props {
