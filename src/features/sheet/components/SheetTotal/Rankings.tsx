@@ -1,6 +1,19 @@
 import { RankingItem } from './RankingItem'
+import { YearlyTopBook } from './types'
 
-export const Rankings: React.FC = () => {
+interface Props {
+  yearlyTopBooks: YearlyTopBook[]
+}
+
+export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
+  const books = yearlyTopBooks.map((book) => {
+    const {
+      year,
+      order,
+      book: { title, author, image },
+    } = book
+    // TODO: ランキング表示形式に整形
+  })
   return (
     <div className="mt-8">
       <RankingItem
