@@ -1,12 +1,10 @@
-import Image from 'next/image'
 import { makeStyles } from '@mui/styles'
-import { Box } from '@mui/material'
 const useStyles = makeStyles({
   image: {
     margin: '0 auto',
     boxShadow: '0 5px 15px rgb(0 0 0 / 15%)',
   },
-  rank: {
+  order: {
     color: 'transparent',
     fontSize: '30px',
     fontWeight: 700,
@@ -32,34 +30,42 @@ const useStyles = makeStyles({
 })
 
 export interface BookProps {
-  rank: number
-  image: string
-  link: string
-  name: string
+  book: {
+    title: string
+    author: string
+    order: number
+    image: string
+  }
 }
-export const Book: React.FC<BookProps> = ({ rank, image, link, name }) => {
+export const Book: React.FC<BookProps> = ({ book }) => {
   const classes = useStyles()
+  const { title, author, order, image } = book
   const color =
-    rank === 1 ? classes.gold : rank === 2 ? classes.silver : classes.bronze
+    order === 1 ? classes.gold : order === 2 ? classes.silver : classes.bronze
+  const styleOrder =
+    order === 3
+      ? 'order-3 sm:order-none'
+      : order === 2
+      ? 'order-2 sm:order-2'
+      : 'order-1 sm:order-1'
   return (
-    <Box
-      sx={{
-        width: { xs: '100%', sm: '30%' },
-        order: { xs: rank, sm: rank % 3 },
-        marginBottom: { xs: '20px', sm: '0px' },
-      }}
-    >
-      <div className={`${classes.rank} ${color}`}>{rank}位</div>
-      <a className={classes.link} href={link} target="_blank" rel="noreferrer">
-        <Image
-          className={classes.image}
+    <div className={`w-full sm:w-1/3 mb-5 sm:mb-0 ${styleOrder}`}>
+      <div className={`${classes.order} ${color}`}>{order}位</div>
+      <a
+        href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <img
+          className="m-auto shadow-md mb-4"
           src={image}
           width={128}
           height={186}
           alt=""
         />
-        <div className="mt-4">{name}</div>
       </a>
-    </Box>
+      <div className="mb-2">{title}</div>
+      <div className="mb-4 text-xs">{author}</div>
+    </div>
   )
 }

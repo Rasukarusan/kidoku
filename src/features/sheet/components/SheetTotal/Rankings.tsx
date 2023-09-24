@@ -1,125 +1,72 @@
-import { RankingItem } from './RankingItem'
 import { YearlyTopBook } from './types'
+import { uniq } from '@/utils/array'
+import { makeStyles } from '@mui/styles'
+import { Book } from './Book'
+
+const useStyles = makeStyles({
+  title: {
+    fontSize: '30px',
+    position: 'relative',
+    padding: '0.25em 3em',
+    borderTop: 'solid 2px black',
+    borderBottom: 'solid 2px black',
+    '&::before,&::after': {
+      content: "''",
+      position: 'absolute',
+      top: '-7px',
+      width: '2px',
+      height: 'calc(100% + 14px)',
+      backgroundColor: 'black',
+    },
+    '&::before': {
+      left: '7px',
+    },
+    '&::after': {
+      right: '7px',
+    },
+  },
+})
 
 interface Props {
   yearlyTopBooks: YearlyTopBook[]
 }
 
 export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
-  const books = yearlyTopBooks.map((book) => {
-    const {
-      year,
-      order,
-      book: { title, author, image },
-    } = book
-    // TODO: ランキング表示形式に整形
-  })
+  const classes = useStyles()
+  // 年は降順、順位は昇順で並び替える
+  const books = yearlyTopBooks
+    .map((book) => {
+      const {
+        year,
+        order,
+        book: { title, author, image },
+      } = book
+      return { year, order, title, author, image }
+    })
+    .sort((a, b) => {
+      if (a.year === b.year) {
+        return a.order - b.order
+      }
+      return a.year < b.year ? 1 : -1
+    })
+  const years = uniq(yearlyTopBooks.map((book) => book.year)).sort(
+    (a, b) => a > b
+  )
   return (
     <div className="mt-8">
-      <RankingItem
-        year="2022年"
-        books={[
-          {
-            rank: 1,
-            name: '人生の法則 「欲求の4タイプ」で分かるあなたと他人',
-            image:
-              'http://books.google.com/books/content?id=qOaruAAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/B00GTK5IQG',
-          },
-          {
-            rank: 2,
-            name: 'お金のむこうに人がいる',
-            image:
-              'http://books.google.com/books/content?id=47mNzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4478113726',
-          },
-          {
-            rank: 3,
-            name: 'プロジェクト・ヘイル・メアリー',
-            image:
-              'http://books.google.com/books/content?id=AIazzgEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/B09NBZLC7J',
-          },
-        ]}
-      />
-      <RankingItem
-        year="2021年"
-        books={[
-          {
-            rank: 1,
-            name: '嫌われる勇気',
-            image:
-              'http://books.google.com/books/content?id=qNMHnwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4478025819',
-          },
-          {
-            rank: 2,
-            name: 'ラッセル幸福論',
-            image:
-              'https://images-na.ssl-images-amazon.com/images/I/51YB2WFC5CL._SX334_BO1,204,203,200_.jpg',
-            link: 'https://www.amazon.co.jp/dp/4003364937',
-          },
-          {
-            rank: 3,
-            name: '精神科医が見つけた 3つの幸福 最新科学から最高の人生をつくる方法',
-            image:
-              'http://books.google.com/books/content?id=EJYjEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4864108234',
-          },
-        ]}
-      />
-      <RankingItem
-        year="2020年"
-        books={[
-          {
-            rank: 1,
-            name: 'ブルシット・ジョブ　クソどうでもいい仕事の理論',
-            image:
-              'http://books.google.com/books/content?id=9CsPEAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4000614134',
-          },
-          {
-            rank: 2,
-            name: 'Google×スタンフォードNO FLOP!失敗できない人の失敗しない技術',
-            image:
-              'http://books.google.com/books/content?id=6f4rywEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4763137492',
-          },
-          {
-            rank: 3,
-            name: '好きなようにしてください',
-            image:
-              'http://books.google.com/books/content?id=0vp-CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4478068879',
-          },
-        ]}
-      />
-      <RankingItem
-        year="2019年"
-        books={[
-          {
-            rank: 1,
-            name: '人生は、運よりも実力よりも「勘違いさせる力」で決まっている',
-            image:
-              'http://books.google.com/books/content?id=x81fuwEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4478106347',
-          },
-          {
-            rank: 2,
-            name: 'このまま今の会社にいていいのか？と一度でも思ったら読む 転職の思考法',
-            image:
-              'http://books.google.com/books/content?id=2ldgDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/4478105553',
-          },
-          {
-            rank: 3,
-            name: 'プログラミングバカ一代',
-            image:
-              'http://books.google.com/books/content?id=fbANswEACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api',
-            link: 'https://www.amazon.co.jp/dp/B012C0SO1W',
-          },
-        ]}
-      />
+      {years.map((year) => {
+        const yearBooks = books.filter((book) => book.year === year)
+        return (
+          <>
+            <span className={classes.title}>{year}</span>
+            <div className="block sm:flex justify-around mt-8">
+              {yearBooks.map((book, i) => (
+                <Book key={`${book.title}-${i}`} book={book} />
+              ))}
+            </div>
+          </>
+        )
+      })}
     </div>
   )
 }

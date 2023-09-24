@@ -57,7 +57,11 @@ export const SheetTotalPage: React.FC<Props> = ({
         </div>
 
         <Title text="年間ベスト書籍" />
-        <Rankings yearlyTopBooks={yearlyTopBooks} />
+        {yearlyTopBooks.length > 0 ? (
+          <Rankings yearlyTopBooks={yearlyTopBooks} />
+        ) : (
+          <div className="mt-4 font-bold">設定されていません</div>
+        )}
       </div>
     </Container>
   )
