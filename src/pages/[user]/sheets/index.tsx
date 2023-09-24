@@ -18,7 +18,7 @@ export async function getServerSideProps(context) {
   })
   if (sheets.length === 0) {
     return {
-      redirect: { destination: '/' },
+      redirect: { destination: `/${username}/sheets/total` },
     }
   }
   return {
