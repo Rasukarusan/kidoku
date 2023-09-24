@@ -81,6 +81,7 @@ export const Header = () => {
                         <Link
                           className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
                           href={`/${session.user.name}/sheets`}
+                          onClick={() => setOpenMenu(false)}
                         >
                           読書記録
                         </Link>
@@ -90,6 +91,7 @@ export const Header = () => {
                         <Link
                           className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
                           href="/settings/profile"
+                          onClick={() => setOpenMenu(false)}
                         >
                           アカウント設定
                         </Link>
