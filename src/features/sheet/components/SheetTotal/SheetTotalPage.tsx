@@ -37,32 +37,22 @@ export const SheetTotalPage: React.FC<Props> = ({
 
   return (
     <Container fixed>
-      <div
-        style={{
-          marginBottom: '16px',
-          borderBottom: 1,
-          borderColor: 'divider',
-        }}
-      >
+      <div className="border-b border-gray-200 mb-8">
         <Tabs value="total" sheets={sheets} username={username} />
       </div>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+      <div className="text-center mb-10">
         <Title text="累計読書数" />
         <Value value={total} unit="冊" />
-        <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
+        <div className="w-4/5 h-[300px] m-auto mb-4">
           <CategoryMap categories={categories} />
         </div>
-      </div>
 
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="年間平均読書数" />
         <Value value={average} unit="冊" />
-        <div style={{ width: '85%', height: '300px', margin: '0 auto' }}>
+        <div className="w-4/5 h-[300px] m-auto mb-4">
           <YearsGraph years={years} />
         </div>
-      </div>
 
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <Title text="年間ベスト書籍" />
         <Rankings />
       </div>

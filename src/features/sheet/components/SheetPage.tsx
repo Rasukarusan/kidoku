@@ -1,13 +1,8 @@
 import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import {
-  Container,
-  Grid,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton,
-} from '@mui/material'
+import { Grid, Box, ToggleButtonGroup, ToggleButton } from '@mui/material'
+import { Container } from '@/components/layout/Container'
 import { Record } from '../types'
 import { BarGraph } from './BarGraph'
 import { Tabs } from './Tabs'
@@ -67,13 +62,25 @@ export const SheetPage: React.FC<Props> = ({
     setMode(newMode)
   }
 
+  if (data.length === 0) {
+    return (
+      <Container>
+        <div className="border-b border-gray-200 mb-8">
+          <Tabs sheets={sheets} value={year} username={username} />
+        </div>
+        <div className="p-10 text-center">
+          <div className="text-4xl font-bold mb-4">データがまだありません</div>
+          <img src="/no-image.png" alt="" width="400" className="m-auto" />
+        </div>
+      </Container>
+    )
+  }
+
   return (
-    <Container fixed sx={{ marginBottom: '32px' }}>
-      <Box
-        sx={{ marginBottom: '16px', borderBottom: 1, borderColor: 'divider' }}
-      >
+    <Container>
+      <div className="border-b border-gray-200 mb-8">
         <Tabs sheets={sheets} value={year} username={username} />
-      </Box>
+      </div>
       <Box
         sx={{
           width: '100%',
