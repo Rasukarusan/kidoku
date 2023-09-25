@@ -63,10 +63,6 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
       },
     }).then((res) => res.json())
     setAddResult(res)
-    // 数秒後にアラートを非表示
-    setTimeout(() => {
-      setAddResult(null)
-    }, 5000)
     if (res.result) {
       reward()
     }
@@ -149,7 +145,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             })}
           </div>
 
-          {addResult && (
+          {isAnimating && (
             <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
               {addResult.result ? (
                 <SuccessAlert
