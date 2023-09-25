@@ -37,7 +37,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
     } else {
       setSelectItem(null)
     }
-  }, [order])
+  }, [order, year])
 
   const onClickSet = async () => {
     setLoading(true)
@@ -107,7 +107,6 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
               )
             })}
           </div>
-
           {isAnimating && (
             <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
               <SuccessAlert
