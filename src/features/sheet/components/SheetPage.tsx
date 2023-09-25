@@ -12,7 +12,8 @@ import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import { fetcher } from '@/libs/swr'
 import { useSession } from 'next-auth/react'
-import { YearlyTopBook } from '@prisma/client'
+import { YearlyTopBook } from '@/types/book'
+import { YearlyTopBooks } from './YearlyTopBooks'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -84,29 +85,17 @@ export const SheetPage: React.FC<Props> = ({
       <div className="border-b border-gray-200 mb-8">
         <Tabs sheets={sheets} value={year} username={username} />
       </div>
+      <YearlyTopBooks
+        books={data}
+        year={year}
+        yearlyTopBooks={yearlyTopBooks}
+      />
       <Box
         sx={{
           width: '100%',
           marginBottom: '50px',
         }}
       >
-        <div className="text-center mb-8">
-          <div className="title mb-4">{year}年トップ３</div>
-          <div className="flex justify-between">
-            {[1, 2, 3].map((v) => (
-              <div
-                key={v}
-                className="text-center"
-                style={{ order: v === 3 ? 0 : v }}
-              >
-                <button className="bg-gray-100 rounded-md w-32 h-36 hover:bg-gray-200 text-2xl mb-1">
-                  +
-                </button>
-                <div>{v}位</div>
-              </div>
-            ))}
-          </div>
-        </div>
         <Grid container>
           <Grid item xs={12} sm={6} md={6}>
             <BarGraph records={data} setShowData={setShowData} />
@@ -142,30 +131,6 @@ export const SheetPage: React.FC<Props> = ({
       ) : (
         <BookRows books={currentData} />
       )}
-
-      <style jsx>{`
-        .title {
-          position: relative;
-          display: inline-block;
-          padding: 0 55px;
-        }
-        .title::before,
-        .title::after {
-          content: '';
-          position: absolute;
-          top: 50%;
-          display: inline-block;
-          width: 45px;
-          height: 1px;
-          background-color: black;
-        }
-        .title::before {
-          left: 0;
-        }
-        .title.::after {
-          right: 0;
-        }
-      `}</style>
     </Container>
   )
 }

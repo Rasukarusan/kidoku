@@ -103,5 +103,6 @@ model YearlyTopBook {
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   book    books    @relation(fields: [book_id], references: [id], onDelete: Cascade)
 
+  @@unique([userId, order, year], map: "uniq_user_order_year")
   @@map("yearly_top_books")
 }
