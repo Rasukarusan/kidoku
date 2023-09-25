@@ -10,24 +10,38 @@ export default async (req, res) => {
     }
     const userId = session.user.id
     const body = JSON.parse(req.body)
-    const { year, order, bookId } = body
-    const result = await prisma.yearlyTopBook.upsert({
-      create: {
-        year,
-        order,
-        user: { connect: { id: userId } },
-        book: { connect: { id: bookId } },
-      },
-      update: { book: { connect: { id: bookId } } },
-      where: {
-        userId_order_year: {
+    if (req.method === 'POST') {
+      const { year, order, bookId } = body
+      const result = await prisma.yearlyTopBook.upsert({
+        create: {
           year,
           order,
-          userId,
+          user: { connect: { id: userId } },
+          book: { connect: { id: bookId } },
         },
-      },
-    })
-    return res.status(200).json({ result: true })
+        update: { book: { connect: { id: bookId } } },
+        where: {
+          userId_order_year: {
+            year,
+            order,
+            userId,
+          },
+        },
+      })
+      return res.status(200).json({ result: true })
+    } else if (req.method === 'DELETE') {
+      const { year, order, bookId } = body
+      const result = await prisma.yearlyTopBook.delete({
+        where: {
+          userId_order_year: {
+            year,
+            order,
+            userId,
+          },
+        },
+      })
+      return res.status(200).json({ result: true })
+    }
   } catch (e) {
     console.error(e)
     res.status(400).json({ result: false })
