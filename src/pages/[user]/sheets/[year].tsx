@@ -50,9 +50,9 @@ export async function getStaticProps(context) {
       : dayjs().format('M') + '月' // まだ読み終わっていない場合は今月とする
     const memo = book.is_public_memo ? book.memo : ''
     return {
+      ...book,
       month,
       memo,
-      ...book,
     }
   })
   const yearlyTopBooks = await prisma.yearlyTopBook.findMany({
