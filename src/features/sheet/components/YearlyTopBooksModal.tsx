@@ -72,49 +72,53 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
       onClick={onClose}
     >
       <div
-        className="m-4 w-full sm:w-2/3 bg-white h-3/4 rounded-md overflow-y-hidden flex-col relative flex p-4"
+        className="m-4 w-full sm:w-2/3 bg-white h-3/4 rounded-t-md flex-col relative flex"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 font-bold text-center text-2xl">
-          {year}年ベスト<span className="underline">{order}位</span>を設定
-        </h2>
-        <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full">
-          {books.map((book, i: number) => {
-            return (
-              <div
-                className={`w-[200px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
-                  selectItem?.id === book.id
-                    ? 'bg-pink-200 hover:bg-pink-200'
-                    : 'bg-white'
-                }`}
-                key={book.id}
-                onClick={() =>
-                  setSelectItem(selectItem?.id === book.id ? null : book)
-                }
-              >
-                <div className="font-bold mb-1">{truncate(book.title, 15)}</div>
-                <div className="text-xs mb-1">{book.author}</div>
-                <img
-                  className="m-auto mb-1 h-[150px] object-contain"
-                  src={book.image}
-                  alt={book.title}
-                />
-                <div className="text-sm">{truncate(book.memo, 30)}</div>
-              </div>
-            )
-          })}
-        </div>
-
-        {isAnimating && (
-          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
-            <SuccessAlert
-              open={true}
-              text={`『${selectItem.title}』を${order}位に設定しました`}
-              onClose={() => setSelectItem(null)}
-            />
+        <div className="p-4 h-full">
+          <h2 className="mb-4 font-bold text-center text-2xl shrink-0">
+            {year}年ベスト<span className="underline">{order}位</span>を設定
+          </h2>
+          <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full pb-12">
+            {books.map((book, i: number) => {
+              return (
+                <div
+                  className={`w-[200px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
+                    selectItem?.id === book.id
+                      ? 'bg-pink-200 hover:bg-pink-200'
+                      : 'bg-white'
+                  }`}
+                  key={book.id}
+                  onClick={() =>
+                    setSelectItem(selectItem?.id === book.id ? null : book)
+                  }
+                >
+                  <div className="font-bold mb-1">
+                    {truncate(book.title, 15)}
+                  </div>
+                  <div className="text-xs mb-1">{book.author}</div>
+                  <img
+                    className="m-auto mb-1 h-[150px] object-contain"
+                    src={book.image}
+                    alt={book.title}
+                  />
+                  <div className="text-sm">{truncate(book.memo, 30)}</div>
+                </div>
+              )
+            })}
           </div>
-        )}
-        <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0 bg-blue-600 hover:bg-blue-700">
+
+          {isAnimating && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
+              <SuccessAlert
+                open={true}
+                text={`『${selectItem.title}』を${order}位に設定しました`}
+                onClose={() => setSelectItem(null)}
+              />
+            </div>
+          )}
+        </div>
+        <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0 bg-blue-600 hover:bg-blue-700 rounded-b-md ">
           <button
             className="font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center"
             onClick={onClickSet}
