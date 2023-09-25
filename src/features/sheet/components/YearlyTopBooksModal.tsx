@@ -27,6 +27,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     if (!yearlyTopBooks) return
@@ -50,15 +51,20 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
           Accept: 'application/json',
         },
       }).then((res) => res.json())
+      setMessage(`『${selectItem.title}』を${order}位に設定しました`)
     } else {
       // 現在の設定を削除
-      // const res = await fetch(`/api/yearly`, {
-      //   method: 'DELETE',
-      //   body: JSON.stringify({ bookId: selectItem.id, year, order }),
-      //   headers: {
-      //     Accept: 'application/json',
-      //   },
-      // }).then((res) => res.json())
+      const current = yearlyTopBooks
+        .filter((book) => book.order === order)
+        .pop()
+      const res = await fetch(`/api/yearly`, {
+        method: 'DELETE',
+        body: JSON.stringify({ bookId: current.book.id, year, order }),
+        headers: {
+          Accept: 'application/json',
+        },
+      }).then((res) => res.json())
+      setMessage(`『${order}位の設定を削除しました`)
     }
     reward()
     setLoading(false)
@@ -107,17 +113,17 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
               )
             })}
           </div>
-          {isAnimating && (
+        </div>
+        <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0 bg-blue-600 hover:bg-blue-700 rounded-b-md ">
+          {isAnimating && message && (
             <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
               <SuccessAlert
                 open={true}
-                text={`『${selectItem.title}』を${order}位に設定しました`}
+                text={message}
                 onClose={() => setSelectItem(null)}
               />
             </div>
           )}
-        </div>
-        <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0 bg-blue-600 hover:bg-blue-700 rounded-b-md ">
           <button
             className="font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center"
             onClick={onClickSet}
