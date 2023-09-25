@@ -22,6 +22,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const [selectItem, setSelectItem] = useState<Item>(null)
   const [addResult, setAddResult] = useState<AddResult>(null)
   const [loading, setLoading] = useState(false)
+  const [inputValue, setInputValue] = useState('')
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
@@ -30,11 +31,20 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     ref.current?.focus()
   }, [open])
 
+  // デバウンス。入力から一定時間経った後に検索を実行する。
+  // 300ms以内に入力があった場合はタイマーがクリアされ、新しいタイマーが設定され、デバウンスが実現される。
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const items = await searchBooks(inputValue)
+      setResults(items)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [inputValue])
+
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchWord = e.target.value
     if (searchWord) {
-      const items = await searchBooks(searchWord)
-      setResults(items)
+      setInputValue(searchWord)
     }
   }
 
