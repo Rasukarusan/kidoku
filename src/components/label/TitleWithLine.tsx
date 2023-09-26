@@ -1,7 +1,7 @@
 interface Props {
   text: string
 }
-export const Title: React.FC<Props> = ({ text }) => {
+export const TitleWithLine: React.FC<Props> = ({ text }) => {
   return (
     <>
       <h2 className="title">{text}</h2>

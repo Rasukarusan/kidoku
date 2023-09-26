@@ -25,8 +25,9 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   const [current, setCurrent] = useState<YearlyTopBook>(null)
   const [selectItem, setSelectItem] = useState<Record>(null)
   const [loading, setLoading] = useState(false)
-  const { reward, isAnimating } = useReward('rewardId', 'confetti', {
-    elementCount: 200,
+  const { reward, isAnimating } = useReward('rewardId', 'balloons', {
+    lifetime: 200,
+    spread: 100,
   })
   const [message, setMessage] = useState('')
 
