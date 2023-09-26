@@ -91,7 +91,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
             {books.map((book, i: number) => {
               return (
                 <div
-                  className={`w-[200px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
+                  className={`w-3/4 sm:w-[200px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
                     selectItem?.id === book.id
                       ? 'bg-pink-200 hover:bg-pink-200'
                       : 'bg-white'
@@ -116,7 +116,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
             })}
           </div>
         </div>
-        <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0 bg-blue-600 hover:bg-blue-700 rounded-b-md ">
+        <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0">
           {isAnimating && message && (
             <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
               <SuccessAlert

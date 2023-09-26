@@ -78,7 +78,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
         onClick={onClose}
       >
         <div
-          className="w-2/3 bg-white h-3/4 rounded-md overflow-y-hidden flex-col relative flex"
+          className="w-full sm:w-2/3 bg-white h-3/4 rounded-md overflow-y-hidden flex-col relative flex m-2 sm:m-0"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center border-b-[#f1f5f9] border-b pt-2 px-2 shrink-0">
@@ -118,7 +118,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                 item.volumeInfo
               return (
                 <div
-                  className={`w-[200px] max-h-[300px] h-[300px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
+                  className={`w-2/3 sm:w-[200px] max-h-[300px] h-[300px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
                     selectItem?.id === item.id
                       ? 'bg-pink-200 hover:bg-pink-200'
                       : 'bg-white'

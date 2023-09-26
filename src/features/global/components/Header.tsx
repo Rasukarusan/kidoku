@@ -9,6 +9,7 @@ import { ExitIcon } from '@/components/icon/ExitIcon'
 import { BookIcon } from '@/components/icon/BookIcon'
 import Link from 'next/link'
 import { SearchBox } from '@/components/input/SearchBox/SearchBox'
+import { Logo } from '@/components/icon/Logo'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -51,7 +52,7 @@ export const Header = () => {
               href="/"
               className="mr-8 font-bold tracking-[.3rem] no-underline font-['Nico_Moji'] text-xl"
             >
-              Kidoku
+              <Logo className="w-8 h-8" />
             </Link>
             <SearchBox />
             <div className="flex-grow"></div>
