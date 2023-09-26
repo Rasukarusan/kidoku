@@ -2,6 +2,7 @@ import { Record } from '../types'
 import { YearlyTopBook } from '@/types/book'
 import { useState } from 'react'
 import { YearlyTopBooksModal } from './YearlyTopBooksModal'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   books: Record[]
@@ -14,8 +15,11 @@ export const YearlyTopBooks: React.FC<Props> = ({
   year,
   yearlyTopBooks,
 }) => {
+  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [order, setOrder] = useState(null)
+  const isMine =
+    session && books.length > 0 && session.user.id === books[0].userId
 
   const onClickAdd = (order: number) => {
     setOpen(true)
@@ -46,12 +50,15 @@ export const YearlyTopBooks: React.FC<Props> = ({
             return (
               <div
                 key={v}
-                className="text-center hover:opacity-90"
+                className="text-center"
                 style={{ order: v === 3 ? 0 : v }}
               >
                 <button
-                  className="bg-gray-100 rounded-md w-32 h-36 hover:bg-gray-200 text-2xl mb-1 w-[128px] h-[186px] shadow-md"
+                  className={`bg-gray-100 rounded-md w-32 h-36  text-2xl mb-1 w-[128px] h-[186px] shadow-md ${
+                    session ? 'hover:bg-gray-200 hover:opacity-90' : ''
+                  }`}
                   onClick={() => onClickAdd(v)}
+                  disabled={!session}
                 >
                   {yearlyTopBook ? (
                     <img
@@ -61,7 +68,13 @@ export const YearlyTopBooks: React.FC<Props> = ({
                       height={186}
                     />
                   ) : (
-                    <span>+</span>
+                    <>
+                      {isMine ? (
+                        <span className="font-bold">+</span>
+                      ) : (
+                        <span className="font-bold text-gray-500">未設定</span>
+                      )}
+                    </>
                   )}
                 </button>
                 <div className="">{v}位</div>
