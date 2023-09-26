@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { BookDetailRead } from './BookDetailRead'
 import { BookDetailEdit } from './BookDetailEdit'
 import { useReward } from 'react-rewards'
+import { useSWRConfig } from 'swr'
+import { useRouter } from 'next/router'
 
 interface Props {
   book?: Record
@@ -13,6 +15,8 @@ interface Props {
 }
 
 export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
+  const router = useRouter()
+  const { mutate } = useSWRConfig()
   const { data: session } = useSession()
   const [edit, setEdit] = useState(false)
   const [newBook, setNewBook] = useState<Record>(book)
@@ -54,6 +58,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
     reward()
     setLoading(false)
     setEdit(false)
+    mutate(`/api/books/${router.query.year}`)
   }
 
   if (!newBook) return null
