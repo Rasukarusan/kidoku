@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { Tabs } from '../Tabs'
 import { Category, Year } from '../../types'
-import { Title } from './Title'
-import { Value } from './Value'
+import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { Rankings } from './Rankings'
 import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
 import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
+import { CoutUpText } from '@/components/label/CountUpText'
 
 interface Props {
   total: number
@@ -44,19 +44,19 @@ export const SheetTotalPage: React.FC<Props> = ({
         <Tabs value="total" sheets={sheets} username={username} />
       </div>
       <div className="text-center mb-10">
-        <Title text="累計読書数" />
-        <Value value={total} unit="冊" />
+        <TitleWithLine text="累計読書数" />
+        <CoutUpText value={total} unit="冊" />
         <div className="w-4/5 h-[300px] m-auto mb-4">
           <CategoryMap categories={categories} />
         </div>
 
-        <Title text="年間平均読書数" />
-        <Value value={average} unit="冊" />
+        <TitleWithLine text="年間平均読書数" />
+        <CoutUpText value={average} unit="冊" />
         <div className="w-4/5 h-[300px] m-auto mb-4">
           <YearsGraph years={years} />
         </div>
 
-        <Title text="年間ベスト書籍" />
+        <TitleWithLine text="年間ベスト書籍" />
         {yearlyTopBooks.length > 0 ? (
           <Rankings yearlyTopBooks={yearlyTopBooks} />
         ) : (

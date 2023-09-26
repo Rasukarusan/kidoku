@@ -3,6 +3,7 @@ import { YearlyTopBook } from '@/types/book'
 import { useState } from 'react'
 import { YearlyTopBooksModal } from './YearlyTopBooksModal'
 import { useSession } from 'next-auth/react'
+import { TitleWithLine } from '@/components/label/TitleWithLine'
 
 interface Props {
   books: Record[]
@@ -41,7 +42,9 @@ export const YearlyTopBooks: React.FC<Props> = ({
         yearlyTopBooks={yearlyTopBooks}
       />
       <div className="text-center mb-8">
-        <div className="title mb-4">{year}年トップ３</div>
+        <div className="mb-4">
+          <TitleWithLine text={`${year}年トップ３`} />
+        </div>
         <div className="flex justify-between">
           {[1, 2, 3].map((v) => {
             const yearlyTopBook = yearlyTopBooks
@@ -54,7 +57,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
                 style={{ order: v === 3 ? 0 : v }}
               >
                 <button
-                  className={`bg-gray-100 rounded-md w-20 sm:w-32 h-28 sm:h-36  text-2xl mb-1 w-[128px] h-[186px] shadow-md ${
+                  className={`bg-gray-100 rounded-md w-24 sm:w-32 h-28 sm:h-36  text-2xl mb-1 shadow-md ${
                     session ? 'hover:bg-gray-200 hover:opacity-90' : ''
                   }`}
                   onClick={() => onClickAdd(v)}
@@ -84,29 +87,6 @@ export const YearlyTopBooks: React.FC<Props> = ({
             )
           })}
         </div>
-        <style jsx>{`
-          .title {
-            position: relative;
-            display: inline-block;
-            padding: 0 55px;
-          }
-          .title::before,
-          .title::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            display: inline-block;
-            width: 45px;
-            height: 1px;
-            background-color: black;
-          }
-          .title::before {
-            left: 0;
-          }
-          .title.::after {
-            right: 0;
-          }
-        `}</style>
       </div>
     </>
   )

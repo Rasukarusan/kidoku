@@ -14,6 +14,8 @@ import { fetcher } from '@/libs/swr'
 import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
 import { YearlyTopBooks } from './YearlyTopBooks'
+import { TitleWithLine } from '@/components/label/TitleWithLine'
+import { CoutUpText } from '@/components/label/CountUpText'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -84,6 +86,10 @@ export const SheetPage: React.FC<Props> = ({
     <Container className="mb-12">
       <div className="border-b border-gray-200 mb-8">
         <Tabs sheets={sheets} value={year} username={username} />
+      </div>
+      <div className="text-center mb-10">
+        <TitleWithLine text="累計読書数" />
+        <CoutUpText value={data.length} unit="冊" step={1} />
       </div>
       <YearlyTopBooks
         books={data}

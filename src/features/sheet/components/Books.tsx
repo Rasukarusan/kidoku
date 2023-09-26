@@ -45,7 +45,7 @@ export const Books: React.FC<Props> = ({ books }) => {
         {books.map((book, i) => {
           return (
             <Grid key={book.title + i} item xs={4} sm={3} md={2}>
-              <div className="relative bg-white px-2 py-4 sm:px-0 sm:py-0">
+              <div className="relative bg-white px-2 py-4 sm:px-0 sm:py-2">
                 <img
                   className="hover:cursor-pointer drop-shadow-lg"
                   src={book.image === '-' ? '/no-image.png' : book.image}
