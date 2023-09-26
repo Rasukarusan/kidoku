@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useReward } from 'react-rewards'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { DanDangerAlert } from '@/components/label/DangerAlert'
+// import useSWR from 'swr'
+// import { fetcher } from '@/libs/swr'
 // import { items } from './mock'
 
 interface AddResult {
@@ -17,6 +19,8 @@ interface Props {
   onClose: () => void
 }
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
+  // const { data: res } = useSWR(`/api/sheets/hoge`, fetcher)
+
   const ref = useRef<HTMLInputElement>(null)
   const [results, setResults] = useState<Item[]>([])
   const [selectItem, setSelectItem] = useState<Item>(null)
@@ -26,7 +30,6 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
-
   useEffect(() => {
     ref.current?.focus()
   }, [open])
@@ -162,6 +165,12 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
               )}
             </div>
           )}
+          <div className="w-full text-gray-900 text-center h-16 p-2">
+            <select className="border p-2 px-8">
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+            </select>
+          </div>
           <div
             className={`w-full text-center h-[50px] flex items-center justify-center shrink-0 ${
               selectItem ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400'
