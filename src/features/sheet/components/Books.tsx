@@ -45,7 +45,7 @@ export const Books: React.FC<Props> = ({ books }) => {
         {books.map((book, i) => {
           return (
             <Grid key={book.title + i} item xs={4} sm={3} md={2}>
-              <div className="relative bg-white">
+              <div className="relative bg-white px-2 py-4 sm:px-0 sm:py-0">
                 <img
                   className="hover:cursor-pointer drop-shadow-lg"
                   src={book.image === '-' ? '/no-image.png' : book.image}
@@ -59,7 +59,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                   book.is_public_memo) &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
-                    <p className="absolute top-[-15px] right-[28px]">
+                    <p className="absolute top-[-5px] sm:top-[-15px] right-[28px]">
                       <SmsIcon />
                     </p>
                   )}
