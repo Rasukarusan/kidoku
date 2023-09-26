@@ -54,7 +54,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
                 style={{ order: v === 3 ? 0 : v }}
               >
                 <button
-                  className={`bg-gray-100 rounded-md w-32 h-36  text-2xl mb-1 w-[128px] h-[186px] shadow-md ${
+                  className={`bg-gray-100 rounded-md w-20 sm:w-32 h-28 sm:h-36  text-2xl mb-1 w-[128px] h-[186px] shadow-md ${
                     session ? 'hover:bg-gray-200 hover:opacity-90' : ''
                   }`}
                   onClick={() => onClickAdd(v)}
@@ -72,7 +72,9 @@ export const YearlyTopBooks: React.FC<Props> = ({
                       {isMine ? (
                         <span className="font-bold">+</span>
                       ) : (
-                        <span className="font-bold text-gray-500">未設定</span>
+                        <span className="font-bold text-gray-500 text-sm sm:text-base">
+                          未設定
+                        </span>
                       )}
                     </>
                   )}
