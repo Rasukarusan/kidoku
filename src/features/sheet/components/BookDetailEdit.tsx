@@ -36,7 +36,7 @@ export const BookDetailEdit: React.FC<Props> = ({
           </div>
           <div className="w-2/3 mr-2">
             <textarea
-              className="font-bold text-xl mb-2 overflow-hidden w-full mr-2 bg-slate-100 px-2 py-1"
+              className="font-bold mb-2 overflow-hidden w-full mr-2 bg-slate-100 px-2 py-1 text-base sm:text-xl"
               value={book.title}
               onChange={(e) => {
                 setBook({ ...book, title: e.target.value })
@@ -50,7 +50,7 @@ export const BookDetailEdit: React.FC<Props> = ({
               <textarea
                 value={book.author}
                 rows={1}
-                className="pl-2 py-1 bg-slate-100 w-full"
+                className="pl-2 py-1 bg-slate-100 w-full text-sm sm:text-base"
                 onChange={(e) => {
                   setBook({ ...book, author: e.target.value })
                 }}
@@ -64,7 +64,7 @@ export const BookDetailEdit: React.FC<Props> = ({
               <textarea
                 value={book.category}
                 rows={1}
-                className="pl-2 py-1 bg-slate-100 w-full"
+                className="pl-2 py-1 bg-slate-100 w-full text-sm sm:text-base"
                 onChange={(e) => {
                   setBook({ ...book, category: e.target.value })
                 }}
@@ -78,7 +78,7 @@ export const BookDetailEdit: React.FC<Props> = ({
               <textarea
                 value={book.impression}
                 rows={1}
-                className="pl-2 py-1 bg-slate-100 w-full"
+                className="pl-2 py-1 bg-slate-100 w-full text-sm sm:text-base"
                 onChange={(e) => {
                   setBook({ ...book, impression: e.target.value })
                 }}
@@ -92,7 +92,7 @@ export const BookDetailEdit: React.FC<Props> = ({
             <Divider sx={{ margin: '15px 0px' }} />
             <textarea
               value={book.memo}
-              className="w-full p-2 bg-slate-100 w-full mb-2"
+              className="w-full p-2 bg-slate-100 w-full mb-2 text-sm sm:text-base"
               rows={12}
               cols={80}
               onChange={(e) => {
