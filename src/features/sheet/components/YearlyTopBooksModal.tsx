@@ -22,6 +22,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   order,
   books,
 }) => {
+  const [current, setCurrent] = useState<YearlyTopBook>(null)
   const [selectItem, setSelectItem] = useState<Record>(null)
   const [loading, setLoading] = useState(false)
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
@@ -32,6 +33,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   useEffect(() => {
     if (!yearlyTopBooks) return
     const current = yearlyTopBooks.filter((book) => book.order === order).pop()
+    setCurrent(current)
     if (current) {
       const b = books.filter((book) => book.id === current.book.id).pop()
       setSelectItem(books.filter((book) => book.id === current.book.id).pop())
@@ -125,8 +127,9 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
             </div>
           )}
           <button
-            className="font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center"
+            className={`font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center disabled:bg-gray-400 bg-blue-600 hover:bg-blue-700 rounded-b-md`}
             onClick={onClickSet}
+            disabled={!selectItem && !current}
           >
             {loading && (
               <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
