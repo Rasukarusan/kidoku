@@ -19,6 +19,18 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
     })
     setLoading(false)
   }
+
+  const onClickDelete = async () => {
+    const confirm = window.confirm('アカウントを削除してもよろしいですか？')
+    if (!confirm) return
+    const res: { result: boolean } = await fetch('/api/user', {
+      method: 'DELETE',
+    }).then((res) => res.json())
+    if (res.result) {
+      location.href = '/'
+    }
+  }
+
   return (
     <div className="p-10">
       <h2 className="text-2xl font-bold">Settings</h2>
@@ -28,16 +40,30 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </button>
         <div className="w-full">
           <div className="font-bold flex items-start mb-4">
-            <span className="mr-1">表示名</span>
+            <span className="mr-1 text-gray-700 text-sm">表示名</span>
             <span className="font-bold text-red-400 text-xs">※</span>
           </div>
           <input
             value={currentName}
-            className="p-2 border border-slate-200 rounded-md w-full bg-slate-100"
+            className="p-2 border border-slate-200 rounded-md w-full bg-slate-100 mb-4"
             onChange={(e) => {
               setCurrentName(e.target.value)
             }}
           />
+          <div className="mb-4">
+            <div className="font-bold mb-4 text-gray-700 text-sm">
+              アカウント削除
+            </div>
+            <button
+              className="text-red-500 font-bold rounded-md mb-2 text-sm"
+              onClick={onClickDelete}
+            >
+              アカウントを削除する
+            </button>
+            <div className="text-xs text-gray-600">
+              ※アカウントを削除すると登録されていたデータは全て削除され、復元できませんのでご注意ください。
+            </div>
+          </div>
         </div>
       </div>
       <button
