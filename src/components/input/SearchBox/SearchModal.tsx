@@ -23,7 +23,10 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     fallbackData: { result: true, sheets: [] },
   })
   const ref = useRef<HTMLInputElement>(null)
-  const [sheet, setSheet] = useState<string>('')
+  const [sheet, setSheet] = useState<{ id: number; name: string }>({
+    id: null,
+    name: null,
+  })
   const [results, setResults] = useState<Item[]>([])
   const [selectItem, setSelectItem] = useState<Item>(null)
   const [addResult, setAddResult] = useState<AddResult>(null)
@@ -32,9 +35,16 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
+  // 検索モーダル開いたら自動でinputフィールドにフォーカスする
   useEffect(() => {
     ref.current?.focus()
   }, [open])
+
+  // シート取得次第、一番上のシートを選択状態にする
+  useEffect(() => {
+    if (data.sheets.length === 0) return
+    setSheet({ id: data.sheets[0].id, name: data.sheets[0].name })
+  }, [data])
 
   // デバウンス。入力から一定時間経った後に検索を実行する。
   // 300ms以内に入力があった場合はタイマーがクリアされ、新しいタイマーが設定され、デバウンスが実現される。
@@ -62,7 +72,14 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     const image = imageLinks ? imageLinks.thumbnail : '/no-image.png'
     const res: AddResult = await fetch(`/api/books`, {
       method: 'POST',
-      body: JSON.stringify({ title, description, author, image, category }),
+      body: JSON.stringify({
+        title,
+        description,
+        author,
+        image,
+        category,
+        sheet,
+      }),
       headers: {
         Accept: 'application/json',
       },
@@ -150,7 +167,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             })}
           </div>
 
-          {isAnimating && (
+          {isAnimating && addResult && (
             <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
               {addResult.result ? (
                 <SuccessAlert
@@ -169,15 +186,20 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           )}
           <div className="w-full text-gray-900 text-center h-16 p-2">
             <select
-              className="border p-2 px-8"
+              className="border p-2 px-4"
               onChange={(e) => {
-                setSheet(e.target.value)
+                const selectedOption = e.target.selectedOptions[0]
+                const sheetId = selectedOption.getAttribute('data-id')
+                setSheet({
+                  id: Number(sheetId),
+                  name: e.target.value,
+                })
               }}
             >
               {data.sheets.map((sheet) => {
-                const { name } = sheet
+                const { id, name } = sheet
                 return (
-                  <option key={name} value={name}>
+                  <option key={name} value={name} data-id={id}>
                     {name}
                   </option>
                 )
