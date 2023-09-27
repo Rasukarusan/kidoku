@@ -36,6 +36,7 @@ model books {
   created          DateTime        @default(now()) @db.DateTime(0)
   updated          DateTime        @default(now()) @db.DateTime(0)
   sheet            sheets          @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   yearly_top_books YearlyTopBook[]
 }
 
@@ -79,6 +80,7 @@ model User {
   sessions         Session[]
   sheets           sheets[]
   yearly_top_books YearlyTopBook[]
+  books            books[]
 
   @@map("users")
 }
