@@ -15,21 +15,7 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
       const body = JSON.parse(req.body)
-      const { title, description, author, image, category } = body
-      const sheet = await prisma.sheets.findFirst({
-        where: { userId },
-        orderBy: [
-          {
-            order: 'desc',
-          },
-        ],
-      })
-      if (!sheet) {
-        return res.status(400).json({
-          result: false,
-          message: '本の追加に失敗しました。シートがありません。',
-        })
-      }
+      const { title, description, author, image, category, sheet } = body
       // await setTimeout(500)
       const result = await prisma.books.create({
         data: {

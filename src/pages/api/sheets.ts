@@ -11,7 +11,7 @@ export default async (req, res) => {
     const userId = session.user.id
     const sheets = await prisma.sheets.findMany({
       where: { userId },
-      select: { name: true },
+      select: { id: true, name: true },
       orderBy: [{ order: 'desc' }],
     })
     console.log(sheets)
