@@ -2,6 +2,8 @@ import { Container } from '@/components/layout/Container'
 import Link from 'next/link'
 import Lottie from 'lottie-react'
 import Inchworm from '../lottie_inchworm.json'
+import Inchworm2 from '../lottie_inchworm2.json'
+import { useState } from 'react'
 
 interface Props {
   users: {
@@ -19,6 +21,7 @@ export const Row = ({ label, value }) => {
   )
 }
 export const IndexPage = ({ users }) => {
+  const [hover, setHover] = useState(false)
   return (
     <Container className="p-6">
       <div className="sm:flex sm:items-start">
@@ -58,7 +61,23 @@ export const IndexPage = ({ users }) => {
             </div>
           ))}
         </div>
-        <Lottie animationData={Inchworm} />
+        <div
+          onMouseEnter={() => {
+            setHover(true)
+          }}
+          onMouseLeave={() => {
+            setHover(false)
+          }}
+        >
+          <Lottie
+            animationData={Inchworm}
+            style={{ display: hover ? 'none' : 'block', cursor: 'pointer' }}
+          />
+          <Lottie
+            animationData={Inchworm2}
+            style={{ display: hover ? 'block' : 'none', cursor: 'pointer' }}
+          />
+        </div>
       </div>
     </Container>
   )
