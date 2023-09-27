@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useReward } from 'react-rewards'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { DanDangerAlert } from '@/components/label/DangerAlert'
-// import useSWR from 'swr'
-// import { fetcher } from '@/libs/swr'
+import useSWR from 'swr'
+import { fetcher } from '@/libs/swr'
 // import { items } from './mock'
 
 interface AddResult {
@@ -19,9 +19,11 @@ interface Props {
   onClose: () => void
 }
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
-  // const { data: res } = useSWR(`/api/sheets/hoge`, fetcher)
-
+  const { data } = useSWR(`/api/sheets`, fetcher, {
+    fallbackData: { result: true, sheets: [] },
+  })
   const ref = useRef<HTMLInputElement>(null)
+  const [sheet, setSheet] = useState<string>('')
   const [results, setResults] = useState<Item[]>([])
   const [selectItem, setSelectItem] = useState<Item>(null)
   const [addResult, setAddResult] = useState<AddResult>(null)
@@ -166,9 +168,20 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             </div>
           )}
           <div className="w-full text-gray-900 text-center h-16 p-2">
-            <select className="border p-2 px-8">
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
+            <select
+              className="border p-2 px-8"
+              onChange={(e) => {
+                setSheet(e.target.value)
+              }}
+            >
+              {data.sheets.map((sheet) => {
+                const { name } = sheet
+                return (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                )
+              })}
             </select>
           </div>
           <div
