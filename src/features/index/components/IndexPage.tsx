@@ -21,11 +21,14 @@ export const Row = ({ label, value }) => {
 export const IndexPage = ({ users }) => {
   return (
     <Container className="p-6">
-      <div className="flex items-start">
+      <div className="sm:flex sm:items-start">
         <div>
           {users.map((user, i) => (
-            <div key={user.name} className="flex items-center">
-              <Link href={`/${user.name}/sheets`} className="m-10 flex">
+            <div key={user.name} className="sm:flex sm:items-center">
+              <Link
+                href={`/${user.name}/sheets`}
+                className="m-4 sm:m-10 flex justify-center"
+              >
                 <div className="mr-4">
                   <img
                     src={user.image}
@@ -35,7 +38,7 @@ export const IndexPage = ({ users }) => {
                   <div className="font-bold text-center">{user.name}</div>
                 </div>
               </Link>
-              <table className="border w-96">
+              <table className="border w-96 mb-4">
                 <tbody>
                   <Row label="Total" value={`${user.books.total}冊`} />
                   <Row
@@ -55,7 +58,7 @@ export const IndexPage = ({ users }) => {
             </div>
           ))}
         </div>
-        <Lottie animationData={Inchworm} />;
+        <Lottie animationData={Inchworm} />
       </div>
     </Container>
   )
