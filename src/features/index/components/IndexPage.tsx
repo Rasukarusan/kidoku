@@ -32,19 +32,21 @@ export const IndexPage = ({ users }) => {
             </div>
           </Link>
           <table className="border w-96">
-            <Row label="Total" value={`${user.books.total}冊`} />
-            <Row
-              label="Category"
-              value={
-                user.books.categories.length === 0
-                  ? '-'
-                  : user.books.categories.map((category) => (
-                      <div key={`${category.name}-${category.percent}`}>
-                        {`${category.name}: ${category.percent}% `}
-                      </div>
-                    ))
-              }
-            />
+            <tbody>
+              <Row label="Total" value={`${user.books.total}冊`} />
+              <Row
+                label="Category"
+                value={
+                  user.books.categories.length === 0
+                    ? '-'
+                    : user.books.categories.map((category) => (
+                        <div key={`${category.name}-${category.percent}`}>
+                          {`${category.name}: ${category.percent}% `}
+                        </div>
+                      ))
+                }
+              />
+            </tbody>
           </table>
         </div>
       ))}
