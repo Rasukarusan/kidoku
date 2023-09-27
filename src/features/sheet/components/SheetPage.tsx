@@ -92,7 +92,7 @@ export const SheetPage: React.FC<Props> = ({
         <CoutUpText value={data.length} unit="冊" step={1} />
       </div>
       <YearlyTopBooks
-        books={data}
+        books={currentData}
         year={year}
         yearlyTopBooks={yearlyTopBooks}
       />
