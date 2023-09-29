@@ -1,15 +1,13 @@
 import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Grid, Box, ToggleButtonGroup, ToggleButton } from '@mui/material'
+import { Grid, Box } from '@mui/material'
 import { Container } from '@/components/layout/Container'
 import { Record } from '../types'
 import { BarGraph } from './BarGraph'
 import { Tabs } from './Tabs'
 import { Books } from './Books'
 import { BookRows } from './BookRows'
-import GridViewIcon from '@mui/icons-material/GridView'
-import TableRowsIcon from '@mui/icons-material/TableRows'
 import { fetcher } from '@/libs/swr'
 import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
@@ -61,10 +59,7 @@ export const SheetPage: React.FC<Props> = ({
     setCurrentData(newData)
   }
 
-  const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newMode: 'row' | 'grid'
-  ) => {
+  const handleChange = (newMode: 'row' | 'grid') => {
     setMode(newMode)
   }
 
@@ -111,27 +106,22 @@ export const SheetPage: React.FC<Props> = ({
           </Grid>
         </Grid>
       </Box>
-      <Box
-        sx={{
-          textAlign: 'center',
-          marginBottom: '20px',
-        }}
-      >
-        <ToggleButtonGroup
-          color="standard"
-          value={mode}
-          exclusive
-          onChange={handleChange}
-          aria-label="Platform"
+      <div className="flex justify-end mb-8">
+        <button
+          className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md focus:bg-gray-300"
+          onClick={() => handleChange('grid')}
         >
-          <ToggleButton value="grid">
-            <GridViewIcon />
-          </ToggleButton>
-          <ToggleButton value="row">
-            <TableRowsIcon />
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
+          <img src="/grid_icon.png" alt="" width="15" className=" mr-1" />
+          Grid
+        </button>
+        <button
+          className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center  py-1 rounded-r-md focus:bg-gray-300"
+          onClick={() => handleChange('row')}
+        >
+          <img src="/list_icon.png" alt="" width="15" className=" mr-1" />
+          List
+        </button>
+      </div>
       {mode === 'grid' ? (
         <Books books={currentData} />
       ) : (
