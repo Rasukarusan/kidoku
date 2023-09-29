@@ -32,7 +32,7 @@ export const IndexPage = ({ users }) => {
                 href={`/${user.name}/sheets`}
                 className="m-4 sm:m-10 flex justify-center"
               >
-                <div className="mr-4">
+                <div className="mr-4 hover:brightness-90 hover:underline">
                   <img
                     src={user.image}
                     alt=""
