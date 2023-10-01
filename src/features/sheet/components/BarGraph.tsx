@@ -28,6 +28,21 @@ const formatter = (value, name, props) => {
   return [`${value}冊`, label]
 }
 
+const colors = [
+  '#003049',
+  '#021E66',
+  '#D62828',
+  '#F77F00',
+  '#564779',
+  '#FCBF49',
+  '#EAE2B7',
+  '#F76E7C',
+  '#F73668',
+  '#FF7F75',
+  '#F0EAD8',
+  '#2B2F6C',
+]
+
 export const BarGraph: React.FC<Props> = ({ records, setShowData }) => {
   const data = useMemo(() => {
     const months = {}
@@ -89,7 +104,7 @@ export const BarGraph: React.FC<Props> = ({ records, setShowData }) => {
               <Cell
                 key={`cell-${index}`}
                 cursor="pointer"
-                fill={index === activeIndex ? '#00C49F' : '#507C8F'}
+                fill={colors[index]}
               />
             ))}
           </Bar>

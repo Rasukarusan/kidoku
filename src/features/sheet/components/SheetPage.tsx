@@ -129,10 +129,12 @@ export const SheetPage: React.FC<Props> = ({
         )}
       </div>
       <div className="w-full mb-14 flex justify-center flex-wrap">
-        <div className="w-full sm:w-1/2">
+        <div className="w-full sm:w-1/2 text-center">
+          <TitleWithLine text="月ごとの読書数" className="mb-4" />
           <BarGraph records={data} setShowData={setShowData} />
         </div>
-        <div className="w-full sm:w-1/2">
+        <div className="w-full sm:w-1/2 text-center">
+          <TitleWithLine text="カテゴリ内訳" className="mb-4" />
           <TreemapGraph records={data} setShowData={setShowData} />
         </div>
       </div>
