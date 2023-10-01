@@ -14,7 +14,6 @@ export default async (req, res) => {
       select: { id: true, name: true },
       orderBy: [{ order: 'desc' }],
     })
-    console.log(sheets)
     return res.status(200).json({ result: true, sheets })
   } catch (e) {
     console.error(e)

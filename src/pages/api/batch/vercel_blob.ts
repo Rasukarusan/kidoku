@@ -12,11 +12,9 @@ const post = async (request: NextApiRequest, response: NextApiResponse) => {
   const books = await prisma.books.findMany({
     where: { sheet_id: 1 },
   })
-  console.log(books)
   // const books = r.slice(0, 2)
   for (let i = 0; i < books.length; i++) {
     const book = books[i]
-    console.log(book.image)
     const path = `${book.id}.webp`
     const res = await (await fetch(book.image)).arrayBuffer()
     // webpに変換し、VercelBlobにアップロード
@@ -30,7 +28,6 @@ const post = async (request: NextApiRequest, response: NextApiResponse) => {
         const { url } = await put('hoge.webp', info, {
           access: 'public',
         })
-        console.log(url)
         await prisma.books.update({
           where: { id: book.id },
           data: {
