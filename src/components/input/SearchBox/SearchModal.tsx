@@ -96,11 +96,11 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   return (
     <>
       <div
-        className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden"
+        className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden p-8"
         onClick={onClose}
       >
         <div
-          className="w-full sm:w-2/3 bg-white h-3/4 rounded-md overflow-y-hidden flex-col relative flex m-2 sm:m-0"
+          className="w-full sm:w-2/3 bg-white h-2/3 sm:h-3/4 rounded-md overflow-y-hidden flex-col relative flex m-2 sm:m-0"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center border-b-[#f1f5f9] border-b pt-2 px-2 shrink-0">

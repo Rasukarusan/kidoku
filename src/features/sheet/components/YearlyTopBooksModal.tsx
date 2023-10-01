@@ -77,11 +77,11 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden"
+      className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden p-8"
       onClick={onClose}
     >
       <div
-        className="m-4 w-full sm:w-2/3 bg-white h-3/4 rounded-t-md flex-col relative flex"
+        className="w-full sm:w-2/3 bg-white h-2/3 sm:h-3/4 rounded-t-md flex-col relative flex"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-4 h-full">
@@ -128,7 +128,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
             </div>
           )}
           <button
-            className={`font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center disabled:bg-gray-400 bg-blue-600 hover:bg-blue-700 rounded-b-md`}
+            className={`font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center disabled:bg-gray-400 bg-blue-600 hover:bg-blue-700 rounded-b-md z-10`}
             onClick={onClickSet}
             disabled={!selectItem && !current}
           >
