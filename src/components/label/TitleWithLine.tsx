@@ -1,9 +1,10 @@
 interface Props {
   text: string
+  className?: string
 }
-export const TitleWithLine: React.FC<Props> = ({ text }) => {
+export const TitleWithLine: React.FC<Props> = ({ text, className = '' }) => {
   return (
-    <>
+    <div className={className}>
       <h2 className="title">{text}</h2>
       <style jsx>{`
         .title {
@@ -28,6 +29,6 @@ export const TitleWithLine: React.FC<Props> = ({ text }) => {
           right: 0;
         }
       `}</style>
-    </>
+    </div>
   )
 }
