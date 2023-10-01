@@ -1,7 +1,6 @@
 import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Grid, Box } from '@mui/material'
 import { Container } from '@/components/layout/Container'
 import { Record } from '../types'
 import { BarGraph } from './BarGraph'
@@ -91,21 +90,6 @@ export const SheetPage: React.FC<Props> = ({
         year={year}
         yearlyTopBooks={yearlyTopBooks}
       />
-      <Box
-        sx={{
-          width: '100%',
-          marginBottom: '50px',
-        }}
-      >
-        <Grid container>
-          <Grid item xs={12} sm={6} md={6}>
-            <BarGraph records={data} setShowData={setShowData} />
-          </Grid>
-          <Grid item xs={12} sm={6} md={6}>
-            <TreemapGraph records={data} setShowData={setShowData} />
-          </Grid>
-        </Grid>
-      </Box>
       <div className="flex justify-end mb-8">
         <button
           className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md focus:bg-gray-300"
@@ -134,11 +118,22 @@ export const SheetPage: React.FC<Props> = ({
           List
         </button>
       </div>
-      {mode === 'grid' ? (
-        <Books books={currentData} />
-      ) : (
-        <BookRows books={currentData} />
-      )}
+
+      <div className="mb-8">
+        {mode === 'grid' ? (
+          <Books books={currentData} />
+        ) : (
+          <BookRows books={currentData} />
+        )}
+      </div>
+      <div className="w-full mb-14 flex justify-center flex-wrap">
+        <div className="w-full sm:w-1/2">
+          <BarGraph records={data} setShowData={setShowData} />
+        </div>
+        <div className="w-full sm:w-1/2">
+          <TreemapGraph records={data} setShowData={setShowData} />
+        </div>
+      </div>
     </Container>
   )
 }
