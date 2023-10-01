@@ -110,6 +110,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
                     className="m-auto mb-1 h-[150px] object-contain"
                     src={book.image}
                     alt={book.title}
+                    loading="lazy"
                   />
                   <div className="text-sm">{truncate(book.memo, 30)}</div>
                 </div>

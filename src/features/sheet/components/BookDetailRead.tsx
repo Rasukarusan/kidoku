@@ -28,6 +28,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
                 className="mx-auto my-0 drop-shadow-lg"
                 src={book.image}
                 alt={book.title}
+                loading="lazy"
               />
             </a>
           </div>

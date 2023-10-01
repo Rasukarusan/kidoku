@@ -111,14 +111,26 @@ export const SheetPage: React.FC<Props> = ({
           className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md focus:bg-gray-300"
           onClick={() => handleChange('grid')}
         >
-          <img src="/grid_icon.png" alt="" width="15" className=" mr-1" />
+          <img
+            src="/grid_icon.png"
+            alt=""
+            width="15"
+            className=" mr-1"
+            loading="lazy"
+          />
           Grid
         </button>
         <button
           className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center  py-1 rounded-r-md focus:bg-gray-300"
           onClick={() => handleChange('row')}
         >
-          <img src="/list_icon.png" alt="" width="15" className=" mr-1" />
+          <img
+            src="/list_icon.png"
+            alt=""
+            width="15"
+            className=" mr-1"
+            loading="lazy"
+          />
           List
         </button>
       </div>

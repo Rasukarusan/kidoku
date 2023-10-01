@@ -31,6 +31,7 @@ export const Book: React.FC<Props> = ({ book }) => {
           width={128}
           height={186}
           alt=""
+          loading="lazy"
         />
       </a>
       <div className="mb-2">{title}</div>
