@@ -99,6 +99,7 @@ export const SheetPage: React.FC<Props> = ({
             src="/grid_icon.png"
             alt=""
             width="15"
+            height="15"
             className=" mr-1"
             loading="lazy"
           />
@@ -112,6 +113,7 @@ export const SheetPage: React.FC<Props> = ({
             src="/list_icon.png"
             alt=""
             width="15"
+            height="15"
             className=" mr-1"
             loading="lazy"
           />
