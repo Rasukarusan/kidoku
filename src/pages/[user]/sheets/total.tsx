@@ -62,6 +62,7 @@ export async function getServerSideProps(context) {
       order: true,
       book: { select: { title: true, author: true, image: true } },
     },
+    orderBy: { year: 'desc' },
   })
   return {
     props: {
