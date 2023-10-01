@@ -160,6 +160,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                     className="m-auto mb-1 h-[150px] object-contain"
                     src={imageLinks ? imageLinks.thumbnail : '/no-image.png'}
                     alt={title}
+                    loading="lazy"
                   />
                   <div className="text-sm">{truncate(description, 30)}</div>
                 </div>

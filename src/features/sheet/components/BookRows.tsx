@@ -65,6 +65,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                     src={book.image}
                     alt={book.title}
                     width={50}
+                    loading="lazy"
                   />
                   <div className="px-4">
                     <div

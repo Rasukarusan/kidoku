@@ -54,6 +54,7 @@ export const Books: React.FC<Props> = ({ books }) => {
                   onClick={() => onClickImage(book)}
                   onMouseEnter={() => onMouseEnter(i)}
                   onMouseLeave={() => onMouseLeave(i)}
+                  loading="lazy"
                 />
                 {((session && session.user.id === book.userId) ||
                   book.is_public_memo) &&
