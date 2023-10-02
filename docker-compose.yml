@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    ports:
+      - "7700:7700"
+    volumes:
+      - ./data/meilisearch:/data.ms
+    environment:
+      - MEILI_HTTP_ADDR=0.0.0.0:7700
+      - MEILI_MASTER_KEY=YourMasterKey # 任意の値
