@@ -2,9 +2,10 @@ version: '3'
 
 services:
   meilisearch:
-    image: getmeili/meilisearch:latest
+    # image: getmeili/meilisearch:latest
+    image: getmeili/meilisearch:prototype-japanese-4
     ports:
-      - "7700:7700"
+      - '7700:7700'
     volumes:
       - ./data/meilisearch:/data.ms
     environment:
