@@ -8,21 +8,18 @@ export default async function handler(
 ) {
   try {
     const books = await prisma.books.findMany({
-      where: { sheet_id: 1 },
       select: { id: true, title: true },
     })
     const client = new MeiliSearch({
       host: 'http://localhost:7700',
       apiKey: 'YourMasterKey',
     })
-    client
-      .index('books')
-      .addDocuments(books)
-      .then((res) => console.log(res))
-    client
-      .index('books')
-      .search('1')
-      .then((res) => console.log(res))
+    const re = await client.index('books').addDocuments(books)
+    console.log(re)
+    // client
+    //   .index('books')
+    //   .search('金')
+    //   .then((res) => console.log(res))
   } catch (error) {
     console.error(error)
     return response.status(200).json({ result: false })
