@@ -2,12 +2,13 @@ version: '3'
 
 services:
   meilisearch:
-    # image: getmeili/meilisearch:latest
-    image: getmeili/meilisearch:prototype-japanese-4
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - '7700:7700'
     volumes:
       - ./data/meilisearch:/meili_data/data.ms
     environment:
-      - MEILI_HTTP_ADDR=0.0.0.0:7700
-      - MEILI_MASTER_KEY=YourMasterKey # 任意の値
+      - MEILI_HTTP_ADDR=${MEILI_HTTP_ADDR}
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
