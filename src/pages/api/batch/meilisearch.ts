@@ -11,8 +11,8 @@ export default async function handler(
       select: { id: true, title: true },
     })
     const client = new MeiliSearch({
-      host: 'http://localhost:7700',
-      apiKey: 'YourMasterKey',
+      host: process.env.MEILI_HOST,
+      apiKey: process.env.MEILI_MASTER_KEY,
     })
     const re = await client.index('books').addDocuments(books)
     console.log(re)

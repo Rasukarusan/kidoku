@@ -24,4 +24,5 @@ https://app.rasukarusan.com
 - Mui
 - Framer Motion
 - Recoil
-- SWR
+- TiDB
+- MeiliSearch
