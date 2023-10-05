@@ -2,6 +2,7 @@ import prisma from '@/libs/prisma'
 import sharp from 'sharp'
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { del as blob_del, list, put } from '@vercel/blob'
+import { isAdmin } from '@/utils/api'
 
 const get = async (request: NextApiRequest, response: NextApiResponse) => {
   const res = await list()
@@ -56,6 +57,9 @@ export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
+  if (!isAdmin(request)) {
+    return response.status(401).json({ result: false })
+  }
   if (request.method === 'GET') {
     return get(request, response)
   } else if (request.method === 'POST') {
