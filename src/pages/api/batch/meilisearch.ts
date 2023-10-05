@@ -1,11 +1,15 @@
 import prisma from '@/libs/prisma'
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { MeiliSearch } from 'meilisearch'
+import { isAdmin } from '@/utils/api'
 
 export default async function handler(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
+  if (!isAdmin(request)) {
+    return response.status(401).json({ result: false })
+  }
   try {
     const books = await prisma.books.findMany({
       select: {
