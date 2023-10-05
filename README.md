@@ -26,3 +26,34 @@ https://app.rasukarusan.com
 - Recoil
 - TiDB
 - MeiliSearch
+
+## MeiliSearch エンドポイント
+
+https://www.meilisearch.com/docs/reference/api/indexes
+
+- 検索
+
+日本語の場合は URL エンコード必要
+
+```sh
+curl -H "Authorization: Bearer YourMasterKey" "http://localhost:7700/indexes/books/search?q=soft" | jq
+```
+
+- 設定取得
+
+```sh
+curl -H "Authorization: Bearer YourMasterKey" http://localhost:7700/indexes/books/settings | jq
+```
+
+- 検索対象のカラム、表示するカラムを設定
+
+```sh
+curl -XPATCH -d '{"displayedAttributes": ["*"], "searchableAttributes": ["title", "memo", "author"]}' -H 'Content-Type: application/json' -H "Authorization: Bearer YourMasterKey" http://localhost:7700/indexes/books/settings | jq
+
+```
+
+- ドキュメント全削除
+
+```sh
+curl -XDELETE -H 'Content-Type: application/json' -H "Authorization: Bearer YourMasterKey" http://localhost:7700/indexes/books/documents
+```
