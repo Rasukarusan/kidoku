@@ -2,8 +2,8 @@ import { Item } from '@/types/search'
 import { searchBooks } from '@/utils/search'
 import { truncate } from '@/utils/string'
 import { useEffect, useRef, useState } from 'react'
-import { items } from './mock'
 import { AddModal } from './AddModal'
+// import { items } from './mock'
 
 interface Props {
   open: boolean
@@ -11,8 +11,8 @@ interface Props {
 }
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const ref = useRef<HTMLInputElement>(null)
-  // const [books, setBooks] = useState<Item[]>([])
-  const [books, setBooks] = useState<Item[]>(items)
+  const [books, setBooks] = useState<Item[]>([])
+  // const [books, setBooks] = useState<Item[]>(items)
   const [selectItem, setSelectItem] = useState<Item>(null)
   const [inputValue, setInputValue] = useState('')
   const [openAddModal, setOpenAddModal] = useState(false)
@@ -36,7 +36,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     setInputValue(e.target.value)
   }
 
-  // if (!open) return null
+  if (!open) return null
 
   return (
     <>
@@ -95,7 +95,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                   className={`w-2/3 sm:w-[200px] max-h-[300px] h-[260px] border border-gray-300 m-2 px-4 pt-2 rounded-md shadow cursor-pointer hover:bg-gray-100 relative`}
                   key={item.id}
                   onMouseEnter={() => setSelectItem(item)}
-                  onMouseLeave={() => setSelectItem(null)}
+                  // onMouseLeave={() => setSelectItem(null)}
                 >
                   <div className="h-[220px] mb-2">
                     <img

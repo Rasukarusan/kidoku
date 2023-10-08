@@ -15,7 +15,19 @@ export default async (req, res) => {
 
     if (req.method === 'POST') {
       const body = JSON.parse(req.body)
-      const { title, description, author, image, category, sheet } = body
+      const {
+        title,
+        description,
+        author,
+        image,
+        category,
+        is_public_memo,
+        impression,
+        memo,
+        finished,
+        sheet,
+      } = body
+      console.log(JSON.parse(req.body))
       // await setTimeout(500)
       const result = await prisma.books.create({
         data: {
@@ -25,9 +37,10 @@ export default async (req, res) => {
           author,
           image,
           category,
-          impression: '',
-          memo: '',
-          finished: null,
+          impression,
+          memo,
+          is_public_memo,
+          finished: new Date(finished),
         },
       })
       return res.status(200).json({
