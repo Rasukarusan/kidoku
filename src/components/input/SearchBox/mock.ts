@@ -6,7 +6,7 @@ export const items = [
     etag: 'WPxcnWRHZ60',
     selfLink: 'https://www.googleapis.com/books/v1/volumes/H-4rnwEACAAJ',
     volumeInfo: {
-      title: '完訳7つの習慣',
+      title: '完訳7つの習慣人格主義の回復人格主義の回復',
       subtitle: '人格主義の回復',
       authors: ['Stephen R. Covey'],
       publisher: 'Villagebooks/Tsai Fong Books',
@@ -137,7 +137,7 @@ export const items = [
     etag: 'Zk740mR6hBQ',
     selfLink: 'https://www.googleapis.com/books/v1/volumes/cysZMQAACAAJ',
     volumeInfo: {
-      title: '完訳7つの習慣',
+      title: '完訳7つの習慣7つの習慣成功には原則があったコヴィー,S.R.(スティーブン・R)',
       subtitle:
         '人格主義の回復特装版「ウィークリー・チャレンジ」付属人格主義の回復',
       authors: ['スティーブン・R. コヴィー'],
