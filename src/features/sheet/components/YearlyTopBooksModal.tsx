@@ -1,4 +1,4 @@
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import { truncate } from '@/utils/string'
@@ -7,7 +7,7 @@ import { Loading } from '@/components/icon/Loading'
 import { YearlyTopBook } from '@/types/book'
 
 interface Props {
-  books: Record[]
+  books: Book[]
   year: string
   order: number
   open: boolean
@@ -23,7 +23,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   books,
 }) => {
   const [current, setCurrent] = useState<YearlyTopBook>(null)
-  const [selectItem, setSelectItem] = useState<Record>(null)
+  const [selectItem, setSelectItem] = useState<Book>(null)
   const [loading, setLoading] = useState(false)
   const { reward, isAnimating } = useReward('rewardId', 'balloons', {
     lifetime: 200,

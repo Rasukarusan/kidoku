@@ -9,18 +9,18 @@ import {
   Line,
   Cell,
 } from 'recharts'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 
 interface Props {
-  records: Record[]
-  setShowData: (newData: Record[]) => void
+  records: Book[]
+  setShowData: (newData: Book[]) => void
 }
 
 interface Data {
   name: string
   count: number
   sum: number
-  children: Record[]
+  children: Book[]
 }
 
 const formatter = (value, name, props) => {

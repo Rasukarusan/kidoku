@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { ResponsiveContainer, Treemap, Tooltip } from 'recharts'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { TreemapItem } from './TreemapItem'
 
 interface Props {
-  records: Record[]
-  setShowData: (newData: Record[]) => void
+  records: Book[]
+  setShowData: (newData: Book[]) => void
 }
 
 interface Data {

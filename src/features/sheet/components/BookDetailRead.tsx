@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { Divider } from '@mui/material'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
@@ -7,7 +7,7 @@ import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import { useSession } from 'next-auth/react'
 
 interface Props {
-  book: Record
+  book: Book
   onClick: () => void
 }
 
