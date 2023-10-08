@@ -2,7 +2,7 @@ import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { Container } from '@/components/layout/Container'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { BarGraph } from './BarGraph'
 import { Tabs } from './Tabs'
 import { Books } from './Books'
@@ -20,7 +20,7 @@ const TreemapGraph = dynamic(
 )
 
 interface Props {
-  data: Record[]
+  data: Book[]
   year: string
   sheets: string[]
   username: string
@@ -39,7 +39,7 @@ export const SheetPage: React.FC<Props> = ({
   const { data: res } = useSWR(`/api/books/${year}`, fetcher, {
     fallbackData: { result: true, books: data },
   })
-  const [currentData, setCurrentData] = useState<Record[]>(data)
+  const [currentData, setCurrentData] = useState<Book[]>(data)
   const [open, setOpen] = useState(false)
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
@@ -54,7 +54,7 @@ export const SheetPage: React.FC<Props> = ({
     }
   }, [res, session, data])
 
-  const setShowData = (newData: Record[]) => {
+  const setShowData = (newData: Book[]) => {
     setCurrentData(newData)
   }
 

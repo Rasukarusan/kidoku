@@ -1,11 +1,11 @@
 import { truncate } from '@/utils/string'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { useState } from 'react'
 import { Memo } from './Memo'
 import { useSession } from 'next-auth/react'
 
 interface Props {
-  books: Record[]
+  books: Book[]
 }
 
 export const BookRows: React.FC<Props> = ({ books }) => {

@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
 import { useSession } from 'next-auth/react'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 
 interface Props {
-  book: Record
-  onClick: (book: Record) => void
+  book: Book
+  onClick: (book: Book) => void
   onMouseLeave: (i: number) => void
 }
 

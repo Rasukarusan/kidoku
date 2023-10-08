@@ -1,22 +1,22 @@
 import { Fragment, useState } from 'react'
 import SmsIcon from '@mui/icons-material/Sms'
 import { Grid } from '@mui/material'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
 import { BookDetailDialog } from './BookDetailDialog'
 import { useSession } from 'next-auth/react'
 
 interface Props {
-  books: Record[]
+  books: Book[]
 }
 export const Books: React.FC<Props> = ({ books }) => {
   const initialHovers = Array(books.length).fill(false)
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
-  const [selectBook, setSelectBook] = useState<Record>(null)
+  const [selectBook, setSelectBook] = useState<Book>(null)
   const [hovers, setHovers] = useState(initialHovers)
 
-  const onClickImage = (book: Record) => {
+  const onClickImage = (book: Book) => {
     setSelectBook(book)
     setOpen(true)
     setHovers(initialHovers)

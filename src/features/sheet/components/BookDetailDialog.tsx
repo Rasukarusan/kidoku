@@ -1,4 +1,4 @@
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { Dialog } from '@mui/material'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
@@ -9,7 +9,7 @@ import { useSWRConfig } from 'swr'
 import { useRouter } from 'next/router'
 
 interface Props {
-  book?: Record
+  book?: Book
   open: boolean
   onClose: () => void
 }
@@ -19,7 +19,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   const { mutate } = useSWRConfig()
   const { data: session } = useSession()
   const [edit, setEdit] = useState(false)
-  const [newBook, setNewBook] = useState<Record>(book)
+  const [newBook, setNewBook] = useState<Book>(book)
   const [loading, setLoading] = useState(false)
   const { reward, isAnimating } = useReward('rewardId', 'balloons', {
     lifetime: 200,
@@ -75,7 +75,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
         <BookDetailEdit
           book={newBook}
           onClick={onClickSave}
-          setBook={(editBook: Record) => {
+          setBook={(editBook: Book) => {
             setNewBook({ ...editBook })
           }}
           loading={loading}

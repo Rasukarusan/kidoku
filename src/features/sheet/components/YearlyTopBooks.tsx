@@ -1,4 +1,4 @@
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { YearlyTopBook } from '@/types/book'
 import { useState } from 'react'
 import { YearlyTopBooksModal } from './YearlyTopBooksModal'
@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 
 interface Props {
-  books: Record[]
+  books: Book[]
   year: string
   yearlyTopBooks: YearlyTopBook[]
 }

@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { Record } from '../types'
+import { Book } from '@/types/book'
 import { Divider } from '@mui/material'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
@@ -9,9 +9,9 @@ import { useSession } from 'next-auth/react'
 import { Loading } from '@/components/icon/Loading'
 
 interface Props {
-  book: Record
+  book: Book
   onClick: () => void
-  setBook: (book: Record) => void
+  setBook: (book: Book) => void
   loading: boolean
 }
 
