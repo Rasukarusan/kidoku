@@ -23,3 +23,16 @@ export const getSuggestions = async (keyword: string) => {
     .get(url)
     .then((res) => res.data.suggestions.map((suggestion) => suggestion.value))
 }
+
+/**
+ * 検索結果から必要な本の情報を抜き出す
+ */
+export const getBookInfo = (item: Item) => {
+  if (!item) return {}
+  const { title, description, authors, imageLinks, categories } =
+    item.volumeInfo
+  const author = authors ? authors.join(',') : '-'
+  const category = categories ? categories.join(',') : '-'
+  const image = imageLinks ? imageLinks.thumbnail : '/no-image.png'
+  return { title, description, author, image, category }
+}
