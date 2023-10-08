@@ -8,7 +8,8 @@ import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { DanDangerAlert } from '@/components/label/DangerAlert'
 import useSWR from 'swr'
 import { fetcher } from '@/libs/swr'
-// import { items } from './mock'
+import { items } from './mock'
+import { AddModal } from './AddModal'
 
 interface AddResult {
   result: boolean
@@ -27,11 +28,14 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     id: null,
     name: null,
   })
-  const [results, setResults] = useState<Item[]>([])
+  // const [results, setResults] = useState<Item[]>([])
+  const [results, setResults] = useState<Item[]>(items)
   const [selectItem, setSelectItem] = useState<Item>(null)
   const [addResult, setAddResult] = useState<AddResult>(null)
   const [loading, setLoading] = useState(false)
   const [inputValue, setInputValue] = useState('')
+  const [hoverBookId, setHoverBookId] = useState('')
+  const [openAddModal, setOpenAddModal] = useState(false)
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
@@ -70,6 +74,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     const author = authors ? authors.join(',') : '-'
     const category = categories ? categories.join(',') : '-'
     const image = imageLinks ? imageLinks.thumbnail : '/no-image.png'
+    return
     const res: AddResult = await fetch(`/api/books`, {
       method: 'POST',
       body: JSON.stringify({
@@ -91,7 +96,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     setLoading(false)
   }
 
-  if (!open) return null
+  // if (!open) return null
 
   return (
     <>
@@ -103,6 +108,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           className="w-full sm:w-2/3 bg-white h-2/3 sm:h-3/4 rounded-md overflow-y-hidden flex-col relative flex m-2 sm:m-0"
           onClick={(e) => e.stopPropagation()}
         >
+          {openAddModal && <AddModal item={null} />}
           <div className="flex items-center border-b-[#f1f5f9] border-b pt-2 px-2 shrink-0">
             <div className="relative text-gray-600 w-full">
               <span className="absolute inset-y-0 left-0 flex items-center pl-2">
@@ -140,7 +146,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                 item.volumeInfo
               return (
                 <div
-                  className={`w-2/3 sm:w-[200px] max-h-[300px] h-[300px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
+                  className={`w-2/3 sm:w-[200px] max-h-[300px] h-[260px] border border-gray-300 m-2 px-4 pt-2 rounded-md shadow cursor-pointer hover:bg-gray-100 relative ${
                     selectItem?.id === item.id
                       ? 'bg-pink-200 hover:bg-pink-200'
                       : 'bg-white'
@@ -149,20 +155,33 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                   onClick={() =>
                     setSelectItem(selectItem?.id === item.id ? null : item)
                   }
+                  onMouseEnter={() => setHoverBookId(item.id)}
+                  onMouseLeave={() => setHoverBookId('')}
                 >
-                  <div className="font-bold mb-1">{truncate(title, 15)}</div>
-                  <div className="text-xs mb-1">
-                    {Array.isArray(authors)
-                      ? truncate(authors.join(','), 12)
-                      : '-'}
+                  <div className="h-[220px] mb-2">
+                    <img
+                      className="m-auto mb-2 h-[150px] object-contain"
+                      src={imageLinks ? imageLinks.thumbnail : '/no-image.png'}
+                      alt={title}
+                      loading="lazy"
+                    />
+                    <div className="font-bold mb-1">{truncate(title, 15)}</div>
+                    <div className="text-xs">
+                      {Array.isArray(authors)
+                        ? truncate(authors.join(','), 12)
+                        : '-'}
+                    </div>
+                    {hoverBookId === item.id && (
+                      <div className="text-center absolute left-1/2 -translate-x-2/4 bottom-0 w-full opacity-80 hover:opacity-100">
+                        <button
+                          className="bg-blue-600 hover:bg-blue-700 text-xs text-white py-2 font-bold w-full rounded-md"
+                          onClick={onClickAdd}
+                        >
+                          本を登録する
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <img
-                    className="m-auto mb-1 h-[150px] object-contain"
-                    src={imageLinks ? imageLinks.thumbnail : '/no-image.png'}
-                    alt={title}
-                    loading="lazy"
-                  />
-                  <div className="text-sm">{truncate(description, 30)}</div>
                 </div>
               )
             })}
