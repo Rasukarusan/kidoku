@@ -1,54 +1,25 @@
-import { Loading } from '@/components/icon/Loading'
 import { Item } from '@/types/search'
 import { searchBooks } from '@/utils/search'
 import { truncate } from '@/utils/string'
 import { useEffect, useRef, useState } from 'react'
-import { useReward } from 'react-rewards'
-import { SuccessAlert } from '@/components/label/SuccessAlert'
-import { DanDangerAlert } from '@/components/label/DangerAlert'
-import useSWR from 'swr'
-import { fetcher } from '@/libs/swr'
 import { items } from './mock'
 import { AddModal } from './AddModal'
 
-interface AddResult {
-  result: boolean
-  message: string
-}
 interface Props {
   open: boolean
   onClose: () => void
 }
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
-  const { data } = useSWR(`/api/sheets`, fetcher, {
-    fallbackData: { result: true, sheets: [] },
-  })
   const ref = useRef<HTMLInputElement>(null)
-  const [sheet, setSheet] = useState<{ id: number; name: string }>({
-    id: null,
-    name: null,
-  })
-  // const [results, setResults] = useState<Item[]>([])
-  const [results, setResults] = useState<Item[]>(items)
+  // const [books, setBooks] = useState<Item[]>([])
+  const [books, setBooks] = useState<Item[]>(items)
   const [selectItem, setSelectItem] = useState<Item>(null)
-  const [addResult, setAddResult] = useState<AddResult>(null)
-  const [loading, setLoading] = useState(false)
   const [inputValue, setInputValue] = useState('')
-  const [hoverBookId, setHoverBookId] = useState('')
   const [openAddModal, setOpenAddModal] = useState(false)
-  const { reward, isAnimating } = useReward('rewardId', 'confetti', {
-    elementCount: 200,
-  })
   // 検索モーダル開いたら自動でinputフィールドにフォーカスする
   useEffect(() => {
     ref.current?.focus()
   }, [open])
-
-  // シート取得次第、一番上のシートを選択状態にする
-  useEffect(() => {
-    if (data.sheets.length === 0) return
-    setSheet({ id: data.sheets[0].id, name: data.sheets[0].name })
-  }, [data])
 
   // デバウンス。入力から一定時間経った後に検索を実行する。
   // 300ms以内に入力があった場合はタイマーがクリアされ、新しいタイマーが設定され、デバウンスが実現される。
@@ -56,44 +27,13 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
     if (!inputValue) return
     const timer = setTimeout(async () => {
       const items = await searchBooks(inputValue)
-      setResults(items)
+      setBooks(items)
     }, 300)
     return () => clearTimeout(timer)
   }, [inputValue])
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
-  }
-
-  const onClickAdd = async () => {
-    setLoading(true)
-    const book = results.filter((item) => item.id === selectItem.id).pop()
-    if (!book) return
-    const { title, description, authors, imageLinks, categories } =
-      book.volumeInfo
-    const author = authors ? authors.join(',') : '-'
-    const category = categories ? categories.join(',') : '-'
-    const image = imageLinks ? imageLinks.thumbnail : '/no-image.png'
-    return
-    const res: AddResult = await fetch(`/api/books`, {
-      method: 'POST',
-      body: JSON.stringify({
-        title,
-        description,
-        author,
-        image,
-        category,
-        sheet,
-      }),
-      headers: {
-        Accept: 'application/json',
-      },
-    }).then((res) => res.json())
-    setAddResult(res)
-    if (res.result) {
-      reward()
-    }
-    setLoading(false)
   }
 
   // if (!open) return null
@@ -108,7 +48,13 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           className="w-full sm:w-2/3 bg-white h-2/3 sm:h-3/4 rounded-md overflow-y-hidden flex-col relative flex m-2 sm:m-0"
           onClick={(e) => e.stopPropagation()}
         >
-          {openAddModal && <AddModal item={null} />}
+          {openAddModal && (
+            <AddModal
+              item={selectItem}
+              books={books}
+              onClose={() => setOpenAddModal(false)}
+            />
+          )}
           <div className="flex items-center border-b-[#f1f5f9] border-b pt-2 px-2 shrink-0">
             <div className="relative text-gray-600 w-full">
               <span className="absolute inset-y-0 left-0 flex items-center pl-2">
@@ -141,22 +87,15 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             </div>
           </div>
           <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full">
-            {results.map((item: Item, i: number) => {
+            {books.map((item: Item, i: number) => {
               const { title, description, authors, imageLinks } =
                 item.volumeInfo
               return (
                 <div
-                  className={`w-2/3 sm:w-[200px] max-h-[300px] h-[260px] border border-gray-300 m-2 px-4 pt-2 rounded-md shadow cursor-pointer hover:bg-gray-100 relative ${
-                    selectItem?.id === item.id
-                      ? 'bg-pink-200 hover:bg-pink-200'
-                      : 'bg-white'
-                  }`}
+                  className={`w-2/3 sm:w-[200px] max-h-[300px] h-[260px] border border-gray-300 m-2 px-4 pt-2 rounded-md shadow cursor-pointer hover:bg-gray-100 relative`}
                   key={item.id}
-                  onClick={() =>
-                    setSelectItem(selectItem?.id === item.id ? null : item)
-                  }
-                  onMouseEnter={() => setHoverBookId(item.id)}
-                  onMouseLeave={() => setHoverBookId('')}
+                  onMouseEnter={() => setSelectItem(item)}
+                  onMouseLeave={() => setSelectItem(null)}
                 >
                   <div className="h-[220px] mb-2">
                     <img
@@ -171,11 +110,11 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                         ? truncate(authors.join(','), 12)
                         : '-'}
                     </div>
-                    {hoverBookId === item.id && (
+                    {selectItem?.id === item.id && (
                       <div className="text-center absolute left-1/2 -translate-x-2/4 bottom-0 w-full opacity-80 hover:opacity-100">
                         <button
                           className="bg-blue-600 hover:bg-blue-700 text-xs text-white py-2 font-bold w-full rounded-md"
-                          onClick={onClickAdd}
+                          onClick={() => setOpenAddModal(true)}
                         >
                           本を登録する
                         </button>
@@ -185,62 +124,6 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                 </div>
               )
             })}
-          </div>
-
-          {isAnimating && addResult && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
-              {addResult.result ? (
-                <SuccessAlert
-                  open={true}
-                  text={addResult.message}
-                  onClose={() => setAddResult(null)}
-                />
-              ) : (
-                <DanDangerAlert
-                  open={true}
-                  text={addResult.message}
-                  onClose={() => setAddResult(null)}
-                />
-              )}
-            </div>
-          )}
-          <div className="w-full text-gray-900 text-center h-16 p-2">
-            <select
-              className="border p-2 px-4"
-              onChange={(e) => {
-                const selectedOption = e.target.selectedOptions[0]
-                const sheetId = selectedOption.getAttribute('data-id')
-                setSheet({
-                  id: Number(sheetId),
-                  name: e.target.value,
-                })
-              }}
-            >
-              {data.sheets.map((sheet) => {
-                const { id, name } = sheet
-                return (
-                  <option key={name} value={name} data-id={id}>
-                    {name}
-                  </option>
-                )
-              })}
-            </select>
-          </div>
-          <div
-            className={`w-full text-center h-[50px] flex items-center justify-center shrink-0 ${
-              selectItem ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400'
-            }`}
-          >
-            <button
-              className="font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center"
-              onClick={onClickAdd}
-              disabled={!selectItem || isAnimating}
-            >
-              {loading && (
-                <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
-              )}
-              <span id="rewardId">追加する</span>
-            </button>
           </div>
         </div>
       </div>
