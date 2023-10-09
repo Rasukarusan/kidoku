@@ -183,6 +183,28 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
               setBook({ ...book, is_public_memo: !book?.is_public_memo })
             }}
           />
+          <div className="w-full text-gray-900 text-center ">
+            <select
+              className="border p-2 px-4 cursor-pointer"
+              onChange={(e) => {
+                const selectedOption = e.target.selectedOptions[0]
+                const sheetId = selectedOption.getAttribute('data-id')
+                setSheet({
+                  id: Number(sheetId),
+                  name: e.target.value,
+                })
+              }}
+            >
+              {data.sheets.map((sheet) => {
+                const { id, name } = sheet
+                return (
+                  <option key={name} value={name} data-id={id}>
+                    {name}
+                  </option>
+                )
+              })}
+            </select>
+          </div>
         </div>
         <div className="border-t border-1 text-center w-full">
           <button
