@@ -48,13 +48,12 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           className="w-full sm:w-2/3 bg-white h-2/3 sm:h-3/4 rounded-md overflow-y-hidden flex-col relative flex m-2 sm:m-0"
           onClick={(e) => e.stopPropagation()}
         >
-          {openAddModal && (
-            <AddModal
-              item={selectItem}
-              books={books}
-              onClose={() => setOpenAddModal(false)}
-            />
-          )}
+          <AddModal
+            open={openAddModal}
+            item={selectItem}
+            books={books}
+            onClose={() => setOpenAddModal(false)}
+          />
           <div className="flex items-center border-b-[#f1f5f9] border-b pt-2 px-2 shrink-0">
             <div className="relative text-gray-600 w-full">
               <span className="absolute inset-y-0 left-0 flex items-center pl-2">
