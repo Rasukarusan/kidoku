@@ -26,7 +26,7 @@ export const IndexPage = ({ users }) => {
           {users.map((user, i) => (
             <div key={user.name} className="sm:flex sm:items-center">
               <Link
-                href={`/${user.name}/sheets`}
+                href={`/${user.name}/sheets/2023`}
                 className="m-4 sm:m-10 flex justify-center"
               >
                 <div className="mr-4 hover:brightness-90 hover:underline">
