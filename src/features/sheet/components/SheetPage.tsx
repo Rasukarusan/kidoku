@@ -13,6 +13,7 @@ import { YearlyTopBook } from '@/types/book'
 import { YearlyTopBooks } from './YearlyTopBooks'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { CoutUpText } from '@/components/label/CountUpText'
+import { NO_IMAGE } from '@/libs/constants'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -70,7 +71,7 @@ export const SheetPage: React.FC<Props> = ({
         </div>
         <div className="p-10 text-center">
           <div className="text-4xl font-bold mb-4">データがまだありません</div>
-          <img src="/no-image.png" alt="" width="400" className="m-auto" />
+          <img src={NO_IMAGE} alt="" width="400" className="m-auto" />
         </div>
       </Container>
     )

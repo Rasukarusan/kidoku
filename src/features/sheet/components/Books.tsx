@@ -5,6 +5,7 @@ import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
 import { BookDetailDialog } from './BookDetailDialog'
 import { useSession } from 'next-auth/react'
+import { NO_IMAGE } from '@/libs/constants'
 
 interface Props {
   books: Book[]
@@ -48,7 +49,7 @@ export const Books: React.FC<Props> = ({ books }) => {
               <div className="relative bg-white px-2 py-4 sm:px-0 sm:py-2">
                 <img
                   className="hover:cursor-pointer drop-shadow-lg"
-                  src={book.image === '-' ? '/no-image.png' : book.image}
+                  src={book.image === '-' ? NO_IMAGE : book.image}
                   width={128}
                   height={186}
                   onClick={() => onClickImage(book)}

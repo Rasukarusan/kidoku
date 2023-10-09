@@ -1,6 +1,7 @@
 import { selector } from 'recoil'
 import { selectItemsAtom } from './atom'
 import { SelectItems } from '@/features/index/types'
+import { NO_IMAGE } from '@/libs/constants'
 
 /**
  * クリップボードにコピーするテキストを取得
@@ -13,7 +14,7 @@ const getCopyText = (selectItems: SelectItems): string => {
     const categories = item.volumeInfo.categories ?? '-'
     const imageLink = item.volumeInfo.imageLinks
       ? item.volumeInfo.imageLinks.thumbnail
-      : '/no-image.png'
+      : NO_IMAGE
     text += title + '\t' + authors + '\t' + categories + '\t' + imageLink + '\n'
   })
   return text
