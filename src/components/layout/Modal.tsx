@@ -8,11 +8,12 @@ interface Props {
 
 export const Modal: React.FC<Props> = ({ open, onClose, children }) => {
   useEffect(() => {
-    document.body.classList.add('no-scroll')
-    return () => {
+    if (open) {
+      document.body.classList.add('no-scroll')
+    } else {
       document.body.classList.remove('no-scroll')
     }
-  }, [])
+  }, [open])
 
   if (!open) return null
 
