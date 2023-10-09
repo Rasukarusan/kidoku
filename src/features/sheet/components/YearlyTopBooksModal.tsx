@@ -74,8 +74,6 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
     setLoading(false)
   }
 
-  if (!open) return null
-
   return (
     <Modal open={open} onClose={onClose}>
       <div className="p-4 h-full">

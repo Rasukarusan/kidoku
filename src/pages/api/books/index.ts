@@ -1,8 +1,9 @@
+import sharp from 'sharp'
 import prisma from '@/libs/prisma'
+import { put } from '@vercel/blob'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
-import path from 'path'
-import { promises as fs } from 'fs'
+import { NO_IMAGE } from '@/libs/constants'
 // import { setTimeout } from 'timers/promises'
 
 export default async (req, res) => {
@@ -29,33 +30,43 @@ export default async (req, res) => {
         finished,
         sheet,
       } = body
-      console.log(body)
-
-      // Base64データをBufferに変換
-      const imageBuffer = Buffer.from(image, 'base64')
-
-      // 保存する画像のパスを指定
-      const imagePath = path.join(process.cwd(), 'tmp', 'uploaded-image.jpg')
-      await fs.writeFile(imagePath, imageBuffer)
-      return res.status(200).json({
-        result: true,
-        message: `『${title}』を「${sheet.name}」に追加しました`,
-      })
+      const data = {
+        sheet_id: sheet.id,
+        userId,
+        title,
+        author,
+        image,
+        category,
+        impression,
+        memo,
+        is_public_memo,
+        finished: new Date(finished),
+      }
+      data['image'] = image === NO_IMAGE || image.includes('http') ? image : ''
       // await setTimeout(500)
-      const result = await prisma.books.create({
-        data: {
-          sheet_id: sheet.id,
-          userId,
-          title,
-          author,
-          image,
-          category,
-          impression,
-          memo,
-          is_public_memo,
-          finished: new Date(finished),
-        },
-      })
+      const book = await prisma.books.create({ data })
+
+      // 画像選択された場合はVercel Blobにアップロードする
+      if (image !== NO_IMAGE && !image.includes('http')) {
+        const imageBuffer = Buffer.from(image, 'base64')
+        sharp(imageBuffer)
+          .resize(158)
+          .webp({ quality: 90 })
+          .toBuffer(async (err, info) => {
+            if (err) {
+              throw err
+            }
+            const { url } = await put(`${book.id}.webp`, info, {
+              access: 'public',
+            })
+            await prisma.books.update({
+              where: { id: book.id },
+              data: {
+                image: url,
+              },
+            })
+          })
+      }
       return res.status(200).json({
         result: true,
         message: `『${title}』を「${sheet.name}」に追加しました`,
