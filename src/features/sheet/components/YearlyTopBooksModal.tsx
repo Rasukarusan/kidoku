@@ -75,7 +75,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} className="sm:w-2/3 h-3/4">
       <div className="p-4 h-full">
         <h2 className="mb-4 font-bold text-center text-2xl shrink-0">
           {year}年ベスト<span className="underline">{order}位</span>を設定
@@ -110,7 +110,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
       </div>
       <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0">
         {isAnimating && message && (
-          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
+          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-32 sm:bottom-28 z-20">
             <SuccessAlert
               open={true}
               text={message}

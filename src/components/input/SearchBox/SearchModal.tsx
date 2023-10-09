@@ -39,7 +39,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} className="sm:w-1/2 h-3/4">
       <AddModal
         open={openAddModal}
         item={selectItem}
@@ -85,7 +85,6 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
               className={`w-2/3 sm:w-[200px] max-h-[300px] h-[260px] border border-gray-300 m-2 px-4 pt-2 rounded-md shadow cursor-pointer hover:bg-gray-100 relative`}
               key={item.id}
               onMouseEnter={() => setSelectItem(item)}
-              // onMouseLeave={() => setSelectItem(null)}
             >
               <div className="h-[220px] mb-2">
                 <img
