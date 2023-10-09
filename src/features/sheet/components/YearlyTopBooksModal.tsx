@@ -5,6 +5,7 @@ import { truncate } from '@/utils/string'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { Loading } from '@/components/icon/Loading'
 import { YearlyTopBook } from '@/types/book'
+import { Modal } from '@/components/layout/Modal'
 
 interface Props {
   books: Book[]
@@ -76,70 +77,60 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   if (!open) return null
 
   return (
-    <div
-      className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden p-8"
-      onClick={onClose}
-    >
-      <div
-        className="w-full sm:w-2/3 bg-white h-2/3 sm:h-3/4 rounded-t-md flex-col relative flex"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-4 h-full">
-          <h2 className="mb-4 font-bold text-center text-2xl shrink-0">
-            {year}年ベスト<span className="underline">{order}位</span>を設定
-          </h2>
-          <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full pb-12">
-            {books.map((book, i: number) => {
-              return (
-                <div
-                  className={`w-3/4 sm:w-[200px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
-                    selectItem?.id === book.id
-                      ? 'bg-pink-200 hover:bg-pink-200'
-                      : 'bg-white'
-                  }`}
-                  key={book.id}
-                  onClick={() =>
-                    setSelectItem(selectItem?.id === book.id ? null : book)
-                  }
-                >
-                  <div className="font-bold mb-1">
-                    {truncate(book.title, 15)}
-                  </div>
-                  <div className="text-xs mb-1">{book.author}</div>
-                  <img
-                    className="m-auto mb-1 h-[150px] object-contain"
-                    src={book.image}
-                    alt={book.title}
-                    loading="lazy"
-                  />
-                  <div className="text-sm">{truncate(book.memo, 30)}</div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-        <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0">
-          {isAnimating && message && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
-              <SuccessAlert
-                open={true}
-                text={message}
-                onClose={() => setSelectItem(null)}
-              />
-            </div>
-          )}
-          <button
-            className={`font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center disabled:bg-gray-400 bg-blue-600 hover:bg-blue-700 rounded-b-md z-10`}
-            onClick={onClickSet}
-            disabled={!selectItem && !current}
-          >
-            {loading && (
-              <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
-            )}
-            <span id="rewardId">設定する</span>
-          </button>
+    <Modal open={open} onClose={onClose}>
+      <div className="p-4 h-full">
+        <h2 className="mb-4 font-bold text-center text-2xl shrink-0">
+          {year}年ベスト<span className="underline">{order}位</span>を設定
+        </h2>
+        <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full pb-12">
+          {books.map((book, i: number) => {
+            return (
+              <div
+                className={`w-3/4 sm:w-[200px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
+                  selectItem?.id === book.id
+                    ? 'bg-pink-200 hover:bg-pink-200'
+                    : 'bg-white'
+                }`}
+                key={book.id}
+                onClick={() =>
+                  setSelectItem(selectItem?.id === book.id ? null : book)
+                }
+              >
+                <div className="font-bold mb-1">{truncate(book.title, 15)}</div>
+                <div className="text-xs mb-1">{book.author}</div>
+                <img
+                  className="m-auto mb-1 h-[150px] object-contain"
+                  src={book.image}
+                  alt={book.title}
+                  loading="lazy"
+                />
+                <div className="text-sm">{truncate(book.memo, 30)}</div>
+              </div>
+            )
+          })}
         </div>
       </div>
-    </div>
+      <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0">
+        {isAnimating && message && (
+          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-10">
+            <SuccessAlert
+              open={true}
+              text={message}
+              onClose={() => setSelectItem(null)}
+            />
+          </div>
+        )}
+        <button
+          className="font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center disabled:bg-gray-400 bg-blue-600 hover:bg-blue-700 rounded-b-md z-10"
+          onClick={onClickSet}
+          disabled={!selectItem && !current}
+        >
+          {loading && (
+            <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
+          )}
+          <span id="rewardId">設定する</span>
+        </button>
+      </div>
+    </Modal>
   )
 }

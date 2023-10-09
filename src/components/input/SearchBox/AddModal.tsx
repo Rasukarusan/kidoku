@@ -79,7 +79,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   }
   return (
     <Modal open={open} onClose={onClose}>
-      <>
+      <div className="flex flex-col justify-between h-full">
         <div className="p-4">
           <div className="flex items-start">
             <div className="w-1/3 mr-4">
@@ -156,9 +156,9 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
             }}
           />
         </div>
-        <div className="border-t border-1 text-center w-full absolute bottom-0">
+        <div className="border-t border-1 text-center w-full">
           <button
-            className="hover:bg-blue-700 bg-blue-600 px-4 py-1 disabled:bg-blue-700 font-bold text-white w-full h-12 flex items-center justify-center"
+            className="hover:bg-blue-700 bg-blue-600 px-4 py-1 disabled:bg-blue-700 font-bold text-white w-full h-12 flex items-center justify-center rounded-b-md"
             onClick={onClickAdd}
             tabIndex={6}
             disabled={isAnimating}
@@ -169,7 +169,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
             <span id="rewardId">本を登録する</span>
           </button>
         </div>
-      </>
+      </div>
     </Modal>
   )
 }
