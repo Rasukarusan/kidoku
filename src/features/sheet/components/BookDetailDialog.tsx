@@ -1,5 +1,5 @@
 import { Book } from '@/types/book'
-import { Dialog } from '@mui/material'
+import { Modal } from '@/components/layout/Modal'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { BookDetailRead } from './BookDetailRead'
@@ -64,7 +64,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   if (!newBook) return null
 
   return (
-    <Dialog
+    <Modal
       onClose={() => {
         setEdit(false)
         onClose()
@@ -84,6 +84,6 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
         <BookDetailRead book={book} onClick={onClickEdit} />
       )}
       <span id="rewardId" className="text-center"></span>
-    </Dialog>
+    </Modal>
   )
 }

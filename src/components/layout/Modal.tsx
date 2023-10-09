@@ -4,9 +4,15 @@ interface Props {
   open: boolean
   onClose: () => void
   children: React.ReactNode
+  className?: string
 }
 
-export const Modal: React.FC<Props> = ({ open, onClose, children }) => {
+export const Modal: React.FC<Props> = ({
+  open,
+  onClose,
+  children,
+  className = '',
+}) => {
   useEffect(() => {
     if (open) {
       document.body.classList.add('no-scroll')
@@ -23,7 +29,7 @@ export const Modal: React.FC<Props> = ({ open, onClose, children }) => {
       onClick={onClose}
     >
       <div
-        className="w-full sm:w-2/3 bg-white  h-2/3 sm:h-3/4 rounded-md overflow-y-hidden flex-col relative flex m-2 sm:m-0 text-gray-700"
+        className={`w-full sm:w-2/3 bg-white h-2/3 sm:h-3/4 rounded-md flex-col flex m-2 sm:m-0 text-gray-700 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {children}
