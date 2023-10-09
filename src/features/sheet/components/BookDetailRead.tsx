@@ -1,6 +1,5 @@
 import { Fragment } from 'react'
 import { Book } from '@/types/book'
-import { Divider } from '@mui/material'
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
 import CategoryIcon from '@mui/icons-material/Category'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
@@ -15,7 +14,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
   return (
-    <>
+    <div className="flex flex-col justify-between h-full">
       <div className="p-4">
         <div className="flex items-start">
           <div className="w-1/3 mr-4">
@@ -65,10 +64,9 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </div>
         </div>
         {(isMine || book.is_public_memo) && (
-          <>
-            <Divider sx={{ margin: '15px 0px' }} />
+          <div>
             <Memo memo={book.memo} />
-          </>
+          </div>
         )}
       </div>
       {isMine && (
@@ -81,7 +79,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </button>
         </div>
       )}
-    </>
+    </div>
   )
 }
 
@@ -94,7 +92,7 @@ export const Memo = ({ memo }) => {
     return <Fragment key={index}>{item.match(/\n/) ? <br /> : item}</Fragment>
   })
   return (
-    <div className="max-h-[310px] sm:p-2 overflow-y-auto text-sm sm:text-base">
+    <div className="max-h-[290px] sm:p-2 overflow-y-auto text-sm sm:text-base">
       {texts}
     </div>
   )

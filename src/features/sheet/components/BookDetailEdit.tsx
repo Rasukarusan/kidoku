@@ -93,7 +93,7 @@ export const BookDetailEdit: React.FC<Props> = ({
             <textarea
               value={book.memo}
               className="w-full p-2 bg-slate-100 w-full mb-2 text-sm sm:text-base"
-              rows={12}
+              rows={8}
               cols={80}
               onChange={(e) => {
                 setBook({ ...book, memo: e.target.value })

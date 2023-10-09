@@ -97,7 +97,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} className="sm:w-1/2 h-3/4">
       <div className="flex flex-col justify-between h-full">
         <div className="p-4">
           <div className="flex items-center">
