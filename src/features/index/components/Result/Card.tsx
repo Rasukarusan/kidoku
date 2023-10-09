@@ -18,6 +18,7 @@ import { truncate } from '../../util'
 import { theme as Theme } from '@/features/global/theme'
 import { selectItemsAtom } from '@/store/selectItems'
 import { useRecoilState } from 'recoil'
+import { NO_IMAGE } from '@/libs/constants'
 
 const useStyles = makeStyles((theme: typeof Theme) =>
   createStyles({
@@ -82,7 +83,7 @@ export const Card: React.FC<Props> = ({ row, searchWord, item }) => {
       <CardMedia
         component="img"
         className={classes.media}
-        image={imageLinks ? imageLinks.thumbnail : '/no-image.png'}
+        image={imageLinks ? imageLinks.thumbnail : NO_IMAGE}
         title={title}
       />
       <CardContent>

@@ -1,6 +1,8 @@
 import prisma from '@/libs/prisma'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
+import path from 'path'
+import { promises as fs } from 'fs'
 // import { setTimeout } from 'timers/promises'
 
 export default async (req, res) => {
@@ -27,7 +29,18 @@ export default async (req, res) => {
         finished,
         sheet,
       } = body
-      console.log(JSON.parse(req.body))
+      console.log(body)
+
+      // Base64データをBufferに変換
+      const imageBuffer = Buffer.from(image, 'base64')
+
+      // 保存する画像のパスを指定
+      const imagePath = path.join(process.cwd(), 'tmp', 'uploaded-image.jpg')
+      await fs.writeFile(imagePath, imageBuffer)
+      return res.status(200).json({
+        result: true,
+        message: `『${title}』を「${sheet.name}」に追加しました`,
+      })
       // await setTimeout(500)
       const result = await prisma.books.create({
         data: {

@@ -1,4 +1,5 @@
 import { ApiClient } from '@/libs/apiClient'
+import { NO_IMAGE } from '@/libs/constants'
 import { Item } from '@/types/search'
 
 /**
@@ -33,6 +34,6 @@ export const getBookInfo = (item: Item) => {
     item.volumeInfo
   const author = authors ? authors.join(',') : '-'
   const category = categories ? categories.join(',') : '-'
-  const image = imageLinks ? imageLinks.thumbnail : '/no-image.png'
+  const image = imageLinks ? imageLinks.thumbnail : NO_IMAGE
   return { title, description, author, image, category }
 }

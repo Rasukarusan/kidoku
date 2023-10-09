@@ -5,6 +5,7 @@ import { Modal } from '@/components/layout/Modal'
 import { useEffect, useRef, useState } from 'react'
 import { AddModal } from './AddModal'
 // import { items } from './mock'
+import { NO_IMAGE } from '@/libs/constants'
 
 interface Props {
   open: boolean
@@ -89,7 +90,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
               <div className="h-[220px] mb-2">
                 <img
                   className="m-auto mb-2 h-[150px] object-contain"
-                  src={imageLinks ? imageLinks.thumbnail : '/no-image.png'}
+                  src={imageLinks ? imageLinks.thumbnail : NO_IMAGE}
                   alt={title}
                   loading="lazy"
                 />
