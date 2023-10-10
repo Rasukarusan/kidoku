@@ -1,3 +1,5 @@
+import useSWR from 'swr'
+import { fetcher } from '@/libs/swr'
 import { useRouter } from 'next/router'
 import { AppBar, Toolbar, Container } from '@mui/material'
 import { signOut, useSession } from 'next-auth/react'
@@ -26,6 +28,9 @@ export const Header = () => {
     },
     closed: { opacity: 0, y: 20, transition: { duration: 0.2 } },
   }
+  const { data: sheets } = useSWR(`/api/sheets`, fetcher, {
+    fallbackData: { result: true, sheets: [] },
+  })
 
   /**
    * 画面上をクリックしたらメニューを非表示
@@ -42,6 +47,12 @@ export const Header = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const url = !session
+    ? '/'
+    : sheets.sheets.length > 0
+    ? `/${session.user.name}/sheets/${sheets.sheets[0].name}`
+    : `/${session.user.name}/sheets/total`
 
   return (
     <>
@@ -81,7 +92,7 @@ export const Header = () => {
                         <BookIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
                         <Link
                           className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
-                          href={`/${session.user.name}/sheets`}
+                          href={url}
                           onClick={() => setOpenMenu(false)}
                         >
                           読書記録
