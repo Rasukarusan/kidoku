@@ -25,7 +25,7 @@ export const Modal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden p-8"
+      className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden p-4 sm:p-8"
       onClick={onClose}
     >
       <div
