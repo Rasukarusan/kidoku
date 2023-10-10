@@ -4,8 +4,8 @@ import prisma from '@/libs/prisma'
 
 export default SheetTotalPage
 
-export async function getServerSideProps(context) {
-  const { user: username } = context.params
+export const getStaticProps = async (ctx) => {
+  const { user: username } = ctx.params
   const user = await prisma.user.findUnique({
     where: { name: username },
   })
@@ -73,5 +73,21 @@ export async function getServerSideProps(context) {
       username,
       yearlyTopBooks,
     },
+    revalidate: 86400,
+  }
+}
+
+export async function getStaticPaths() {
+  const users = await prisma.user.findMany({
+    select: { name: true },
+  })
+  const paths = users
+    .map((user) => {
+      return { params: { user: user.name } }
+    })
+    .flat()
+  return {
+    paths,
+    fallback: 'blocking', // キャッシュが存在しない場合はSSR
   }
 }
