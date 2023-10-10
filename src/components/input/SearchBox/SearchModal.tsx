@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AddModal } from './AddModal'
 // import { items } from './mock'
 import { NO_IMAGE } from '@/libs/constants'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   open: boolean
@@ -18,6 +19,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const [selectItem, setSelectItem] = useState<Item>(null)
   const [inputValue, setInputValue] = useState('')
   const [openAddModal, setOpenAddModal] = useState(false)
+  const { data: session } = useSession()
   // 検索モーダル開いたら自動でinputフィールドにフォーカスする
   useEffect(() => {
     ref.current?.focus()
@@ -101,7 +103,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                     ? truncate(authors.join(','), 12)
                     : '-'}
                 </div>
-                {selectItem?.id === item.id && (
+                {session && selectItem?.id === item.id && (
                   <div className="text-center absolute left-1/2 -translate-x-2/4 bottom-0 w-full opacity-80 hover:opacity-100">
                     <button
                       className="bg-blue-600 hover:bg-blue-700 text-xs text-white py-2 font-bold w-full rounded-md"
