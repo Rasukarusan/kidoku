@@ -77,12 +77,12 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           />
         </div>
       </div>
-      <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full">
+      <div className="w-full text-gray-900 p-2 sm:p-4 flex flex-wrap justify-center overflow-y-auto h-full">
         {books.map((item: Item, i: number) => {
           const { title, description, authors, imageLinks } = item.volumeInfo
           return (
             <div
-              className={`w-2/3 sm:w-[200px] max-h-[300px] h-[260px] border border-gray-300 m-2 px-4 pt-2 rounded-md shadow cursor-pointer hover:bg-gray-100 relative`}
+              className={`w-[45%] sm:w-[200px] max-h-[300px] h-[260px] border border-gray-300 m-2 px-2 sm:px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 relative`}
               key={item.id}
               onMouseEnter={() => setSelectItem(item)}
             >
@@ -93,7 +93,9 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
                   alt={title}
                   loading="lazy"
                 />
-                <div className="font-bold mb-1">{truncate(title, 15)}</div>
+                <div className="text-sm sm:text-base font-bold mb-1">
+                  {truncate(title, 15)}
+                </div>
                 <div className="text-xs">
                   {Array.isArray(authors)
                     ? truncate(authors.join(','), 12)
