@@ -8,6 +8,7 @@ interface Props {
     name: string
     image: string
     books: { total: number; categories: { name: string; percent: number }[] }
+    url: string
   }[]
 }
 export const Row = ({ label, value }) => {
@@ -25,10 +26,7 @@ export const IndexPage = ({ users }) => {
         <div>
           {users.map((user, i) => (
             <div key={user.name} className="sm:flex sm:items-center">
-              <Link
-                href={`/${user.name}/sheets/2023`}
-                className="m-4 sm:m-10 flex justify-center"
-              >
+              <Link href={user.url} className="m-4 sm:m-10 flex justify-center">
                 <div className="mr-4 hover:brightness-90 hover:underline">
                   <img
                     src={user.image}
