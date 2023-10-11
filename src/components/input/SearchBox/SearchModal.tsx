@@ -44,7 +44,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   }
 
   return (
-    <Modal open={open} onClose={onClose} className="sm:w-1/2 h-3/4">
+    <Modal open={open} onClose={onClose} className="w-full sm:w-1/2 h-3/4">
       <AddModal
         open={openAddModal}
         item={selectItem}
