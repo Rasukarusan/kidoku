@@ -4,7 +4,7 @@ interface Props {
   onClose: () => void
 }
 
-export const DanDangerAlert: React.FC<Props> = ({ open, text, onClose }) => {
+export const DangerAlert: React.FC<Props> = ({ open, text, onClose }) => {
   if (!open) return null
   return (
     <div

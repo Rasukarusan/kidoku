@@ -9,8 +9,10 @@ import useSWR from 'swr'
 import dayjs from 'dayjs'
 import { Modal } from '@/components/layout/Modal'
 import { ImagePicker } from '@/components/button/ImagePicker'
+import { DangerAlert } from '@/components/label/DangerAlert'
+import { SuccessAlert } from '@/components/label/SuccessAlert'
 
-interface AddResult {
+interface Response {
   result: boolean
   message: string
 }
@@ -32,7 +34,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   })
   const [loading, setLoading] = useState(false)
   const [book, setBook] = useState(null)
-  const [addResult, setAddResult] = useState<AddResult>(null)
+  const [response, setResponse] = useState<Response>(null)
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
@@ -63,7 +65,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   const onClickAdd = async () => {
     if (!book) return
     setLoading(true)
-    const res: AddResult = await fetch(`/api/books`, {
+    const res: Response = await fetch(`/api/books`, {
       method: 'POST',
       body: JSON.stringify({
         ...book,
@@ -72,8 +74,15 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
       headers: {
         Accept: 'application/json',
       },
-    }).then((res) => res.json())
-    setAddResult(res)
+    })
+      .then((res) => res.json())
+      .catch((e) => {
+        return {
+          result: false,
+          message: '本の登録に失敗しました。画像は3MBまで登録できます。',
+        }
+      })
+    setResponse(res)
     if (res.result) {
       reward()
     }
@@ -181,6 +190,27 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
           </div>
         </div>
         <div className="border-t border-1 text-center w-full">
+          {response && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-32 sm:bottom-28 z-20">
+              {response.result ? (
+                <SuccessAlert
+                  open={!!response}
+                  text={response.message}
+                  onClose={() => {
+                    setResponse(null)
+                  }}
+                />
+              ) : (
+                <DangerAlert
+                  open={!!response}
+                  text={response.message}
+                  onClose={() => {
+                    setResponse(null)
+                  }}
+                />
+              )}
+            </div>
+          )}
           <button
             className="hover:bg-blue-700 bg-blue-600 px-4 py-1 disabled:bg-blue-700 font-bold text-white w-full h-12 flex items-center justify-center rounded-b-md"
             onClick={onClickAdd}
