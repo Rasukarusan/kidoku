@@ -92,7 +92,7 @@ export const Memo = ({ memo }) => {
     return <Fragment key={index}>{item.match(/\n/) ? <br /> : item}</Fragment>
   })
   return (
-    <div className="max-h-[290px] sm:p-2 overflow-y-auto text-sm sm:text-base">
+    <div className="max-h-[290px] sm:px-2 sm:py-4 overflow-y-auto text-sm sm:text-base">
       {texts}
     </div>
   )

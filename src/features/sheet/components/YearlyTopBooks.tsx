@@ -57,7 +57,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
                 style={{ order: v === 3 ? 0 : v }}
               >
                 <button
-                  className={`bg-gray-100 rounded-md w-24 sm:w-32 h-28 sm:h-36  text-2xl mb-1 shadow-md ${
+                  className={`bg-gray-100 rounded-md w-[96px] h-[140px] sm:w-[128px] sm:h-[186px] text-2xl mb-1 shadow-md ${
                     isMine ? 'hover:bg-gray-200 hover:brightness-95' : ''
                   }`}
                   onClick={() => onClickAdd(v)}
