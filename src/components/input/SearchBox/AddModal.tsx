@@ -3,11 +3,12 @@ import { Loading } from '@/components/icon/Loading'
 import { fetcher } from '@/libs/swr'
 import { Item } from '@/types/search'
 import { getBookInfo } from '@/utils/search'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import useSWR from 'swr'
 import dayjs from 'dayjs'
 import { Modal } from '@/components/layout/Modal'
+import { ImagePicker } from '@/components/button/ImagePicker'
 
 interface AddResult {
   result: boolean
@@ -39,8 +40,6 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
     id: null,
     name: null,
   })
-  const fileInputRef = useRef(null)
-  const [file, setFile] = useState(null)
 
   // シート取得次第、一番上のシートを選択状態にする
   useEffect(() => {
@@ -59,7 +58,6 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
       impression: '',
       finished,
     })
-    setFile(bookInfo.image)
   }, [item])
 
   const onClickAdd = async () => {
@@ -82,41 +80,17 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
     setLoading(false)
   }
 
-  // 画像選択
-  const handleChange = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    const url = URL.createObjectURL(file)
-    setFile(url)
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const image = (e.target.result as string).split(',')[1]
-      setBook({ ...book, image })
-    }
-    reader.readAsDataURL(file)
-  }
-
   return (
     <Modal open={open} onClose={onClose} className="sm:w-1/2 h-3/4">
       <div className="flex flex-col justify-between h-full">
         <div className="p-4">
           <div className="flex items-center">
-            <button
-              className="w-1/3 mr-4"
-              onClick={() => fileInputRef.current.click()}
-            >
-              <img
-                className="mx-auto my-0 drop-shadow-lg"
-                src={file}
-                alt={book?.title}
-              />
-              <input
-                ref={fileInputRef}
-                type="file"
-                onChange={handleChange}
-                className="hidden"
-              />
-            </button>
+            <ImagePicker
+              img={book?.image}
+              onImageLoad={(image) => {
+                setBook({ ...book, image })
+              }}
+            />
             <div className="w-2/3 mr-2">
               <Label text="タイトル" />
               <textarea
