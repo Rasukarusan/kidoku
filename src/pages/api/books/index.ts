@@ -5,7 +5,13 @@ import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 import { NO_IMAGE } from '@/libs/constants'
 // import { setTimeout } from 'timers/promises'
-
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '3mb',
+    },
+  },
+}
 export default async (req, res) => {
   try {
     const session = await getServerSession(req, res, authOptions)
@@ -80,7 +86,6 @@ export default async (req, res) => {
       if (!book) {
         res.status(401).json({ result: false })
       }
-      const { image } = body
       const data = {
         title: body.title,
         author: body.author,
@@ -90,6 +95,7 @@ export default async (req, res) => {
         memo: body.memo,
         is_public_memo: body.is_public_memo,
       }
+      const { image } = body
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
       if (image !== NO_IMAGE && !image.includes('http')) {
         const imageBuffer = Buffer.from(image, 'base64')
