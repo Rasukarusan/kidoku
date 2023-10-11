@@ -28,10 +28,13 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   // デバウンス。入力から一定時間経った後に検索を実行する。
   // 300ms以内に入力があった場合はタイマーがクリアされ、新しいタイマーが設定され、デバウンスが実現される。
   useEffect(() => {
-    if (!inputValue) return
     const timer = setTimeout(async () => {
+      if (!inputValue) {
+        setBooks([])
+        return
+      }
       const items = await searchBooks(inputValue)
-      setBooks(items)
+      setBooks(items ?? [])
     }, 300)
     return () => clearTimeout(timer)
   }, [inputValue])
