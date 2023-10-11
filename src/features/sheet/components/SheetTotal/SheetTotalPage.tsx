@@ -46,13 +46,13 @@ export const SheetTotalPage: React.FC<Props> = ({
       <div className="text-center mb-10">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={total} unit="冊" />
-        <div className="w-4/5 h-[300px] m-auto mb-4">
+        <div className="sm:w-3/4 w-full h-[200px] sm:h-[300px] m-auto mb-4">
           <CategoryMap categories={categories} />
         </div>
 
         <TitleWithLine text="年間平均読書数" />
         <CoutUpText value={average} unit="冊" />
-        <div className="w-4/5 h-[300px] m-auto mb-4">
+        <div className="sm:w-3/4 w-full h-[300px] m-auto mb-4">
           <YearsGraph years={years} />
         </div>
 
