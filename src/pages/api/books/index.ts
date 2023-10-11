@@ -80,27 +80,44 @@ export default async (req, res) => {
       if (!book) {
         res.status(401).json({ result: false })
       }
-      const {
-        title,
-        author,
-        category,
-        image,
-        impression,
-        memo,
-        is_public_memo,
-      } = body
-      const success = await prisma.books.update({
-        where: { id, userId },
-        data: {
-          title,
-          author,
-          category,
-          image,
-          impression,
-          memo,
-          is_public_memo,
-        },
-      })
+      const { image } = body
+      const data = {
+        title: body.title,
+        author: body.author,
+        category: body.category,
+        image: body.image,
+        impression: body.impression,
+        memo: body.memo,
+        is_public_memo: body.is_public_memo,
+      }
+      // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
+      if (image !== NO_IMAGE && !image.includes('http')) {
+        const imageBuffer = Buffer.from(image, 'base64')
+        sharp(imageBuffer)
+          .resize(158)
+          .webp({ quality: 90 })
+          .toBuffer(async (err, info) => {
+            if (err) {
+              throw err
+            }
+            const { url } = await put(`${book.id}.webp`, info, {
+              access: 'public',
+            })
+            await prisma.books.update({
+              where: { id, userId },
+              data: {
+                ...data,
+                image: url,
+              },
+            })
+          })
+      } else {
+        // 画像がユーザーが選択したものではない場合レコード更新して終了
+        await prisma.books.update({
+          where: { id, userId },
+          data,
+        })
+      }
       return res.status(200).json({ result: true })
     }
   } catch (e) {

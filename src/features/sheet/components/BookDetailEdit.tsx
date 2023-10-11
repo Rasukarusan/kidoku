@@ -7,6 +7,7 @@ import CategoryIcon from '@mui/icons-material/Category'
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import { useSession } from 'next-auth/react'
 import { Loading } from '@/components/icon/Loading'
+import { ImagePicker } from '@/components/button/ImagePicker'
 
 interface Props {
   book: Book
@@ -27,13 +28,11 @@ export const BookDetailEdit: React.FC<Props> = ({
     <>
       <div className="p-4 overflow-y-hidden">
         <div className="flex items-start">
-          <div className="w-1/3 mr-4">
-            <img
-              className="mx-auto my-0 drop-shadow-lg"
-              src={book.image}
-              alt={book.title}
-            />
-          </div>
+          <ImagePicker
+            img={book.image}
+            onImageLoad={(image) => setBook({ ...book, image })}
+          />
+
           <div className="w-2/3 mr-2">
             <textarea
               className="font-bold mb-2 overflow-hidden w-full mr-2 bg-slate-100 px-2 py-1 text-base sm:text-xl"
