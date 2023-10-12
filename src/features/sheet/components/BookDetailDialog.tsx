@@ -29,6 +29,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
 
   useEffect(() => {
     setNewBook(book)
+    setCurrentBook(book)
   }, [book])
 
   const onClickEdit = () => {
