@@ -3,6 +3,14 @@ import Link from 'next/link'
 import Lottie from 'lottie-react'
 import Inchworm from '../lottie_inchworm.json'
 
+import { InstantSearch, SearchBox, Hits, Highlight } from 'react-instantsearch'
+import { instantMeiliSearch } from '@meilisearch/instant-meilisearch'
+
+const searchClient = instantMeiliSearch(
+  'http://localhost:7700',
+  'YourMasterKey'
+)
+
 interface Props {
   users: {
     name: string
@@ -11,6 +19,7 @@ interface Props {
     url: string
   }[]
 }
+
 export const Row = ({ label, value }) => {
   return (
     <tr className="border">
@@ -19,9 +28,28 @@ export const Row = ({ label, value }) => {
     </tr>
   )
 }
+
+const Hit = ({ hit }) => {
+  console.log(hit)
+  return (
+    <div className="flex items-center border m-4 p-4">
+      <img className="mr-4" src={hit.image} width="50" />
+      <div>
+        <Highlight attribute="title" hit={hit} className="mb-1" />
+        <div className="text-xs mb-1">{hit.author}</div>
+        <div className="text-xs mb-1">{hit.memo}</div>
+      </div>
+    </div>
+  )
+}
+
 export const IndexPage = ({ users }) => {
   return (
     <Container className="p-6">
+      <InstantSearch indexName="books" searchClient={searchClient}>
+        <SearchBox className="border" />
+        <Hits hitComponent={Hit} />
+      </InstantSearch>
       <div className="sm:flex sm:items-start">
         <div>
           {users.map((user, i) => (
