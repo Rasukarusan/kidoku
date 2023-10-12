@@ -19,6 +19,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   const { mutate } = useSWRConfig()
   const { data: session } = useSession()
   const [edit, setEdit] = useState(false)
+  const [currentBook, setCurrentBook] = useState<Book>(book)
   const [newBook, setNewBook] = useState<Book>(book)
   const [loading, setLoading] = useState(false)
   const { reward, isAnimating } = useReward('rewardId', 'balloons', {
@@ -55,6 +56,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
         Accept: 'application/json',
       },
     })
+    setCurrentBook(newBook)
     reward()
     setLoading(false)
     setEdit(false)
@@ -82,7 +84,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
           loading={loading}
         />
       ) : (
-        <BookDetailRead book={book} onClick={onClickEdit} />
+        <BookDetailRead book={currentBook} onClick={onClickEdit} />
       )}
       <span id="rewardId" className="text-center"></span>
     </Modal>
