@@ -1,1 +1,0 @@
-export { isLoginAtom } from './atom'
