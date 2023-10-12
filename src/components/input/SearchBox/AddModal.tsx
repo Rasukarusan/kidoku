@@ -11,6 +11,7 @@ import { Modal } from '@/components/layout/Modal'
 import { ImagePicker } from '@/components/button/ImagePicker'
 import { DangerAlert } from '@/components/label/DangerAlert'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
+import { BookInputField } from '../BookInputField'
 
 interface Response {
   result: boolean
@@ -22,10 +23,6 @@ interface Props {
   item: Item
   books: Item[]
   onClose: () => void
-}
-
-export const Label: React.FC<{ text: string }> = ({ text }) => {
-  return <div className="text-gray-400 text-xs mb-1">{text}</div>
 }
 
 export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
@@ -101,62 +98,39 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
               }}
             />
             <div className="w-2/3 mr-2">
-              <Label text="タイトル" />
-              <textarea
-                className="mb-1 overflow-hidden w-full mr-2 bg-slate-100 px-2 py-1 text-sm sm:text-base"
+              <BookInputField
                 value={book?.title}
-                onChange={(e) => {
-                  setBook({ ...book, title: e.target.value })
-                }}
+                onChange={(e) => setBook({ ...book, title: e.target.value })}
+                label="タイトル"
                 tabIndex={1}
               />
-              <div className="mb-1">
-                <Label text="著者" />
-                <textarea
-                  value={book?.author}
-                  rows={1}
-                  className="pl-2 py-1 bg-slate-100 w-full text-sm sm:text-base"
-                  onChange={(e) => {
-                    setBook({ ...book, author: e.target.value })
-                  }}
-                  tabIndex={2}
-                />
-              </div>
-              <div className="mb-1">
-                <Label text="カテゴリ" />
-                <textarea
-                  value={book?.category}
-                  rows={1}
-                  className="pl-2 py-1 bg-slate-100 w-full text-sm sm:text-base"
-                  onChange={(e) => {
-                    setBook({ ...book, category: e.target.value })
-                  }}
-                  tabIndex={3}
-                />
-              </div>
-              <div className="mb-1">
-                <Label text="感想" />
-                <textarea
-                  value={book?.impression}
-                  rows={1}
-                  className="pl-2 py-1 bg-slate-100 w-full text-sm sm:text-base"
-                  onChange={(e) => {
-                    setBook({ ...book, impression: e.target.value })
-                  }}
-                  tabIndex={4}
-                />
-              </div>
+              <BookInputField
+                value={book?.author}
+                onChange={(e) => setBook({ ...book, author: e.target.value })}
+                label="著者"
+                tabIndex={2}
+              />
+              <BookInputField
+                value={book?.category}
+                onChange={(e) => setBook({ ...book, category: e.target.value })}
+                label="カテゴリ"
+                tabIndex={3}
+              />
+              <BookInputField
+                value={book?.impression}
+                onChange={(e) =>
+                  setBook({ ...book, impression: e.target.value })
+                }
+                label="感想"
+                tabIndex={4}
+              />
             </div>
           </div>
-          <Label text="メモ" />
-          <textarea
-            value={book?.memo}
-            className="w-full p-2 bg-slate-100 w-full mb-1 text-sm sm:text-base"
+          <BookInputField
             rows={4}
-            cols={80}
-            onChange={(e) => {
-              setBook({ ...book, memo: e.target.value })
-            }}
+            value={book?.memo}
+            onChange={(e) => setBook({ ...book, memo: e.target.value })}
+            label="メモ"
             tabIndex={5}
           />
           <ToggleButton

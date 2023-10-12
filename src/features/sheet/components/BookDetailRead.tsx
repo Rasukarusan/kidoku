@@ -1,9 +1,7 @@
 import { Fragment } from 'react'
 import { Book } from '@/types/book'
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
-import CategoryIcon from '@mui/icons-material/Category'
-import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import { useSession } from 'next-auth/react'
+import { BookInputField } from '@/components/input/BookInputField'
 
 interface Props {
   book: Book
@@ -32,41 +30,40 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             </a>
           </div>
           <div className="w-2/3 mr-2">
-            <div className="font-bold text-base sm:text-xl mb-2">
-              <a
-                href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {book.title}
-              </a>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-1">
-                <PeopleAltIcon />
-              </span>
-              <span className="pl-2 text-sm sm:text-base">{book.author}</span>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-1">
-                <CategoryIcon />
-              </span>
-              <span className="pl-2 text-sm sm:text-base">{book.category}</span>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-1">
-                <InsertEmoticonIcon />
-              </span>
-              <span className="pl-2 text-sm sm:text-base">
-                {book.impression}
-              </span>
-            </div>
+            <BookInputField
+              value={book?.title}
+              label="タイトル"
+              tabIndex={1}
+              readonly={true}
+            />
+            <BookInputField
+              value={book?.author}
+              label="著者"
+              tabIndex={2}
+              readonly={true}
+            />
+            <BookInputField
+              value={book?.category}
+              label="カテゴリ"
+              tabIndex={3}
+              readonly={true}
+            />
+            <BookInputField
+              value={book?.impression}
+              label="感想"
+              tabIndex={4}
+              readonly={true}
+            />
           </div>
         </div>
         {(isMine || book.is_public_memo) && (
-          <div>
-            <Memo memo={book.memo} />
-          </div>
+          <BookInputField
+            rows={8}
+            value={book.memo}
+            label="メモ"
+            tabIndex={5}
+            readonly={true}
+          />
         )}
       </div>
       {isMine && (
