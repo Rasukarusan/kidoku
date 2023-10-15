@@ -25,6 +25,7 @@ export default async (req, res) => {
         image,
         impression,
         memo,
+        finished,
         is_public_memo,
       } = book
       return {
@@ -37,6 +38,7 @@ export default async (req, res) => {
         image,
         impression,
         memo,
+        finished,
         is_public_memo,
       }
     })
