@@ -11,6 +11,7 @@ export interface Book {
   image: string
   impression: string // 感想 ex.) ◎
   memo: string
+  finished: string
   is_public_memo: boolean
 }
 

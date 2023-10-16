@@ -32,26 +32,26 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </div>
           <div className="w-2/3 mr-2">
             <BookInputField
-              value={book?.title}
+              value={book.title}
               label="タイトル"
               tabIndex={1}
               readonly={true}
             />
             <BookInputField
-              value={book?.author}
+              value={book.author}
               label="著者"
               tabIndex={2}
               readonly={true}
             />
             <BookInputField
-              value={book?.category}
+              value={book.category}
               label="カテゴリ"
               tabIndex={3}
               readonly={true}
             />
             <div className="flex justify-between">
               <BookInputField
-                value={book?.impression}
+                value={book.impression}
                 label="感想"
                 tabIndex={4}
                 readonly={true}
