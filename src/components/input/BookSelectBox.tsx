@@ -11,7 +11,8 @@ export const BookSelectBox: React.FC<Props> = ({
   label,
   tabIndex,
   readonly = false,
-  onChange = null,
+  // eslint-disable-next-line
+  onChange = () => {},
 }) => {
   const values = { great: '◎', good: '◯', bad: '✗' }
   return (

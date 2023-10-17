@@ -11,7 +11,8 @@ export const BookDatePicker: React.FC<Props> = ({
   label,
   tabIndex,
   readonly = false,
-  onChange = null,
+  // eslint-disable-next-line
+  onChange = () => {},
 }) => {
   return (
     <div className="mb-1">
