@@ -15,13 +15,13 @@ export const BookSelectBox: React.FC<Props> = ({
 }) => {
   const values = { great: '◎', good: '◯', bad: '✗' }
   return (
-    <div className="mb-1 mr-12">
+    <div className="mb-1 pr-4 sm:pr-12">
       <div className="text-gray-400 text-xs mb-1">{label}</div>
       <select
         disabled={readonly}
         className={`px-2 py-1 w-full text-sm sm:text-base ${
           readonly
-            ? 'bg-white resize-none border-b'
+            ? 'bg-white resize-none border-b appearance-none'
             : 'bg-slate-100 cursor-pointer'
         }`}
         onChange={onChange}
