@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { useSession } from 'next-auth/react'
@@ -10,6 +10,7 @@ import { BookDatePicker } from '@/components/input/BookDatePicker'
 import dayjs from 'dayjs'
 
 interface Props {
+  currentBook: Book // 変更前の本
   book: Book
   onClick: () => void
   setBook: (book: Book) => void
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const BookDetailEdit: React.FC<Props> = ({
+  currentBook,
   book,
   onClick,
   setBook,
@@ -24,6 +26,26 @@ export const BookDetailEdit: React.FC<Props> = ({
 }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
+  const [diff, setDiff] = useState({
+    title: false,
+    author: false,
+    category: false,
+    impression: false,
+    finished: false,
+    memo: false,
+  })
+
+  // どこが変更されたかを取得
+  useEffect(() => {
+    setDiff({
+      title: book.title !== currentBook.title,
+      author: book.author !== currentBook.author,
+      category: book.category !== currentBook.category,
+      impression: book.impression !== currentBook.impression,
+      finished: book.finished !== currentBook.finished,
+      memo: book.memo !== currentBook.memo,
+    })
+  }, [book])
   return (
     <>
       <div className="p-4 overflow-y-hidden">
@@ -38,18 +60,21 @@ export const BookDetailEdit: React.FC<Props> = ({
               onChange={(e) => setBook({ ...book, title: e.target.value })}
               label="タイトル"
               tabIndex={1}
+              isChanged={diff.title}
             />
             <BookInputField
               value={book?.author}
               onChange={(e) => setBook({ ...book, author: e.target.value })}
               label="著者"
               tabIndex={2}
+              isChanged={diff.author}
             />
             <BookInputField
               value={book?.category}
               onChange={(e) => setBook({ ...book, category: e.target.value })}
               label="カテゴリ"
               tabIndex={3}
+              isChanged={diff.category}
             />
             <div className="flex items-center">
               <BookSelectBox
@@ -59,6 +84,7 @@ export const BookDetailEdit: React.FC<Props> = ({
                 }
                 label="感想"
                 tabIndex={4}
+                isChanged={diff.impression}
               />
               <BookDatePicker
                 value={dayjs(book.finished).format('YYYY-MM-DD')}
@@ -70,6 +96,7 @@ export const BookDetailEdit: React.FC<Props> = ({
                 }
                 label="読了日"
                 tabIndex={5}
+                isChanged={diff.finished}
               />
             </div>
           </div>
@@ -82,6 +109,7 @@ export const BookDetailEdit: React.FC<Props> = ({
               onChange={(e) => setBook({ ...book, memo: e.target.value })}
               label="メモ"
               tabIndex={6}
+              isChanged={diff.memo}
             />
             <ToggleButton
               label="メモを公開する"

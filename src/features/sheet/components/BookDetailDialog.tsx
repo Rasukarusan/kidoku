@@ -77,6 +77,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
     >
       {edit ? (
         <BookDetailEdit
+          currentBook={currentBook}
           book={newBook}
           onClick={onClickSave}
           setBook={(editBook: Book) => {

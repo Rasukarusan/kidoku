@@ -4,6 +4,7 @@ interface Props {
   tabIndex: number
   readonly?: boolean
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  isChanged?: boolean
 }
 
 export const BookDatePicker: React.FC<Props> = ({
@@ -13,6 +14,7 @@ export const BookDatePicker: React.FC<Props> = ({
   readonly = false,
   // eslint-disable-next-line
   onChange = () => {},
+  isChanged = false,
 }) => {
   return (
     <div className="mb-1">
@@ -24,7 +26,7 @@ export const BookDatePicker: React.FC<Props> = ({
           readonly
             ? 'bg-white resize-none border-b'
             : 'bg-slate-100 cursor-pointer'
-        }`}
+        } ${isChanged ? 'border-2 border-orange-400' : ''}`}
         onChange={onChange}
         tabIndex={tabIndex}
         disabled={readonly}
