@@ -14,6 +14,7 @@ import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { BookInputField } from '../BookInputField'
 import { BookSelectBox } from '../BookSelectBox'
 import { BookDatePicker } from '../BookDatePicker'
+import { useRouter } from 'next/router'
 
 interface Response {
   result: boolean
@@ -28,9 +29,14 @@ interface Props {
 }
 
 export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
+  const router = useRouter()
   const { data } = useSWR(`/api/sheets`, fetcher, {
     fallbackData: { result: true, sheets: [] },
   })
+  const { mutate } = useSWR(
+    `/api/books/${router.asPath.split('/').pop()}`,
+    fetcher
+  )
   const [loading, setLoading] = useState(false)
   const [book, setBook] = useState(null)
   const [response, setResponse] = useState<Response>(null)
@@ -83,6 +89,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
       })
     setResponse(res)
     if (res.result) {
+      mutate()
       reward()
     }
     setLoading(false)
