@@ -64,6 +64,16 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
     mutate(`/api/books/${router.query.year}`)
   }
 
+  const onDelete = async () => {
+    const res = await fetch(`/api/books`, {
+      method: 'DELETE',
+      body: JSON.stringify(newBook),
+      headers: {
+        Accept: 'application/json',
+      },
+    })
+  }
+
   if (!newBook) return null
 
   return (
@@ -87,6 +97,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
             setNewBook({ ...editBook })
           }}
           loading={loading}
+          onDelete={onDelete}
         />
       ) : (
         <BookDetailRead book={currentBook} onClick={onClickEdit} />
