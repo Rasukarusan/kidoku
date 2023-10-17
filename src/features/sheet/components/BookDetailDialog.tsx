@@ -69,8 +69,11 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   return (
     <Modal
       onClose={() => {
-        setEdit(false)
-        onClose()
+        if (edit) {
+          setEdit(false)
+        } else {
+          onClose()
+        }
       }}
       open={open}
       className="sm:w-1/2"
