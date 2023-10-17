@@ -24,7 +24,7 @@ export const BookDatePicker: React.FC<Props> = ({
         value={value}
         className={`pl-2 py-1 w-full text-sm sm:text-base ${
           readonly
-            ? 'bg-white resize-none border-b'
+            ? 'bg-white resize-none border-b appearance-none'
             : 'bg-slate-100 cursor-pointer'
         } ${isChanged ? 'border-2 border-orange-400' : ''}`}
         onChange={onChange}
