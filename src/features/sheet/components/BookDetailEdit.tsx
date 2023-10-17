@@ -13,6 +13,7 @@ interface Props {
   currentBook: Book // 変更前の本
   book: Book
   onClick: () => void
+  onDelete: () => void
   setBook: (book: Book) => void
   loading: boolean
 }
@@ -21,6 +22,7 @@ export const BookDetailEdit: React.FC<Props> = ({
   currentBook,
   book,
   onClick,
+  onDelete,
   setBook,
   loading,
 }) => {
@@ -111,13 +113,21 @@ export const BookDetailEdit: React.FC<Props> = ({
               tabIndex={6}
               isChanged={diff.memo}
             />
-            <ToggleButton
-              label="メモを公開する"
-              checked={book.is_public_memo}
-              onChange={() => {
-                setBook({ ...book, is_public_memo: !book.is_public_memo })
-              }}
-            />
+            <div className="flex justify-between">
+              <ToggleButton
+                label="メモを公開する"
+                checked={book.is_public_memo}
+                onChange={() => {
+                  setBook({ ...book, is_public_memo: !book.is_public_memo })
+                }}
+              />
+              <button
+                className="text-sm text-red-600 font-bold pr-2"
+                onClick={onDelete}
+              >
+                削除する
+              </button>
+            </div>
           </>
         )}
       </div>
