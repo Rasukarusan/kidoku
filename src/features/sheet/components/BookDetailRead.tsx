@@ -17,7 +17,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   return (
     <div className="flex flex-col justify-between h-full">
       <div className="p-4">
-        <div className="flex items-start">
+        <div className="flex items-center">
           <div className="w-1/3 mr-4">
             <a
               href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
