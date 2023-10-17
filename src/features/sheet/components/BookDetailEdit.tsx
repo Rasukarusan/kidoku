@@ -5,6 +5,9 @@ import { useSession } from 'next-auth/react'
 import { Loading } from '@/components/icon/Loading'
 import { ImagePicker } from '@/components/button/ImagePicker'
 import { BookInputField } from '@/components/input/BookInputField'
+import { BookSelectBox } from '@/components/input/BookSelectBox'
+import { BookDatePicker } from '@/components/input/BookDatePicker'
+import dayjs from 'dayjs'
 
 interface Props {
   book: Book
@@ -48,12 +51,27 @@ export const BookDetailEdit: React.FC<Props> = ({
               label="カテゴリ"
               tabIndex={3}
             />
-            <BookInputField
-              value={book?.impression}
-              onChange={(e) => setBook({ ...book, impression: e.target.value })}
-              label="感想"
-              tabIndex={4}
-            />
+            <div className="flex items-center">
+              <BookSelectBox
+                value={book?.impression}
+                onChange={(e) =>
+                  setBook({ ...book, impression: e.target.value })
+                }
+                label="感想"
+                tabIndex={4}
+              />
+              <BookDatePicker
+                value={dayjs(book.finished).format('YYYY-MM-DD')}
+                onChange={(e) =>
+                  setBook({
+                    ...book,
+                    finished: dayjs(e.target.value).format('YYYY-MM-DD'),
+                  })
+                }
+                label="読了日"
+                tabIndex={5}
+              />
+            </div>
           </div>
         </div>
         {isMine && (
@@ -63,7 +81,7 @@ export const BookDetailEdit: React.FC<Props> = ({
               value={book?.memo}
               onChange={(e) => setBook({ ...book, memo: e.target.value })}
               label="メモ"
-              tabIndex={5}
+              tabIndex={6}
             />
             <ToggleButton
               label="メモを公開する"

@@ -3,6 +3,8 @@ import { Book } from '@/types/book'
 import { useSession } from 'next-auth/react'
 import { BookInputField } from '@/components/input/BookInputField'
 import dayjs from 'dayjs'
+import { BookSelectBox } from '@/components/input/BookSelectBox'
+import { BookDatePicker } from '@/components/input/BookDatePicker'
 
 interface Props {
   book: Book
@@ -49,15 +51,15 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
               tabIndex={3}
               readonly={true}
             />
-            <div className="flex justify-between">
-              <BookInputField
+            <div className="flex items-center">
+              <BookSelectBox
                 value={book.impression}
                 label="感想"
                 tabIndex={4}
                 readonly={true}
               />
-              <BookInputField
-                value={dayjs(book.finished).format('YYYY/MM/DD')}
+              <BookDatePicker
+                value={dayjs(book.finished).format('YYYY-MM-DD')}
                 label="読了日"
                 tabIndex={5}
                 readonly={true}
