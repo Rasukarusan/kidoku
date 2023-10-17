@@ -15,6 +15,7 @@ import { BookInputField } from '../BookInputField'
 import { BookSelectBox } from '../BookSelectBox'
 import { BookDatePicker } from '../BookDatePicker'
 import { useRouter } from 'next/router'
+import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 
 interface Response {
   result: boolean
@@ -47,6 +48,15 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
     id: null,
     name: null,
   })
+
+  // カテゴリ一覧
+  const { data: categories } = useSWR(`/api/books/category`, fetcher)
+  const options =
+    categories && categories.result
+      ? categories.categories.map((category) => {
+          return { value: category, label: category }
+        })
+      : []
 
   // シート取得次第、一番上のシートを選択状態にする
   useEffect(() => {
@@ -119,11 +129,14 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
                 label="著者"
                 tabIndex={2}
               />
-              <BookInputField
-                value={book?.category}
-                onChange={(e) => setBook({ ...book, category: e.target.value })}
+              <BookCreatableSelectBox
                 label="カテゴリ"
+                defaultValue={{ value: book?.category, label: book?.category }}
+                options={options}
                 tabIndex={3}
+                onChange={(newValue: { value: string; label: string }) => {
+                  setBook({ ...book, category: newValue?.value ?? '-' })
+                }}
               />
               <div className="flex items-center">
                 <BookSelectBox

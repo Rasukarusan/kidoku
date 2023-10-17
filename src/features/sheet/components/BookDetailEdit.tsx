@@ -8,6 +8,9 @@ import { BookInputField } from '@/components/input/BookInputField'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
 import dayjs from 'dayjs'
+import useSWR from 'swr'
+import { fetcher } from '@/libs/swr'
+import { BookCreatableSelectBox } from '@/components/input/BookCreatableSelectBox'
 
 interface Props {
   currentBook: Book // 変更前の本
@@ -36,6 +39,14 @@ export const BookDetailEdit: React.FC<Props> = ({
     finished: false,
     memo: false,
   })
+  // カテゴリ一覧
+  const { data } = useSWR(`/api/books/category`, fetcher)
+  const options =
+    data && data.result
+      ? data.categories.map((category) => {
+          return { value: category, label: category }
+        })
+      : []
 
   // どこが変更されたかを取得
   useEffect(() => {
@@ -71,12 +82,15 @@ export const BookDetailEdit: React.FC<Props> = ({
               tabIndex={2}
               isChanged={diff.author}
             />
-            <BookInputField
-              value={book?.category}
-              onChange={(e) => setBook({ ...book, category: e.target.value })}
+            <BookCreatableSelectBox
               label="カテゴリ"
+              defaultValue={{ value: book?.category, label: book?.category }}
+              options={options}
               tabIndex={3}
               isChanged={diff.category}
+              onChange={(newValue: { value: string; label: string }) => {
+                setBook({ ...book, category: newValue?.value ?? '-' })
+              }}
             />
             <div className="flex items-center">
               <BookSelectBox
