@@ -5,6 +5,7 @@ interface Props {
   tabIndex: number
   rows?: number
   readonly?: boolean
+  isChanged?: boolean
 }
 
 export const BookInputField: React.FC<Props> = ({
@@ -14,18 +15,22 @@ export const BookInputField: React.FC<Props> = ({
   tabIndex,
   rows = 1,
   readonly = false,
-}) => (
-  <div className="mb-1">
-    <div className="text-gray-400 text-xs mb-1">{label}</div>
-    <textarea
-      rows={rows}
-      value={value}
-      className={`pl-2 py-1 ${
-        readonly ? 'bg-white resize-none border-b' : 'bg-slate-100'
-      } w-full text-sm sm:text-base`}
-      onChange={onChange}
-      tabIndex={tabIndex}
-      disabled={readonly}
-    />
-  </div>
-)
+  isChanged = false,
+}) => {
+  console.log(isChanged)
+  return (
+    <div className="mb-1">
+      <div className="text-gray-400 text-xs mb-1">{label}</div>
+      <textarea
+        rows={rows}
+        value={value}
+        className={`pl-2 py-1  w-full text-sm sm:text-base ${
+          readonly ? 'bg-white resize-none border-b' : 'bg-slate-100'
+        } ${isChanged ? 'border-2 border-orange-400' : ''}`}
+        onChange={onChange}
+        tabIndex={tabIndex}
+        disabled={readonly}
+      />
+    </div>
+  )
+}
