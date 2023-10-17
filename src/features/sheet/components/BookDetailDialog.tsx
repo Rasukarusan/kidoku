@@ -65,13 +65,20 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   }
 
   const onDelete = async () => {
-    const res = await fetch(`/api/books`, {
+    if (!confirm(`『${currentBook.title}』を削除してもよろしいですか？`)) return
+    type Result = {
+      result: boolean
+    }
+    const res: Result = await fetch(`/api/books`, {
       method: 'DELETE',
-      body: JSON.stringify(newBook),
+      body: JSON.stringify(currentBook),
       headers: {
         Accept: 'application/json',
       },
-    })
+    }).then((res) => res.json())
+    if (res.result) {
+      onClose()
+    }
   }
 
   if (!newBook) return null
