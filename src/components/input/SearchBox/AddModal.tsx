@@ -12,6 +12,8 @@ import { ImagePicker } from '@/components/button/ImagePicker'
 import { DangerAlert } from '@/components/label/DangerAlert'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { BookInputField } from '../BookInputField'
+import { BookSelectBox } from '../BookSelectBox'
+import { BookDatePicker } from '../BookDatePicker'
 
 interface Response {
   result: boolean
@@ -53,8 +55,8 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
     setBook({
       ...bookInfo,
       is_public_memo: false,
-      memo: '',
-      impression: '',
+      memo: '[期待]\n\n[感想]\n',
+      impression: '◎',
       finished,
     })
   }, [item])
@@ -116,18 +118,22 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
                 label="カテゴリ"
                 tabIndex={3}
               />
-              <BookInputField
-                value={book?.impression}
-                onChange={(e) =>
-                  setBook({ ...book, impression: e.target.value })
-                }
-                label="感想"
-                tabIndex={4}
-              />
+              <div className="flex items-center">
+                <BookSelectBox
+                  value={book?.impression}
+                  label="感想"
+                  tabIndex={4}
+                />
+                <BookDatePicker
+                  value={dayjs(book?.finished).format('YYYY-MM-DD')}
+                  label="読了日"
+                  tabIndex={5}
+                />
+              </div>
             </div>
           </div>
           <BookInputField
-            rows={4}
+            rows={8}
             value={book?.memo}
             onChange={(e) => setBook({ ...book, memo: e.target.value })}
             label="メモ"
