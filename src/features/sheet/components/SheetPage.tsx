@@ -41,7 +41,6 @@ export const SheetPage: React.FC<Props> = ({
     fallbackData: { result: true, books: data },
   })
   const [currentData, setCurrentData] = useState<Book[]>(data)
-  const [open, setOpen] = useState(false)
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
 
@@ -124,7 +123,7 @@ export const SheetPage: React.FC<Props> = ({
 
       <div className="mb-8">
         {mode === 'grid' ? (
-          <Books books={currentData} />
+          <Books books={currentData} year={year} />
         ) : (
           <BookRows books={currentData} />
         )}

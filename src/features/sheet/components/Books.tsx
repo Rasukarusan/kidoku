@@ -1,5 +1,7 @@
-import { Fragment, useState } from 'react'
+import useSWR from 'swr'
 import SmsIcon from '@mui/icons-material/Sms'
+import { fetcher } from '@/libs/swr'
+import { Fragment, useState } from 'react'
 import { Grid } from '@mui/material'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
@@ -9,13 +11,15 @@ import { NO_IMAGE } from '@/libs/constants'
 
 interface Props {
   books: Book[]
+  year: string
 }
-export const Books: React.FC<Props> = ({ books }) => {
+export const Books: React.FC<Props> = ({ books, year }) => {
   const initialHovers = Array(books.length).fill(false)
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [selectBook, setSelectBook] = useState<Book>(null)
   const [hovers, setHovers] = useState(initialHovers)
+  const { mutate } = useSWR(`/api/books/${year}`, fetcher)
 
   const onClickImage = (book: Book) => {
     setSelectBook(book)
@@ -80,7 +84,10 @@ export const Books: React.FC<Props> = ({ books }) => {
       <BookDetailDialog
         open={open}
         book={selectBook}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          mutate()
+          setOpen(false)
+        }}
       />
     </>
   )

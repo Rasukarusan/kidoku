@@ -17,7 +17,6 @@ export const BookInputField: React.FC<Props> = ({
   readonly = false,
   isChanged = false,
 }) => {
-  console.log(isChanged)
   return (
     <div className="mb-1">
       <div className="text-gray-400 text-xs mb-1">{label}</div>
