@@ -31,6 +31,12 @@ https://app.rasukarusan.com
 
 https://www.meilisearch.com/docs/reference/api/indexes
 
+- index 作成
+
+```sh
+curl -XPOST -H "Authorization: Bearer YourMasterKey" -H 'Content-Type: application/json' -d '{"uid": "books", "primaryKey": "id"}' http://localhost:7700/indexes | jq
+```
+
 - 検索
 
 日本語の場合は URL エンコード必要
