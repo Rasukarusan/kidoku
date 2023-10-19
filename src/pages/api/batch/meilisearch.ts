@@ -42,6 +42,7 @@ export default async function handler(
       apiKey: process.env.MEILI_MASTER_KEY,
     })
     const re = await client.index('books').addDocuments(b)
+    console.log(re)
     // client
     //   .index('books')
     //   .search('金')
