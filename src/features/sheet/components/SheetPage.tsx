@@ -90,6 +90,18 @@ export const SheetPage: React.FC<Props> = ({
         year={year}
         yearlyTopBooks={yearlyTopBooks}
       />
+
+      <div className="w-full mb-14 flex justify-center flex-wrap">
+        <div className="w-full sm:w-1/2 text-center">
+          <TitleWithLine text="月ごとの読書数" className="mb-4" />
+          <BarGraph records={data} setShowData={setShowData} />
+        </div>
+        <div className="w-full sm:w-1/2 text-center">
+          <TitleWithLine text="カテゴリ内訳" className="mb-4" />
+          <TreemapGraph records={data} setShowData={setShowData} />
+        </div>
+      </div>
+
       <div className="flex justify-end mb-8">
         <button
           className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md focus:bg-gray-300"
@@ -127,16 +139,6 @@ export const SheetPage: React.FC<Props> = ({
         ) : (
           <BookRows books={currentData} />
         )}
-      </div>
-      <div className="w-full mb-14 flex justify-center flex-wrap">
-        <div className="w-full sm:w-1/2 text-center">
-          <TitleWithLine text="月ごとの読書数" className="mb-4" />
-          <BarGraph records={data} setShowData={setShowData} />
-        </div>
-        <div className="w-full sm:w-1/2 text-center">
-          <TitleWithLine text="カテゴリ内訳" className="mb-4" />
-          <TreemapGraph records={data} setShowData={setShowData} />
-        </div>
       </div>
     </Container>
   )
