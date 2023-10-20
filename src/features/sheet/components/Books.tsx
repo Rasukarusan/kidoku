@@ -1,13 +1,12 @@
 import useSWR from 'swr'
-import SmsIcon from '@mui/icons-material/Sms'
 import { fetcher } from '@/libs/swr'
 import { Fragment, useState } from 'react'
-import { Grid } from '@mui/material'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
 import { BookDetailDialog } from './BookDetailDialog'
 import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
+import { CommentIcon } from '@/components/icon/CommentIcon'
 
 interface Props {
   books: Book[]
@@ -46,10 +45,10 @@ export const Books: React.FC<Props> = ({ books, year }) => {
 
   return (
     <>
-      <Grid container rowSpacing={1} columnSpacing={{ xs: 2, sm: 2, md: 3 }}>
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-x-2 gap-y-6">
         {books.map((book, i) => {
           return (
-            <Grid key={book.title + i} item xs={4} sm={3} md={2}>
+            <div key={book.title + i} className="">
               <div className="relative bg-white px-2 py-4 sm:px-0 sm:py-2">
                 <img
                   className="hover:cursor-pointer drop-shadow-lg"
@@ -65,8 +64,8 @@ export const Books: React.FC<Props> = ({ books, year }) => {
                   book.is_public_memo) &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
-                    <p className="absolute top-[-5px] sm:top-[-15px] right-[28px]">
-                      <SmsIcon />
+                    <p className="absolute top-[-5px] sm:top-[-16px] right-[40px]">
+                      <CommentIcon className="text-black w-6" />
                     </p>
                   )}
                 {hovers[i] && (
@@ -77,10 +76,10 @@ export const Books: React.FC<Props> = ({ books, year }) => {
                   />
                 )}
               </div>
-            </Grid>
+            </div>
           )
         })}
-      </Grid>
+      </div>
       <BookDetailDialog
         open={open}
         book={selectBook}
