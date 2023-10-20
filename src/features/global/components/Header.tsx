@@ -65,8 +65,9 @@ export const Header = () => {
             <Logo className="w-8 h-8" />
           </Link>
           <SearchBox />
+          <div className="flex-grow"></div>
           {session && (
-            <div className="relative ml-auto" ref={dropdownRef}>
+            <div className="relative" ref={dropdownRef}>
               <button
                 className="rounded-full bg-gray-200 w-[34px] h-[34px] sm:w-[40px] sm:h-[40px] sm:mr-4"
                 onClick={() => setOpenMenu(!openMenu)}
