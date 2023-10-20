@@ -16,7 +16,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   }
 
   return (
-    <div className="flex justify-start items-center overflow-x-auto">
+    <div className="flex justify-start items-center overflow-x-auto no-scrollbar">
       {['total', ...sheets].map((sheet) => (
         <button
           key={sheet}
