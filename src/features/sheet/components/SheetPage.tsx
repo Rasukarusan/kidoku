@@ -43,10 +43,11 @@ export const SheetPage: React.FC<Props> = ({
   const [currentData, setCurrentData] = useState<Book[]>(data)
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
+  const [filter, setFilter] = useState('')
 
+  const isMine =
+    data.length > 0 && session && session.user.id === data[0].userId
   useEffect(() => {
-    const isMine =
-      data.length > 0 && session && session.user.id === data[0].userId
     if (isMine) {
       setCurrentData(res.books)
     } else {
@@ -94,11 +95,19 @@ export const SheetPage: React.FC<Props> = ({
       <div className="w-full mb-14 flex justify-center flex-wrap">
         <div className="w-full sm:w-1/2 text-center">
           <TitleWithLine text="月ごとの読書数" className="mb-4" />
-          <BarGraph records={data} setShowData={setShowData} />
+          <BarGraph
+            records={data}
+            setShowData={setShowData}
+            setFilter={(newFilter) => setFilter(newFilter)}
+          />
         </div>
         <div className="w-full sm:w-1/2 text-center">
           <TitleWithLine text="カテゴリ内訳" className="mb-4" />
-          <TreemapGraph records={data} setShowData={setShowData} />
+          <TreemapGraph
+            records={data}
+            setShowData={setShowData}
+            setFilter={(newFilter) => setFilter(newFilter)}
+          />
         </div>
       </div>
 
@@ -132,6 +141,25 @@ export const SheetPage: React.FC<Props> = ({
           List
         </button>
       </div>
+
+      {filter && (
+        <div className="flex justify-center items-center mb-8 sm:mb-12">
+          <div className="text-2xl font-bold mr-2">「{filter}」の本</div>
+          <button
+            className="rounded-full w-6 h-6 bg-gray-200 text-xs text-center font-bold"
+            onClick={() => {
+              setFilter('')
+              if (isMine) {
+                setCurrentData(res.books)
+              } else {
+                setCurrentData(data)
+              }
+            }}
+          >
+            ✗
+          </button>
+        </div>
+      )}
 
       <div className="mb-8">
         {mode === 'grid' ? (

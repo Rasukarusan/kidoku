@@ -6,6 +6,7 @@ import { TreemapItem } from './TreemapItem'
 interface Props {
   records: Book[]
   setShowData: (newData: Book[]) => void
+  setFilter: (filter: string) => void
 }
 
 interface Data {
@@ -32,7 +33,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export const TreemapGraph: React.FC<Props> = ({ records, setShowData }) => {
+export const TreemapGraph: React.FC<Props> = ({
+  records,
+  setShowData,
+  setFilter,
+}) => {
   const data = useMemo(() => {
     const categories = {}
     records.forEach((record) => {
@@ -72,9 +77,11 @@ export const TreemapGraph: React.FC<Props> = ({ records, setShowData }) => {
     if (index === activeIndex) {
       setActiveIndex(null)
       setShowData(records)
+      setFilter('')
     } else {
       setActiveIndex(index)
       const showData = records.filter((record) => record.category === node.name)
+      setFilter(node.name)
       setShowData(showData)
     }
   }

@@ -14,6 +14,7 @@ import { Book } from '@/types/book'
 interface Props {
   records: Book[]
   setShowData: (newData: Book[]) => void
+  setFilter: (filter: string) => void
 }
 
 interface Data {
@@ -43,7 +44,11 @@ const colors = [
   '#2B2F6C',
 ]
 
-export const BarGraph: React.FC<Props> = ({ records, setShowData }) => {
+export const BarGraph: React.FC<Props> = ({
+  records,
+  setShowData,
+  setFilter,
+}) => {
   const data = useMemo(() => {
     const months = {}
     records.forEach((record) => {
@@ -80,9 +85,11 @@ export const BarGraph: React.FC<Props> = ({ records, setShowData }) => {
     if (index === activeIndex) {
       setActiveIndex(null)
       setShowData(records)
+      setFilter('')
     } else {
       setActiveIndex(index)
       const newData = data.filter((v) => v.name === node.name)[0].children
+      setFilter(node.name)
       setShowData(newData)
     }
   }
