@@ -113,7 +113,9 @@ export const SheetPage: React.FC<Props> = ({
 
       <div className="flex justify-end mb-8">
         <button
-          className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md focus:bg-gray-300"
+          className={`bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md ${
+            mode === 'grid' ? 'bg-gray-300' : ''
+          }`}
           onClick={() => handleChange('grid')}
         >
           <img
@@ -127,7 +129,9 @@ export const SheetPage: React.FC<Props> = ({
           Grid
         </button>
         <button
-          className="bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center  py-1 rounded-r-md focus:bg-gray-300"
+          className={`bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center  py-1 rounded-r-md ${
+            mode === 'row' ? 'bg-gray-300' : ''
+          }`}
           onClick={() => handleChange('row')}
         >
           <img
