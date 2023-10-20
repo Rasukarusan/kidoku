@@ -111,6 +111,27 @@ export const SheetPage: React.FC<Props> = ({
         </div>
       </div>
 
+      <div className="flex justify-center items-center mb-8 sm:mb-8">
+        <div className="text-2xl font-bold mr-2 h-6">
+          {filter && `「${filter}」の本`}
+        </div>
+        {filter && (
+          <button
+            className="rounded-full w-6 h-6 bg-gray-200 text-xs text-center font-bold"
+            onClick={() => {
+              setFilter('')
+              if (isMine) {
+                setCurrentData(res.books)
+              } else {
+                setCurrentData(data)
+              }
+            }}
+          >
+            ✗
+          </button>
+        )}
+      </div>
+
       <div className="flex justify-end mb-8">
         <button
           className={`bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md ${
@@ -145,25 +166,6 @@ export const SheetPage: React.FC<Props> = ({
           List
         </button>
       </div>
-
-      {filter && (
-        <div className="flex justify-center items-center mb-8 sm:mb-12">
-          <div className="text-2xl font-bold mr-2">「{filter}」の本</div>
-          <button
-            className="rounded-full w-6 h-6 bg-gray-200 text-xs text-center font-bold"
-            onClick={() => {
-              setFilter('')
-              if (isMine) {
-                setCurrentData(res.books)
-              } else {
-                setCurrentData(data)
-              }
-            }}
-          >
-            ✗
-          </button>
-        </div>
-      )}
 
       <div className="mb-8">
         {mode === 'grid' ? (
