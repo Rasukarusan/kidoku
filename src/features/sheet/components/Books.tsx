@@ -45,13 +45,13 @@ export const Books: React.FC<Props> = ({ books, year }) => {
 
   return (
     <>
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-x-2 gap-y-6">
+      <div className="grid grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-6">
         {books.map((book, i) => {
           return (
             <div key={book.title + i} className="">
               <div className="relative bg-white px-2 py-4 sm:px-0 sm:py-2">
                 <img
-                  className="hover:cursor-pointer drop-shadow-lg"
+                  className="drop-shadow-lg hover:cursor-pointer"
                   src={book.image === '-' ? NO_IMAGE : book.image}
                   width={128}
                   height={186}
@@ -64,8 +64,8 @@ export const Books: React.FC<Props> = ({ books, year }) => {
                   book.is_public_memo) &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
-                    <p className="absolute top-[-5px] sm:top-[-16px] right-[40px]">
-                      <CommentIcon className="text-black w-6" />
+                    <p className="absolute top-[-5px] right-[40px] sm:top-[-16px]">
+                      <CommentIcon className="w-6 text-black" />
                     </p>
                   )}
                 {hovers[i] && (

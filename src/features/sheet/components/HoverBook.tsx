@@ -14,7 +14,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
 
   return (
     <motion.div
-      className="absolute top-0 z-10 bg-white w-[350px] max-w-[350px] border-2 border-[#507C8F] rounded p-0 overflow-x-hidden"
+      className="absolute top-0 z-10 w-[350px] max-w-[350px] overflow-x-hidden rounded border-2 border-[#507C8F] bg-white p-0"
       animate={{ scale: 1.2, color: '#263238' }}
       onMouseLeave={() => onMouseLeave(-1)}
       onClick={() => onClick(book)}
@@ -30,10 +30,10 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
           />
         </div>
         <div className="p-2">
-          <div className="font-bold text-sm">{book.title}</div>
-          <div className="text-xs pt-1">{book.author}</div>
+          <div className="text-sm font-bold">{book.title}</div>
+          <div className="pt-1 text-xs">{book.author}</div>
           {(isMine || book.is_public_memo) && (
-            <div className="text-xs mt-2 h-[80px] line-clamp-5">
+            <div className="mt-2 h-[80px] text-xs line-clamp-5">
               {book.memo}
             </div>
           )}

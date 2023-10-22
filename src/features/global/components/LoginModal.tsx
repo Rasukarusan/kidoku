@@ -11,11 +11,11 @@ interface Props {
 
 export const LoginModal: React.FC<Props> = ({ open, onClose }) => {
   return (
-    <Modal open={open} onClose={onClose} className="!w-auto !h-auto p-4">
+    <Modal open={open} onClose={onClose} className="!h-auto !w-auto p-4">
       <div className="text-center">
         <Link href="/" legacyBehavior>
-          <div className="font-['Nico_Moji'] font-bold text-2xl tracking-[.3rem] flex items-center justify-center">
-            <Logo className="w-5 mr-2" />
+          <div className="flex items-center justify-center font-['Nico_Moji'] text-2xl font-bold tracking-[.3rem]">
+            <Logo className="mr-2 w-5" />
             Kidoku
           </div>
         </Link>

@@ -15,10 +15,10 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
   return (
-    <div className="flex flex-col justify-between h-full">
+    <div className="flex h-full flex-col justify-between">
       <div className="p-4">
         <div className="flex items-center">
-          <div className="w-1/3 mr-4">
+          <div className="mr-4 w-1/3">
             <a
               href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
               target="_blank"
@@ -32,7 +32,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
               />
             </a>
           </div>
-          <div className="w-2/3 mr-2">
+          <div className="mr-2 w-2/3">
             <BookInputField
               value={book.title}
               label="タイトル"
@@ -78,9 +78,9 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
         )}
       </div>
       {isMine && (
-        <div className="border-t border-1 text-center w-full">
+        <div className="border-1 w-full border-t text-center">
           <button
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-1 font-bold text-white h-12 w-full"
+            className="h-12 w-full bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700"
             onClick={onClick}
           >
             編集する
@@ -100,7 +100,7 @@ export const Memo = ({ memo }) => {
     return <Fragment key={index}>{item.match(/\n/) ? <br /> : item}</Fragment>
   })
   return (
-    <div className="max-h-[290px] sm:px-2 sm:py-4 overflow-y-auto text-sm sm:text-base">
+    <div className="max-h-[290px] overflow-y-auto text-sm sm:px-2 sm:py-4 sm:text-base">
       {texts}
     </div>
   )

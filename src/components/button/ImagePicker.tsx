@@ -23,7 +23,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   }
 
   return (
-    <button className="w-1/3 mr-4" onClick={() => ref.current.click()}>
+    <button className="mr-4 w-1/3" onClick={() => ref.current.click()}>
       <img className="mx-auto my-0 drop-shadow-lg" src={image} alt="" />
       <input ref={ref} type="file" onChange={handleChange} className="hidden" />
     </button>

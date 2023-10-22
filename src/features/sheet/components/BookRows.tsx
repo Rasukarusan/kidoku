@@ -23,9 +23,9 @@ export const BookRows: React.FC<Props> = ({ books }) => {
     session && books.length > 0 && session.user.id === books[0].userId
 
   return (
-    <div className="overflow-x-auto relative mb-12">
-      <table className="w-full text-sm text-left text-gray-500 border">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 hidden sm:table-header-group">
+    <div className="relative mb-12 overflow-x-auto">
+      <table className="w-full border text-left text-sm text-gray-500">
+        <thead className="hidden bg-gray-50 text-xs uppercase text-gray-700 sm:table-header-group">
           <tr>
             <th scope="col" className="py-3 px-4">
               No
@@ -36,10 +36,10 @@ export const BookRows: React.FC<Props> = ({ books }) => {
             <th scope="col" className="py-3 px-6">
               著者
             </th>
-            <th scope="col" className="py-3 px-6 whitespace-nowrap">
+            <th scope="col" className="whitespace-nowrap py-3 px-6">
               カテゴリ
             </th>
-            <th scope="col" className="py-3 px-6 whitespace-nowrap">
+            <th scope="col" className="whitespace-nowrap py-3 px-6">
               感想
             </th>
             <th scope="col" className="py-3 px-6">
@@ -50,14 +50,14 @@ export const BookRows: React.FC<Props> = ({ books }) => {
         <tbody>
           {books.map((book, i) => (
             <tr
-              className="bg-white border-b hover:bg-gray-50 hover:cursor-pointer"
+              className="border-b bg-white hover:cursor-pointer hover:bg-gray-50"
               key={`${book.title}-${i}`}
               onClick={() => onClickRow(i)}
             >
               <td className={`py-4 text-center ${pc}`}>{i + 1}</td>
               <th
                 scope="row"
-                className="py-4 px-4 sm:px-6 font-medium text-gray-900"
+                className="py-4 px-4 font-medium text-gray-900 sm:px-6"
               >
                 <div className="flex items-center">
                   <img
@@ -78,8 +78,8 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                       {expands[i] ? book.title : truncate(book.title, 20)}
                     </div>
                     <div className="sm:hidden">{book.title}</div>
-                    <div className="flex justify-between mt-1 sm:hidden">
-                      <div className="text-gray-500 pr-2">{book.author}</div>
+                    <div className="mt-1 flex justify-between sm:hidden">
+                      <div className="pr-2 text-gray-500">{book.author}</div>
                       <div className="text-gray-500">{book.impression}</div>
                     </div>
                   </div>
@@ -91,7 +91,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               </td>
               <td className={`py-4 px-6 ${pc}`}>{book.impression}</td>
               {(isMine || book.is_public_memo) && (
-                <td className={`py-4 px-6 whitespace-normal ${pc}`}>
+                <td className={`whitespace-normal py-4 px-6 ${pc}`}>
                   {expands[i] ? (
                     <Memo memo={book.memo} />
                   ) : (

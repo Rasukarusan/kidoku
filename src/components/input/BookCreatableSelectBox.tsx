@@ -34,7 +34,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
   }
   return (
     <div className="mb-1">
-      <div className="text-gray-400 text-xs mb-1">{label}</div>
+      <div className="mb-1 text-xs text-gray-400">{label}</div>
       <CreatableSelect
         styles={customStyles}
         defaultValue={defaultValue}

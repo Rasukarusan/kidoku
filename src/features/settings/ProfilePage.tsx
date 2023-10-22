@@ -34,28 +34,28 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   return (
     <div className="p-10">
       <h2 className="text-2xl font-bold">Settings</h2>
-      <div className="flex p-4 mb-8">
-        <button className="rounded-full w-[100px] h-[100px] mr-8 mb-4">
+      <div className="mb-8 flex p-4">
+        <button className="mr-8 mb-4 h-[100px] w-[100px] rounded-full">
           <img src={image} width={100} height={100} className="rounded-full" />
         </button>
         <div className="w-full">
-          <div className="font-bold flex items-start mb-4">
-            <span className="mr-1 text-gray-700 text-sm">表示名</span>
-            <span className="font-bold text-red-400 text-xs">※</span>
+          <div className="mb-4 flex items-start font-bold">
+            <span className="mr-1 text-sm text-gray-700">表示名</span>
+            <span className="text-xs font-bold text-red-400">※</span>
           </div>
           <input
             value={currentName}
-            className="p-2 border border-slate-200 rounded-md w-full bg-slate-100 mb-4"
+            className="mb-4 w-full rounded-md border border-slate-200 bg-slate-100 p-2"
             onChange={(e) => {
               setCurrentName(e.target.value)
             }}
           />
           <div className="mb-4">
-            <div className="font-bold mb-4 text-gray-700 text-sm">
+            <div className="mb-4 text-sm font-bold text-gray-700">
               アカウント削除
             </div>
             <button
-              className="text-red-500 font-bold rounded-md mb-2 text-sm"
+              className="mb-2 rounded-md text-sm font-bold text-red-500"
               onClick={onClickDelete}
             >
               アカウントを削除する
@@ -67,11 +67,11 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </div>
       </div>
       <button
-        className="px-4 py-2 hover:bg-blue-500 bg-blue-400 font-bold rounded-md text-white block m-auto flex items-center"
+        className="m-auto block flex items-center rounded-md bg-blue-400 px-4 py-2 font-bold text-white hover:bg-blue-500"
         onClick={onSubmit}
       >
         {loading && (
-          <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
+          <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
         )}
         <span>更新する</span>
       </button>

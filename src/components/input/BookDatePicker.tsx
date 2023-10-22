@@ -18,14 +18,14 @@ export const BookDatePicker: React.FC<Props> = ({
 }) => {
   return (
     <div className="mb-1">
-      <div className="text-gray-400 text-xs mb-1">{label}</div>
+      <div className="mb-1 text-xs text-gray-400">{label}</div>
       <input
         type="date"
         value={value}
-        className={`pl-2 py-1 w-full text-sm sm:text-base ${
+        className={`w-full py-1 pl-2 text-sm sm:text-base ${
           readonly
-            ? 'bg-white resize-none border-b appearance-none'
-            : 'bg-slate-100 cursor-pointer'
+            ? 'resize-none appearance-none border-b bg-white'
+            : 'cursor-pointer bg-slate-100'
         } ${isChanged ? 'border-2 border-orange-400' : ''}`}
         onChange={onChange}
         tabIndex={tabIndex}

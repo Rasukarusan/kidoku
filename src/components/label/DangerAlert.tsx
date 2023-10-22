@@ -9,7 +9,7 @@ export const DangerAlert: React.FC<Props> = ({ open, text, onClose }) => {
   return (
     <div
       id="alert-1"
-      className={`flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50`}
+      className={`mb-4 flex items-center rounded-lg bg-red-50 p-4 text-red-800`}
       role="alert"
     >
       <svg
@@ -25,14 +25,14 @@ export const DangerAlert: React.FC<Props> = ({ open, text, onClose }) => {
       <div className="ml-3 text-sm font-medium">{text}</div>
       <button
         type="button"
-        className="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8"
+        className="-mx-1.5 -my-1.5 ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 p-1.5 text-red-500 hover:bg-red-200 focus:ring-2 focus:ring-red-400"
         data-dismiss-target="#alert-1"
         aria-label="Close"
         onClick={onClose}
       >
         <span className="sr-only">Close</span>
         <svg
-          className="w-3 h-3"
+          className="h-3 w-3"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

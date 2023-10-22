@@ -106,9 +106,9 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   }
 
   return (
-    <Modal open={open} onClose={onClose} className="sm:w-1/2 h-3/4">
-      <div className="flex flex-col justify-between h-full">
-        <div className="p-4 bg-white">
+    <Modal open={open} onClose={onClose} className="h-3/4 sm:w-1/2">
+      <div className="flex h-full flex-col justify-between">
+        <div className="bg-white p-4">
           <div className="flex items-center">
             <ImagePicker
               img={book?.image}
@@ -116,7 +116,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
                 setBook({ ...book, image })
               }}
             />
-            <div className="w-2/3 mr-2">
+            <div className="mr-2 w-2/3">
               <BookInputField
                 value={book?.title}
                 onChange={(e) => setBook({ ...book, title: e.target.value })}
@@ -166,9 +166,9 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
               setBook({ ...book, is_public_memo: !book?.is_public_memo })
             }}
           />
-          <div className="w-full text-gray-900 text-center ">
+          <div className="w-full text-center text-gray-900 ">
             <select
-              className="border p-2 px-4 cursor-pointer"
+              className="cursor-pointer border p-2 px-4"
               onChange={(e) => {
                 const selectedOption = e.target.selectedOptions[0]
                 const sheetId = selectedOption.getAttribute('data-id')
@@ -189,9 +189,9 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
             </select>
           </div>
         </div>
-        <div className="border-t border-1 text-center w-full">
+        <div className="border-1 w-full border-t text-center">
           {response && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 bottom-32 sm:bottom-28 z-20">
+            <div className="absolute left-1/2 bottom-32 z-20 -translate-x-1/2 transform sm:bottom-28">
               {response.result ? (
                 <SuccessAlert
                   open={!!response}
@@ -212,13 +212,13 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
             </div>
           )}
           <button
-            className="hover:bg-blue-700 bg-blue-600 px-4 py-1 disabled:bg-blue-700 font-bold text-white w-full h-12 flex items-center justify-center rounded-b-md"
+            className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-700"
             onClick={onClickAdd}
             tabIndex={6}
             disabled={isAnimating}
           >
             {loading && (
-              <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
+              <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
             )}
             <span id="rewardId">本を登録する</span>
           </button>

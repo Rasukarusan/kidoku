@@ -61,13 +61,13 @@ export const BookDetailEdit: React.FC<Props> = ({
   }, [book])
   return (
     <>
-      <div className="p-4 overflow-y-hidden">
+      <div className="overflow-y-hidden p-4">
         <div className="flex items-center">
           <ImagePicker
             img={book.image}
             onImageLoad={(image) => setBook({ ...book, image })}
           />
-          <div className="w-2/3 mr-2">
+          <div className="mr-2 w-2/3">
             <BookInputField
               value={book?.title}
               onChange={(e) => setBook({ ...book, title: e.target.value })}
@@ -136,7 +136,7 @@ export const BookDetailEdit: React.FC<Props> = ({
                 }}
               />
               <button
-                className="text-sm text-red-600 font-bold pr-2"
+                className="pr-2 text-sm font-bold text-red-600"
                 onClick={onDelete}
               >
                 削除する
@@ -145,14 +145,14 @@ export const BookDetailEdit: React.FC<Props> = ({
           </>
         )}
       </div>
-      <div className="border-t border-1 text-center w-full">
+      <div className="border-1 w-full border-t text-center">
         <button
-          className="hover:bg-green-700 bg-green-600 px-4 py-1 font-bold text-white w-full h-12 flex items-center justify-center"
+          className="flex h-12 w-full items-center justify-center bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700"
           onClick={onClick}
           tabIndex={6}
         >
           {loading && (
-            <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
+            <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
           )}
           <span>保存する</span>
         </button>

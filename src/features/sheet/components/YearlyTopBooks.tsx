@@ -41,7 +41,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
         order={order}
         yearlyTopBooks={yearlyTopBooks}
       />
-      <div className="text-center mb-8">
+      <div className="mb-8 text-center">
         <div className="mb-4">
           <TitleWithLine text={`${year}年トップ３`} />
         </div>
@@ -57,7 +57,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
                 style={{ order: v === 3 ? 0 : v }}
               >
                 <button
-                  className={`bg-gray-100 rounded-md w-[96px] h-[140px] sm:w-[128px] sm:h-[186px] text-2xl mb-1 shadow-md ${
+                  className={`mb-1 h-[140px] w-[96px] rounded-md bg-gray-100 text-2xl shadow-md sm:h-[186px] sm:w-[128px] ${
                     isMine ? 'hover:bg-gray-200 hover:brightness-95' : ''
                   }`}
                   onClick={() => onClickAdd(v)}
@@ -75,7 +75,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
                       {isMine ? (
                         <span className="font-bold">+</span>
                       ) : (
-                        <span className="font-bold text-gray-500 text-sm sm:text-base">
+                        <span className="text-sm font-bold text-gray-500 sm:text-base">
                           未設定
                         </span>
                       )}

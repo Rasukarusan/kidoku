@@ -23,7 +23,7 @@ interface Props {
 export const Row = ({ label, value }) => {
   return (
     <tr className="border">
-      <td className="border w-1/4 p-2 bg-gray-100">{label}</td>
+      <td className="w-1/4 border bg-gray-100 p-2">{label}</td>
       <td className="border p-2">{value}</td>
     </tr>
   )
@@ -32,12 +32,12 @@ export const Row = ({ label, value }) => {
 const Hit = ({ hit }) => {
   console.log(hit)
   return (
-    <div className="flex items-center border m-4 p-4">
+    <div className="m-4 flex items-center border p-4">
       <img className="mr-4" src={hit.image} width="50" />
       <div>
         <Highlight attribute="title" hit={hit} className="mb-1" />
-        <div className="text-xs mb-1">{hit.author}</div>
-        <div className="text-xs mb-1">{hit.memo}</div>
+        <div className="mb-1 text-xs">{hit.author}</div>
+        <div className="mb-1 text-xs">{hit.memo}</div>
       </div>
     </div>
   )
@@ -54,17 +54,17 @@ export const IndexPage = ({ users }) => {
         <div>
           {users.map((user, i) => (
             <div key={user.name} className="sm:flex sm:items-center">
-              <Link href={user.url} className="m-4 sm:m-10 flex justify-center">
-                <div className="mr-4 hover:brightness-90 hover:underline">
+              <Link href={user.url} className="m-4 flex justify-center sm:m-10">
+                <div className="mr-4 hover:underline hover:brightness-90">
                   <img
                     src={user.image}
                     alt=""
-                    className="rounded-full w-[100px] h-[100px] mb-2"
+                    className="mb-2 h-[100px] w-[100px] rounded-full"
                   />
-                  <div className="font-bold text-center">{user.name}</div>
+                  <div className="text-center font-bold">{user.name}</div>
                 </div>
               </Link>
-              <table className="border w-96 mb-4">
+              <table className="mb-4 w-96 border">
                 <tbody>
                   <Row label="Total" value={`${user.books.total}冊`} />
                   <Row

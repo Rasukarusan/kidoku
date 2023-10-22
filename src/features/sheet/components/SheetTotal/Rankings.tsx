@@ -34,7 +34,7 @@ export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
         return (
           <Fragment key={year}>
             <span className="title">{year}</span>
-            <div className="block sm:flex justify-around mt-8">
+            <div className="mt-8 block justify-around sm:flex">
               {yearBooks.map((book, i) => (
                 <Book key={`${book.title}-${i}`} book={book} />
               ))}

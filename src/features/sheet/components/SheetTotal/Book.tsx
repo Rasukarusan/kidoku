@@ -16,8 +16,8 @@ export const Book: React.FC<Props> = ({ book }) => {
       ? 'order-2 sm:order-2'
       : 'order-1 sm:order-1'
   return (
-    <div className={`w-full sm:w-1/3 mb-5 sm:mb-0 ${styleOrder}`}>
-      <div className={`text-transparent text-3xl font-bold mb-2 ${color}`}>
+    <div className={`mb-5 w-full sm:mb-0 sm:w-1/3 ${styleOrder}`}>
+      <div className={`mb-2 text-3xl font-bold text-transparent ${color}`}>
         {order}位
       </div>
       <a
@@ -26,7 +26,7 @@ export const Book: React.FC<Props> = ({ book }) => {
         rel="noreferrer"
       >
         <img
-          className="m-auto shadow-md mb-4"
+          className="m-auto mb-4 shadow-md"
           src={image}
           width={128}
           height={186}

@@ -12,10 +12,10 @@ interface ColumnProps {
 const Column: React.FC<ColumnProps> = ({ title, items }) => {
   return (
     <div>
-      <h2 className="mb-6 text-sm font-semibold tuppercase text-white">
+      <h2 className="tuppercase mb-6 text-sm font-semibold text-white">
         {title}
       </h2>
-      <ul className="text-gray-500 dark:text-gray-400 font-medium">
+      <ul className="font-medium text-gray-500 dark:text-gray-400">
         {items.map((item) => (
           <li key={item.title} className="mb-4">
             <a
@@ -40,13 +40,13 @@ export const Footer: React.FC = () => {
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
             <a href="/" className="flex items-center">
-              <Logo className="w-8 text-white mr-2" />
-              <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
+              <Logo className="mr-2 w-8 text-white" />
+              <span className="self-center whitespace-nowrap text-2xl font-semibold text-white">
                 Kidoku
               </span>
             </a>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3 text-sm">
+          <div className="grid grid-cols-2 gap-8 text-sm sm:grid-cols-3 sm:gap-6">
             <Column
               title="About"
               items={[
