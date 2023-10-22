@@ -5,6 +5,7 @@ import { BookInputField } from '@/components/input/BookInputField'
 import dayjs from 'dayjs'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
+import { LockIcon } from '@/components/icon/LockIcon'
 
 interface Props {
   book: Book
@@ -67,11 +68,15 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             </div>
           </div>
         </div>
+        <div className="mb-1 flex items-center">
+          <div className="mr-1 text-xs text-gray-400">メモ</div>
+          {!book.is_public_memo && <LockIcon className="w-[15px]" />}
+        </div>
         {(isMine || book.is_public_memo) && (
           <BookInputField
             rows={8}
             value={book.memo}
-            label="メモ"
+            label=""
             tabIndex={6}
             readonly={true}
           />
