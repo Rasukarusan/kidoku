@@ -16,11 +16,11 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   }
 
   return (
-    <div className="flex justify-start items-center overflow-x-auto no-scrollbar">
+    <div className="no-scrollbar flex items-center justify-start overflow-x-auto">
       {['total', ...sheets].map((sheet) => (
         <button
           key={sheet}
-          className={`w-[90px] px-8 py-3 text-sm text-gray-600 text-center ease-in duration-300 uppercase hover:bg-gray-100 ${
+          className={`w-[90px] px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100 ${
             tab === sheet ? 'border-b-2 border-gray-900' : ''
           }`}
           onClick={() => onClick(sheet)}

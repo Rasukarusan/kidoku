@@ -40,19 +40,19 @@ export const SheetTotalPage: React.FC<Props> = ({
 
   return (
     <Container>
-      <div className="border-b border-gray-200 mb-8">
+      <div className="mb-8 border-b border-gray-200">
         <Tabs value="total" sheets={sheets} username={username} />
       </div>
-      <div className="text-center mb-10">
+      <div className="mb-10 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={total} unit="冊" />
-        <div className="sm:w-3/4 w-full h-[200px] sm:h-[300px] m-auto mb-4">
+        <div className="m-auto mb-4 h-[200px] w-full sm:h-[300px] sm:w-3/4">
           <CategoryMap categories={categories} />
         </div>
 
         <TitleWithLine text="年間平均読書数" />
         <CoutUpText value={average} unit="冊" />
-        <div className="sm:w-3/4 w-full h-[300px] m-auto mb-4">
+        <div className="m-auto mb-4 h-[300px] w-full sm:w-3/4">
           <YearsGraph years={years} />
         </div>
 

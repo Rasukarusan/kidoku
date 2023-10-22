@@ -75,16 +75,16 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   }
 
   return (
-    <Modal open={open} onClose={onClose} className="sm:w-2/3 h-3/4">
-      <div className="p-4 h-full">
-        <h2 className="mb-4 font-bold text-center text-2xl shrink-0">
+    <Modal open={open} onClose={onClose} className="h-3/4 sm:w-2/3">
+      <div className="h-full p-4">
+        <h2 className="mb-4 shrink-0 text-center text-2xl font-bold">
           {year}年ベスト<span className="underline">{order}位</span>を設定
         </h2>
-        <div className="w-full text-gray-900 p-4 flex flex-wrap justify-center overflow-y-auto h-full pb-12">
+        <div className="flex h-full w-full flex-wrap justify-center overflow-y-auto p-4 pb-12 text-gray-900">
           {books.map((book, i: number) => {
             return (
               <div
-                className={`w-3/4 sm:w-[200px] border border-gray-300 m-2 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-100 ${
+                className={`m-2 w-3/4 cursor-pointer rounded-md border border-gray-300 px-4 py-2 shadow hover:bg-gray-100 sm:w-[200px] ${
                   selectItem?.id === book.id
                     ? 'bg-pink-200 hover:bg-pink-200'
                     : 'bg-white'
@@ -94,8 +94,8 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
                   setSelectItem(selectItem?.id === book.id ? null : book)
                 }
               >
-                <div className="font-bold mb-1">{truncate(book.title, 15)}</div>
-                <div className="text-xs mb-1">{book.author}</div>
+                <div className="mb-1 font-bold">{truncate(book.title, 15)}</div>
+                <div className="mb-1 text-xs">{book.author}</div>
                 <img
                   className="m-auto mb-1 h-[150px] object-contain"
                   src={book.image}
@@ -108,9 +108,9 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
           })}
         </div>
       </div>
-      <div className="w-full text-center h-[50px] flex items-center justify-center shrink-0">
+      <div className="flex h-[50px] w-full shrink-0 items-center justify-center text-center">
         {isAnimating && message && (
-          <div className="absolute left-1/2 transform -translate-x-1/2 bottom-32 sm:bottom-28 z-20">
+          <div className="absolute left-1/2 bottom-32 z-20 -translate-x-1/2 transform sm:bottom-28">
             <SuccessAlert
               open={true}
               text={message}
@@ -119,12 +119,12 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
           </div>
         )}
         <button
-          className="font-bold text-white flex items-center disabled:font-medium w-full h-full justify-center disabled:bg-gray-400 bg-blue-600 hover:bg-blue-700 rounded-b-md z-10"
+          className="z-10 flex h-full w-full items-center justify-center rounded-b-md bg-blue-600 font-bold text-white hover:bg-blue-700 disabled:bg-gray-400 disabled:font-medium"
           onClick={onClickSet}
           disabled={!selectItem && !current}
         >
           {loading && (
-            <Loading className="w-[18px] h-[18px] border-[3px] mr-2 border-white" />
+            <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
           )}
           <span id="rewardId">設定する</span>
         </button>

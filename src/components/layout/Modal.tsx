@@ -25,11 +25,11 @@ export const Modal: React.FC<Props> = ({
 
   return (
     <div
-      className="fixed w-full h-full backdrop-blur-[4px] flex justify-center items-center z-[1000] left-0 top-0 bg-[rgba(0,0,0,0.1)] overflow-y-hidden p-4 sm:p-8"
+      className="fixed left-0 top-0 z-[1000] flex h-full w-full items-center justify-center overflow-y-hidden bg-[rgba(0,0,0,0.1)] p-4 backdrop-blur-[4px] sm:p-8"
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-md flex-col flex m-2 sm:m-0 text-gray-700 ${className}`}
+        className={`m-2 flex flex-col rounded-md bg-white text-gray-700 sm:m-0 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {children}

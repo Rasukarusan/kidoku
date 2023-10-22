@@ -66,11 +66,11 @@ export const SheetPage: React.FC<Props> = ({
   if (data.length === 0) {
     return (
       <Container>
-        <div className="border-b border-gray-200 mb-8">
+        <div className="mb-8 border-b border-gray-200">
           <Tabs sheets={sheets} value={year} username={username} />
         </div>
         <div className="p-10 text-center">
-          <div className="text-4xl font-bold mb-4">データがまだありません</div>
+          <div className="mb-4 text-4xl font-bold">データがまだありません</div>
           <img src={NO_IMAGE} alt="" width="400" className="m-auto" />
         </div>
       </Container>
@@ -79,10 +79,10 @@ export const SheetPage: React.FC<Props> = ({
 
   return (
     <Container className="mb-12">
-      <div className="border-b border-gray-200 mb-8">
+      <div className="mb-8 border-b border-gray-200">
         <Tabs sheets={sheets} value={year} username={username} />
       </div>
-      <div className="text-center mb-10">
+      <div className="mb-10 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
       </div>
@@ -92,8 +92,8 @@ export const SheetPage: React.FC<Props> = ({
         yearlyTopBooks={yearlyTopBooks}
       />
 
-      <div className="w-full mb-14 flex justify-center flex-wrap">
-        <div className="w-full sm:w-1/2 text-center">
+      <div className="mb-14 flex w-full flex-wrap justify-center">
+        <div className="w-full text-center sm:w-1/2">
           <TitleWithLine text="月ごとの読書数" className="mb-4" />
           <BarGraph
             records={data}
@@ -101,7 +101,7 @@ export const SheetPage: React.FC<Props> = ({
             setFilter={(newFilter) => setFilter(newFilter)}
           />
         </div>
-        <div className="w-full sm:w-1/2 text-center">
+        <div className="w-full text-center sm:w-1/2">
           <TitleWithLine text="カテゴリ内訳" className="mb-4" />
           <TreemapGraph
             records={data}
@@ -111,13 +111,13 @@ export const SheetPage: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="flex justify-center items-center mb-8 sm:mb-8">
-        <div className="text-2xl font-bold mr-2 h-6">
+      <div className="mb-8 flex items-center justify-center sm:mb-8">
+        <div className="mr-2 h-6 text-2xl font-bold">
           {filter && `「${filter}」の本`}
         </div>
         {filter && (
           <button
-            className="rounded-full w-6 h-6 bg-gray-200 text-xs text-center font-bold"
+            className="h-6 w-6 rounded-full bg-gray-200 text-center text-xs font-bold"
             onClick={() => {
               setFilter('')
               if (isMine) {
@@ -132,9 +132,9 @@ export const SheetPage: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="flex justify-end mb-8">
+      <div className="mb-8 flex justify-end">
         <button
-          className={`bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center py-1 rounded-l-md ${
+          className={`flex items-center justify-center rounded-l-md border border-gray-400 bg-gray-50 px-2 py-1 text-xs ${
             mode === 'grid' ? 'bg-gray-300' : ''
           }`}
           onClick={() => handleChange('grid')}
@@ -150,7 +150,7 @@ export const SheetPage: React.FC<Props> = ({
           Grid
         </button>
         <button
-          className={`bg-gray-50 border border-gray-400 px-2 text-xs flex justify-center items-center  py-1 rounded-r-md ${
+          className={`flex items-center justify-center rounded-r-md border border-gray-400 bg-gray-50 px-2  py-1 text-xs ${
             mode === 'row' ? 'bg-gray-300' : ''
           }`}
           onClick={() => handleChange('row')}

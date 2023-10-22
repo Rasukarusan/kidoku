@@ -56,20 +56,20 @@ export const Header = () => {
 
   return (
     <>
-      <div className="bg-main text-white fixed top-0 w-full z-50">
+      <div className="fixed top-0 z-50 w-full bg-main text-white">
         <Container className="flex items-center p-2">
           <Link
             href="/"
-            className="mr-8 font-bold tracking-[.3rem] no-underline font-['Nico_Moji'] text-xl"
+            className="mr-8 font-['Nico_Moji'] text-xl font-bold tracking-[.3rem] no-underline"
           >
-            <Logo className="w-8 h-8" />
+            <Logo className="h-8 w-8" />
           </Link>
           <SearchBox />
           <div className="flex-grow"></div>
           {session && (
             <div className="relative" ref={dropdownRef}>
               <button
-                className="rounded-full bg-gray-200 w-[34px] h-[34px] sm:w-[40px] sm:h-[40px] sm:mr-4"
+                className="h-[34px] w-[34px] rounded-full bg-gray-200 sm:mr-4 sm:h-[40px] sm:w-[40px]"
                 onClick={() => setOpenMenu(!openMenu)}
               >
                 <img
@@ -85,32 +85,32 @@ export const Header = () => {
                     animate="open"
                     exit="closed"
                     variants={variants}
-                    className="absolute z-[1000] right-4 m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
+                    className="absolute right-4 z-[1000] m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
                   >
-                    <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
-                      <BookIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
+                    <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
+                      <BookIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
                       <Link
-                        className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
+                        className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
                         href={url}
                         onClick={() => setOpenMenu(false)}
                       >
                         読書記録
                       </Link>
                     </li>
-                    <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
-                      <SettingsIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
+                    <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
+                      <SettingsIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
                       <Link
-                        className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm"
+                        className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
                         href="/settings/profile"
                         onClick={() => setOpenMenu(false)}
                       >
                         アカウント設定
                       </Link>
                     </li>
-                    <li className="border border-bottom-1 flex items-center px-4 py-2 hover:bg-neutral-100">
-                      <ExitIcon className="w-[24px] h-[24px] text-slate-300 mr-2" />
+                    <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
+                      <ExitIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
                       <button
-                        className="block w-full whitespace-nowrap text-gray-600 bg-transparent text-sm text-left"
+                        className="block w-full whitespace-nowrap bg-transparent text-left text-sm text-gray-600"
                         onClick={() => signOut()}
                       >
                         ログアウト
@@ -124,7 +124,7 @@ export const Header = () => {
           {session === null && (
             <>
               <button
-                className="rounded-md bg-[#4f5b62] text-xs sm:text-sm px-4 py-2 sm:px-5 sm:py-2 font-bold"
+                className="rounded-md bg-[#4f5b62] px-4 py-2 text-xs font-bold sm:px-5 sm:py-2 sm:text-sm"
                 onClick={() => setOpen(true)}
               >
                 ログイン
