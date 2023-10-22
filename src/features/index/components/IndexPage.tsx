@@ -7,7 +7,7 @@ import { InstantSearch, SearchBox, Hits, Highlight } from 'react-instantsearch'
 import { instantMeiliSearch } from '@meilisearch/instant-meilisearch'
 
 const searchClient = instantMeiliSearch(
-  'localhost:3000/api/meilisearch',
+  process.env.NEXT_PUBLIC_HOST + '/api/meilisearch',
   'hoge'
 )
 
