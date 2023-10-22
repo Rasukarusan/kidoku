@@ -7,8 +7,8 @@ import { InstantSearch, SearchBox, Hits, Highlight } from 'react-instantsearch'
 import { instantMeiliSearch } from '@meilisearch/instant-meilisearch'
 
 const searchClient = instantMeiliSearch(
-  'http://localhost:7700',
-  'YourMasterKey'
+  'localhost:3000/api/meilisearch',
+  'hoge'
 )
 
 interface Props {
@@ -32,12 +32,19 @@ export const Row = ({ label, value }) => {
 const Hit = ({ hit }) => {
   console.log(hit)
   return (
-    <div className="m-4 flex items-center border p-4">
-      <img className="mr-4" src={hit.image} width="50" />
+    <div key={hit.id} className="m-4 flex items-center border p-4">
+      <Link
+        href={`/${hit.user}/sheets/${hit.sheet}`}
+        className="mr-4 min-w-[50px] text-center"
+      >
+        <img className="" src={hit.image} width="50" />
+      </Link>
       <div>
-        <Highlight attribute="title" hit={hit} className="mb-1" />
+        <Link href={`/${hit.user}/sheets/${hit.sheet}`}>
+          <Highlight attribute="title" hit={hit} className="mb-1" />
+        </Link>
         <div className="mb-1 text-xs">{hit.author}</div>
-        <div className="mb-1 text-xs">{hit.memo}</div>
+        <Highlight attribute="memo" hit={hit} className="mb-1 text-xs" />
       </div>
     </div>
   )
