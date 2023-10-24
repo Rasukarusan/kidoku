@@ -14,6 +14,7 @@ import { YearlyTopBooks } from './YearlyTopBooks'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { NO_IMAGE } from '@/libs/constants'
+import { Menu } from './Menu'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -66,8 +67,11 @@ export const SheetPage: React.FC<Props> = ({
   if (data.length === 0) {
     return (
       <Container>
-        <div className="mb-8 border-b border-gray-200">
-          <Tabs sheets={sheets} value={year} username={username} />
+        <div className="flex">
+          <div className=" mb-8 w-[90%] border-b border-gray-200">
+            <Tabs sheets={sheets} value={year} username={username} />
+          </div>
+          <div className="w-[10%]"></div>
         </div>
         <div className="p-10 text-center">
           <div className="mb-4 text-4xl font-bold">データがまだありません</div>
@@ -79,8 +83,13 @@ export const SheetPage: React.FC<Props> = ({
 
   return (
     <Container className="mb-12">
-      <div className="mb-8 border-b border-gray-200">
-        <Tabs sheets={sheets} value={year} username={username} />
+      <div className="flex">
+        <div className="mb-8 w-[90%] border-b border-gray-200 pr-4">
+          <Tabs sheets={sheets} value={year} username={username} />
+        </div>
+        <div className="w-[10%]">
+          <Menu username={username} />
+        </div>
       </div>
       <div className="mb-10 text-center">
         <TitleWithLine text="累計読書数" />

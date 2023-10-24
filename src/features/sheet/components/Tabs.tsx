@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import { AddSheetModal } from './AddSheetModal'
 import { useSession } from 'next-auth/react'
 
 interface Props {
@@ -12,8 +11,6 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const router = useRouter()
   const { data: session } = useSession()
   const [tab, setTab] = useState(value)
-  const [open, setOpen] = useState(false)
-  const isMine = session && session.user.name === username
 
   const onClick = (value: string) => {
     setTab(value)
@@ -33,17 +30,6 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
           {sheet}
         </button>
       ))}
-      {isMine && (
-        <button
-          className="w-[90px] px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100"
-          onClick={() => {
-            setOpen(true)
-          }}
-        >
-          ＋
-        </button>
-      )}
-      <AddSheetModal open={open} onClose={() => setOpen(false)} />
     </div>
   )
 }
