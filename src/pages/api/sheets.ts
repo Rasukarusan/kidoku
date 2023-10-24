@@ -19,9 +19,14 @@ export default async (req, res) => {
       return res.status(200).json({ result: true, sheets })
     } else if (req.method === 'POST') {
       const { name } = JSON.parse(req.body)
-      // TODO: orderを調整
+      const sheet = await prisma.sheets.findFirst({
+        where: { userId },
+        select: { id: true, name: true, order: true },
+        orderBy: [{ order: 'desc' }],
+      })
+      const order = sheet ? sheet.order + 1 : 1
       await prisma.sheets.create({
-        data: { userId, name },
+        data: { userId, name, order },
       })
       return res.status(200).json({ result: true })
     }
