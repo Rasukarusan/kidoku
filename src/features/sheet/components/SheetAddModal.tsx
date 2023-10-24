@@ -6,7 +6,7 @@ interface Props {
   onClose: () => void
 }
 
-export const AddSheetModal: React.FC<Props> = ({ open, onClose }) => {
+export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
   const [newSheet, setNewSheet] = useState('')
   const ref = useRef<HTMLInputElement>(null)
 
