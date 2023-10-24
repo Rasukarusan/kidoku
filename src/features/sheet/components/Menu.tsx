@@ -4,16 +4,19 @@ import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { SettingsIcon } from '@/components/icon/SettingsIcon'
 import { ExitIcon } from '@/components/icon/ExitIcon'
 import { BookIcon } from '@/components/icon/BookIcon'
-import { AddSheetModal } from './AddSheetModal'
+import { SheetAddModal } from './SheetAddModal'
+import { SheetDeleteModal } from './SheetDeleteModal'
 
 interface Props {
+  currentSheet: string
   username: string
 }
-export const Menu: React.FC<Props> = ({ username }) => {
+export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
   const dropdownRef = useRef(null)
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [openAdd, setOpenAdd] = useState(false)
+  const [openDelete, setOpenDelete] = useState(false)
   const isMine = session && session.user.name === username
   const variants: Variants = {
     open: {
@@ -79,22 +82,31 @@ export const Menu: React.FC<Props> = ({ username }) => {
                     className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
                     onClick={() => setOpen(false)}
                   >
-                    シートを削除
+                    シート名編集
                   </button>
                 </li>
                 <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                  <ExitIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
+                  <ExitIcon className="mr-2 h-[24px] w-[24px] text-red-600" />
                   <button
-                    className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
-                    onClick={() => setOpen(false)}
+                    className="block w-full whitespace-nowrap bg-transparent text-sm text-red-600"
+                    onClick={() => {
+                      setOpen(false)
+                      setOpenDelete(true)
+                    }}
                   >
-                    シート名編集
+                    シートを削除
                   </button>
                 </li>
               </motion.ul>
             )}
           </AnimatePresence>
-          <AddSheetModal open={openAdd} onClose={() => setOpenAdd(false)} />
+          <SheetAddModal open={openAdd} onClose={() => setOpenAdd(false)} />
+          <SheetDeleteModal
+            sheet={currentSheet}
+            open={openDelete}
+            onClose={() => setOpenDelete(false)}
+            username={username}
+          />
         </>
       )}
     </div>

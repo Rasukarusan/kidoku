@@ -29,6 +29,12 @@ export default async (req, res) => {
         data: { userId, name, order },
       })
       return res.status(200).json({ result: true })
+    } else if (req.method === 'DELETE') {
+      const { name } = JSON.parse(req.body)
+      const sheet = await prisma.sheets.delete({
+        where: { userId_name: { userId, name } },
+      })
+      return res.status(200).json({ result: true })
     }
     return res.status(200).json({ result: true })
   } catch (e) {

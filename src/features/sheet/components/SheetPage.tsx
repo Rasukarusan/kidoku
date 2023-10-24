@@ -71,7 +71,9 @@ export const SheetPage: React.FC<Props> = ({
           <div className=" mb-8 w-[90%] border-b border-gray-200">
             <Tabs sheets={sheets} value={year} username={username} />
           </div>
-          <div className="w-[10%]"></div>
+          <div className="w-[10%]">
+            <Menu currentSheet={year} username={username} />
+          </div>
         </div>
         <div className="p-10 text-center">
           <div className="mb-4 text-4xl font-bold">データがまだありません</div>
@@ -88,7 +90,7 @@ export const SheetPage: React.FC<Props> = ({
           <Tabs sheets={sheets} value={year} username={username} />
         </div>
         <div className="w-[10%]">
-          <Menu username={username} />
+          <Menu currentSheet={year} username={username} />
         </div>
       </div>
       <div className="mb-10 text-center">
