@@ -17,6 +17,7 @@ export async function getStaticProps(context) {
   const userId = user.id
   const sheets = await prisma.sheets.findMany({
     where: { userId },
+    orderBy: [{ order: 'desc' }],
   })
   const sheet = sheets.find((sheet) => sheet.name === year)
   if (!sheet) {

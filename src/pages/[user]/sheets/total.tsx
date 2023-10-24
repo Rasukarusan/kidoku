@@ -53,6 +53,7 @@ export const getStaticProps = async (ctx) => {
 
   const sheets = await prisma.sheets.findMany({
     where: { userId },
+    orderBy: [{ order: 'desc' }],
   })
 
   const yearlyTopBooks = await prisma.yearlyTopBook.findMany({
