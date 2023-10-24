@@ -54,7 +54,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               key={`${book.title}-${i}`}
               onClick={() => onClickRow(i)}
             >
-              <td className={`py-4 text-center ${pc}`}>{i + 1}</td>
+              <td className="p-2 text-center">{i + 1}</td>
               <th
                 scope="row"
                 className="py-4 px-4 font-medium text-gray-900 sm:px-6"
