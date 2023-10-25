@@ -16,7 +16,7 @@ export const BookSelectBox: React.FC<Props> = ({
   onChange = () => {},
   isChanged = false,
 }) => {
-  const values = { great: '◎', good: '◯', bad: '✗' }
+  const values = ['-', '◎', '◯', '✗']
   return (
     <div className="mb-1 pr-4 sm:pr-12">
       <div className="mb-1 text-xs text-gray-400">{label}</div>
@@ -29,12 +29,12 @@ export const BookSelectBox: React.FC<Props> = ({
         } ${isChanged ? 'border-2 border-orange-400' : ''}`}
         onChange={onChange}
         tabIndex={tabIndex}
+        defaultValue={value}
       >
-        {Object.keys(values).map((key) => {
-          const value = values[key]
+        {values.map((v) => {
           return (
-            <option key={key} value={value}>
-              {value}
+            <option key={v} value={v}>
+              {v}
             </option>
           )
         })}

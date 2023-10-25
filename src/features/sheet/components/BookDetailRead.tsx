@@ -54,6 +54,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             />
             <div className="flex items-center">
               <BookSelectBox
+                key={book.id}
                 value={book.impression}
                 label="感想"
                 tabIndex={4}
