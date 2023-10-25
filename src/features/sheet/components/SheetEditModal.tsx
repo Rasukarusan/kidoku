@@ -23,6 +23,10 @@ export const SheetEditModal: React.FC<Props> = ({
     ref.current?.focus()
   }, [open])
 
+  useEffect(() => {
+    setInput(sheet)
+  }, [sheet])
+
   return (
     <Modal
       open={open}
