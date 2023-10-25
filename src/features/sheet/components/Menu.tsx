@@ -6,6 +6,7 @@ import { ExitIcon } from '@/components/icon/ExitIcon'
 import { BookIcon } from '@/components/icon/BookIcon'
 import { SheetAddModal } from './SheetAddModal'
 import { SheetDeleteModal } from './SheetDeleteModal'
+import { SheetEditModal } from './SheetEditModal'
 
 interface Props {
   currentSheet: string
@@ -16,6 +17,7 @@ export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [openAdd, setOpenAdd] = useState(false)
+  const [openEdit, setOpenEdit] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
   const isMine = session && session.user.name === username
   const variants: Variants = {
@@ -80,7 +82,10 @@ export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
                   <SettingsIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
                   <button
                     className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      setOpen(false)
+                      setOpenEdit(true)
+                    }}
                   >
                     シート名編集
                   </button>
@@ -101,6 +106,12 @@ export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
             )}
           </AnimatePresence>
           <SheetAddModal open={openAdd} onClose={() => setOpenAdd(false)} />
+          <SheetEditModal
+            sheet={currentSheet}
+            open={openEdit}
+            onClose={() => setOpenEdit(false)}
+            username={username}
+          />
           <SheetDeleteModal
             sheet={currentSheet}
             open={openDelete}
