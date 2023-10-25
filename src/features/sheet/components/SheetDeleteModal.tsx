@@ -24,7 +24,14 @@ export const SheetDeleteModal: React.FC<Props> = ({
   }, [open])
 
   return (
-    <Modal open={open} onClose={onClose} className="h-[250px] w-[500px]">
+    <Modal
+      open={open}
+      onClose={() => {
+        setInput('')
+        onClose()
+      }}
+      className="h-[250px] w-[500px]"
+    >
       <div className="p-4 text-center sm:p-10">
         <div className="mb-2 text-2xl font-bold">シートを削除</div>
         <div className="mb-2 text-sm text-gray-500">

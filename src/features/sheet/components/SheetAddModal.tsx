@@ -15,7 +15,14 @@ export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
   }, [open])
 
   return (
-    <Modal open={open} onClose={onClose} className="h-[200px] w-[500px]">
+    <Modal
+      open={open}
+      onClose={() => {
+        setNewSheet('')
+        onClose()
+      }}
+      className="h-[200px] w-[500px]"
+    >
       <div className="p-10 text-center">
         <div className="mb-4 text-2xl font-bold">新しいシートを作成</div>
         <input

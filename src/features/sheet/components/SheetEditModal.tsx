@@ -24,7 +24,14 @@ export const SheetEditModal: React.FC<Props> = ({
   }, [open])
 
   return (
-    <Modal open={open} onClose={onClose} className="h-[200px] w-[500px]">
+    <Modal
+      open={open}
+      onClose={() => {
+        setInput(sheet)
+        onClose()
+      }}
+      className="h-[200px] w-[500px]"
+    >
       <div className="p-4 text-center sm:p-10">
         <div className="mb-4 text-2xl font-bold">シート名を編集</div>
         <input
@@ -38,7 +45,7 @@ export const SheetEditModal: React.FC<Props> = ({
         />
         <button
           className="mx-auto flex items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white disabled:bg-gray-300"
-          disabled={!input || loading}
+          disabled={input === sheet || loading}
           onClick={async () => {
             setLoading(true)
             const res = await fetch('/api/sheets', {
