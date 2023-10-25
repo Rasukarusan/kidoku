@@ -68,7 +68,7 @@ export const SheetPage: React.FC<Props> = ({
     return (
       <Container>
         <div className="flex">
-          <div className=" mb-8 w-[90%] border-b border-gray-200">
+          <div className="mb-8 w-[90%] border-b border-gray-200">
             <Tabs sheets={sheets} value={year} username={username} />
           </div>
           <div className="w-[10%]">
