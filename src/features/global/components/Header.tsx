@@ -6,12 +6,11 @@ import { Container } from '@/components/layout/Container'
 import { LoginModal } from './LoginModal'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { SettingsIcon } from '@/components/icon/SettingsIcon'
-import { ExitIcon } from '@/components/icon/ExitIcon'
-import { BookIcon } from '@/components/icon/BookIcon'
 import Link from 'next/link'
 import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 import { Logo } from '@/components/icon/Logo'
+import { AiOutlineBook, AiOutlineSetting } from 'react-icons/ai'
+import { BiExit } from 'react-icons/bi'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -88,7 +87,7 @@ export const Header = () => {
                     className="absolute right-4 z-[1000] m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
                   >
                     <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                      <BookIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
+                      <AiOutlineBook className="mr-2 h-[24px] w-[24px] text-slate-300" />
                       <Link
                         className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
                         href={url}
@@ -98,7 +97,7 @@ export const Header = () => {
                       </Link>
                     </li>
                     <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                      <SettingsIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
+                      <AiOutlineSetting className="mr-2 h-[24px] w-[24px] text-slate-300" />
                       <Link
                         className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
                         href="/settings/profile"
@@ -108,7 +107,7 @@ export const Header = () => {
                       </Link>
                     </li>
                     <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                      <ExitIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
+                      <BiExit className="mr-2 h-[24px] w-[24px] text-slate-300" />
                       <button
                         className="block w-full whitespace-nowrap bg-transparent text-left text-sm text-gray-600"
                         onClick={() => signOut()}
