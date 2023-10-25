@@ -29,6 +29,13 @@ export default async (req, res) => {
         data: { userId, name, order },
       })
       return res.status(200).json({ result: true })
+    } else if (req.method === 'PUT') {
+      const { oldName, newName } = JSON.parse(req.body)
+      const sheet = await prisma.sheets.update({
+        where: { userId_name: { userId, name: oldName } },
+        data: { name: newName },
+      })
+      return res.status(200).json({ result: true })
     } else if (req.method === 'DELETE') {
       const { name } = JSON.parse(req.body)
       const sheet = await prisma.sheets.delete({
