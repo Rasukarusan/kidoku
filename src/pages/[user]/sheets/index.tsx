@@ -22,6 +22,8 @@ export async function getServerSideProps(context) {
     }
   }
   return {
-    redirect: { destination: `/${username}/sheets/${sheets[0].name}` },
+    redirect: {
+      destination: `/${username}/sheets/${encodeURIComponent(sheets[0].name)}`,
+    },
   }
 }
