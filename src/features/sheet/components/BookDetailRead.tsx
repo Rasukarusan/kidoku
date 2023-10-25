@@ -5,7 +5,7 @@ import { BookInputField } from '@/components/input/BookInputField'
 import dayjs from 'dayjs'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
-import { LockIcon } from '@/components/icon/LockIcon'
+import { AiFillLock } from 'react-icons/ai'
 
 interface Props {
   book: Book
@@ -70,7 +70,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
         </div>
         <div className="mb-1 flex items-center">
           <div className="mr-1 text-xs text-gray-400">メモ</div>
-          {!book.is_public_memo && <LockIcon className="w-[15px]" />}
+          {!book.is_public_memo && <AiFillLock className="w-[15px]" />}
         </div>
         {(isMine || book.is_public_memo) && (
           <BookInputField

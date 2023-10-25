@@ -6,7 +6,7 @@ import { HoverBook } from './HoverBook'
 import { BookDetailDialog } from './BookDetailDialog'
 import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
-import { CommentIcon } from '@/components/icon/CommentIcon'
+import { FaCommentDots } from 'react-icons/fa'
 
 interface Props {
   books: Book[]
@@ -64,8 +64,8 @@ export const Books: React.FC<Props> = ({ books, year }) => {
                   book.is_public_memo) &&
                   book?.memo !== '[期待]\n\n[感想]' &&
                   book?.memo !== '' && (
-                    <p className="absolute top-[-5px] right-[40px] sm:top-[-16px]">
-                      <CommentIcon className="w-6 text-black" />
+                    <p className="absolute top-[-3px] right-[-5px] sm:right-[40px] sm:top-[-10px]">
+                      <FaCommentDots size={20} />
                     </p>
                   )}
                 {hovers[i] && (

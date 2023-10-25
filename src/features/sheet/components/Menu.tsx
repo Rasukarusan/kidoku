@@ -1,12 +1,14 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
-import { SettingsIcon } from '@/components/icon/SettingsIcon'
-import { ExitIcon } from '@/components/icon/ExitIcon'
-import { BookIcon } from '@/components/icon/BookIcon'
 import { SheetAddModal } from './SheetAddModal'
 import { SheetDeleteModal } from './SheetDeleteModal'
 import { SheetEditModal } from './SheetEditModal'
+import {
+  AiOutlineFileAdd,
+  AiOutlineEdit,
+  AiOutlineDelete,
+} from 'react-icons/ai'
 
 interface Props {
   currentSheet: string
@@ -67,7 +69,7 @@ export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
                 className="absolute right-4 z-[1000] m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg sm:right-20"
               >
                 <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                  <BookIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
+                  <AiOutlineFileAdd className="mr-2 h-[24px] w-[24px] text-slate-300" />
                   <button
                     className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
                     onClick={() => {
@@ -79,7 +81,7 @@ export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
                   </button>
                 </li>
                 <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                  <SettingsIcon className="mr-2 h-[24px] w-[24px] text-slate-300" />
+                  <AiOutlineEdit className="mr-2 h-[24px] w-[24px] text-slate-300" />
                   <button
                     className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
                     onClick={() => {
@@ -91,7 +93,7 @@ export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
                   </button>
                 </li>
                 <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                  <ExitIcon className="mr-2 h-[24px] w-[24px] text-red-600" />
+                  <AiOutlineDelete className="mr-2 h-[24px] w-[24px] text-red-600" />
                   <button
                     className="block w-full whitespace-nowrap bg-transparent text-sm text-red-600"
                     onClick={() => {
