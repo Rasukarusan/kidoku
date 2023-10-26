@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
+import { Menu } from '../Menu'
 
 interface Props {
   total: number
@@ -40,8 +41,17 @@ export const SheetTotalPage: React.FC<Props> = ({
 
   return (
     <Container>
-      <div className="mb-8 border-b border-gray-200">
-        <Tabs value="total" sheets={sheets} username={username} />
+      <div className="flex">
+        <div className="mb-8 w-[90%] border-b border-gray-200">
+          <Tabs sheets={sheets} value="total" username={username} />
+        </div>
+        <div className="w-[10%]">
+          <Menu
+            currentSheet="total"
+            username={username}
+            activate={{ edit: false, delete: false }}
+          />
+        </div>
       </div>
       <div className="mb-10 text-center">
         <TitleWithLine text="累計読書数" />

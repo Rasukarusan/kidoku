@@ -13,8 +13,16 @@ import {
 interface Props {
   currentSheet: string
   username: string
+  activate?: {
+    edit: boolean
+    delete: boolean
+  }
 }
-export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
+export const Menu: React.FC<Props> = ({
+  currentSheet,
+  username,
+  activate = { edit: true, delete: true },
+}) => {
   const dropdownRef = useRef(null)
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
@@ -80,26 +88,43 @@ export const Menu: React.FC<Props> = ({ currentSheet, username }) => {
                     シートを追加
                   </button>
                 </li>
-                <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
+                <li
+                  className={`border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100 ${
+                    !activate.edit ? 'bg-neutral-100' : ''
+                  }`}
+                >
                   <AiOutlineEdit className="mr-2 h-[24px] w-[24px] text-slate-300" />
                   <button
-                    className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
+                    className={`block w-full whitespace-nowrap bg-transparent text-sm
+                      ${!activate.edit ? 'text-gray-400' : 'text-gray-600'}`}
                     onClick={() => {
                       setOpen(false)
                       setOpenEdit(true)
                     }}
+                    disabled={!activate.edit}
                   >
                     シート名編集
                   </button>
                 </li>
-                <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-                  <AiOutlineDelete className="mr-2 h-[24px] w-[24px] text-red-600" />
+                <li
+                  className={`border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100 ${
+                    !activate.delete ? 'bg-neutral-100' : ''
+                  }`}
+                >
+                  <AiOutlineDelete
+                    className={`mr-2 h-[24px] w-[24px] ${
+                      !activate.delete ? 'text-slate-300' : 'text-red-600'
+                    }`}
+                  />
                   <button
-                    className="block w-full whitespace-nowrap bg-transparent text-sm text-red-600"
+                    className={`block w-full whitespace-nowrap bg-transparent text-sm ${
+                      !activate.delete ? 'text-gray-400' : 'text-red-600'
+                    }`}
                     onClick={() => {
                       setOpen(false)
                       setOpenDelete(true)
                     }}
+                    disabled={!activate.delete}
                   >
                     シートを削除
                   </button>
