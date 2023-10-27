@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { truncate } from '@/utils/string'
 
 export interface Comment {
+  id: string
   title: string
   memo: string
   image: string
@@ -22,7 +23,9 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
   return (
     <div className="flex items-center p-4">
       <div className="pr-4  text-center">
-        <img className="mb-1 w-[82px] min-w-[82px]" src={image} alt="" />
+        <Link href={`/${username}/sheets/${sheet}?book=${comment.id}`}>
+          <img className="mb-1 w-[82px] min-w-[82px]" src={image} alt="" />
+        </Link>
       </div>
       <div>
         <div className="mb-2 text-xs font-bold text-gray-600 sm:text-sm">

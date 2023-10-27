@@ -16,6 +16,7 @@ import { CoutUpText } from '@/components/label/CountUpText'
 import { NO_IMAGE } from '@/libs/constants'
 import { Menu } from './Menu'
 import { NextSeo } from 'next-seo'
+import { useRouter } from 'next/router'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -37,6 +38,7 @@ export const SheetPage: React.FC<Props> = ({
   username,
   yearlyTopBooks,
 }) => {
+  const router = useRouter()
   const { data: session } = useSession()
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
   const { data: res } = useSWR(`/api/books/${year}`, fetcher, {
@@ -183,7 +185,11 @@ export const SheetPage: React.FC<Props> = ({
 
       <div className="mb-8">
         {mode === 'grid' ? (
-          <Books books={currentData} year={year} />
+          <Books
+            books={currentData}
+            year={year}
+            bookId={(router.query.book as string) || ''}
+          />
         ) : (
           <BookRows books={currentData} />
         )}
