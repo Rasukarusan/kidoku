@@ -1,8 +1,10 @@
 # Kidoku
 
-https://app.rasukarusan.com
+https://app.rasukarusan.com/
 
-![image](https://user-images.githubusercontent.com/17779386/198881209-21a64164-a012-4a36-87eb-bad138d589c4.png)
+<img width="1423" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/99b254db-3c51-408a-b9c0-0ac1ea54984a">
+<img width="1424" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/90b24fa1-4d76-4054-b0d6-76d8f2fd6b0b">
+
 
 ## 機能
 
