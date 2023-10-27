@@ -15,6 +15,7 @@ import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { NO_IMAGE } from '@/libs/constants'
 import { Menu } from './Menu'
+import { NextSeo } from 'next-seo'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -67,6 +68,7 @@ export const SheetPage: React.FC<Props> = ({
   if (data.length === 0) {
     return (
       <Container>
+        <NextSeo title={`${username}/${year} | kidoku`} />
         <div className="flex">
           <div className="mb-8 w-[90%] border-b border-gray-200">
             <Tabs sheets={sheets} value={year} username={username} />
@@ -85,6 +87,7 @@ export const SheetPage: React.FC<Props> = ({
 
   return (
     <Container className="mb-12">
+      <NextSeo title={`${username}/${year} | kidoku`} />
       <div className="flex">
         <div className="mb-8 w-[90%] border-b border-gray-200 pr-4">
           <Tabs sheets={sheets} value={year} username={username} />

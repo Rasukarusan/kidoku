@@ -11,6 +11,7 @@ import { YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { Menu } from '../Menu'
+import { NextSeo } from 'next-seo'
 
 interface Props {
   total: number
@@ -41,6 +42,7 @@ export const SheetTotalPage: React.FC<Props> = ({
 
   return (
     <Container>
+      <NextSeo title={`${username}/Total | kidoku`} />
       <div className="flex">
         <div className="mb-8 w-[90%] border-b border-gray-200">
           <Tabs sheets={sheets} value="total" username={username} />

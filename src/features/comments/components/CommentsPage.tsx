@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
+import { NextSeo } from 'next-seo'
 
 interface Props {
   page: number
@@ -11,6 +12,7 @@ interface Props {
 export const CommentsPage = ({ comments, next, page }) => {
   return (
     <Container className="p-6">
+      <NextSeo title="コメント一覧 | kidoku" />
       <h2 className="p-2 text-2xl font-bold">Comments</h2>
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {comments.map((comment) => (
