@@ -2,7 +2,7 @@
 
 https://app.rasukarusan.com/
 
-<img width="1423" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/99b254db-3c51-408a-b9c0-0ac1ea54984a">
+<img width="1423" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/56a89c90-15cf-42ff-9401-3435cdcf299e">
 <img width="1424" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/90b24fa1-4d76-4054-b0d6-76d8f2fd6b0b">
 
 
