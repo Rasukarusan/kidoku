@@ -9,6 +9,7 @@ export interface Comment {
   updated: string
   username: string
   userImage: string
+  sheet: string
 }
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
 }
 
 export const BookComment: React.FC<Props> = ({ comment }) => {
-  const { title, memo, image, username, userImage } = comment
+  const { title, memo, image, username, userImage, sheet } = comment
   const updated = dayjs().diff(dayjs(comment.updated), 'day', false) + '日前'
   return (
     <div className="flex items-center p-4">
@@ -30,7 +31,10 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
         <div className="flex items-center text-xs text-gray-500 sm:text-sm ">
           <img className="mr-2 h-8 w-8 rounded-full" src={userImage} alt="" />
           <div>
-            <Link className="hover:underline" href={`/${username}/sheets`}>
+            <Link
+              className="hover:underline"
+              href={`/${username}/sheets/${sheet}`}
+            >
               {username}
             </Link>
             <div className="">{updated}</div>
