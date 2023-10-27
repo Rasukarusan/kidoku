@@ -1,12 +1,11 @@
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
-import Link from 'next/link'
 
 interface Props {
   comments: Comment[]
 }
 
-export const IndexPage = ({ comments }) => {
+export const CommentsPage = ({ comments }) => {
   return (
     <Container className="p-6">
       <section>
@@ -15,11 +14,6 @@ export const IndexPage = ({ comments }) => {
           {comments.map((comment) => (
             <BookComment key={comment.id} comment={comment} />
           ))}
-        </div>
-        <div className="text-center">
-          <Link href="/comments" className="text-blue-500">
-            さらに表示
-          </Link>
         </div>
       </section>
     </Container>
