@@ -33,6 +33,7 @@ export async function getServerSideProps(ctx) {
       image: book.image,
       username: book.user.name,
       userImage: book.user.image,
+      sheet: book.sheet.name,
     })
   })
   const next = Math.ceil(total / limit) > page

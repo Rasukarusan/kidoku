@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import { fetcher } from '@/libs/swr'
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
 import { BookDetailDialog } from './BookDetailDialog'
@@ -9,16 +9,27 @@ import { NO_IMAGE } from '@/libs/constants'
 import { FaCommentDots } from 'react-icons/fa'
 
 interface Props {
+  bookId: string
   books: Book[]
   year: string
 }
-export const Books: React.FC<Props> = ({ books, year }) => {
+export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   const initialHovers = Array(books.length).fill(false)
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [selectBook, setSelectBook] = useState<Book>(null)
   const [hovers, setHovers] = useState(initialHovers)
   const { mutate } = useSWR(`/api/books/${year}`, fetcher)
+
+  // URLクエリで指定された本を開く
+  useEffect(() => {
+    if (bookId) {
+      const book = books.filter((book) => book.id === Number(bookId))
+      if (!book) return
+      setSelectBook(book[0])
+      setOpen(true)
+    }
+  }, [bookId])
 
   const onClickImage = (book: Book) => {
     setSelectBook(book)
