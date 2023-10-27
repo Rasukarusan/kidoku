@@ -11,13 +11,13 @@ export const IndexPage = ({ comments }) => {
     <Container className="p-6">
       <section>
         <h2 className="p-2 text-2xl font-bold">Comments</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {comments.map((comment) => (
             <BookComment key={comment.id} comment={comment} />
           ))}
         </div>
         <div className="text-center">
-          <Link href="/comments" className="text-blue-500">
+          <Link href="/comments" className="text-blue-500 hover:underline">
             さらに表示
           </Link>
         </div>
