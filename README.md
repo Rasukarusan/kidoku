@@ -13,7 +13,7 @@ https://app.rasukarusan.com/
 
 ## 目的
 
-- スプレッドシートへの記載を楽にする
+- スプレッドシートで記録していたのをWebアプリ化
 - ビジュアライズして楽しくする
 
 <img width="957" alt="image" src="https://user-images.githubusercontent.com/17779386/178728788-8395242c-dee1-4338-babd-20d04855ed97.png">
