@@ -1,7 +1,9 @@
 import { Container } from '@/components/layout/Container'
+import { NextSeo } from 'next-seo'
 export const TermsPage = () => {
   return (
     <Container className="text-gray-700">
+      <NextSeo title="利用規約 | kidoku" />
       <div className="mx-auto max-w-screen-md py-8 px-4">
         <h1 className="mb-6 text-3xl font-bold">Kidoku利用規約</h1>
 

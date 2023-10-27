@@ -1,7 +1,9 @@
 import { Container } from '@/components/layout/Container'
+import { NextSeo } from 'next-seo'
 export const PrivacyPage = () => {
   return (
     <Container className="text-gray-700">
+      <NextSeo title="プライバシーポリシー | kidoku" />
       <div className="mx-auto max-w-screen-md py-8 px-4">
         <h1 className="mb-6 text-3xl font-bold">プライバシーポリシー</h1>
         <section className="mb-6">

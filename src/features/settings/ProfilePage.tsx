@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Loading } from '@/components/icon/Loading'
 import { Container } from '@/components/layout/Container'
+import { NextSeo } from 'next-seo'
 
 interface Props {
   name: string
@@ -34,6 +35,7 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
 
   return (
     <Container className="p-10">
+      <NextSeo title="アカウント設定 | kidoku" />
       <h2 className="text-2xl font-bold">Settings</h2>
       <div className="mb-8 flex p-4">
         <button className="mr-8 mb-4 h-[100px] w-[100px] rounded-full">
