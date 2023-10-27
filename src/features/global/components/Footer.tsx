@@ -74,13 +74,13 @@ export const Footer: React.FC = () => {
               items={[
                 {
                   title: 'プライバシーポリシー',
-                  href: '#',
-                  target: '_blank',
+                  href: '/privacy',
+                  target: '_self',
                 },
                 {
                   title: '利用規約',
                   href: '/terms',
-                  target: '_blank',
+                  target: '_self',
                 },
               ]}
             />
