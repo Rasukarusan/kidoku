@@ -3,18 +3,26 @@ import prisma, { parse } from '@/libs/prisma'
 
 export default CommentsPage
 
-export const getStaticProps = async (ctx) => {
-  const books = await prisma.books.findMany({
-    include: {
-      user: { select: { name: true, image: true } },
-      sheet: {
-        select: { name: true },
+export async function getServerSideProps(ctx) {
+  const page = parseInt(ctx.query.page) || 1
+  const limit = 20
+  const [total, books] = await Promise.all([
+    await prisma.books.count({
+      where: { is_public_memo: true },
+    }),
+    await prisma.books.findMany({
+      include: {
+        user: { select: { name: true, image: true } },
+        sheet: {
+          select: { name: true },
+        },
       },
-    },
-    where: { is_public_memo: true },
-    orderBy: [{ updated: 'desc' }],
-    take: 10,
-  })
+      where: { is_public_memo: true },
+      orderBy: [{ updated: 'desc' }],
+      skip: (page - 1) * limit,
+      take: limit,
+    }),
+  ])
   const comments = []
   parse(books).map((book) => {
     comments.push({
@@ -27,9 +35,8 @@ export const getStaticProps = async (ctx) => {
       userImage: book.user.image,
     })
   })
-  const result = []
+  const next = Math.ceil(total / limit) > page
   return {
-    props: { comments },
-    revalidate: 86400,
+    props: { comments, next, page },
   }
 }
