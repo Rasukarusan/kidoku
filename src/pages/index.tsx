@@ -25,6 +25,7 @@ export const getStaticProps = async (ctx) => {
       image: book.image,
       username: book.user.name,
       userImage: book.user.image,
+      sheet: book.sheet.name,
     })
   })
   const result = []
