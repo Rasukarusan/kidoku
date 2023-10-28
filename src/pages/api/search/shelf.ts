@@ -15,29 +15,38 @@ export default async function handler(
     })
     const response = await client.index('books').search(word, {
       attributesToHighlight: ['title', 'memo'],
-      highlightPreTag: '<span className="highlight">',
+      highlightPreTag: '<span class="highlight">',
       highlightPostTag: '</span>',
       attributesToCrop: ['memo'],
       cropLength: 20,
     })
-    console.log(response.hits)
     if (response.hits.length === 0) return res.status(200).json([])
     const result: SearchResult[] = []
     response.hits.map((hit) => {
-      const { id, title, author, image, memo, user, sheet, _formatted } = hit
+      const {
+        id,
+        title,
+        author,
+        image,
+        memo,
+        username,
+        userImage,
+        sheet,
+        _formatted,
+      } = hit
       result.push({
         id,
         title: _formatted.title,
         author,
         image,
         category: '',
-        memo: _formatted.title,
-        user,
+        memo: _formatted.memo,
+        username,
+        userImage,
         sheet,
       })
     })
-    console.log(result)
-    return res.status(200).json({ result: true })
+    return res.status(200).json(result)
   } catch (error) {
     console.error(error)
     return res.status(200).json({ result: false })

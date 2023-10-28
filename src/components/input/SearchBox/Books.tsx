@@ -45,7 +45,7 @@ export const Books: React.FC<Props> = ({ input }) => {
           return (
             <div
               className="relative m-2 h-[260px] max-h-[300px] min-w-[45%] cursor-pointer rounded-md border border-gray-300 px-2 py-2 shadow hover:bg-gray-100 sm:min-w-[180px] sm:px-4"
-              key={item.id}
+              key={`${i}-${item.id}`}
               onMouseEnter={() => setSelectItem(item)}
             >
               <div className="mb-2 h-[220px]">
