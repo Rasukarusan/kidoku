@@ -34,8 +34,9 @@ export const searchUserBooks = async (
   title: string
 ): Promise<SearchResult[]> => {
   const client = new ApiClient()
-  await client.get(`/api/search/shelf?q=${title}`).then((res) => res.data.items)
-  const result: SearchResult[] = []
+  const result = await client
+    .get(`/api/search/shelf?q=${title}`)
+    .then((res) => res.data)
   return result
 }
 

@@ -32,7 +32,8 @@ export default async function handler(
         author,
         image,
         memo: is_public_memo ? memo : '',
-        user: user.name,
+        username: user.name,
+        userImage: user.image,
         sheet: sheet.name,
       }
     })

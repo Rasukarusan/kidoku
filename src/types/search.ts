@@ -37,12 +37,13 @@ export interface Item {
 }
 
 export interface SearchResult {
-  id: string
+  id: string | number
   title: string
   author: string
   image: string
   category: string
   memo: string
-  user?: string
+  username?: string
+  userImage?: string
   sheet?: string
 }
