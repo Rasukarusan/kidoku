@@ -17,8 +17,8 @@ export default async function handler(
       attributesToHighlight: ['title', 'memo'],
       highlightPreTag: '<span class="highlight">',
       highlightPostTag: '</span>',
-      attributesToCrop: ['memo'],
-      cropLength: 20,
+      attributesToCrop: ['title', 'memo'],
+      cropLength: 15,
     })
     if (response.hits.length === 0) return res.status(200).json([])
     const result: SearchResult[] = []
