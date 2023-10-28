@@ -15,6 +15,7 @@ interface Props {
 }
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const ref = useRef<HTMLInputElement>(null)
+  const [tab, setTab] = useState<'api' | 'user'>('api')
   const [books, setBooks] = useState<Item[]>([])
   // const [books, setBooks] = useState<Item[]>(items)
   const [selectItem, setSelectItem] = useState<Item>(null)
@@ -73,12 +74,29 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           />
         </div>
       </div>
-      <div className="flex h-full w-full flex-wrap justify-center overflow-y-auto p-2 text-gray-900 sm:p-4">
+      <div className="flex items-center px-4 pt-4 text-sm">
+        <button
+          className={`px-4 py-2 hover:bg-gray-100 ${
+            tab === 'api' ? 'font-bold' : 'text-gray-400'
+          }`}
+          onClick={() => setTab('api')}
+        >
+          検索結果
+        </button>
+        <button
+          className={`px-4 py-2 hover:bg-gray-100
+            ${tab === 'user' ? 'font-bold' : 'text-gray-400 '}`}
+          onClick={() => setTab('user')}
+        >
+          ユーザー本棚
+        </button>
+      </div>
+      <div className="flex overflow-x-auto border-x p-2 text-gray-900 sm:p-4">
         {books.map((item: Item, i: number) => {
           const { title, description, authors, imageLinks } = item.volumeInfo
           return (
             <div
-              className="relative m-2 h-[260px] max-h-[300px] w-[45%] cursor-pointer rounded-md border border-gray-300 px-2 py-2 shadow hover:bg-gray-100 sm:w-[200px] sm:px-4"
+              className="relative m-2 h-[260px] max-h-[300px] min-w-[45%] cursor-pointer rounded-md border border-gray-300 px-2 py-2 shadow hover:bg-gray-100 sm:min-w-[180px] sm:px-4"
               key={item.id}
               onMouseEnter={() => setSelectItem(item)}
             >
