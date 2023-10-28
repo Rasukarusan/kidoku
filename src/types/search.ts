@@ -35,3 +35,14 @@ export interface Item {
   selfLink: string
   volumeInfo: VolumeInfo
 }
+
+export interface SearchResult {
+  id: string
+  title: string
+  author: string
+  image: string
+  category: string
+  memo: string
+  user?: string
+  sheet?: string
+}

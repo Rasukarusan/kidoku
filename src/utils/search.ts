@@ -1,15 +1,42 @@
 import { ApiClient } from '@/libs/apiClient'
 import { NO_IMAGE } from '@/libs/constants'
-import { Item } from '@/types/search'
+import { SearchResult } from '@/types/search'
 
 /**
  * 書籍検索
  */
-export const searchBooks = (title: string): Promise<Item[]> => {
+export const searchBooks = async (title: string): Promise<SearchResult[]> => {
   const client = new ApiClient()
-  return client
+  const result: SearchResult[] = []
+  await client
     .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
-    .then((res) => res.data.items)
+    .then((res) => {
+      res.data.items.map((item) => {
+        const { title, description, authors, categories, imageLinks } =
+          item.volumeInfo
+        result.push({
+          id: item.id,
+          title: title,
+          author: Array.isArray(authors) ? authors.join(',') : '-',
+          category: categories.join(','),
+          image: imageLinks ? imageLinks.thumbnail : NO_IMAGE,
+          memo: description,
+        })
+      })
+    })
+  return result
+}
+
+/**
+ * ユーザー本棚検索
+ */
+export const searchUserBooks = async (
+  title: string
+): Promise<SearchResult[]> => {
+  const client = new ApiClient()
+  await client.get(`/api/search/shelf?q=${title}`).then((res) => res.data.items)
+  const result: SearchResult[] = []
+  return result
 }
 
 /**
@@ -23,17 +50,4 @@ export const getSuggestions = async (keyword: string) => {
   return client
     .get(url)
     .then((res) => res.data.suggestions.map((suggestion) => suggestion.value))
-}
-
-/**
- * 検索結果から必要な本の情報を抜き出す
- */
-export const getBookInfo = (item: Item) => {
-  if (!item) return {}
-  const { title, description, authors, imageLinks, categories } =
-    item.volumeInfo
-  const author = authors ? authors.join(',') : '-'
-  const category = categories ? categories.join(',') : '-'
-  const image = imageLinks ? imageLinks.thumbnail : NO_IMAGE
-  return { title, description, author, image, category }
 }
