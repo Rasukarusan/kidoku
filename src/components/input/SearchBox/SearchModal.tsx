@@ -7,6 +7,7 @@ import { AddModal } from './AddModal'
 // import { items } from './mock'
 import { NO_IMAGE } from '@/libs/constants'
 import { useSession } from 'next-auth/react'
+import { AiOutlineSearch } from 'react-icons/ai'
 
 interface Props {
   open: boolean
@@ -58,17 +59,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
               type="submit"
               className="focus:shadow-outline p-1 focus:outline-none"
             >
-              <svg
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                className="h-6 w-6"
-              >
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
+              <AiOutlineSearch size={20} />
             </button>
           </span>
           <input
@@ -76,7 +67,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
             type="search"
             name="q"
             className="h-12 w-full appearance-none rounded-md bg-white py-2 pl-12 pr-2 text-sm text-gray-900 focus:outline-none"
-            placeholder="本を追加"
+            placeholder="本のタイトルを入力..."
             autoComplete="off"
             onChange={onChange}
           />
@@ -87,7 +78,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           const { title, description, authors, imageLinks } = item.volumeInfo
           return (
             <div
-              className={`relative m-2 h-[260px] max-h-[300px] w-[45%] cursor-pointer rounded-md border border-gray-300 px-2 py-2 shadow hover:bg-gray-100 sm:w-[200px] sm:px-4`}
+              className="relative m-2 h-[260px] max-h-[300px] w-[45%] cursor-pointer rounded-md border border-gray-300 px-2 py-2 shadow hover:bg-gray-100 sm:w-[200px] sm:px-4"
               key={item.id}
               onMouseEnter={() => setSelectItem(item)}
             >
