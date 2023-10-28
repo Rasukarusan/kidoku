@@ -18,9 +18,9 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
           id: item.id,
           title: title,
           author: Array.isArray(authors) ? authors.join(',') : '-',
-          category: categories.join(','),
+          category: categories ? categories.join(',') : '-',
           image: imageLinks ? imageLinks.thumbnail : NO_IMAGE,
-          memo: description,
+          memo: description ?? '',
         })
       })
     })
