@@ -1,8 +1,7 @@
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
 import { fetcher } from '@/libs/swr'
-import { Item } from '@/types/search'
-import { getBookInfo } from '@/utils/search'
+import { SearchResult } from '@/types/search'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import useSWR from 'swr'
@@ -24,8 +23,8 @@ interface Response {
 
 interface Props {
   open: boolean
-  item: Item
-  books: Item[]
+  item: SearchResult
+  books: SearchResult[]
   onClose: () => void
 }
 
@@ -67,12 +66,11 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   useEffect(() => {
     if (!item) return
     const finished = dayjs().format('YYYY-MM-DD')
-    const bookInfo = getBookInfo(item)
     setBook({
-      ...bookInfo,
+      ...item,
       is_public_memo: false,
       memo: '[期待]\n\n[感想]\n',
-      impression: '◎',
+      impression: '-',
       finished,
     })
   }, [item])

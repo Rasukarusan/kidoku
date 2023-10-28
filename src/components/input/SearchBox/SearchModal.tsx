@@ -1,11 +1,10 @@
-import { Item } from '@/types/search'
-import { searchBooks } from '@/utils/search'
+import { SearchResult } from '@/types/search'
+import { searchBooks, searchUserBooks } from '@/utils/search'
 import { truncate } from '@/utils/string'
 import { Modal } from '@/components/layout/Modal'
 import { useEffect, useRef, useState } from 'react'
 import { AddModal } from './AddModal'
 // import { items } from './mock'
-import { NO_IMAGE } from '@/libs/constants'
 import { useSession } from 'next-auth/react'
 import { AiOutlineSearch } from 'react-icons/ai'
 
@@ -16,9 +15,9 @@ interface Props {
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const ref = useRef<HTMLInputElement>(null)
   const [tab, setTab] = useState<'api' | 'user'>('api')
-  const [books, setBooks] = useState<Item[]>([])
+  const [books, setBooks] = useState<SearchResult[]>([])
   // const [books, setBooks] = useState<Item[]>(items)
-  const [selectItem, setSelectItem] = useState<Item>(null)
+  const [selectItem, setSelectItem] = useState<SearchResult>(null)
   const [inputValue, setInputValue] = useState('')
   const [openAddModal, setOpenAddModal] = useState(false)
   const { data: session } = useSession()
@@ -35,7 +34,10 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
         setBooks([])
         return
       }
-      const items = await searchBooks(inputValue)
+      const items =
+        tab === 'api'
+          ? await searchBooks(inputValue)
+          : await searchUserBooks(inputValue)
       setBooks(items ?? [])
     }, 300)
     return () => clearTimeout(timer)
@@ -92,8 +94,8 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
         </button>
       </div>
       <div className="flex overflow-x-auto border-x p-2 text-gray-900 sm:p-4">
-        {books.map((item: Item, i: number) => {
-          const { title, description, authors, imageLinks } = item.volumeInfo
+        {books.map((item: SearchResult, i: number) => {
+          const { id, title, memo, author, image } = item
           return (
             <div
               className="relative m-2 h-[260px] max-h-[300px] min-w-[45%] cursor-pointer rounded-md border border-gray-300 px-2 py-2 shadow hover:bg-gray-100 sm:min-w-[180px] sm:px-4"
@@ -103,18 +105,14 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
               <div className="mb-2 h-[220px]">
                 <img
                   className="m-auto mb-2 h-[150px] object-contain"
-                  src={imageLinks ? imageLinks.thumbnail : NO_IMAGE}
+                  src={image}
                   alt={title}
                   loading="lazy"
                 />
                 <div className="mb-1 text-sm font-bold sm:text-base">
                   {truncate(title, 15)}
                 </div>
-                <div className="text-xs">
-                  {Array.isArray(authors)
-                    ? truncate(authors.join(','), 12)
-                    : '-'}
-                </div>
+                <div className="text-xs">{truncate(author, 12)}</div>
                 {session && selectItem?.id === item.id && (
                   <div className="absolute left-1/2 bottom-0 w-full -translate-x-2/4 text-center opacity-80 hover:opacity-100">
                     <button
