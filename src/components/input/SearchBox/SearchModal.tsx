@@ -65,7 +65,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
       {tab === 'api' ? (
         <Books input={inputValue} />
       ) : (
-        <UserBooks input={inputValue} />
+        <UserBooks input={inputValue} onClose={onClose} />
       )}
     </Modal>
   )
