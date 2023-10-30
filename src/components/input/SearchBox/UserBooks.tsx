@@ -51,7 +51,7 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
                   }}
                 >
                   <img
-                    className="mx-auto min-w-[64px] object-contain sm:h-[150px]"
+                    className="mx-auto min-w-[64px] object-contain sm:h-[100px]"
                     src={image}
                     alt={title}
                     loading="lazy"
