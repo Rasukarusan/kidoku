@@ -32,7 +32,7 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
 
   return (
     <>
-      <div className="flex overflow-x-auto border-x p-2 text-gray-900 sm:p-4">
+      <div className="mb-4 flex overflow-x-auto border-x p-2 text-gray-900 sm:p-4">
         {books.map((item: SearchResult, i: number) => {
           const { id, title, memo, author, image, username, userImage, sheet } =
             item
@@ -85,6 +85,13 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
           )
         })}
       </div>
+      {books.length > 0 && (
+        <div className="mb-4 text-center">
+          <Link href="/comments" className="text-blue-500 hover:underline">
+            さらに表示
+          </Link>
+        </div>
+      )}
     </>
   )
 }
