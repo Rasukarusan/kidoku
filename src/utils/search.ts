@@ -37,7 +37,7 @@ export const searchUserBooks = async (
   const result = await client
     .get(`/api/search/shelf?q=${title}`)
     .then((res) => res.data)
-  return result
+  return result.hits
 }
 
 /**

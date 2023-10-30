@@ -8,6 +8,7 @@ export default async function handler(
 ) {
   try {
     const word = (req.query.q as string) || ''
+    const page = Number(req.query.page as string) || 1
     if (!word) return res.status(200).json([])
     const client = new MeiliSearch({
       host: process.env.MEILI_HOST,
@@ -19,6 +20,7 @@ export default async function handler(
       highlightPostTag: '</span>',
       attributesToCrop: ['title', 'memo'],
       cropLength: 15,
+      page,
     })
     if (response.hits.length === 0) return res.status(200).json([])
     const result: SearchResult[] = []
@@ -46,7 +48,10 @@ export default async function handler(
         sheet,
       })
     })
-    return res.status(200).json(result)
+    return res.status(200).json({
+      hits: result,
+      next: response.totalHits / response.hitsPerPage > page,
+    })
   } catch (error) {
     console.error(error)
     return res.status(200).json({ result: false })
