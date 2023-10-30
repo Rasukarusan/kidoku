@@ -7,7 +7,8 @@ import { fetcher } from '@/libs/swr'
 export const SearchPage: React.FC = () => {
   const router = useRouter()
   const { q } = router.query
-  const { data } = useSWR(`/api/search/shelf?q=${q}`, fetcher)
+  const page = Number(router.query.page as string) || 1
+  const { data } = useSWR(`/api/search/shelf?q=${q}&page=${page}`, fetcher)
   if (!q) return null
   return (
     <Container>
@@ -15,11 +16,10 @@ export const SearchPage: React.FC = () => {
         「<span className="font-bold">{q}</span>」の検索結果
       </div>
       {!data && <div>loading...</div>}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {data &&
-          data.map((v) => {
+          data.hits.map((v) => {
             const { id, title, memo, image, username, userImage, sheet } = v
-            console.log(id)
             return (
               <div className="flex items-center p-4" key={id}>
                 <div className="pr-4 text-center">
@@ -59,6 +59,28 @@ export const SearchPage: React.FC = () => {
               </div>
             )
           })}
+      </div>
+      <div className="mb-4 flex items-center justify-center">
+        {page > 1 && (
+          <div className="mr-4">
+            {page > 1 && (
+              <Link
+                href={`/search?q=${q}&page=${page - 1}`}
+                className="pr-4 text-gray-400 hover:text-gray-700"
+              >
+                ← {page - 1} ページへ
+              </Link>
+            )}
+          </div>
+        )}
+        {data?.next && (
+          <Link
+            href={`/search?q=${q}&page=${page + 1}`}
+            className="rounded-md bg-gray-100 px-4 py-2 text-gray-700 shadow-md hover:bg-gray-200"
+          >
+            次のページへ →
+          </Link>
+        )}
       </div>
     </Container>
   )
