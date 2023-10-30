@@ -91,7 +91,11 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
       </div>
       {books.length > 0 && (
         <div className="mb-4 text-center">
-          <Link href="/comments" className="text-blue-500 hover:underline">
+          <Link
+            href={`/search?q=${input}`}
+            className="text-blue-500 hover:underline"
+            onClick={onClose}
+          >
             さらに表示
           </Link>
         </div>
