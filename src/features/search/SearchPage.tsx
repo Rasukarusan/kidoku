@@ -12,7 +12,7 @@ export const SearchPage: React.FC = () => {
   if (!q) return null
   return (
     <Container>
-      <div className="text-2xl">
+      <div className="py-2 text-2xl sm:py-4">
         「<span className="font-bold">{q}</span>」の検索結果
       </div>
       {!data && <div>loading...</div>}
