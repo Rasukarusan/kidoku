@@ -82,6 +82,16 @@ export const Footer: React.FC = () => {
                   href: '/terms',
                   target: '_self',
                 },
+                {
+                  title: 'お問い合わせ',
+                  href: '/support',
+                  target: '_self',
+                },
+                {
+                  title: '特商法表記',
+                  href: '/law',
+                  target: '_self',
+                },
               ]}
             />
             {session && session.user.admin && (
