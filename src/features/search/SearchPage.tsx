@@ -60,18 +60,14 @@ export const SearchPage: React.FC = () => {
             )
           })}
       </div>
-      <div className="mb-4 flex items-center justify-center">
+      <div className="mb-4 text-center">
         {page > 1 && (
-          <div className="mr-4">
-            {page > 1 && (
-              <Link
-                href={`/search?q=${q}&page=${page - 1}`}
-                className="pr-4 text-gray-400 hover:text-gray-700"
-              >
-                ← {page - 1} ページへ
-              </Link>
-            )}
-          </div>
+          <Link
+            href={`/search?q=${q}&page=${page - 1}`}
+            className="pr-4 text-gray-400 hover:text-gray-700"
+          >
+            ← {page - 1} ページへ
+          </Link>
         )}
         {data?.next && (
           <Link
