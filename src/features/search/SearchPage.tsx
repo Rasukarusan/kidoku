@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Container } from '@/components/layout/Container'
 import { fetcher } from '@/libs/swr'
+import { SkeltonView } from './SkeltonView'
 
 export const SearchPage: React.FC = () => {
   const router = useRouter()
@@ -15,7 +16,7 @@ export const SearchPage: React.FC = () => {
       <div className="py-2 text-2xl sm:py-4">
         「<span className="font-bold">{q}</span>」の検索結果
       </div>
-      {!data && <div>loading...</div>}
+      {!data && <SkeltonView />}
       <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {data &&
           data.hits.map((v) => {
@@ -39,7 +40,7 @@ export const SearchPage: React.FC = () => {
                     ></div>
                   </Link>
                   <div
-                    className="mb-2 text-xs font-bold text-gray-600 sm:text-sm"
+                    className="mb-2 text-xs text-gray-400 sm:text-sm"
                     dangerouslySetInnerHTML={{ __html: memo }}
                   ></div>
                   <div className="flex items-center text-xs text-gray-500 sm:text-sm ">
