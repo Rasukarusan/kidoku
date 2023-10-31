@@ -28,11 +28,11 @@ export const LoginModal: React.FC<Props> = ({ open, onClose }) => {
           />
         </div>
         <div className="text-sm text-gray-400">
-          <Link href="" className="underline" target="_blank">
+          <Link href="/terms" className="underline" target="_blank">
             利用規約
           </Link>
           、
-          <Link href="" className="underline" target="_blank">
+          <Link href="/privacy" className="underline" target="_blank">
             プライバシーポリシー
           </Link>
           に同意したうえでログインしてください。
