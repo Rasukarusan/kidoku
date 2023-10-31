@@ -5,12 +5,14 @@ import { AddModal } from './AddModal'
 // import { items } from './mock'
 import { useSession } from 'next-auth/react'
 import { searchBooks } from '@/utils/search'
+import { LoginModal } from '@/components/layout/LoginModal'
 
 interface Props {
   input: string
 }
 
 export const Books: React.FC<Props> = ({ input }) => {
+  const [openLoginModal, setOpenLoginModal] = useState(false)
   const [openAddModal, setOpenAddModal] = useState(false)
   const [selectItem, setSelectItem] = useState<SearchResult>(null)
   const [books, setBooks] = useState<SearchResult[]>([])
@@ -33,6 +35,10 @@ export const Books: React.FC<Props> = ({ input }) => {
 
   return (
     <>
+      <LoginModal
+        open={openLoginModal}
+        onClose={() => setOpenLoginModal(false)}
+      />
       <AddModal
         open={openAddModal}
         item={selectItem}
@@ -59,11 +65,17 @@ export const Books: React.FC<Props> = ({ input }) => {
                   {truncate(author, 12)}
                 </div>
                 <div className="text-xs">{truncate(author, 12)}</div>
-                {session && selectItem?.id === item.id && (
+                {selectItem?.id === item.id && (
                   <div className="absolute left-1/2 bottom-0 w-full -translate-x-2/4 text-center opacity-80 hover:opacity-100">
                     <button
                       className="w-full rounded-md bg-blue-600 py-2 text-xs font-bold text-white hover:bg-blue-700"
-                      onClick={() => setOpenAddModal(true)}
+                      onClick={() => {
+                        if (!session) {
+                          setOpenLoginModal(true)
+                          return
+                        }
+                        setOpenAddModal(true)
+                      }}
                     >
                       本を登録する
                     </button>
