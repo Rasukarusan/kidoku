@@ -1,8 +1,12 @@
 import { Resend } from 'resend'
 import SupportEmail from '@/libs/email/SupportEmail'
+import { isAdmin } from '@/utils/api'
 
 export default async (req, res) => {
   try {
+    if (!isAdmin(req)) {
+      return res.status(401).json({ result: false })
+    }
     const resend = new Resend(process.env.RESEND_API_KEY)
     const { to } = req.body
 
