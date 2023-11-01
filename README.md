@@ -5,16 +5,17 @@ https://app.rasukarusan.com/
 <img width="1423" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/56a89c90-15cf-42ff-9401-3435cdcf299e">
 <img width="1424" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/90b24fa1-4d76-4054-b0d6-76d8f2fd6b0b">
 
-
 ## 機能
 
-- 本のタイトルから著者、カテゴリ、書影画像を取得
-- 読書記録を可視化
+- 本の検索
+- ユーザー本棚の検索
+- 2022年、2023年などシートごとの本の管理
+- 月ごとの冊数、カテゴリ内訳、本の感想、
 
 ## 目的
 
 - スプレッドシートで記録していたのをWebアプリ化
-- ビジュアライズして楽しくする
+- ビジュアライズして楽しくしたい
 
 <img width="957" alt="image" src="https://user-images.githubusercontent.com/17779386/178728788-8395242c-dee1-4338-babd-20d04855ed97.png">
 
@@ -23,11 +24,11 @@ https://app.rasukarusan.com/
 - Next.js
 - NextAuth
 - Prisma
-- Mui
 - Framer Motion
 - Recoil
 - TiDB
 - MeiliSearch
+- Resend
 
 ## MeiliSearch エンドポイント
 
