@@ -11,6 +11,7 @@ import {
   Row,
   Section,
   Tailwind,
+  Link,
   Text,
 } from '@react-email/components'
 import * as React from 'react'
