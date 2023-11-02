@@ -29,6 +29,12 @@ export const WelcomeEmail = ({ email = 'example@exmaple.com' }: Props) => {
       <Tailwind>
         <Body className="my-auto mx-auto bg-white font-sans">
           <Container className="my-[40px] rounded border border-solid border-[#eaeaea] p-[20px]">
+            <Img
+              src="https://app.rasukarusan.com/logo.png"
+              width="66"
+              alt="Kidoku"
+              style={{ margin: 'auto' }}
+            />
             <Heading className="my-[30px] mx-0 p-0 text-center text-[24px] font-normal text-black">
               ようこそKidokuへ！
             </Heading>
