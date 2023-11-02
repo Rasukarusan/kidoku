@@ -89,8 +89,8 @@ export const Footer: React.FC = () => {
                 },
                 {
                   title: 'お問い合わせ',
-                  href: '/support',
-                  target: '_self',
+                  href: 'https://form.run/@kidoku-support',
+                  target: '_blank',
                 },
                 {
                   title: '特商法表記',
