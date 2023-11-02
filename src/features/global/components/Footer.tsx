@@ -1,5 +1,6 @@
 import { Logo } from '@/components/icon/Logo'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 
 interface ColumnProps {
   title: string
@@ -34,6 +35,10 @@ const Column: React.FC<ColumnProps> = ({ title, items }) => {
 
 export const Footer: React.FC = () => {
   const { data: session } = useSession()
+  const router = useRouter()
+  if (router.asPath.startsWith('/auth/init')) {
+    return null
+  }
   return (
     <footer className="bg-[#263238]">
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">

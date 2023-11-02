@@ -53,6 +53,10 @@ export const Header = () => {
     ? `/${session.user.name}/sheets/${sheets.sheets[0].name}`
     : `/${session.user.name}/sheets/total`
 
+  if (router.asPath.startsWith('/auth/init')) {
+    return null
+  }
+
   return (
     <>
       <div className="fixed top-0 z-50 w-full bg-main text-white">
