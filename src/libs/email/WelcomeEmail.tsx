@@ -25,7 +25,6 @@ export const WelcomeEmail = ({ email = 'example@exmaple.com' }: Props) => {
   return (
     <Html>
       <Head />
-      <Preview>Kidokuアカウント登録完了メール</Preview>
       <Tailwind>
         <Body className="my-auto mx-auto bg-white font-sans">
           <Container className="my-[40px] rounded border border-solid border-[#eaeaea] p-[20px]">
