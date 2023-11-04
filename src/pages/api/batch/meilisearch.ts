@@ -2,6 +2,7 @@ import prisma from '@/libs/prisma'
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { MeiliSearch } from 'meilisearch'
 import { isAdmin } from '@/utils/api'
+import { addDocuments } from '@/libs/meilisearch/addDocuments'
 
 export default async function handler(
   request: NextApiRequest,
@@ -37,17 +38,8 @@ export default async function handler(
         sheet: sheet.name,
       }
     })
-
-    const client = new MeiliSearch({
-      host: process.env.MEILI_HOST,
-      apiKey: process.env.MEILI_MASTER_KEY,
-    })
-    const re = await client.index('books').addDocuments(b)
+    const re = await addDocuments('books', b)
     console.log(re)
-    // client
-    //   .index('books')
-    //   .search('金')
-    //   .then((res) => console.log(res))
     return response.status(200).json({ result: true })
   } catch (error) {
     console.error(error)

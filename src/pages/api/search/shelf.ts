@@ -1,6 +1,7 @@
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { MeiliSearch } from 'meilisearch'
 import { SearchResult } from '@/types/search'
+import { searchBooks } from '@/libs/meilisearch/searchBooks'
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,14 +15,7 @@ export default async function handler(
       host: process.env.MEILI_HOST,
       apiKey: process.env.MEILI_MASTER_KEY,
     })
-    const response = await client.index('books').search(word, {
-      attributesToHighlight: ['title', 'memo'],
-      highlightPreTag: '<span class="highlight">',
-      highlightPostTag: '</span>',
-      attributesToCrop: ['title', 'memo'],
-      cropLength: 15,
-      page,
-    })
+    const response = await searchBooks(word, page)
     if (response.hits.length === 0) return res.status(200).json([])
     const result: SearchResult[] = []
     response.hits.map((hit) => {

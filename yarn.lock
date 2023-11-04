@@ -628,13 +628,6 @@
     jju "^1.4.0"
     read-yaml-file "^1.1.0"
 
-"@meilisearch/instant-meilisearch@^0.13.6":
-  version "0.13.6"
-  resolved "https://registry.yarnpkg.com/@meilisearch/instant-meilisearch/-/instant-meilisearch-0.13.6.tgz#0a00762312f8d09a9e379e5447b697cbec283065"
-  integrity sha512-olVCeOXmignmfY+ML8ExgyPCLGkr/XPXcz0n8tajRFr4afDKzomxySGMfQXVok9SoyhB+xeNH/mEMhguxCwklg==
-  dependencies:
-    meilisearch "^0.35.0"
-
 "@motionone/animation@^10.12.0":
   version "10.12.0"
   resolved "https://registry.yarnpkg.com/@motionone/animation/-/animation-10.12.0.tgz#bca8968d3d9c779f8a548678f24206bd36cc60b6"
