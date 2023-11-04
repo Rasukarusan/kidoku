@@ -56,8 +56,8 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
       headers: {
         Accept: 'application/json',
       },
-    })
-    setCurrentBook(newBook)
+    }).then((res) => res.json())
+    setCurrentBook({ ...newBook, image: res.data.image })
     reward()
     setLoading(false)
     setEdit(false)
