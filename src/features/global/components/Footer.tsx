@@ -113,11 +113,6 @@ export const Footer: React.FC = () => {
                     href: 'https://vercel.com/rasukarusan/kidoku',
                     target: '_blank',
                   },
-                  {
-                    title: 'Fly.io',
-                    href: 'https://fly.io/apps/kidoku-search',
-                    target: '_blank',
-                  },
                 ]}
               />
             )}
