@@ -1,9 +1,9 @@
-import sharp from 'sharp'
 import prisma from '@/libs/prisma'
-import { put } from '@vercel/blob'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 import { NO_IMAGE } from '@/libs/constants'
+import { put } from '@vercel/blob'
+import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
 // import { setTimeout } from 'timers/promises'
 export const config = {
   api: {
@@ -55,23 +55,16 @@ export default async (req, res) => {
       // 画像選択された場合はVercel Blobにアップロードする
       if (image !== NO_IMAGE && !image.includes('http')) {
         const imageBuffer = Buffer.from(image, 'base64')
-        sharp(imageBuffer)
-          .resize(158)
-          .webp({ quality: 90 })
-          .toBuffer(async (err, info) => {
-            if (err) {
-              throw err
-            }
-            const { url } = await put(`${book.id}.webp`, info, {
-              access: 'public',
-            })
-            await prisma.books.update({
-              where: { id: book.id },
-              data: {
-                image: url,
-              },
-            })
-          })
+        const buffer = await bufferToWebp(imageBuffer)
+        const { url } = await put(`${book.id}.webp`, buffer, {
+          access: 'public',
+        })
+        await prisma.books.update({
+          where: { id: book.id },
+          data: {
+            image: url,
+          },
+        })
       }
       return res.status(200).json({
         result: true,
@@ -99,24 +92,18 @@ export default async (req, res) => {
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
       if (image !== NO_IMAGE && !image.includes('http')) {
         const imageBuffer = Buffer.from(image, 'base64')
-        sharp(imageBuffer)
-          .resize(158)
-          .webp({ quality: 90 })
-          .toBuffer(async (err, info) => {
-            if (err) {
-              throw err
-            }
-            const { url } = await put(`${book.id}.webp`, info, {
-              access: 'public',
-            })
-            await prisma.books.update({
-              where: { id, userId },
-              data: {
-                ...data,
-                image: url,
-              },
-            })
-          })
+        const buffer = await bufferToWebp(imageBuffer)
+        const { url } = await put(`${book.id}.webp`, buffer, {
+          access: 'public',
+        })
+        await prisma.books.update({
+          where: { id, userId },
+          data: {
+            ...data,
+            image: url,
+          },
+        })
+        // })
       } else {
         // 画像がユーザーが選択したものではない場合レコード更新して終了
         await prisma.books.update({
