@@ -1,6 +1,5 @@
 import prisma from '@/libs/prisma'
 import type { NextApiResponse, NextApiRequest } from 'next'
-import { MeiliSearch } from 'meilisearch'
 import { isAdmin } from '@/utils/api'
 import { addDocuments } from '@/libs/meilisearch/addDocuments'
 

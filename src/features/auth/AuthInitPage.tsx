@@ -1,6 +1,6 @@
 import { Container } from '@/components/layout/Container'
 import { BuiltInProviderType } from 'next-auth/providers'
-import { ClientSafeProvider, LiteralUnion, useSession } from 'next-auth/react'
+import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
 import { NextSeo } from 'next-seo'
 
 interface Props {
