@@ -17,6 +17,8 @@ import { NO_IMAGE } from '@/libs/constants'
 import { Menu } from './Menu'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
+import { BsFillGrid3X3GapFill } from 'react-icons/bs'
+import { FaListUl } from 'react-icons/fa'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -155,14 +157,7 @@ export const SheetPage: React.FC<Props> = ({
           }`}
           onClick={() => handleChange('grid')}
         >
-          <img
-            src="/grid_icon.png"
-            alt=""
-            width="15"
-            height="15"
-            className=" mr-1"
-            loading="lazy"
-          />
+          <BsFillGrid3X3GapFill className="mr-1" />
           Grid
         </button>
         <button
@@ -171,14 +166,7 @@ export const SheetPage: React.FC<Props> = ({
           }`}
           onClick={() => handleChange('row')}
         >
-          <img
-            src="/list_icon.png"
-            alt=""
-            width="15"
-            height="15"
-            className=" mr-1"
-            loading="lazy"
-          />
+          <FaListUl className="mr-1" />
           List
         </button>
       </div>
