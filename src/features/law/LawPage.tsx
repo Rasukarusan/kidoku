@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/layout/Container'
 import { SUPPORT_URL } from '@/libs/constants'
+import { NextSeo } from 'next-seo'
 
 const Title = ({ text }) => {
   return <h3 className="mb-2 text-xl font-bold">{text}</h3>
@@ -13,6 +14,7 @@ const Text = ({ children }) => {
 export const LawPage: React.FC = () => {
   return (
     <Container>
+      <NextSeo title="特定商取引法に基づく表記 | Kidoku" />
       <div className="p-4">
         <h2 className="mb-4 text-center text-2xl font-bold">
           特定商取引法に基づく表記

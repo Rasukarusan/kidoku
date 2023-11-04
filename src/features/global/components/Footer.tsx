@@ -94,7 +94,7 @@ export const Footer: React.FC = () => {
                   target: '_blank',
                 },
                 {
-                  title: '特商法表記',
+                  title: '特定商取引法に基づく表記',
                   href: '/law',
                   target: '_self',
                 },
