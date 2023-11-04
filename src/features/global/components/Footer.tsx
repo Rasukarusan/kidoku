@@ -1,4 +1,5 @@
 import { Logo } from '@/components/icon/Logo'
+import { SUPPORT_URL } from '@/libs/constants'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 
@@ -89,7 +90,7 @@ export const Footer: React.FC = () => {
                 },
                 {
                   title: 'お問い合わせ',
-                  href: 'https://form.run/@kidoku-support',
+                  href: SUPPORT_URL,
                   target: '_blank',
                 },
                 {
