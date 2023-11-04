@@ -96,22 +96,13 @@ export default async (req, res) => {
         const { url } = await put(`${book.id}.webp`, buffer, {
           access: 'public',
         })
-        await prisma.books.update({
-          where: { id, userId },
-          data: {
-            ...data,
-            image: url,
-          },
-        })
-        // })
-      } else {
-        // 画像がユーザーが選択したものではない場合レコード更新して終了
-        await prisma.books.update({
-          where: { id, userId },
-          data,
-        })
+        data.image = url
       }
-      return res.status(200).json({ result: true })
+      await prisma.books.update({
+        where: { id, userId },
+        data,
+      })
+      return res.status(200).json({ data })
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
       const id = body.id
