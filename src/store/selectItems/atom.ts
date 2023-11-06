@@ -1,5 +1,5 @@
 import { atom } from 'recoil'
-import { SelectItems } from '@/features/index/types'
+import { SelectItems } from './types'
 
 export const selectItemsAtom = atom<SelectItems>({
   key: 'selectItemsAtom',
