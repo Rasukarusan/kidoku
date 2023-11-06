@@ -22,7 +22,7 @@ export const CommentsPage = ({ comments, next, page }) => {
       <div className="text-center">
         {page > 1 && (
           <Link
-            href={`/comments?page=${page - 1}`}
+            href={`/comments/${page - 1}`}
             className="pr-4 text-gray-400 hover:text-gray-700"
           >
             ← {page - 1} ページへ
@@ -31,7 +31,7 @@ export const CommentsPage = ({ comments, next, page }) => {
 
         {next && (
           <Link
-            href={`/comments?page=${page + 1}`}
+            href={`/comments/${page + 1}`}
             className="rounded-md bg-gray-100 px-4 py-2 text-gray-700 shadow-md hover:bg-gray-200"
           >
             次のページへ →
