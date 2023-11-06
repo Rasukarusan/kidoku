@@ -49,12 +49,10 @@ export async function getStaticPaths() {
   })
   const limit = 20
   const pages = Math.ceil(count / limit)
-  console.log(pages)
   const paths = []
   for (let i = 1; i <= pages; i++) {
     paths.push({ params: { page: `${i}` } })
   }
-  console.log(paths)
   return {
     paths,
     fallback: 'blocking', // キャッシュが存在しない場合はSSR
