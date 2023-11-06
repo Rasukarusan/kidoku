@@ -3,8 +3,8 @@ import prisma, { parse } from '@/libs/prisma'
 
 export default CommentsPage
 
-export async function getServerSideProps(ctx) {
-  const page = parseInt(ctx.query.page) || 1
+export async function getStaticProps(ctx) {
+  const page = parseInt(ctx.params.page) || 1
   const limit = 20
   const [total, books] = await Promise.all([
     await prisma.books.count({
@@ -39,5 +39,24 @@ export async function getServerSideProps(ctx) {
   const next = Math.ceil(total / limit) > page
   return {
     props: { comments, next, page },
+    revalidate: 86400,
+  }
+}
+
+export async function getStaticPaths() {
+  const count = await prisma.books.count({
+    where: { is_public_memo: true },
+  })
+  const limit = 20
+  const pages = Math.ceil(count / limit)
+  console.log(pages)
+  const paths = []
+  for (let i = 1; i <= pages; i++) {
+    paths.push({ params: { page: `${i}` } })
+  }
+  console.log(paths)
+  return {
+    paths,
+    fallback: 'blocking', // キャッシュが存在しない場合はSSR
   }
 }

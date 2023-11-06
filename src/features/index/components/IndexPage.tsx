@@ -17,7 +17,7 @@ export const IndexPage = ({ comments }) => {
           ))}
         </div>
         <div className="text-center">
-          <Link href="/comments" className="text-blue-500 hover:underline">
+          <Link href="/comments/1" className="text-blue-500 hover:underline">
             さらに表示
           </Link>
         </div>
