@@ -1,6 +1,6 @@
 import { selector } from 'recoil'
 import { selectItemsAtom } from './atom'
-import { SelectItems } from '@/features/index/types'
+import { SelectItems } from './types'
 import { NO_IMAGE } from '@/libs/constants'
 
 /**
