@@ -30,7 +30,16 @@ https://app.rasukarusan.com/
 - MeiliSearch
 - Resend
 
-## MeiliSearch エンドポイント
+## MeiliSearchの起動に失敗した場合
+
+`dockuer-compose up`で下記のエラーが出てmeilisearchの起動に失敗した場合、`data/meilisearch`の`meilisearch`ディレクトリを削除すると起動できる。
+
+```
+Error: Meilisearch (v1.4.2) failed to infer the version of the database.
+To update Meilisearch please follow our guide on https://www.meilisearch.com/docs/learn/update_and_migration/updating.
+```
+
+## Meilisearch エンドポイント
 
 https://www.meilisearch.com/docs/reference/api/indexes
 
