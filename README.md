@@ -30,6 +30,32 @@ https://app.rasukarusan.com/
 - MeiliSearch
 - Resend
 
+## 環境構築
+
+envファイルの作成
+```sh
+cp .env.example .env
+```
+
+画面アクセス
+```sh
+yarn
+yarn dev
+open http://localhost:3000
+```
+
+検索環境(meilisearch)構築
+```sh
+docker-compose up --build
+
+# meiliearchが構築できていることを確認
+open http://localhost:7700
+
+# ドキュメント登録
+curl -XPOST -H "Authorization: Bearer ${ADMIN_AUTH_TOKEN}" http://localhost:3000/api/batch/meilisearch
+# {"result":true}
+```
+
 ## MeiliSearchの起動に失敗した場合
 
 `dockuer-compose up`で下記のエラーが出てmeilisearchの起動に失敗した場合、`data/meilisearch`の`meilisearch`ディレクトリを削除すると起動できる。
