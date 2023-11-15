@@ -22,6 +22,7 @@ https://app.rasukarusan.com/
 ## 技術
 
 - Next.js
+- Tailwind
 - NextAuth
 - Prisma
 - Framer Motion
