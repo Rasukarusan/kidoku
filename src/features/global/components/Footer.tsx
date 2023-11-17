@@ -46,7 +46,7 @@ export const Footer: React.FC = () => {
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
             <a href="/" className="flex items-center text-gray-700">
-              <Logo className="mr-2 w-8" />
+              <Logo className="mr-2 w-6 sm:w-8" />
               <span className="self-center whitespace-nowrap text-2xl font-semibold">
                 kidoku
               </span>
@@ -56,8 +56,7 @@ export const Footer: React.FC = () => {
             <Column
               title="About"
               items={[
-                { title: 'kidokuについて', href: '#', target: '_self' },
-                { title: '運営会社', href: '#', target: '_self' },
+                { title: 'kidokuについて', href: '/about', target: '_self' },
               ]}
             />
             <Column
