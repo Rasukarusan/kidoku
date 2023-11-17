@@ -69,7 +69,7 @@ export const Footer: React.FC = () => {
                   target: '_blank',
                 },
                 {
-                  title: 'Twitter',
+                  title: 'X',
                   href: 'https://twitter.com/rasukarusan2',
                   target: '_blank',
                 },
