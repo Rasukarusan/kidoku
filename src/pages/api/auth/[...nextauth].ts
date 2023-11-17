@@ -25,8 +25,8 @@ export const authOptions: NextAuthOptions = {
       return session
     },
   },
-  pages: {
-    newUser: '/auth/init',
-  },
+  // pages: {
+  //   newUser: '/auth/init',
+  // },
 }
 export default NextAuth(authOptions)
