@@ -65,7 +65,7 @@ export const Header = () => {
             href="/"
             className="mr-8 font-['Nico_Moji'] text-xl font-bold tracking-[.3rem] no-underline"
           >
-            <Logo className="h-8 w-8" />
+            <Logo className="h-8 w-8 text-gray-700" />
           </Link>
           <SearchBox />
           <div className="flex-grow"></div>
@@ -127,7 +127,7 @@ export const Header = () => {
           {session === null && (
             <>
               <button
-                className="rounded-md bg-[#4f5b62] px-4 py-2 text-xs font-bold sm:px-5 sm:py-2 sm:text-sm"
+                className="rounded-md px-4 py-2 text-xs font-bold text-gray-700 sm:px-5 sm:py-2 sm:text-sm"
                 onClick={() => setOpen(true)}
               >
                 ログイン
