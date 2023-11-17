@@ -5,6 +5,6 @@ export default PrivacyPage
 export const getStaticProps = async (ctx) => {
   return {
     props: {},
-    revalidate: 86400,
+    revalidate: 300,
   }
 }

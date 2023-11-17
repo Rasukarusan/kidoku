@@ -73,7 +73,7 @@ export async function getStaticProps(context) {
       username,
       yearlyTopBooks,
     },
-    revalidate: 86400,
+    revalidate: 300,
   }
 }
 export async function getStaticPaths() {

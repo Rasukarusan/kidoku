@@ -31,6 +31,6 @@ export const getStaticProps = async (ctx) => {
   const result = []
   return {
     props: { comments },
-    revalidate: 86400,
+    revalidate: 300,
   }
 }
