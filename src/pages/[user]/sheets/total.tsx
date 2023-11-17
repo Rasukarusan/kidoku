@@ -74,7 +74,7 @@ export const getStaticProps = async (ctx) => {
       username,
       yearlyTopBooks,
     },
-    revalidate: 86400,
+    revalidate: 300,
   }
 }
 
