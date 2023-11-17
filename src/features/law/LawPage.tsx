@@ -14,7 +14,7 @@ const Text = ({ children }) => {
 export const LawPage: React.FC = () => {
   return (
     <Container>
-      <NextSeo title="特定商取引法に基づく表記 | Kidoku" />
+      <NextSeo title="特定商取引法に基づく表記 | kidoku" />
       <div className="p-4">
         <h2 className="mb-4 text-center text-2xl font-bold">
           特定商取引法に基づく表記
