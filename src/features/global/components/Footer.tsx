@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Logo } from '@/components/icon/Logo'
 import { SUPPORT_URL } from '@/libs/constants'
 import { useSession } from 'next-auth/react'
@@ -20,13 +21,13 @@ const Column: React.FC<ColumnProps> = ({ title, items }) => {
       <ul className="font-medium text-gray-500 dark:text-gray-400">
         {items.map((item) => (
           <li key={item.title} className="mb-4">
-            <a
+            <Link
               href={item.href}
               className="hover:underline"
               target={item.target}
             >
               {item.title}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
