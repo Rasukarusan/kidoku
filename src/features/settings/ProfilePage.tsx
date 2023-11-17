@@ -10,6 +10,20 @@ interface Props {
 export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   const [currentName, setCurrentName] = useState(name)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value
+    setCurrentName(newName)
+    const res = await fetch(`/api/check/name`, {
+      method: 'POST',
+      body: JSON.stringify({ name: newName }),
+      headers: {
+        Accept: 'application/json',
+      },
+    }).then((res) => res.json())
+    setError(res.result ? '' : 'すでに利用されているため登録できません')
+  }
   const onSubmit = async () => {
     setLoading(true)
     const res = await fetch(`/api/me`, {
@@ -38,7 +52,7 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
       <NextSeo title="アカウント設定 | kidoku" />
       <h2 className="text-2xl font-bold">Settings</h2>
       <div className="mb-8 flex p-4">
-        <button className="mr-8 mb-4 h-[100px] w-[100px] rounded-full">
+        <button className="mr-8 mb-4 h-[100px] w-[100px] rounded-full" disabled>
           <img src={image} width={100} height={100} className="rounded-full" />
         </button>
         <div className="w-full">
@@ -48,11 +62,10 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
           </div>
           <input
             value={currentName}
-            className="mb-4 w-full rounded-md border border-slate-200 bg-slate-100 p-2"
-            onChange={(e) => {
-              setCurrentName(e.target.value)
-            }}
+            className="mb-2 w-full rounded-md border border-slate-200 bg-slate-100 p-2"
+            onChange={onChange}
           />
+          <div className="mb-4 text-xs text-red-700">{error}</div>
           <div className="mb-4">
             <div className="mb-4 text-sm font-bold text-gray-700">
               アカウント削除
@@ -70,8 +83,9 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </div>
       </div>
       <button
-        className="m-auto block flex items-center rounded-md bg-blue-400 px-4 py-2 font-bold text-white hover:bg-blue-500"
+        className="m-auto block flex items-center rounded-md bg-blue-400 px-4 py-2 font-bold text-white hover:bg-blue-500 disabled:bg-gray-400"
         onClick={onSubmit}
+        disabled={error !== ''}
       >
         {loading && (
           <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
