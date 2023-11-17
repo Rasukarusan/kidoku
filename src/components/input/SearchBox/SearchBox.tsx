@@ -13,7 +13,7 @@ export const SearchBox: React.FC = () => {
           document.body.classList.remove('no-scroll')
         }}
       />
-      <div className="relative text-gray-600 focus-within:text-gray-400">
+      <div className="relative rounded-md border border-gray-200 text-gray-600 focus-within:text-gray-400">
         <span className="absolute inset-y-0 left-0 flex items-center pl-2">
           <button
             type="submit"

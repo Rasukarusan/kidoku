@@ -14,7 +14,7 @@ interface ColumnProps {
 const Column: React.FC<ColumnProps> = ({ title, items }) => {
   return (
     <div>
-      <h2 className="tuppercase mb-6 text-sm font-semibold text-white">
+      <h2 className="tuppercase mb-6 text-sm font-semibold text-gray-700">
         {title}
       </h2>
       <ul className="font-medium text-gray-500 dark:text-gray-400">
@@ -41,13 +41,13 @@ export const Footer: React.FC = () => {
     return null
   }
   return (
-    <footer className="bg-[#263238]">
+    <footer className="bg-main">
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
-            <a href="/" className="flex items-center">
-              <Logo className="mr-2 w-8 text-white" />
-              <span className="self-center whitespace-nowrap text-2xl font-semibold text-white">
+            <a href="/" className="flex items-center text-gray-700">
+              <Logo className="mr-2 w-8" />
+              <span className="self-center whitespace-nowrap text-2xl font-semibold">
                 Kidoku
               </span>
             </a>
