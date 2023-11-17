@@ -25,7 +25,7 @@ export const AuthInitPage: React.FC<Props> = ({ providers }) => {
   }
   return (
     <Container>
-      <NextSeo title="Welcome! | Kidoku" />
+      <NextSeo title="Welcome! | kidoku" />
       <div className="p-4 text-center">
         <h2 className="mb-8 text-3xl font-bold">Welcome</h2>
         <img

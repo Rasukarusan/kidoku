@@ -5,7 +5,7 @@ export const TermsPage = () => {
     <Container className="text-gray-700">
       <NextSeo title="利用規約 | kidoku" />
       <div className="mx-auto max-w-screen-md py-8 px-4">
-        <h1 className="mb-6 text-3xl font-bold">Kidoku利用規約</h1>
+        <h1 className="mb-6 text-3xl font-bold">kidoku利用規約</h1>
 
         <h2 className="mb-4 text-2xl font-semibold">第1条（適用）</h2>
         <p className="mb-6">
@@ -15,7 +15,7 @@ export const TermsPage = () => {
         <h2 className="mb-4 text-2xl font-semibold">第2条（定義）</h2>
         <ol className="mb-6 list-decimal pl-6">
           <li className="mb-2">
-            「サービス」とは、Kidoku及びこれに付随する一切のサービスを指します。
+            「サービス」とは、kidoku及びこれに付随する一切のサービスを指します。
           </li>
           <li>
             「ユーザー」とは、本サービスを利用する全ての個人または法人を指します。

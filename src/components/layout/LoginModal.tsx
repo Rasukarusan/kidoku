@@ -16,7 +16,7 @@ export const LoginModal: React.FC<Props> = ({ open, onClose }) => {
         <Link href="/" legacyBehavior>
           <div className="flex items-center justify-center font-['Nico_Moji'] text-2xl font-bold tracking-[.3rem]">
             <Logo className="mr-2 w-5" />
-            Kidoku
+            kidoku
           </div>
         </Link>
         <div className="my-6">

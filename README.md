@@ -1,4 +1,4 @@
-# Kidoku
+# kidoku
 
 https://kidoku.net/
 

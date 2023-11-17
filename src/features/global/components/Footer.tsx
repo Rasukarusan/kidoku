@@ -48,7 +48,7 @@ export const Footer: React.FC = () => {
             <a href="/" className="flex items-center text-gray-700">
               <Logo className="mr-2 w-8" />
               <span className="self-center whitespace-nowrap text-2xl font-semibold">
-                Kidoku
+                kidoku
               </span>
             </a>
           </div>
@@ -56,7 +56,7 @@ export const Footer: React.FC = () => {
             <Column
               title="About"
               items={[
-                { title: 'Kidokuについて', href: '#', target: '_self' },
+                { title: 'kidokuについて', href: '#', target: '_self' },
                 { title: '運営会社', href: '#', target: '_self' },
               ]}
             />
