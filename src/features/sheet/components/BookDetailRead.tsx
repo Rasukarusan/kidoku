@@ -33,7 +33,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
               />
             </a>
           </div>
-          <div className="mr-2 w-2/3">
+          <div className="mr-2 mb-2 w-2/3">
             <BookInputField
               value={book.title}
               label="タイトル"
@@ -71,7 +71,12 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
         </div>
         <div className="mb-1 flex items-center">
           <div className="mr-1 text-xs text-gray-400">メモ</div>
-          {!book.is_public_memo && <AiFillLock className="w-[15px]" />}
+          {!book.is_public_memo && <AiFillLock className="mr-1 w-[15px]" />}
+          {!book.is_public_memo && isMine && (
+            <div className="text-[10px] text-gray-400">
+              非公開のメモは他のユーザーには表示されません
+            </div>
+          )}
         </div>
         {(isMine || book.is_public_memo) && (
           <BookInputField
