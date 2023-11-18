@@ -19,7 +19,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
       onMouseLeave={() => onMouseLeave(-1)}
       onClick={() => onClick(book)}
     >
-      <div className="flex">
+      <div className="flex w-full">
         <div className="min-w-[128px]">
           <img
             className="cursor-pointer drop-shadow-lg"
@@ -31,10 +31,22 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
         </div>
         <div className="p-2">
           <div className="text-sm font-bold">{book.title}</div>
-          <div className="pt-1 text-xs">{book.author}</div>
+          <div className="mb-2 pt-1 text-xs">{book.author}</div>
           {(isMine || book.is_public_memo) && (
-            <div className="mt-2 h-[80px] text-xs line-clamp-5">
-              {book.memo}
+            <div className="h-[80px] text-xs line-clamp-5">{book.memo}</div>
+          )}
+          {!isMine && !book.is_public_memo && (
+            <div className="relative">
+              <div className="absolute h-20 w-[190px] bg-gray-200 blur-sm"></div>
+              <div className="flex h-20 items-center justify-center rounded-md">
+                <div>
+                  <div className="mb-2 flex items-center justify-center blur-none">
+                    <div className="text-center text-sm font-bold blur-none">
+                      非公開のメモです
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

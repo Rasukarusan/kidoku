@@ -87,6 +87,23 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             readonly={true}
           />
         )}
+        {!isMine && !book.is_public_memo && (
+          <div className="relative">
+            <div className="absolute h-40 w-full bg-gray-200 blur-sm"></div>
+            <div className="flex h-40 items-center justify-center rounded-md">
+              <div>
+                <div className="mb-2 flex items-center blur-none">
+                  <div className="font-bold blur-none">非公開のメモです</div>
+                </div>
+                {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
+                  <button className="w-full rounded-md bg-blue-600 py-1 text-center font-bold text-white blur-none">
+                    開放する
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       {isMine && (
         <div className="border-1 w-full border-t text-center">
