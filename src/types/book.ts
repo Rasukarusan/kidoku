@@ -13,6 +13,7 @@ export interface Book {
   memo: string
   finished: string
   is_public_memo: boolean
+  is_purchasable: boolean
 }
 
 export type YearlyTopBook = {
