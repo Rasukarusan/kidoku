@@ -10,7 +10,10 @@ export const IndexPage = ({ comments }) => {
   return (
     <Container className="p-6">
       <section>
-        <h2 className="p-2 text-2xl font-bold">Comments</h2>
+        <div className="flex items-center">
+          <h2 className="p-2 text-2xl font-bold">Comments</h2>
+          <div className="text-xs text-gray-400">5分ごとに更新されます</div>
+        </div>
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {comments.map((comment) => (
             <BookComment key={comment.id} comment={comment} />
