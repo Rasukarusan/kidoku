@@ -127,14 +127,30 @@ export const BookDetailEdit: React.FC<Props> = ({
               tabIndex={6}
               isChanged={diff.memo}
             />
-            <div className="flex justify-between">
-              <ToggleButton
-                label="メモを公開する"
-                checked={book.is_public_memo}
-                onChange={() => {
-                  setBook({ ...book, is_public_memo: !book.is_public_memo })
-                }}
-              />
+            <div className="flex items-end justify-between">
+              <div>
+                <ToggleButton
+                  label="メモを公開する"
+                  checked={book.is_public_memo}
+                  onChange={() => {
+                    setBook({
+                      ...book,
+                      is_public_memo: !book.is_public_memo,
+                    })
+                  }}
+                  disabled={false}
+                />
+                {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
+                  <ToggleButton
+                    label="課金によるメモの解放を許可する"
+                    checked={book.is_purchasable}
+                    onChange={() => {
+                      setBook({ ...book, is_purchasable: !book.is_purchasable })
+                    }}
+                    disabled={book.is_public_memo}
+                  />
+                )}
+              </div>
               <button
                 className="pr-2 text-sm font-bold text-red-600"
                 onClick={onDelete}
