@@ -87,6 +87,7 @@ export default async (req, res) => {
         impression: body.impression,
         memo: body.memo,
         is_public_memo: body.is_public_memo,
+        updated: new Date(),
       }
       const { image } = body
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
