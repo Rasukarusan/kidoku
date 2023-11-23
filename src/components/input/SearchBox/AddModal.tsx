@@ -141,11 +141,20 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
                   value={book?.impression}
                   label="感想"
                   tabIndex={4}
+                  onChange={(e) =>
+                    setBook({ ...book, impression: e.target.value })
+                  }
                 />
                 <BookDatePicker
                   value={dayjs(book?.finished).format('YYYY-MM-DD')}
                   label="読了日"
                   tabIndex={5}
+                  onChange={(e) =>
+                    setBook({
+                      ...book,
+                      finished: dayjs(e.target.value).format('YYYY-MM-DD'),
+                    })
+                  }
                 />
               </div>
             </div>
