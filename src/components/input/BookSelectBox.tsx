@@ -16,7 +16,7 @@ export const BookSelectBox: React.FC<Props> = ({
   onChange = () => {},
   isChanged = false,
 }) => {
-  const values = ['-', '◎', '◯', '✗']
+  const values = ['-', '◎', '◯', '△', '✗']
   return (
     <div className="mb-1 pr-4 sm:pr-12">
       <div className="mb-1 text-xs text-gray-400">{label}</div>
