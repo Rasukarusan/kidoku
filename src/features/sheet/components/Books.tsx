@@ -7,6 +7,7 @@ import { BookDetailDialog } from './BookDetailDialog'
 import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
 import { FaCommentDots } from 'react-icons/fa'
+import { AiFillLock } from 'react-icons/ai'
 
 interface Props {
   bookId: string
@@ -71,14 +72,15 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                   onMouseLeave={() => onMouseLeave(i)}
                   loading={i > 6 ? 'lazy' : 'eager'}
                 />
-                {((session && session.user.id === book.userId) ||
-                  book.is_public_memo) &&
-                  book?.memo !== '[期待]\n\n[感想]' &&
-                  book?.memo !== '' && (
-                    <p className="absolute top-[-3px] right-[-5px] sm:right-[40px] sm:top-[-10px]">
-                      <FaCommentDots size={20} />
-                    </p>
-                  )}
+                {book.is_public_memo ? (
+                  <p className="absolute top-[-3px] right-[-5px] sm:right-[40px] sm:top-[-10px]">
+                    <FaCommentDots size={20} color="#616A6B" />
+                  </p>
+                ) : (
+                  <p className="absolute top-[-3px] right-[-5px] sm:right-[45px] sm:top-[-10px]">
+                    <AiFillLock size={25} color="black" />
+                  </p>
+                )}
                 {hovers[i] && (
                   <HoverBook
                     book={book}
