@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import { Book } from '@/types/book'
 import { useSession } from 'next-auth/react'
 import { BookInputField } from '@/components/input/BookInputField'
@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
 import { AiFillLock } from 'react-icons/ai'
+import { CheckoutModal } from '@/components/form/CheckoutModal'
 
 interface Props {
   book: Book
@@ -15,6 +16,13 @@ interface Props {
 export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
+  const [open, setOpen] = useState(false)
+  const returnUrl = () => {
+    const url = new URL(window.location.href)
+    const path = url.pathname
+    return process.env.NEXT_PUBLIC_HOST + path + `?book=${book.id}`
+  }
+
   return (
     <div className="flex h-full flex-col justify-between">
       <div className="p-4">
@@ -96,9 +104,19 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
                   <div className="font-bold blur-none">非公開のメモです</div>
                 </div>
                 {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
-                  <button className="w-full rounded-md bg-blue-600 py-1 text-center font-bold text-white blur-none">
-                    開放する
-                  </button>
+                  <>
+                    <CheckoutModal
+                      open={open}
+                      onClose={() => setOpen(false)}
+                      returnUrl={returnUrl()}
+                    />
+                    <button
+                      className="w-full rounded-md bg-blue-600 py-1 text-center font-bold text-white blur-none"
+                      onClick={() => setOpen(true)}
+                    >
+                      開放する
+                    </button>
+                  </>
                 )}
               </div>
             </div>
