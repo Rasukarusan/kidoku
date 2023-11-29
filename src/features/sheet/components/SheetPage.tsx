@@ -92,15 +92,15 @@ export const SheetPage: React.FC<Props> = ({
   return (
     <Container className="mb-12">
       <NextSeo title={`${username}/${year} | kidoku`} />
-      <div className="flex">
-        <div className="mb-8 w-[90%] border-b border-gray-200 pr-4">
+      <div className="fixed left-0 top-[56px] z-10 flex w-full bg-white sm:top-[62px] sm:px-32">
+        <div className="w-[90%] border-b border-gray-200 pr-4">
           <Tabs sheets={sheets} value={year} username={username} />
         </div>
         <div className="w-[10%]">
           <Menu currentSheet={year} username={username} />
         </div>
       </div>
-      <div className="mb-10 text-center">
+      <div className="mt-32 mb-10 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
       </div>
