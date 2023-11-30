@@ -82,8 +82,10 @@ export const SheetPage: React.FC<Props> = ({
           </div>
         </div>
         <div className="p-10 text-center">
-          <div className="mb-4 text-4xl font-bold">データがまだありません</div>
-          <img src={NO_IMAGE} alt="" width="400" className="m-auto" />
+          <div className="mb-4 text-2xl font-bold">
+            <span className="text-4xl">🐘 </span>あなたの本がここに表示されます
+          </div>
+          <img src={NO_IMAGE} alt="" width="350" className="m-auto" />
         </div>
       </Container>
     )

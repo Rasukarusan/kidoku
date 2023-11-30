@@ -4,6 +4,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import prisma from '@/libs/prisma'
 import type { NextAuthOptions } from 'next-auth'
 import type { Adapter } from 'next-auth/adapters'
+import { initUser } from '@/libs/auth/init'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -23,6 +24,11 @@ export const authOptions: NextAuthOptions = {
       session.user.id = user.id
       session.user.admin = user.admin
       return session
+    },
+  },
+  events: {
+    createUser: async (user) => {
+      await initUser(user.user)
     },
   },
   // pages: {
