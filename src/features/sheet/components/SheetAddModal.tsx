@@ -1,14 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { Modal } from '@/components/layout/Modal'
+import { useReward } from 'react-rewards'
+import { SuccessAlert } from '@/components/label/SuccessAlert'
+import { DangerAlert } from '@/components/label/DangerAlert'
 
 interface Props {
   open: boolean
   onClose: () => void
 }
+interface Response {
+  result: boolean
+}
 
 export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
   const [newSheet, setNewSheet] = useState('')
   const ref = useRef<HTMLInputElement>(null)
+  const { reward, isAnimating } = useReward('rewardId', 'confetti', {
+    elementCount: 200,
+  })
+  const [response, setResponse] = useState<Response>(null)
 
   useEffect(() => {
     ref.current?.focus()
@@ -35,6 +45,27 @@ export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
           value={newSheet}
           placeholder="シート名を入力"
         />
+        {response && (
+          <div className="absolute left-1/2 z-20 -translate-x-1/2 transform">
+            {response.result ? (
+              <SuccessAlert
+                open={!!response}
+                text="シートを追加しました"
+                onClose={() => {
+                  setResponse(null)
+                }}
+              />
+            ) : (
+              <DangerAlert
+                open={!!response}
+                text="シートの追加に失敗しました"
+                onClose={() => {
+                  setResponse(null)
+                }}
+              />
+            )}
+          </div>
+        )}
         <button
           className="rounded-md bg-blue-700 px-4 py-1 font-bold text-white disabled:bg-blue-300"
           disabled={!newSheet}
@@ -46,10 +77,13 @@ export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
                 Accept: 'application/json',
               },
             }).then((res) => res.json())
-            console.log(res)
+            setResponse(res)
+            if (res.result) {
+              reward()
+            }
           }}
         >
-          追加する
+          <span id="rewardId">追加する</span>
         </button>
       </div>
     </Modal>
