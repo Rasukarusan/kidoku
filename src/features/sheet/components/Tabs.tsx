@@ -1,6 +1,9 @@
+import useSWR from 'swr'
+import { fetcher } from '@/libs/swr'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
+import { FaUser } from 'react-icons/fa'
 
 interface Props {
   sheets: string[]
@@ -11,6 +14,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const router = useRouter()
   const { data: session } = useSession()
   const [tab, setTab] = useState(value)
+  const { data } = useSWR(`/api/user/image?username=${username}`, fetcher)
 
   const onClick = (value: string) => {
     setTab(value)
@@ -27,10 +31,14 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
         }`}
         onClick={() => onClick('total')}
       >
-        <img
-          src="https://lh3.googleusercontent.com/a/ACg8ocJT-LCACb3glXijA-jQa27gYGIy3yRnsSo1TenXA833urs=s96-c"
-          className="mr-4 h-8 w-8 rounded-full"
-        />
+        {data?.image ? (
+          <img
+            src={data?.image}
+            className="min-h-8 min-w-8 mr-4 h-8 w-8 rounded-full"
+          />
+        ) : (
+          <FaUser className="mr-4" size={18} />
+        )}
         total
       </button>
       {sheets.map((sheet) => (
