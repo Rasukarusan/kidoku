@@ -39,7 +39,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
         ) : (
           <FaUser className="mr-4" size={18} />
         )}
-        total
+        <span className="mr-4">total</span>
       </button>
       {sheets.map((sheet) => (
         <button
