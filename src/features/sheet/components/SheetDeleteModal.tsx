@@ -68,7 +68,7 @@ export const SheetDeleteModal: React.FC<Props> = ({
               return
             }
             alert('削除しました')
-            location.href = `/${username}/sheets`
+            location.href = `${process.env.NEXT_PUBLIC_HOST}/${username}/sheets/total`
           }}
         >
           {loading ? (
