@@ -19,11 +19,27 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
 
   return (
     <div className="no-scrollbar flex items-center justify-start overflow-x-auto">
-      {['total', ...sheets].map((sheet) => (
+      <button
+        className={`flex max-h-11 items-center justify-between whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100 ${
+          tab === 'total'
+            ? 'border-b-2 border-gray-900'
+            : 'border-b border-gray-200'
+        }`}
+        onClick={() => onClick('total')}
+      >
+        <img
+          src="https://lh3.googleusercontent.com/a/ACg8ocJT-LCACb3glXijA-jQa27gYGIy3yRnsSo1TenXA833urs=s96-c"
+          className="mr-4 h-8 w-8 rounded-full"
+        />
+        total
+      </button>
+      {sheets.map((sheet) => (
         <button
           key={sheet}
-          className={`whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100 ${
-            tab === sheet ? 'border-b-2 border-gray-900' : ''
+          className={`max-h-11 whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100 ${
+            tab === sheet
+              ? 'border-b-2 border-gray-900'
+              : 'border-b border-gray-200 '
           }`}
           onClick={() => onClick(sheet)}
         >
