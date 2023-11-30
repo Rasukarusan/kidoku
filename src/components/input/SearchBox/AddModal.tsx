@@ -15,6 +15,8 @@ import { BookSelectBox } from '../BookSelectBox'
 import { BookDatePicker } from '../BookDatePicker'
 import { useRouter } from 'next/router'
 import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
+import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
+import { AiOutlineFileAdd } from 'react-icons/ai'
 
 interface Response {
   result: boolean
@@ -30,7 +32,7 @@ interface Props {
 
 export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   const router = useRouter()
-  const { data } = useSWR(`/api/sheets`, fetcher, {
+  const { data, mutate: mutateSheet } = useSWR(`/api/sheets`, fetcher, {
     fallbackData: { result: true, sheets: [] },
   })
   const { mutate } = useSWR(
@@ -47,6 +49,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
     id: null,
     name: null,
   })
+  const [openAdd, setOpenAdd] = useState(false)
 
   // カテゴリ一覧
   const { data: categories } = useSWR(`/api/books/category`, fetcher)
@@ -174,26 +177,45 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
             }}
           />
           <div className="w-full text-center text-gray-900 ">
-            <select
-              className="cursor-pointer border p-2 px-4"
-              onChange={(e) => {
-                const selectedOption = e.target.selectedOptions[0]
-                const sheetId = selectedOption.getAttribute('data-id')
-                setSheet({
-                  id: Number(sheetId),
-                  name: e.target.value,
-                })
+            <SheetAddModal
+              open={openAdd}
+              onClose={() => {
+                setOpenAdd(false)
+                mutateSheet()
               }}
-            >
-              {data.sheets.map((sheet) => {
-                const { id, name } = sheet
-                return (
-                  <option key={name} value={name} data-id={id}>
-                    {name}
-                  </option>
-                )
-              })}
-            </select>
+            />
+            {data.sheets.length === 0 ? (
+              <button
+                className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white"
+                onClick={() => {
+                  setOpenAdd(true)
+                }}
+              >
+                <AiOutlineFileAdd className="mr-1 h-[24px] w-[24px] text-white" />
+                シートを追加
+              </button>
+            ) : (
+              <select
+                className="cursor-pointer border p-2 px-4"
+                onChange={(e) => {
+                  const selectedOption = e.target.selectedOptions[0]
+                  const sheetId = selectedOption.getAttribute('data-id')
+                  setSheet({
+                    id: Number(sheetId),
+                    name: e.target.value,
+                  })
+                }}
+              >
+                {data.sheets.map((sheet) => {
+                  const { id, name } = sheet
+                  return (
+                    <option key={name} value={name} data-id={id}>
+                      {name}
+                    </option>
+                  )
+                })}
+              </select>
+            )}
           </div>
         </div>
         <div className="border-1 w-full border-t text-center">
