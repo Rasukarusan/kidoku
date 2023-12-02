@@ -23,77 +23,142 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
     return process.env.NEXT_PUBLIC_HOST + path + `?book=${book.id}`
   }
 
+  const [scale, setScale] = useState(1) // スケールの初期値
+  const [textareaHeight, setTextareaHeight] = useState(200) // textareaの初期高さ
+  const [small, setSmall] = useState(false)
+  const [scrollAttempts, setScrollAttempts] = useState(0)
+  const maxAttempts = 70 // スクロール試行の最大回数
+  const handleScrollAttempt = (event) => {
+    const { deltaY } = event
+    if (event.target.scrollTop === 0 && event.deltaY < 0) {
+      // スクロール上限に達しており、ユーザーが上にスクロールしようとしている
+      setScrollAttempts((prevAttempts) => prevAttempts + 1)
+      if (scrollAttempts + 1 >= maxAttempts) {
+        setScrollAttempts(0) // カウントをリセット
+        setSmall(false)
+        setTextareaHeight(200)
+      }
+    }
+  }
+
+  const handleScroll = (event) => {
+    const scrollTop = event.target.scrollTop
+    const newScale = Math.max(0.5, 1 - scrollTop / 500)
+    const newHeight = small
+      ? window.innerHeight * 0.8 - 100
+      : Math.min(800, 200 + scrollTop / 2)
+    setScale(newScale)
+    setTextareaHeight(newHeight)
+    if (scale <= 0.8) {
+      setSmall(true)
+    }
+  }
+
   return (
-    <div className="flex h-full flex-col justify-between">
+    <div className="flex h-full min-w-full flex-col justify-between">
       <div className="p-4">
-        <div className="flex items-center">
-          <div className="mr-4 w-1/3">
-            <a
-              href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <img
-                className="mx-auto my-0 drop-shadow-lg"
-                src={book.image}
-                alt={book.title}
-                loading="lazy"
-              />
-            </a>
+        {small ? (
+          <div className="mb-2 flex items-center">
+            <img
+              className="mr-4 max-h-[40px] drop-shadow-lg"
+              src={book.image}
+              alt={book.title}
+              loading="lazy"
+            />
+            <div className="font-bold text-gray-500">{book.title}</div>
           </div>
-          <div className="mr-2 mb-2 w-2/3">
-            <BookInputField
-              value={book.title}
-              label="タイトル"
-              tabIndex={1}
-              readonly={true}
-            />
-            <BookInputField
-              value={book.author}
-              label="著者"
-              tabIndex={2}
-              readonly={true}
-            />
-            <BookInputField
-              value={book.category}
-              label="カテゴリ"
-              tabIndex={3}
-              readonly={true}
-            />
-            <div className="flex items-center">
-              <BookSelectBox
-                key={book.id}
-                value={book.impression}
-                label="感想"
-                tabIndex={4}
+        ) : (
+          <div
+            className="flex items-center"
+            style={{ transform: `scale(${scale})` }}
+          >
+            <div className="mr-4 w-1/3">
+              <a
+                href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  className="mx-auto my-0 drop-shadow-lg"
+                  src={book.image}
+                  alt={book.title}
+                  loading="lazy"
+                />
+              </a>
+            </div>
+            <div className="mr-2 mb-2 w-2/3">
+              <BookInputField
+                value={book.title}
+                label="タイトル"
+                tabIndex={1}
                 readonly={true}
               />
-              <BookDatePicker
-                value={dayjs(book.finished).format('YYYY-MM-DD')}
-                label="読了日"
-                tabIndex={5}
+              <BookInputField
+                value={book.author}
+                label="著者"
+                tabIndex={2}
                 readonly={true}
               />
+              <BookInputField
+                value={book.category}
+                label="カテゴリ"
+                tabIndex={3}
+                readonly={true}
+              />
+              <div className="flex items-center">
+                <BookSelectBox
+                  key={book.id}
+                  value={book.impression}
+                  label="感想"
+                  tabIndex={4}
+                  readonly={true}
+                />
+                <BookDatePicker
+                  value={dayjs(book.finished).format('YYYY-MM-DD')}
+                  label="読了日"
+                  tabIndex={5}
+                  readonly={true}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="mb-1 flex items-center">
-          <div className="mr-1 text-xs text-gray-400">メモ</div>
-          {!book.is_public_memo && <AiFillLock className="mr-1 w-[15px]" />}
-          {!book.is_public_memo && isMine && (
-            <div className="text-[10px] text-gray-400">
-              非公開のメモは他のユーザーには表示されません
-            </div>
-          )}
-        </div>
-        {(isMine || book.is_public_memo) && (
-          <BookInputField
-            rows={8}
-            value={book.memo}
-            label=""
-            tabIndex={6}
-            readonly={true}
+        )}
+        {!small && (
+          <div className="mb-1 flex items-center">
+            <div className="mr-1 text-xs text-gray-400">メモ</div>
+            {!book.is_public_memo && <AiFillLock className="mr-1 w-[15px]" />}
+            {!book.is_public_memo && isMine && (
+              <div className="text-[10px] text-gray-400">
+                非公開のメモは他のユーザーには表示されません
+              </div>
+            )}
+          </div>
+        )}
+        {/*small && (
+          <MdExpandMore
+            className="mx-auto"
+            onClick={() => {
+              setSmall(false)
+              setTextareaHeight(200)
+              setScale(1)
+            }}
           />
+        )*/}
+        {(isMine || book.is_public_memo) && (
+          <div className="mb-1">
+            <textarea
+              rows={8}
+              value={book.memo}
+              className={`${
+                scale <= 0.8 ? 'no-scrollbar' : ''
+              } w-full resize-none border-b bg-white py-1 pl-2 text-sm sm:text-base`}
+              tabIndex={6}
+              disabled={true}
+              onScroll={handleScroll}
+              onWheel={handleScrollAttempt}
+              style={{ height: `${textareaHeight}px` }}
+            />
+          </div>
         )}
         {!isMine && !book.is_public_memo && (
           <div className="relative">
