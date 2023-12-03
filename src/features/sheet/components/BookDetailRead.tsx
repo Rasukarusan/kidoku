@@ -24,18 +24,23 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
     return process.env.NEXT_PUBLIC_HOST + path + `?book=${book.id}`
   }
 
-  const [scale, setScale] = useState(1) // スケールの初期値
-  const [textareaHeight, setTextareaHeight] = useState(200) // textareaの初期高さ
+  const [scale, setScale] = useState(1)
+  const [textareaHeight, setTextareaHeight] = useState(200)
   const [small, setSmall] = useState(false)
   const [scrollAttempts, setScrollAttempts] = useState(0)
-  const maxAttempts = 70 // スクロール試行の最大回数
+  const maxAttempts = 50
+
+  /**
+   * テキストエリアのスクロールが上限に達している状態で、スクロールを検知するため。
+   * PCのトラックパッドでスクロールしていることを想定。広がったテキストエリアをもとに戻す挙動を表現。
+   */
   const handleScrollAttempt = (event) => {
     const { deltaY } = event
+    // スクロール上限に達しており、ユーザーが下にスクロールしようとしている
     if (event.target.scrollTop === 0 && event.deltaY < 0) {
-      // スクロール上限に達しており、ユーザーが上にスクロールしようとしている
       setScrollAttempts((prevAttempts) => prevAttempts + 1)
       if (scrollAttempts + 1 >= maxAttempts) {
-        setScrollAttempts(0) // カウントをリセット
+        setScrollAttempts(0)
         setSmall(false)
         setTextareaHeight(200)
       }
@@ -136,14 +141,16 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </div>
         )}
         {small && (
-          <MdExpandMore
-            className="mx-auto"
+          <button
+            className="w-full text-center"
             onClick={() => {
               setSmall(false)
               setTextareaHeight(200)
               setScale(1)
             }}
-          />
+          >
+            <MdExpandMore className="mx-auto" />
+          </button>
         )}
         {(isMine || book.is_public_memo) && (
           <div className="mb-1">
