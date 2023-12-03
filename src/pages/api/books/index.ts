@@ -68,7 +68,9 @@ export default async (req, res) => {
       }
       return res.status(200).json({
         result: true,
-        message: `『${title}』を「${sheet.name}」に追加しました`,
+        bookTitle: title,
+        sheetName: sheet.name,
+        bookId: book.id,
       })
     } else if (req.method === 'PUT') {
       const body = JSON.parse(req.body)

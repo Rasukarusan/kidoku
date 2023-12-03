@@ -9,9 +9,10 @@ import { LoginModal } from '@/components/layout/LoginModal'
 
 interface Props {
   input: string
+  onClose: () => void
 }
 
-export const Books: React.FC<Props> = ({ input }) => {
+export const Books: React.FC<Props> = ({ input, onClose }) => {
   const [openLoginModal, setOpenLoginModal] = useState(false)
   const [openAddModal, setOpenAddModal] = useState(false)
   const [selectItem, setSelectItem] = useState<SearchResult>(null)
@@ -43,7 +44,10 @@ export const Books: React.FC<Props> = ({ input }) => {
         open={openAddModal}
         item={selectItem}
         books={books}
-        onClose={() => setOpenAddModal(false)}
+        onClose={() => {
+          onClose()
+          setOpenAddModal(false)
+        }}
       />
       <div className="flex overflow-x-auto border-x p-2 text-gray-900 sm:p-4">
         {books.map((item: SearchResult, i: number) => {
