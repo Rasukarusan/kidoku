@@ -43,7 +43,7 @@ export const SheetTotalPage: React.FC<Props> = ({
   return (
     <Container>
       <NextSeo title={`${username}/Total | kidoku`} />
-      <div className="fixed left-0 top-[56px] z-10 flex w-full bg-white sm:top-[62px] sm:px-32">
+      <div className="fixed left-0 top-[54px] z-10 flex w-full bg-white sm:top-[54px] sm:px-32">
         <div className="w-[90%] pr-4">
           <Tabs sheets={sheets} value="total" username={username} />
         </div>

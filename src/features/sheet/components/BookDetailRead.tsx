@@ -27,25 +27,6 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   const [scale, setScale] = useState(1)
   const [textareaHeight, setTextareaHeight] = useState(200)
   const [small, setSmall] = useState(false)
-  const [scrollAttempts, setScrollAttempts] = useState(0)
-  const maxAttempts = 50
-
-  /**
-   * テキストエリアのスクロールが上限に達している状態で、スクロールを検知するため。
-   * PCのトラックパッドでスクロールしていることを想定。広がったテキストエリアをもとに戻す挙動を表現。
-   */
-  const handleScrollAttempt = (event) => {
-    const { deltaY } = event
-    // スクロール上限に達しており、ユーザーが下にスクロールしようとしている
-    if (event.target.scrollTop === 0 && event.deltaY < 0) {
-      setScrollAttempts((prevAttempts) => prevAttempts + 1)
-      if (scrollAttempts + 1 >= maxAttempts) {
-        setScrollAttempts(0)
-        setSmall(false)
-        setTextareaHeight(200)
-      }
-    }
-  }
 
   const handleScroll = (event) => {
     const scrollTop = event.target.scrollTop
