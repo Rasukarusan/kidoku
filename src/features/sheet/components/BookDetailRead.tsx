@@ -7,6 +7,7 @@ import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
 import { AiFillLock } from 'react-icons/ai'
 import { CheckoutModal } from '@/components/form/CheckoutModal'
+import { MdExpandMore } from 'react-icons/md'
 
 interface Props {
   book: Book
@@ -134,7 +135,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             )}
           </div>
         )}
-        {/*small && (
+        {small && (
           <MdExpandMore
             className="mx-auto"
             onClick={() => {
@@ -143,7 +144,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
               setScale(1)
             }}
           />
-        )*/}
+        )}
         {(isMine || book.is_public_memo) && (
           <div className="mb-1">
             <textarea
