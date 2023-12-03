@@ -17,10 +17,13 @@ import { useRouter } from 'next/router'
 import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 import { AiOutlineFileAdd } from 'react-icons/ai'
+import { useSession } from 'next-auth/react'
 
 interface Response {
   result: boolean
-  message: string
+  bookTitle: string
+  bookId: number
+  sheetName: string
 }
 
 interface Props {
@@ -32,6 +35,7 @@ interface Props {
 
 export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   const router = useRouter()
+  const { data: session } = useSession()
   const { data, mutate: mutateSheet } = useSWR(`/api/sheets`, fetcher, {
     fallbackData: { result: true, sheets: [] },
   })
@@ -224,7 +228,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
               {response.result ? (
                 <SuccessAlert
                   open={!!response}
-                  text={response.message}
+                  text={`『${response.bookTitle}』を「${response.sheetName}」に追加しました`}
                   onClose={() => {
                     setResponse(null)
                   }}
@@ -232,7 +236,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
               ) : (
                 <DangerAlert
                   open={!!response}
-                  text={response.message}
+                  text="本の登録に失敗しました"
                   onClose={() => {
                     setResponse(null)
                   }}
@@ -240,17 +244,31 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
               )}
             </div>
           )}
-          <button
-            className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-700"
-            onClick={onClickAdd}
-            tabIndex={6}
-            disabled={isAnimating}
-          >
-            {loading && (
-              <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
-            )}
-            <span id="rewardId">本を登録する</span>
-          </button>
+          {response?.bookId > 0 ? (
+            <button
+              className="flex h-12 w-full items-center justify-center rounded-b-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-blue-700"
+              onClick={() => {
+                onClose()
+                router.push(
+                  `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}`
+                )
+              }}
+            >
+              <span id="rewardId">シートに飛ぶ</span>
+            </button>
+          ) : (
+            <button
+              className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-700"
+              onClick={onClickAdd}
+              tabIndex={6}
+              disabled={isAnimating}
+            >
+              {loading && (
+                <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
+              )}
+              <span id="rewardId">本を登録する</span>
+            </button>
+          )}
         </div>
       </div>
     </Modal>
