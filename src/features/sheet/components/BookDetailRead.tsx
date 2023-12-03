@@ -1,8 +1,9 @@
+import dayjs from 'dayjs'
+import Linkify from 'linkify-react'
 import { Fragment, useState } from 'react'
 import { Book } from '@/types/book'
 import { useSession } from 'next-auth/react'
 import { BookInputField } from '@/components/input/BookInputField'
-import dayjs from 'dayjs'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
 import { AiFillLock } from 'react-icons/ai'
@@ -36,7 +37,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
       : Math.min(800, 200 + scrollTop / 2)
     setScale(newScale)
     setTextareaHeight(newHeight)
-    if (scale <= 0.8) {
+    if (scale <= 0.7) {
       setSmall(true)
     }
   }
@@ -135,18 +136,15 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
         )}
         {(isMine || book.is_public_memo) && (
           <div className="mb-1">
-            <textarea
-              rows={8}
-              value={book.memo}
+            <div
               className={`${
                 scale <= 0.8 ? 'no-scrollbar' : ''
-              } w-full resize-none border-b bg-white py-1 pl-2 text-sm sm:text-base`}
-              tabIndex={6}
-              disabled={true}
+              } w-full resize-none overflow-auto border-b bg-white py-1 pl-2 text-sm sm:text-base`}
               onScroll={handleScroll}
-              onWheel={handleScrollAttempt}
               style={{ height: `${textareaHeight}px` }}
-            />
+            >
+              <Memo memo={book.memo} />
+            </div>
           </div>
         )}
         {!isMine && !book.is_public_memo && (
@@ -200,8 +198,11 @@ export const Memo = ({ memo }) => {
     return <Fragment key={index}>{item.match(/\n/) ? <br /> : item}</Fragment>
   })
   return (
-    <div className="max-h-[290px] overflow-y-auto text-sm sm:px-2 sm:py-4 sm:text-base">
+    <Linkify
+      as="div"
+      options={{ className: 'text-blue-500', target: '_blank' }}
+    >
       {texts}
-    </div>
+    </Linkify>
   )
 }
