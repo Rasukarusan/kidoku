@@ -34,7 +34,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
         {data?.image ? (
           <img
             src={data?.image}
-            className="min-h-8 min-w-8 mr-4 h-8 w-8 rounded-full"
+            className="min-h-6 min-w-6 mr-4 h-6 w-6 rounded-full"
           />
         ) : (
           <FaUser className="mr-4" size={18} />
