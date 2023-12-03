@@ -161,6 +161,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
                       open={open}
                       onClose={() => setOpen(false)}
                       returnUrl={returnUrl()}
+                      purchaseText="￥50でコメントを開放する"
                     />
                     <button
                       className="w-full rounded-md bg-blue-600 py-1 text-center font-bold text-white blur-none"

@@ -14,12 +14,14 @@ interface Props {
   open: boolean
   onClose: () => void
   returnUrl: string
+  purchaseText: string
 }
 
 export const CheckoutModal: React.FC<Props> = ({
   open,
   onClose,
   returnUrl,
+  purchaseText,
 }) => {
   const [clientSecret, setClientSecret] = useState('')
   useEffect(() => {
@@ -50,7 +52,7 @@ export const CheckoutModal: React.FC<Props> = ({
     >
       {clientSecret && (
         <Elements options={options} stripe={stripePromise}>
-          <CheckoutForm returnUrl={returnUrl} />
+          <CheckoutForm returnUrl={returnUrl} purchaseText={purchaseText} />
         </Elements>
       )}
     </Modal>
