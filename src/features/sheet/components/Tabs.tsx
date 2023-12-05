@@ -22,7 +22,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   }
 
   return (
-    <div className="no-scrollbar flex items-center justify-start overflow-x-auto">
+    <div className="no-scrollbar flex items-center justify-start overflow-x-auto sm:justify-center">
       <button
         className={`flex max-h-11 items-center justify-between whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100 ${
           tab === 'total'
