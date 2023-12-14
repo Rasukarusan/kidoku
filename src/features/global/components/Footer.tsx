@@ -58,6 +58,11 @@ export const Footer: React.FC = () => {
               title="About"
               items={[
                 { title: 'kidokuについて', href: '/about', target: '_self' },
+                {
+                  title: 'ロードマップ',
+                  href: 'https://github.com/users/Rasukarusan/projects/1',
+                  target: '_blank',
+                },
               ]}
             />
             <Column
