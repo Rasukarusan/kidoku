@@ -12,16 +12,16 @@ export default async function handler(
   }
   try {
     const books = await prisma.books.findMany({
-      where: { is_public_memo: true },
+      where: { is_public_memo: true, sheet: { name: '2023' } },
       select: {
         title: true,
         author: true,
         memo: true,
-        sheet: { select: { name: true } },
       },
+      // take: 10,
     })
-    console.log(books)
-    const result = await chat()
+    console.log(JSON.stringify(books))
+    const result = await chat(JSON.stringify(books))
     console.log(result)
     console.log(result.choices)
     return response.status(200).json({ result: true })
