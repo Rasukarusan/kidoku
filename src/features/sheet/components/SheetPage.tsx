@@ -19,6 +19,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaListUl } from 'react-icons/fa'
+import { AiSummary } from './AiSummary'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -102,10 +103,16 @@ export const SheetPage: React.FC<Props> = ({
           <Menu currentSheet={year} username={username} />
         </div>
       </div>
+
       <div className="mt-32 mb-10 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
       </div>
+
+      <div className="mb-10">
+        <AiSummary />
+      </div>
+
       <YearlyTopBooks
         books={currentData}
         year={year}
