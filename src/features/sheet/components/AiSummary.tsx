@@ -2,6 +2,7 @@ import { IoSparklesSharp } from 'react-icons/io5'
 import { IoIosAnalytics } from 'react-icons/io'
 import { MdOutlineSentimentSatisfied } from 'react-icons/md'
 import { FaRegLightbulb } from 'react-icons/fa6'
+import { Fragment } from 'react'
 
 const aiSummary = `
 {
@@ -42,9 +43,9 @@ const Item = ({ title, text }) => {
     <>
       <div className="flex items-center justify-center py-2">
         <Icon color="a782c3" className="mr-2" />
-        <div className="font-bold">{title}</div>
+        <div className="font-bold text-gray-700">{title}</div>
       </div>
-      <div className="pb-2 text-sm">{text}</div>
+      <div className="pb-2 text-sm text-gray-700">{text}</div>
     </>
   )
 }
@@ -52,16 +53,15 @@ const Item = ({ title, text }) => {
 export const AiSummary: React.FC = () => {
   const json: AiSummaryJson = JSON.parse(aiSummary)
   return (
-    <div className="mx-auto w-3/4">
-      <div className="flex items-center justify-center py-2">
-        <IoSparklesSharp color="a782c3" className="mr-2" />
-        <div>AI Summary</div>
-      </div>
+    <div className="mx-auto w-full sm:w-3/4">
       <div className="rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4">
         <Item title="読書傾向" text={json.reading_trend_analysis} />
         <Item title="感情分析" text={json.sentiment_analysis} />
         <Item title="「もしも」シナリオ" text={json.what_if_scenario} />
         <Item title="まとめ" text={json.overall_feedback} />
+      </div>
+      <div className="pt-1 text-right text-xs text-gray-400">
+        ※ あなたの読書履歴に基づきAIが生成しています。
       </div>
     </div>
   )
