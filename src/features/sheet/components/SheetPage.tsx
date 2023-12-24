@@ -19,7 +19,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaListUl } from 'react-icons/fa'
-import { AiSummary } from './AiSummary'
+import { AiSummary, AiSummaryJson } from './AiSummary'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -32,6 +32,7 @@ interface Props {
   sheets: string[]
   username: string
   yearlyTopBooks: YearlyTopBook[]
+  aiSummary: AiSummaryJson
 }
 
 export const SheetPage: React.FC<Props> = ({
@@ -40,6 +41,7 @@ export const SheetPage: React.FC<Props> = ({
   sheets,
   username,
   yearlyTopBooks,
+  aiSummary,
 }) => {
   const router = useRouter()
   const { data: session } = useSession()
@@ -110,7 +112,7 @@ export const SheetPage: React.FC<Props> = ({
       </div>
 
       <div className="mb-10">
-        <AiSummary />
+        <AiSummary json={aiSummary} />
       </div>
 
       <YearlyTopBooks
