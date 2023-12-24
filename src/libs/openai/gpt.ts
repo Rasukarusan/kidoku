@@ -7,9 +7,9 @@ const openai = new OpenAI({
 export async function chat(content) {
   const prompt = `
 以下のJSONを読み取り、ルールに基づきフィードバックを提供してください。前置きは出力しないでください。
-出力はjsonでキー名はそれぞれreading_trend_analysis, sentiment_analysis, what_if_scenario,overall_feedbackで、valueは日本語でお願いします。
-また、「ユーザーは」ではなく「あなたは」という口調にしてください。
-[ルール] 
+出力はjsonでキー名はそれぞれreading_trend_analysis, sentiment_analysis, what_if_scenario,overall_feedbackで、valueは日本語でお願いします。「ユーザーは」や「あなたは」などは出力せず、いきなり本題から入ってください。
+また、できるだけ抽象的な表現は避け、推測や極論で良いのでできるだけ決めつけるような口調でお願いします。
+[ルール]
 ------------
 フィードバックは「読書傾向分析」「感情分析」「「もしも」シナリオ」「総評」の4項目です。
 ・読書傾向分析：ユーザーが好むジャンル、著者、テーマを分析し、その傾向を可視化する。たとえば、グラフやチャートを使用して、彼らの読書パターンを示す。
