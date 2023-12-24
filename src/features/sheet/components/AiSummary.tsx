@@ -48,9 +48,10 @@ const Item = ({ itemKey, text }) => {
 }
 
 interface Props {
+  username: string
   json?: AiSummaryJson
 }
-export const AiSummary: React.FC<Props> = ({ json }) => {
+export const AiSummary: React.FC<Props> = ({ username, json }) => {
   if (!json) {
     return (
       <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
@@ -67,7 +68,7 @@ export const AiSummary: React.FC<Props> = ({ json }) => {
         })}
       </div>
       <div className="pt-1 text-right text-xs text-gray-400">
-        ※ あなたの読書履歴に基づきAIが生成しています。
+        ※ {username}の読書履歴に基づきAIが生成しています。
       </div>
     </div>
   )

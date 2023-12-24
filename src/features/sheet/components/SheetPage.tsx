@@ -112,7 +112,7 @@ export const SheetPage: React.FC<Props> = ({
       </div>
 
       <div className="mb-10">
-        <AiSummary json={aiSummary} />
+        <AiSummary json={aiSummary} username={username} />
       </div>
 
       <YearlyTopBooks
