@@ -9,14 +9,15 @@ datasource db {
 }
 
 model sheets {
-  id      Int       @id @default(autoincrement()) @db.UnsignedInt
-  userId  String    @map("user_id")
-  name    String    @db.VarChar(120)
-  order   Int?      @default(1)
-  created DateTime? @default(now()) @db.DateTime(0)
-  updated DateTime? @default(now()) @db.DateTime(0)
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  books   books[]
+  id                  Int                  @id @default(autoincrement()) @db.UnsignedInt
+  userId              String               @map("user_id")
+  name                String               @db.VarChar(120)
+  order               Int?                 @default(1)
+  created             DateTime?            @default(now()) @db.DateTime(0)
+  updated             DateTime?            @default(now()) @db.DateTime(0)
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  books               books[]
+  UserReadingAnalysis UserReadingAnalysis?
 
   @@unique([userId, name], map: "uniq_user_id_name")
 }
@@ -71,17 +72,18 @@ model Session {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  name             String?         @unique(map: "uniq_name")
-  email            String?         @unique
-  emailVerified    DateTime?       @map("email_verified")
-  image            String?
-  admin            Boolean         @default(false)
-  accounts         Account[]
-  sessions         Session[]
-  sheets           sheets[]
-  yearly_top_books YearlyTopBook[]
-  books            books[]
+  id                  String                @id @default(cuid())
+  name                String?               @unique(map: "uniq_name")
+  email               String?               @unique
+  emailVerified       DateTime?             @map("email_verified")
+  image               String?
+  admin               Boolean               @default(false)
+  accounts            Account[]
+  sessions            Session[]
+  sheets              sheets[]
+  yearly_top_books    YearlyTopBook[]
+  books               books[]
+  UserReadingAnalysis UserReadingAnalysis[]
 
   @@map("users")
 }
@@ -108,4 +110,20 @@ model YearlyTopBook {
 
   @@unique([userId, order, year], map: "uniq_user_order_year")
   @@map("yearly_top_books")
+}
+
+model UserReadingAnalysis {
+  id                     Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId                 String    @map("user_id")
+  sheet_id               Int       @unique(map: "uniq_sheet_id")
+  reading_trend_analysis String    @db.MediumText
+  sentiment_analysis     String    @db.MediumText
+  what_if_scenario       String    @db.MediumText
+  overall_feedback       String    @db.MediumText
+  created                DateTime? @default(now()) @db.DateTime(0)
+  updated                DateTime? @default(now()) @db.DateTime(0)
+  sheet                  sheets    @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_reading_analysis")
 }
