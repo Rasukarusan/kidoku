@@ -2,6 +2,7 @@ import prisma from '@/libs/prisma'
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { isAdmin } from '@/utils/api'
 import { chat } from '@/libs/openai/gpt'
+// import fs from 'fs'
 
 export default async function handler(
   request: NextApiRequest,
@@ -14,16 +15,15 @@ export default async function handler(
     const books = await prisma.books.findMany({
       where: { is_public_memo: true, sheet: { name: '2023' } },
       select: {
-        title: true,
-        author: true,
+        category: true,
         memo: true,
       },
-      // take: 10,
     })
     console.log(JSON.stringify(books))
+    // fs.writeFileSync('file.txt', JSON.stringify(books))
     const result = await chat(JSON.stringify(books))
     console.log(result)
-    console.log(result.choices)
+    console.log(result.choices[0].message.content)
     return response.status(200).json({ result: true })
   } catch (error) {
     console.error(error)
