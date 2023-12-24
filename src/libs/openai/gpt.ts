@@ -36,6 +36,9 @@ export async function chat(content) {
       },
     ],
     model: 'gpt-4-1106-preview',
+    response_format: {
+      type: 'json_object',
+    },
   })
   return chatCompletion
 }
