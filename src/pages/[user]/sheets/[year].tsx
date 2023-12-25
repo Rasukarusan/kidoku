@@ -75,7 +75,6 @@ export async function getStaticProps(context) {
       overall_feedback: true,
     },
   })
-  console.log(sheet.id, aiSummary)
 
   return {
     props: {
