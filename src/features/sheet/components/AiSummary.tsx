@@ -67,8 +67,8 @@ export const AiSummary: React.FC<Props> = ({ username, json }) => {
           return <Item key={key} itemKey={key} text={json[key]} />
         })}
       </div>
-      <div className="pt-1 text-right text-xs text-gray-400">
-        ※ {username}の読書履歴に基づきAIが生成しています。
+      <div className="w-full pt-1 text-left text-xs text-gray-400 sm:text-right">
+        ※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。
       </div>
     </div>
   )
