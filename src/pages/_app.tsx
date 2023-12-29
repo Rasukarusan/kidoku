@@ -9,12 +9,7 @@ import SEO from '../../next-seo.config'
 import './global.css'
 import { RecoilEnv } from 'recoil'
 import { SessionProvider } from 'next-auth/react'
-import { Kosugi } from 'next/font/google'
-// import { Zen_Maru } from 'next/font/google'
-const notojp = Kosugi({
-  weight: '400',
-  subsets: ['latin'],
-})
+import { kosugi, notojp } from '@/libs/fonts'
 
 // Expectation Violation: Duplicate atom keyをログに出力させないための設定
 RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false
@@ -35,7 +30,7 @@ export default function MyApp(props) {
       <RecoilRoot>
         <SessionProvider session={pageProps.session}>
           <LoadingTopBar />
-          <div className={notojp.className}>
+          <div className={`${kosugi.variable} ${notojp.variable}`}>
             <Header />
             <Component {...pageProps} />
           </div>
