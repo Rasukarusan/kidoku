@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+div {
+  font-family: var(--font-kosugi), var(--font-notojp), sans-serif;
+}
+
 .no-scroll {
   overflow: hidden;
   /* position: fixed; */
