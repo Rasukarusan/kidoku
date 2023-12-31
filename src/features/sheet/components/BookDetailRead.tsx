@@ -26,8 +26,9 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   }
 
   const [scale, setScale] = useState(1)
-  const [textareaHeight, setTextareaHeight] = useState(200)
+  const [memoAreaHeight, setMemoAreaHeight] = useState(200)
   const [small, setSmall] = useState(false)
+  const [readmoreBlur, setReadmoreBlur] = useState(true)
 
   const handleScroll = (event) => {
     const scrollTop = event.target.scrollTop
@@ -36,7 +37,8 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
       ? window.innerHeight * 0.8 - 100
       : Math.min(800, 200 + scrollTop / 2)
     setScale(newScale)
-    setTextareaHeight(newHeight)
+    setMemoAreaHeight(newHeight)
+    setReadmoreBlur(scrollTop === 0)
     if (scale <= 0.7) {
       setSmall(true)
     }
@@ -127,7 +129,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             className="w-full text-center"
             onClick={() => {
               setSmall(false)
-              setTextareaHeight(200)
+              setMemoAreaHeight(200)
               setScale(1)
             }}
           >
@@ -135,13 +137,13 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           </button>
         )}
         {(isMine || book.is_public_memo) && (
-          <div className="mb-1">
+          <div className="relative mb-1 block">
             <div
               className={`${
-                scale <= 0.8 ? 'no-scrollbar' : ''
-              } w-full resize-none overflow-auto border-b bg-white py-1 pl-2 text-sm sm:text-base`}
+                readmoreBlur ? 'readmore-blur' : ''
+              } no-scrollbar w-full resize-none overflow-auto border-b bg-white py-1 pl-2 text-sm sm:text-base`}
               onScroll={handleScroll}
-              style={{ height: `${textareaHeight}px` }}
+              style={{ height: `${memoAreaHeight}px` }}
             >
               <Memo memo={book.memo} />
             </div>
