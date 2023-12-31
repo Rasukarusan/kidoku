@@ -9,6 +9,7 @@ import {
   AiOutlineEdit,
   AiOutlineDelete,
 } from 'react-icons/ai'
+import { BsThreeDots } from 'react-icons/bs'
 
 interface Props {
   currentSheet: string
@@ -65,7 +66,7 @@ export const Menu: React.FC<Props> = ({
               setOpen(!open)
             }}
           >
-            <span className="px-2">...</span>
+            <BsThreeDots />
           </button>
           <AnimatePresence>
             {open && (
