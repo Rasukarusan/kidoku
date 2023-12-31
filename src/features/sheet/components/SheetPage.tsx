@@ -20,6 +20,7 @@ import { useRouter } from 'next/router'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaListUl } from 'react-icons/fa'
 import { AiSummary, AiSummaryJson } from './AiSummary'
+import { IoMdCloseCircle } from 'react-icons/io'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -147,7 +148,6 @@ export const SheetPage: React.FC<Props> = ({
         </div>
         {filter && (
           <button
-            className="h-6 w-6 rounded-full bg-gray-200 text-center text-xs font-bold"
             onClick={() => {
               setFilter('')
               if (isMine) {
@@ -157,7 +157,7 @@ export const SheetPage: React.FC<Props> = ({
               }
             }}
           >
-            ✗
+            <IoMdCloseCircle size={20} />
           </button>
         )}
       </div>
