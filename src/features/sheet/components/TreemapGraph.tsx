@@ -4,6 +4,7 @@ import { Book } from '@/types/book'
 import { TreemapItem } from './TreemapItem'
 
 interface Props {
+  sheet: string
   records: Book[]
   setShowData: (newData: Book[]) => void
   setFilter: (filter: string) => void
@@ -34,6 +35,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 export const TreemapGraph: React.FC<Props> = ({
+  sheet,
   records,
   setShowData,
   setFilter,
@@ -97,7 +99,7 @@ export const TreemapGraph: React.FC<Props> = ({
   }
 
   return (
-    <div style={{ width: '100%', height: '300px' }}>
+    <div style={{ width: '100%', height: '300px' }} key={sheet}>
       <ResponsiveContainer width="100%" height="100%">
         <Treemap
           data={data}

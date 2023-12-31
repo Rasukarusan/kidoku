@@ -133,6 +133,7 @@ export const SheetPage: React.FC<Props> = ({
         <div className="w-full text-center sm:w-1/2">
           <TitleWithLine text="カテゴリ内訳" className="mb-4" />
           <TreemapGraph
+            sheet={year}
             records={data}
             setShowData={setShowData}
             setFilter={(newFilter) => setFilter(newFilter)}
