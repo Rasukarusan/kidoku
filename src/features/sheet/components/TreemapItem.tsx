@@ -21,10 +21,10 @@ export const TreemapItem = (props) => {
       {depth === 1 ? (
         <motion.text
           animate={
-            hovers[index] || isClicked ? { scale: 2.0, fontWeight: 700 } : null
+            hovers[index] || isClicked ? { scale: 1.5, fontWeight: 700 } : null
           }
           x={x + width / 2}
-          y={y + height / 2 + 9}
+          y={y + height / 2}
           textAnchor="middle"
           fill="#fff"
           stroke="none"
