@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth/next'
 import { NO_IMAGE } from '@/libs/constants'
 import { put } from '@vercel/blob'
 import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
+import { addDocuments } from '@/libs/meilisearch/addDocuments'
 // import { setTimeout } from 'timers/promises'
 export const config = {
   api: {
@@ -12,6 +13,38 @@ export const config = {
     },
   },
 }
+
+async function updateMeiliSearchDocuments() {
+  const books = await prisma.books.findMany({
+    select: {
+      id: true,
+      title: true,
+      author: true,
+      image: true,
+      is_public_memo: true,
+      memo: true,
+      user: { select: { name: true, image: true } },
+      sheet: { select: { name: true } },
+    },
+  })
+  const documents = books.map((book) => {
+    const { id, title, author, image, memo, is_public_memo, user, sheet } = book
+    return {
+      id,
+      title,
+      author,
+      image,
+      memo: is_public_memo ? memo : '',
+      username: user.name,
+      userImage: user.image,
+      sheet: sheet.name,
+    }
+  })
+  const result = await addDocuments('books', documents)
+  console.log(result)
+  return result
+}
+
 export default async (req, res) => {
   try {
     const session = await getServerSession(req, res, authOptions)
@@ -66,6 +99,7 @@ export default async (req, res) => {
           },
         })
       }
+      await updateMeiliSearchDocuments()
       return res.status(200).json({
         result: true,
         bookTitle: title,
@@ -106,6 +140,7 @@ export default async (req, res) => {
         where: { id, userId },
         data,
       })
+      await updateMeiliSearchDocuments()
       return res.status(200).json({ data })
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
