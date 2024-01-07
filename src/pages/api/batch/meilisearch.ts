@@ -23,7 +23,7 @@ export default async function handler(
         sheet: { select: { name: true } },
       },
     })
-    const b = books.map((book) => {
+    const documents = books.map((book) => {
       const { id, title, author, image, memo, is_public_memo, user, sheet } =
         book
       return {
@@ -37,8 +37,8 @@ export default async function handler(
         sheet: sheet.name,
       }
     })
-    const re = await addDocuments('books', b)
-    console.log(re)
+    const result = await addDocuments('books', documents)
+    console.log(result)
     return response.status(200).json({ result: true })
   } catch (error) {
     console.error(error)
