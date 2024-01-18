@@ -1,9 +1,17 @@
 import { useState } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { SearchModal } from './SearchModal'
 
 export const SearchBox: React.FC = () => {
   const [open, setOpen] = useState(false)
+  useHotkeys(
+    'meta+k, ctrl+k',
+    () => {
+      setOpen(!open)
+    },
+    { preventDefault: true }
+  )
   return (
     <>
       <SearchModal
