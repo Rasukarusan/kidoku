@@ -1,14 +1,36 @@
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
+import { useChat } from 'ai/react'
 
 interface Props {
   comments: Comment[]
 }
 
 export const IndexPage = ({ comments }) => {
+  const { messages, input, setInput, handleInputChange, handleSubmit } =
+    useChat({
+      api: '/api/batch/chatgpt',
+    })
   return (
     <Container className="p-6">
+      {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && (
+        <div className="stretch mx-auto flex w-full max-w-md flex-col py-24">
+          {messages.map((m) => (
+            <div key={m.id}>
+              {m.role === 'user' ? 'User: ' : 'AI: '}
+              {m.content}
+            </div>
+          ))}
+
+          <form onSubmit={handleSubmit}>
+            <label>Say something...</label>
+            <button type="submit" onClick={() => setInput('h')}>
+              Send
+            </button>
+          </form>
+        </div>
+      )}
       <section>
         <div className="flex items-center">
           <h2 className="p-2 text-2xl font-bold">Comments</h2>
