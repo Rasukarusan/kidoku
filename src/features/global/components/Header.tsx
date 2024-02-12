@@ -50,8 +50,8 @@ export const Header = () => {
   const url = !session
     ? '/'
     : sheets.sheets.length > 0
-    ? `/${session.user.name}/sheets/${sheets.sheets[0].name}`
-    : `/${session.user.name}/sheets/total`
+      ? `/${session.user.name}/sheets/${sheets.sheets[0].name}`
+      : `/${session.user.name}/sheets/total`
 
   if (router.asPath.startsWith('/auth/init')) {
     return null

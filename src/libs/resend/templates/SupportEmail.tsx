@@ -25,9 +25,9 @@ export const SupportEmail = ({ email = 'example@exmaple.com' }: Props) => {
       <Head />
       <Preview>this is preview!</Preview>
       <Tailwind>
-        <Body className="my-auto mx-auto bg-white font-sans">
-          <Container className="my-[40px] mx-auto w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">
-            <Heading className="my-[30px] mx-0 p-0 text-center text-[24px] font-normal text-black"></Heading>
+        <Body className="mx-auto my-auto bg-white font-sans">
+          <Container className="mx-auto my-[40px] w-[465px] rounded border border-solid border-[#eaeaea] p-[20px]">
+            <Heading className="mx-0 my-[30px] p-0 text-center text-[24px] font-normal text-black"></Heading>
             <Text className="text-[14px] leading-[24px] text-black"></Text>
             <Text className="text-[14px] leading-[24px] text-black">
               <strong>bukinoshita</strong> (<strong>Vercel</strong>.
@@ -39,7 +39,7 @@ export const SupportEmail = ({ email = 'example@exmaple.com' }: Props) => {
                 <Column align="left"></Column>
               </Row>
             </Section>
-            <Section className="mt-[32px] mb-[32px] text-center">
+            <Section className="mb-[32px] mt-[32px] text-center">
               <Button className="rounded bg-[#000000] text-center text-[12px] font-semibold text-white no-underline">
                 Join the team
               </Button>
@@ -47,7 +47,7 @@ export const SupportEmail = ({ email = 'example@exmaple.com' }: Props) => {
             <Text className="text-[14px] leading-[24px] text-black">
               or copy and paste this URL into your browser:{' '}
             </Text>
-            <Hr className="my-[26px] mx-0 w-full border border-solid border-[#eaeaea]" />
+            <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
           </Container>
         </Body>
       </Tailwind>

@@ -52,7 +52,7 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
       <NextSeo title="アカウント設定 | kidoku" />
       <h2 className="text-2xl font-bold">Settings</h2>
       <div className="mb-8 flex p-4">
-        <button className="mr-8 mb-4 h-[100px] w-[100px] rounded-full" disabled>
+        <button className="mb-4 mr-8 h-[100px] w-[100px] rounded-full" disabled>
           <img src={image} width={100} height={100} className="rounded-full" />
         </button>
         <div className="w-full">

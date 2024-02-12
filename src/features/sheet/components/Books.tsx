@@ -73,11 +73,11 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                   loading={i > 6 ? 'lazy' : 'eager'}
                 />
                 {book.is_public_memo ? (
-                  <p className="absolute top-[-3px] right-[-5px] sm:right-[40px] sm:top-[-10px]">
+                  <p className="absolute right-[-5px] top-[-3px] sm:right-[40px] sm:top-[-10px]">
                     <FaCommentDots size={20} color="#616A6B" />
                   </p>
                 ) : (
-                  <p className="absolute top-[-3px] right-[-5px] sm:right-[45px] sm:top-[-10px]">
+                  <p className="absolute right-[-5px] top-[-3px] sm:right-[45px] sm:top-[-10px]">
                     <AiFillLock size={25} color="black" />
                   </p>
                 )}
