@@ -4,7 +4,7 @@ export const TermsPage = () => {
   return (
     <Container className="text-gray-700">
       <NextSeo title="利用規約 | kidoku" />
-      <div className="mx-auto max-w-screen-md py-8 px-4">
+      <div className="mx-auto max-w-screen-md px-4 py-8">
         <h1 className="mb-6 text-3xl font-bold">kidoku利用規約</h1>
 
         <h2 className="mb-4 text-2xl font-semibold">第1条（適用）</h2>

@@ -13,8 +13,8 @@ export const Book: React.FC<Props> = ({ book }) => {
     order === 3
       ? 'order-3 sm:order-none'
       : order === 2
-      ? 'order-2 sm:order-2'
-      : 'order-1 sm:order-1'
+        ? 'order-2 sm:order-2'
+        : 'order-1 sm:order-1'
   return (
     <div className={`mb-5 w-full sm:mb-0 sm:w-1/3 ${styleOrder}`}>
       <div className={`mb-2 text-3xl font-bold text-transparent ${color}`}>

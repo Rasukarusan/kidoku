@@ -7,6 +7,7 @@ import type { Adapter } from 'next-auth/adapters'
 import { initUser } from '@/libs/auth/init'
 
 export const authOptions: NextAuthOptions = {
+  // @ts-expect-error hoge
   adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     GoogleProvider({

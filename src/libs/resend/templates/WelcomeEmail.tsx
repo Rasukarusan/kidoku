@@ -21,7 +21,7 @@ export const WelcomeEmail = ({ email = 'example@exmaple.com' }: Props) => {
     <Html>
       <Head />
       <Tailwind>
-        <Body className="my-auto mx-auto bg-white font-sans">
+        <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="my-[40px] rounded border border-solid border-[#eaeaea] p-[20px]">
             <Img
               src="https://kidoku.net/logo.png"
@@ -29,7 +29,7 @@ export const WelcomeEmail = ({ email = 'example@exmaple.com' }: Props) => {
               alt="kidoku"
               style={{ margin: 'auto' }}
             />
-            <Heading className="my-[30px] mx-0 p-0 text-center text-[24px] font-normal text-black">
+            <Heading className="mx-0 my-[30px] p-0 text-center text-[24px] font-normal text-black">
               ようこそkidokuへ！
             </Heading>
             <Text className="">
@@ -65,7 +65,7 @@ export const WelcomeEmail = ({ email = 'example@exmaple.com' }: Props) => {
               <br />
               「kidoku」チームより
             </Text>
-            <Hr className="my-[26px] mx-0 w-full border border-solid border-[#eaeaea]" />
+            <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
             <Text className="text-gray-400">
               ※ このメッセージは {email} に送られました。
               <br />

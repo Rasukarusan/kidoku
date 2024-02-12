@@ -76,7 +76,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
                 />
               </a>
             </div>
-            <div className="mr-2 mb-2 w-2/3">
+            <div className="mb-2 mr-2 w-2/3">
               <BookInputField
                 value={book.title}
                 label="タイトル"

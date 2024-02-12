@@ -107,7 +107,7 @@ export const SheetPage: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="mt-32 mb-10 text-center">
+      <div className="mb-10 mt-32 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
       </div>

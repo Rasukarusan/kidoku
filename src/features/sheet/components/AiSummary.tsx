@@ -65,7 +65,7 @@ export const AiSummary: React.FC<Props> = ({ username, json }) => {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {Object.keys(json).map((key) => {
           return (
-            <div key={key} className="rounded-md bg-[#f7f6f3] py-4 px-8">
+            <div key={key} className="rounded-md bg-[#f7f6f3] px-8 py-4">
               <Item key={key} itemKey={key} text={json[key]} />
             </div>
           )

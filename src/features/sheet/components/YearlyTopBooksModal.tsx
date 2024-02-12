@@ -110,7 +110,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
       </div>
       <div className="flex h-[50px] w-full shrink-0 items-center justify-center text-center">
         {isAnimating && message && (
-          <div className="absolute left-1/2 bottom-32 z-20 -translate-x-1/2 transform sm:bottom-28">
+          <div className="absolute bottom-32 left-1/2 z-20 -translate-x-1/2 transform sm:bottom-28">
             <SuccessAlert
               open={true}
               text={message}

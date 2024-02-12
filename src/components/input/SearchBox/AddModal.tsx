@@ -224,7 +224,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
         </div>
         <div className="border-1 w-full border-t text-center">
           {response && (
-            <div className="absolute left-1/2 bottom-32 z-20 -translate-x-1/2 transform sm:bottom-28">
+            <div className="absolute bottom-32 left-1/2 z-20 -translate-x-1/2 transform sm:bottom-28">
               {response.result ? (
                 <SuccessAlert
                   open={!!response}

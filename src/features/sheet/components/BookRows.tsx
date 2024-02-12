@@ -27,22 +27,22 @@ export const BookRows: React.FC<Props> = ({ books }) => {
       <table className="w-full border text-left text-sm text-gray-500">
         <thead className="hidden bg-gray-50 text-xs uppercase text-gray-700 sm:table-header-group">
           <tr>
-            <th scope="col" className="py-3 px-4">
+            <th scope="col" className="px-4 py-3">
               No
             </th>
-            <th scope="col" className="py-3 px-6">
+            <th scope="col" className="px-6 py-3">
               タイトル
             </th>
-            <th scope="col" className="py-3 px-6">
+            <th scope="col" className="px-6 py-3">
               著者
             </th>
-            <th scope="col" className="whitespace-nowrap py-3 px-6">
+            <th scope="col" className="whitespace-nowrap px-6 py-3">
               カテゴリ
             </th>
-            <th scope="col" className="whitespace-nowrap py-3 px-6">
+            <th scope="col" className="whitespace-nowrap px-6 py-3">
               感想
             </th>
-            <th scope="col" className="py-3 px-6">
+            <th scope="col" className="px-6 py-3">
               一言
             </th>
           </tr>
@@ -57,7 +57,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               <td className="p-2 text-center">{i + 1}</td>
               <th
                 scope="row"
-                className="py-4 px-4 font-medium text-gray-900 sm:px-6"
+                className="px-4 py-4 font-medium text-gray-900 sm:px-6"
               >
                 <div className="flex items-center">
                   <img
@@ -85,13 +85,13 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                   </div>
                 </div>
               </th>
-              <td className={`py-4 px-6 ${pc}`}>{book.author}</td>
-              <td className={`py-4 px-6 ${pc} whitespace-nowrap`}>
+              <td className={`px-6 py-4 ${pc}`}>{book.author}</td>
+              <td className={`px-6 py-4 ${pc} whitespace-nowrap`}>
                 {book.category}
               </td>
-              <td className={`py-4 px-6 ${pc}`}>{book.impression}</td>
+              <td className={`px-6 py-4 ${pc}`}>{book.impression}</td>
               {(isMine || book.is_public_memo) && (
-                <td className={`whitespace-normal py-4 px-6 ${pc}`}>
+                <td className={`whitespace-normal px-6 py-4 ${pc}`}>
                   {expands[i] ? (
                     <Memo memo={book.memo} />
                   ) : (

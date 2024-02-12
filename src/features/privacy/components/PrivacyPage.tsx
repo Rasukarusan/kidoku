@@ -4,7 +4,7 @@ export const PrivacyPage = () => {
   return (
     <Container className="text-gray-700">
       <NextSeo title="プライバシーポリシー | kidoku" />
-      <div className="mx-auto max-w-screen-md py-8 px-4">
+      <div className="mx-auto max-w-screen-md px-4 py-8">
         <h1 className="mb-6 text-3xl font-bold">プライバシーポリシー</h1>
         <section className="mb-6">
           <h2 className="mb-4 text-2xl font-semibold">1. 個人情報の定義</h2>

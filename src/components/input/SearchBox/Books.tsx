@@ -70,7 +70,7 @@ export const Books: React.FC<Props> = ({ input, onClose }) => {
                 </div>
                 <div className="text-xs">{truncate(author, 12)}</div>
                 {selectItem?.id === item.id && (
-                  <div className="absolute left-1/2 bottom-0 w-full -translate-x-2/4 text-center opacity-80 hover:opacity-100">
+                  <div className="absolute bottom-0 left-1/2 w-full -translate-x-2/4 text-center opacity-80 hover:opacity-100">
                     <button
                       className="w-full rounded-md bg-blue-600 py-2 text-xs font-bold text-white hover:bg-blue-700"
                       onClick={() => {
