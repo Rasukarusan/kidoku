@@ -28,7 +28,7 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
         </Link>
       </div>
       <div>
-        <div className="mb-2 text-xs font-bold text-gray-600 sm:text-sm">
+        <div className="mb-2 text-xs font-bold sm:text-sm">
           {truncate(memo, 120)}
         </div>
         <div className="flex items-center text-xs text-gray-500 sm:text-sm ">
