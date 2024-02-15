@@ -1,9 +1,7 @@
+import prisma from '@/libs/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth/[...nextauth]'
-import prisma from '@/libs/prisma'
 import { chat } from '@/libs/openai/gpt'
-// import { isAdmin } from '@/utils/api'
-// import prisma from '@/libs/prisma/edge'
 
 export default async (req, res) => {
   try {
@@ -12,16 +10,24 @@ export default async (req, res) => {
       res.status(401).json({ result: false })
     }
     const body = JSON.parse(req.body)
-    const { sheetName } = body
+    const { sheetName, isTotal } = body
     const userId = session.user.id
-    const books = await prisma.books.findMany({
-      where: { is_public_memo: true, sheet: { name: sheetName } },
-      select: {
-        category: true,
-        memo: true,
-      },
-      take: 1,
-    })
+    const books = isTotal
+      ? await prisma.books.findMany({
+          where: { userId, is_public_memo: true, sheet: { name: sheetName } },
+          select: {
+            category: true,
+            memo: true,
+          },
+        })
+      : await prisma.books.findMany({
+          where: { userId, is_public_memo: true, sheet: { name: sheetName } },
+          select: {
+            category: true,
+            memo: true,
+          },
+          take: 10,
+        })
     const sheet = await prisma.sheets.findFirst({
       where: { userId, name: sheetName },
       select: { id: true },
