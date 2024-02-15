@@ -55,12 +55,14 @@ interface Props {
   aiSummary?: AiSummaryJson
   bookCount: number
   sheet: string
+  isTotal: boolean
 }
 export const AiSummary: React.FC<Props> = ({
   username,
   aiSummary,
   bookCount,
   sheet,
+  isTotal,
 }) => {
   const minimum = 1
   const [json, setJson] = useState(aiSummary)
@@ -70,7 +72,7 @@ export const AiSummary: React.FC<Props> = ({
     setGenerating(true)
     const res = await fetch('/api/ai-summary', {
       method: 'POST',
-      body: JSON.stringify({ sheetName: sheet }),
+      body: JSON.stringify({ sheetName: sheet, isTotal }),
     }).then((res) => res.json())
     setJson(res.data)
   }
