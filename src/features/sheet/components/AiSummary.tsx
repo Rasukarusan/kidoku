@@ -1,8 +1,11 @@
 import { IoSparklesSharp } from 'react-icons/io5'
 import { IoIosAnalytics } from 'react-icons/io'
-import { MdOutlineSentimentSatisfied } from 'react-icons/md'
-import { FaRegLightbulb } from 'react-icons/fa6'
-import { Fragment } from 'react'
+import {
+  MdOutlineRestartAlt,
+  MdOutlineSentimentSatisfied,
+} from 'react-icons/md'
+import { FaCircleNotch, FaRegLightbulb } from 'react-icons/fa6'
+import { Fragment, useEffect, useState } from 'react'
 import { FaNotEqual } from 'react-icons/fa'
 
 export type AiSummaryJson = {
@@ -49,16 +52,67 @@ const Item = ({ itemKey, text }) => {
 
 interface Props {
   username: string
-  json?: AiSummaryJson
+  aiSummary?: AiSummaryJson
+  bookCount: number
+  sheet: string
 }
-export const AiSummary: React.FC<Props> = ({ username, json }) => {
+export const AiSummary: React.FC<Props> = ({
+  username,
+  aiSummary,
+  bookCount,
+  sheet,
+}) => {
+  const minimum = 1
+  const [json, setJson] = useState(aiSummary)
+  const [generating, setGenerating] = useState(false)
+  const onClickGenerateAiSummary = async () => {
+    if (generating) return
+    setGenerating(true)
+    const res = await fetch('/api/ai-summary', {
+      method: 'POST',
+      body: JSON.stringify({ sheetName: sheet }),
+    }).then((res) => res.json())
+    setJson(res.data)
+  }
+
+  useEffect(() => {
+    setJson(aiSummary)
+  }, [sheet])
+
   if (!json) {
-    return (
-      <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
-        <FaNotEqual color="a782c3" className="mr-2" />
-        AIの分析結果はありません。
-      </div>
-    )
+    if (
+      process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 !== 'true' ||
+      bookCount < minimum
+    ) {
+      return (
+        <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
+          <FaNotEqual className="mr-2-2 text-ai" />
+          AIの分析結果はありません。
+        </div>
+      )
+    }
+    if (process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true') {
+      return (
+        <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
+          <button
+            type="button"
+            className="flex items-center rounded-md px-2 py-1 hover:font-bold"
+            onClick={onClickGenerateAiSummary}
+          >
+            {generating ? (
+              <FaCircleNotch size={25} className="mr-2 animate-spin text-ai" />
+            ) : (
+              <MdOutlineRestartAlt size={25} className="mr-2 text-ai" />
+            )}
+            {generating ? (
+              <span className="animate-pulse">AI分析中...</span>
+            ) : (
+              <span className="underline">AIの分析を始める</span>
+            )}
+          </button>
+        </div>
+      )
+    }
   }
   return (
     <div className="mx-auto w-full sm:w-3/4">
