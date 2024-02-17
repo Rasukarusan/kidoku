@@ -14,7 +14,7 @@ export default async (req, res) => {
     const userId = session.user.id
     const books = isTotal
       ? await prisma.books.findMany({
-          where: { userId, is_public_memo: true, sheet: { name: sheetName } },
+          where: { userId, is_public_memo: true },
           select: {
             category: true,
             memo: true,
