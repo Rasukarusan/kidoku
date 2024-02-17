@@ -22,15 +22,18 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
   const updated = dayjs().diff(dayjs(comment.updated), 'day', false) + '日前'
   return (
     <div className="flex items-center p-4">
-      <div className="pr-4  text-center">
+      <div className="pr-4 text-center">
         <Link href={`/${username}/sheets/${sheet}?book=${comment.id}`}>
           <img className="mb-1 w-[82px] min-w-[82px]" src={image} alt="" />
         </Link>
       </div>
       <div>
-        <div className="mb-2 text-xs font-bold sm:text-sm">
+        <Link
+          href={`/${username}/sheets/${sheet}?book=${comment.id}`}
+          className="mb-2 inline-block text-xs font-bold sm:text-sm"
+        >
           {truncate(memo, 120)}
-        </div>
+        </Link>
         <div className="flex items-center text-xs text-gray-500 sm:text-sm ">
           <img className="mr-2 h-8 w-8 rounded-full" src={userImage} alt="" />
           <div>
