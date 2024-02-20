@@ -40,7 +40,7 @@ export async function getStaticProps(ctx) {
   const next = Math.ceil(total / limit) > page
   return {
     props: { comments, next, page },
-    revalidate: 300,
+    revalidate: 5,
   }
 }
 

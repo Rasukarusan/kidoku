@@ -81,7 +81,7 @@ export async function getStaticProps(context) {
       yearlyTopBooks,
       aiSummary: analysis,
     },
-    revalidate: 300,
+    revalidate: 5,
   }
 }
 export async function getStaticPaths() {

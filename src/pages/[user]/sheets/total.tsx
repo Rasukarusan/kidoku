@@ -80,7 +80,7 @@ export const getStaticProps = async (ctx) => {
       yearlyTopBooks,
       aiSummary: analysis,
     },
-    revalidate: 300,
+    revalidate: 5,
   }
 }
 
