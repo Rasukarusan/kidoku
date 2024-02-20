@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Head from 'next/head'
+import { Analytics } from '@vercel/analytics/react'
 import { Header, Footer } from '@/features/global'
 import { LoadingTopBar } from '@/features/global/components/LoadingTopBar'
 import { RecoilRoot } from 'recoil'
@@ -33,6 +34,7 @@ export default function MyApp(props) {
           <Layout>
             <Header />
             <Component {...pageProps} />
+            <Analytics />
           </Layout>
           <Footer />
         </SessionProvider>
