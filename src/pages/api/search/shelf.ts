@@ -2,6 +2,7 @@ import type { NextApiResponse, NextApiRequest } from 'next'
 import { MeiliSearch } from 'meilisearch'
 import { SearchResult } from '@/types/search'
 import { searchBooks } from '@/libs/meilisearch/searchBooks'
+import { mask } from '@/utils/string'
 
 export default async function handler(
   req: NextApiRequest,
@@ -36,7 +37,7 @@ export default async function handler(
         author,
         image,
         category: '',
-        memo: _formatted.memo,
+        memo: mask(_formatted.memo),
         username,
         userImage,
         sheet,
