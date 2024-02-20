@@ -66,16 +66,18 @@ export async function getStaticProps(context) {
     orderBy: { order: 'asc' },
   })
 
-  const aiSummary = await prisma.userReadingAnalysis.findFirst({
+  const aiSummary = await prisma.aiSummaries.findFirst({
     where: { userId, sheet_id: sheet.id },
-    select: {
-      reading_trend_analysis: true,
-      sentiment_analysis: true,
-      what_if_scenario: true,
-      overall_feedback: true,
-    },
+    select: { analysis: true },
   })
-
+  const analysis = aiSummary
+    ? parse(aiSummary.analysis)
+    : {
+        reading_trend_analysis: null,
+        sentiment_analysis: null,
+        what_if_scenario: null,
+        overall_feedback: null,
+      }
   return {
     props: {
       data: parse(data),
@@ -83,7 +85,7 @@ export async function getStaticProps(context) {
       sheets: sheets.map((sheet) => sheet.name),
       username,
       yearlyTopBooks,
-      aiSummary,
+      aiSummary: analysis,
     },
     revalidate: 300,
   }
