@@ -70,14 +70,7 @@ export async function getStaticProps(context) {
     where: { userId, sheet_id: sheet.id },
     select: { analysis: true },
   })
-  const analysis = aiSummary
-    ? parse(aiSummary.analysis)
-    : {
-        reading_trend_analysis: null,
-        sentiment_analysis: null,
-        what_if_scenario: null,
-        overall_feedback: null,
-      }
+  const analysis = aiSummary ? parse(aiSummary.analysis) : null
   return {
     props: {
       data: parse(data),
