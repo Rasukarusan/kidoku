@@ -7,17 +7,19 @@ export default async (req, res) => {
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session) {
-      res.status(401).json({ result: false })
+      return res.status(401).json({ result: false })
     }
     const body = JSON.parse(req.body)
     const { sheetName, isTotal } = body
     const userId = session.user.id
-    const sheet = await prisma.sheets.findFirst({
-      where: { userId, name: sheetName },
-      select: { id: true, name: true },
-    })
-    if (!sheet || sheet.name !== sheetName) {
-      res.status(401).json({ result: false })
+    const sheet = isTotal
+      ? { id: 0, name: sheetName }
+      : await prisma.sheets.findFirst({
+          where: { userId, name: sheetName },
+          select: { id: true, name: true },
+        })
+    if ((!isTotal && !sheet) || sheet.name !== sheetName) {
+      return res.status(401).json({ result: false })
     }
     const books = isTotal
       ? await prisma.books.findMany({
@@ -46,7 +48,7 @@ export default async (req, res) => {
     await prisma.aiSummaries.create({
       data: {
         userId,
-        sheet_id: sheet.id,
+        sheet_id: isTotal ? 0 : sheet.id,
         analysis: {
           reading_trend_analysis,
           sentiment_analysis,
@@ -55,9 +57,9 @@ export default async (req, res) => {
         },
       },
     })
-    res.status(200).json({ result: true, data: json })
+    return res.status(200).json({ result: true, data: json })
   } catch (e) {
     console.error(e)
-    res.status(400).json({ result: false })
+    return res.status(400).json({ result: false })
   }
 }

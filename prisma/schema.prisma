@@ -9,15 +9,16 @@ datasource db {
 }
 
 model sheets {
-  id          Int          @id @default(autoincrement()) @db.UnsignedInt
-  userId      String       @map("user_id")
-  name        String       @db.VarChar(120)
-  order       Int?         @default(1)
-  created     DateTime?    @default(now()) @db.DateTime(0)
-  updated     DateTime?    @default(now()) @db.DateTime(0)
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  books       books[]
-  AiSummaries AiSummaries?
+  id            Int          @id @default(autoincrement()) @db.UnsignedInt
+  userId        String       @map("user_id")
+  name          String       @db.VarChar(120)
+  order         Int?         @default(1)
+  created       DateTime?    @default(now()) @db.DateTime(0)
+  updated       DateTime?    @default(now()) @db.DateTime(0)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  books         books[]
+  AiSummaries   AiSummaries? @relation(fields: [aiSummariesId], references: [id])
+  aiSummariesId Int?         @db.UnsignedInt
 
   @@unique([userId, name], map: "uniq_user_id_name")
 }
@@ -115,12 +116,12 @@ model YearlyTopBook {
 model AiSummaries {
   id       Int       @id @default(autoincrement()) @db.UnsignedInt
   userId   String    @map("user_id")
-  sheet_id Int       @unique(map: "uniq_sheet_id")
+  sheet_id Int
   analysis Json
   created  DateTime? @default(now()) @db.DateTime(0)
   updated  DateTime? @default(now()) @db.DateTime(0)
-  sheet    sheets    @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sheets   sheets[]
 
   @@map("ai_summaries")
 }
