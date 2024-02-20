@@ -9,6 +9,7 @@ import { BookDatePicker } from '@/components/input/BookDatePicker'
 import { AiFillLock } from 'react-icons/ai'
 import { CheckoutModal } from '@/components/form/CheckoutModal'
 import { MdExpandMore } from 'react-icons/md'
+import { mask } from '@/utils/string'
 
 interface Props {
   book: Book
@@ -145,7 +146,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
               onScroll={handleScroll}
               style={{ height: `${memoAreaHeight}px` }}
             >
-              <Memo memo={book.memo} />
+              <Memo memo={mask(book.memo)} />
             </div>
           </div>
         )}

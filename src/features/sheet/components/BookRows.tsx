@@ -1,4 +1,4 @@
-import { truncate } from '@/utils/string'
+import { mask, truncate } from '@/utils/string'
 import { Book } from '@/types/book'
 import { useState } from 'react'
 import { Memo } from './Memo'
@@ -93,9 +93,9 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               {(isMine || book.is_public_memo) && (
                 <td className={`whitespace-normal px-6 py-4 ${pc}`}>
                   {expands[i] ? (
-                    <Memo memo={book.memo} />
+                    <Memo memo={mask(book.memo)} />
                   ) : (
-                    <span>{truncate(book.memo, 40)}</span>
+                    <span>{truncate(mask(book.memo), 40)}</span>
                   )}
                 </td>
               )}

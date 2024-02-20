@@ -2,6 +2,7 @@ import { IndexPage } from '@/features/index/components/IndexPage'
 export default IndexPage
 
 import prisma, { parse } from '@/libs/prisma'
+import { mask } from '@/utils/string'
 
 export const getStaticProps = async (ctx) => {
   const books = await prisma.books.findMany({
@@ -20,7 +21,7 @@ export const getStaticProps = async (ctx) => {
     comments.push({
       id: book.id,
       title: book.title,
-      memo: book.memo,
+      memo: mask(book.memo),
       updated: book.updated,
       image: book.image,
       username: book.user.name,

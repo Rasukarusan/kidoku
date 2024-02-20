@@ -1,6 +1,7 @@
 import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
+import { mask } from '@/utils/string'
 export default SheetPage
 
 type Props = { params: { year: string } }
@@ -49,7 +50,7 @@ export async function getStaticProps(context) {
     const month = book.finished
       ? dayjs(book.finished).format('M') + '月'
       : dayjs().format('M') + '月' // まだ読み終わっていない場合は今月とする
-    const memo = book.is_public_memo ? book.memo : ''
+    const memo = book.is_public_memo ? mask(book.memo) : ''
     return {
       ...book,
       month,
