@@ -16,5 +16,6 @@ export * from '@prisma/client'
  * Reason: `object` ("[object Date]") cannot be serialized as JSON. Please only return JSON serializable data types.
  */
 export const parse = (value) => {
+  if (!value) return null
   return JSON.parse(JSON.stringify(value))
 }

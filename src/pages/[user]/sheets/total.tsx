@@ -1,6 +1,6 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
-import prisma from '@/libs/prisma'
+import prisma, { parse } from '@/libs/prisma'
 
 export default SheetTotalPage
 
@@ -65,15 +65,18 @@ export const getStaticProps = async (ctx) => {
     },
     orderBy: { year: 'desc' },
   })
-  const aiSummary = await prisma.userReadingAnalysis.findFirst({
+  const aiSummary = await prisma.aiSummaries.findFirst({
     where: { userId, sheet_id: 0 },
-    select: {
-      reading_trend_analysis: true,
-      sentiment_analysis: true,
-      what_if_scenario: true,
-      overall_feedback: true,
-    },
+    select: { analysis: true },
   })
+  const analysis = aiSummary
+    ? parse(aiSummary.analysis)
+    : {
+        reading_trend_analysis: null,
+        sentiment_analysis: null,
+        what_if_scenario: null,
+        overall_feedback: null,
+      }
   return {
     props: {
       total: books.length,
@@ -82,7 +85,7 @@ export const getStaticProps = async (ctx) => {
       sheets: sheets.length === 0 ? [] : sheets.map((sheet) => sheet.name),
       username,
       yearlyTopBooks,
-      aiSummary,
+      aiSummary: analysis,
     },
     revalidate: 300,
   }

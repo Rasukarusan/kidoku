@@ -40,14 +40,16 @@ export default async (req, res) => {
       what_if_scenario,
       overall_feedback,
     } = json
-    await prisma.userReadingAnalysis.create({
+    await prisma.aiSummaries.create({
       data: {
         userId,
         sheet_id: sheet.id,
-        reading_trend_analysis,
-        sentiment_analysis,
-        what_if_scenario,
-        overall_feedback,
+        analysis: {
+          reading_trend_analysis,
+          sentiment_analysis,
+          what_if_scenario,
+          overall_feedback,
+        },
       },
     })
     res.status(200).json({ result: true, data: json })
