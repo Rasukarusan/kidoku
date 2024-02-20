@@ -68,6 +68,7 @@ export const AiSummary: React.FC<Props> = ({
 }) => {
   const minimum = 1
   const [json, setJson] = useState(aiSummary)
+  const [error, setError] = useState(null)
   const [generating, setGenerating] = useState(false)
   const onClickGenerateAiSummary = async () => {
     if (generating) return
@@ -76,7 +77,11 @@ export const AiSummary: React.FC<Props> = ({
       method: 'POST',
       body: JSON.stringify({ sheetName: sheet, isTotal }),
     }).then((res) => res.json())
-    setJson(res.data)
+    if (!res.result) {
+      setError('AI分析に失敗しました')
+    } else {
+      setJson(res.data)
+    }
   }
 
   useEffect(() => {
@@ -87,12 +92,13 @@ export const AiSummary: React.FC<Props> = ({
     if (
       process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 !== 'true' ||
       bookCount < minimum ||
-      !isMine
+      !isMine ||
+      error
     ) {
       return (
         <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
-          <FaNotEqual className="mr-2-2 text-ai" />
-          AIの分析結果はありません。
+          <FaNotEqual className="mr-2 text-ai" />
+          {error ?? 'AIの分析結果はありません。'}
         </div>
       )
     }
@@ -103,6 +109,7 @@ export const AiSummary: React.FC<Props> = ({
             type="button"
             className="flex items-center rounded-md px-2 py-1 hover:font-bold"
             onClick={onClickGenerateAiSummary}
+            disabled={generating}
           >
             {generating ? (
               <FaCircleNotch size={25} className="mr-2 animate-spin text-ai" />
