@@ -119,6 +119,7 @@ export const SheetPage: React.FC<Props> = ({
           bookCount={data.length}
           sheet={year}
           isTotal={false}
+          isMine={isMine}
         />
       </div>
 
