@@ -12,6 +12,13 @@ export default async (req, res) => {
     const body = JSON.parse(req.body)
     const { sheetName, isTotal } = body
     const userId = session.user.id
+    const sheet = await prisma.sheets.findFirst({
+      where: { userId, name: sheetName },
+      select: { id: true, name: true },
+    })
+    if (!sheet || sheet.name !== sheetName) {
+      res.status(401).json({ result: false })
+    }
     const books = isTotal
       ? await prisma.books.findMany({
           where: { userId, is_public_memo: true },
@@ -28,10 +35,6 @@ export default async (req, res) => {
           },
           take: 10,
         })
-    const sheet = await prisma.sheets.findFirst({
-      where: { userId, name: sheetName },
-      select: { id: true },
-    })
     const result = await chat(JSON.stringify(books))
     const json = JSON.parse(result.choices[0].message.content)
     const {

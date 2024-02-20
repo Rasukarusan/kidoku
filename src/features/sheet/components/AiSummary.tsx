@@ -56,6 +56,7 @@ interface Props {
   bookCount: number
   sheet: string
   isTotal: boolean
+  isMine: boolean
 }
 export const AiSummary: React.FC<Props> = ({
   username,
@@ -63,6 +64,7 @@ export const AiSummary: React.FC<Props> = ({
   bookCount,
   sheet,
   isTotal,
+  isMine,
 }) => {
   const minimum = 1
   const [json, setJson] = useState(aiSummary)
@@ -84,7 +86,8 @@ export const AiSummary: React.FC<Props> = ({
   if (!json) {
     if (
       process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 !== 'true' ||
-      bookCount < minimum
+      bookCount < minimum ||
+      !isMine
     ) {
       return (
         <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">

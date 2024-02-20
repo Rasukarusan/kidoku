@@ -42,6 +42,7 @@ export const SheetTotalPage: React.FC<Props> = ({
     }
   }
   const average = years.length === 0 ? 0 : Math.ceil(total / years.length)
+  const isMine = session && session.user.name === username
 
   return (
     <Container>
@@ -68,6 +69,7 @@ export const SheetTotalPage: React.FC<Props> = ({
             bookCount={total}
             sheet="total"
             isTotal={true}
+            isMine={isMine}
           />
         </div>
 
