@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import { ChatCompletionMessageParam } from 'openai/resources'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -22,23 +23,27 @@ export async function chat(content) {
 ・「もしも」シナリオ：ユーザーが異なるジャンルや著者を選んだ場合にどのような読書体験になるかを想像させる仮想シナリオを提示する。
 
 ・総評：ユーザーがどんな人間なのかを示します。
------------
   `
+  const messages: ChatCompletionMessageParam[] = [
+    {
+      role: 'system',
+      content: prompt,
+    },
+    {
+      role: 'user',
+      content,
+    },
+  ]
+  console.time('ai-summary')
   const chatCompletion = await openai.chat.completions.create({
-    messages: [
-      {
-        role: 'user',
-        content: prompt,
-      },
-      {
-        role: 'user',
-        content,
-      },
-    ],
+    messages,
     model: 'gpt-4-0125-preview',
     response_format: {
       type: 'json_object',
     },
   })
+  console.log(messages)
+  console.log(chatCompletion)
+  console.timeEnd('ai-summary')
   return chatCompletion
 }
