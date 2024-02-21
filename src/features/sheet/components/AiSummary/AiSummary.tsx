@@ -1,12 +1,11 @@
 import { IoSparklesSharp } from 'react-icons/io5'
 import { IoIosAnalytics } from 'react-icons/io'
-import {
-  MdOutlineRestartAlt,
-  MdOutlineSentimentSatisfied,
-} from 'react-icons/md'
-import { FaCircleNotch, FaRegLightbulb } from 'react-icons/fa6'
+import { MdOutlineSentimentSatisfied } from 'react-icons/md'
+import { FaRegLightbulb } from 'react-icons/fa6'
 import { Fragment, useEffect, useState } from 'react'
-import { FaNotEqual } from 'react-icons/fa'
+import { AiGenerateButton } from './AiGenerateButton'
+import { Error } from './Error'
+import { Empty } from './Empty'
 
 export type AiSummaryJson = {
   reading_trend_analysis: string
@@ -72,7 +71,8 @@ export const AiSummary: React.FC<Props> = ({
   const [json, setJson] = useState(aiSummary)
   const [error, setError] = useState(null)
   const [generating, setGenerating] = useState(false)
-  const onClickGenerateAiSummary = async () => {
+
+  const onClickGenerate = async () => {
     if (generating) return
     setGenerating(true)
     const res = await fetch('/api/ai-summary', {
@@ -91,40 +91,18 @@ export const AiSummary: React.FC<Props> = ({
   }, [sheet])
 
   if (!json) {
-    if (
+    if (error) {
+      return <Error text={error} />
+    } else if (
       process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 !== 'true' ||
       bookCount < minimum ||
-      !isMine ||
-      error
+      !isMine
     ) {
-      return (
-        <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
-          <FaNotEqual className="mr-2 text-ai" />
-          {error ?? 'AIの分析結果はありません。'}
-        </div>
-      )
+      return <Empty />
     }
     if (process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true') {
       return (
-        <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
-          <button
-            type="button"
-            className="flex items-center rounded-md px-2 py-1 hover:font-bold"
-            onClick={onClickGenerateAiSummary}
-            disabled={generating}
-          >
-            {generating ? (
-              <FaCircleNotch size={25} className="mr-2 animate-spin text-ai" />
-            ) : (
-              <MdOutlineRestartAlt size={25} className="mr-2 text-ai" />
-            )}
-            {generating ? (
-              <span className="animate-pulse">AI分析中...</span>
-            ) : (
-              <span className="underline">AIの分析を始める</span>
-            )}
-          </button>
-        </div>
+        <AiGenerateButton onClick={onClickGenerate} generating={generating} />
       )
     }
   }
