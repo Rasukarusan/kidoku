@@ -2,6 +2,7 @@ import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
 import { useChat } from 'ai/react'
+import BarcodeScanner from '@/components/input/BarcodeScanner'
 
 interface Props {
   comments: Comment[]
@@ -14,6 +15,7 @@ export const IndexPage = ({ comments }) => {
     })
   return (
     <Container className="p-6">
+      <BarcodeScanner />
       {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && (
         <div className="stretch mx-auto flex w-full max-w-md flex-col py-24">
           {messages.map((m) => (
