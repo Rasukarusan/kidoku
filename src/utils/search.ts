@@ -11,7 +11,7 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
   await client
     .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
     .then((res) => {
-      res.data.items.map((item) => {
+      res.data.items?.map((item) => {
         const { title, description, authors, categories, imageLinks } =
           item.volumeInfo
         result.push({

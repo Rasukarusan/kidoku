@@ -43,7 +43,6 @@ export const Books: React.FC<Props> = ({ input, onClose }) => {
       <AddModal
         open={openAddModal}
         item={selectItem}
-        books={books}
         onClose={() => {
           onClose()
           setOpenAddModal(false)
