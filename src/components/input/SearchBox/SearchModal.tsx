@@ -11,7 +11,7 @@ interface Props {
 }
 export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   const ref = useRef<HTMLInputElement>(null)
-  const [tab, setTab] = useState<'api' | 'barcode' | 'user'>('api')
+  const [tab, setTab] = useState<'title' | 'barcode' | 'user'>('barcode')
   const [inputValue, setInputValue] = useState('')
 
   // 検索モーダル開いたら自動でinputフィールドにフォーカスする
@@ -20,6 +20,9 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
   }, [open])
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (tab === 'barcode') {
+      setTab('title')
+    }
     setInputValue(e.target.value)
   }
 
@@ -48,19 +51,19 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
       </div>
       <div className="flex items-center px-4 pt-4 text-sm">
         <button
-          className={`text-nowrap px-4 py-2 hover:bg-gray-100 ${
-            tab === 'api' ? 'font-bold' : 'text-gray-400'
-          }`}
-          onClick={() => setTab('api')}
-        >
-          検索結果
-        </button>
-        <button
           className={`flex text-nowrap px-4 py-2 hover:bg-gray-100
             ${tab === 'barcode' ? 'font-bold' : 'text-gray-400 '}`}
           onClick={() => setTab('barcode')}
         >
           バーコード検索
+        </button>
+        <button
+          className={`text-nowrap px-4 py-2 hover:bg-gray-100 ${
+            tab === 'title' ? 'font-bold' : 'text-gray-400'
+          }`}
+          onClick={() => setTab('title')}
+        >
+          タイトル結果
         </button>
         <button
           className={`text-nowrap px-4 py-2 hover:bg-gray-100
@@ -70,7 +73,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           ユーザー本棚
         </button>
       </div>
-      {tab === 'api' ? (
+      {tab === 'title' ? (
         <Books input={inputValue} onClose={onClose} />
       ) : tab === 'barcode' ? (
         <BarcodeScan input={inputValue} onClose={onClose} />
