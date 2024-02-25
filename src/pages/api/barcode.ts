@@ -13,6 +13,12 @@ export default async function handler(
       res.status(401).json({ result: false })
     }
     if (req.method === 'GET') {
+      const isMobile = req.headers['user-agent'].includes('Mobile')
+      console.log(req.headers['user-agent'])
+      console.log(isMobile)
+      if (isMobile) {
+        return res.status(200).json({ result: false })
+      }
       const id = session.user.id
       const book = await kv.get(`${id}_barcode`)
       await kv.del(`${id}_barcode`)
@@ -23,7 +29,7 @@ export default async function handler(
       const { book } = body
       const id = session.user.id
       console.log(book, id)
-      await kv.set(`${id}_barcode`, book, { ex: 100, nx: true })
+      await kv.set(`${id}_barcode`, book, { ex: 100 })
       return res.status(200).json(true)
     }
   } catch (e) {
