@@ -14,8 +14,6 @@ export default async function handler(
     }
     if (req.method === 'GET') {
       const isMobile = req.headers['user-agent'].includes('Mobile')
-      console.log(req.headers['user-agent'])
-      console.log(isMobile)
       if (isMobile) {
         return res.status(200).json({ result: false })
       }

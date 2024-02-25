@@ -113,7 +113,7 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
   // アニメーションのカスタマイズ
   const modalVariants = {
     hidden: {
-      y: '-100vh',
+      y: '10vh',
       opacity: 0,
     },
     visible: {
@@ -129,7 +129,7 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
       y: '-100vh',
       opacity: 0,
       transition: {
-        duration: 0.3,
+        duration: 0.2,
         ease: 'easeInOut',
       },
     },

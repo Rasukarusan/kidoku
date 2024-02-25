@@ -11,14 +11,14 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const [book, setBook] = useState(null)
   useEffect(() => {
     setInterval(() => {
-      fetch('/api/barcode')
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.result && res.book) {
-            setBook(res.book)
-            setOpen(true)
-          }
-        })
+      // fetch('/api/barcode')
+      //   .then((res) => res.json())
+      //   .then((res) => {
+      //     if (res.result && res.book) {
+      //       setBook(res.book)
+      //       setOpen(true)
+      //     }
+      //   })
     }, 1000)
   }, [])
   return (
