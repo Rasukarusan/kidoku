@@ -18,6 +18,7 @@ import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 import { AiOutlineFileAdd } from 'react-icons/ai'
 import { useSession } from 'next-auth/react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Response {
   result: boolean
@@ -109,170 +110,235 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
     setLoading(false)
   }
 
+  // アニメーションのカスタマイズ
+  const modalVariants = {
+    hidden: {
+      y: '-100vh',
+      opacity: 0,
+    },
+    visible: {
+      y: '0',
+      opacity: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+      },
+    },
+    exit: {
+      y: '-100vh',
+      opacity: 0,
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut',
+      },
+    },
+  }
   return (
-    <Modal open={open} onClose={onClose} className="h-3/4 w-full sm:w-1/2">
-      <div className="flex h-full flex-col justify-between">
-        <div className="bg-white p-4">
-          <div className="flex items-center">
-            <ImagePicker
-              img={book?.image}
-              onImageLoad={(image) => {
-                setBook({ ...book, image })
-              }}
-            />
-            <div className="mr-2 w-2/3">
-              <BookInputField
-                value={book?.title}
-                onChange={(e) => setBook({ ...book, title: e.target.value })}
-                label="タイトル"
-                tabIndex={1}
-              />
-              <BookInputField
-                value={book?.author}
-                onChange={(e) => setBook({ ...book, author: e.target.value })}
-                label="著者"
-                tabIndex={2}
-              />
-              <BookCreatableSelectBox
-                label="カテゴリ"
-                defaultValue={{ value: book?.category, label: book?.category }}
-                options={options}
-                tabIndex={3}
-                onChange={(newValue: { value: string; label: string }) => {
-                  setBook({ ...book, category: newValue?.value ?? '-' })
-                }}
-              />
-              <div className="flex items-center">
-                <BookSelectBox
-                  value={book?.impression}
-                  label="感想"
-                  tabIndex={4}
-                  onChange={(e) =>
-                    setBook({ ...book, impression: e.target.value })
-                  }
-                />
-                <BookDatePicker
-                  value={dayjs(book?.finished).format('YYYY-MM-DD')}
-                  label="読了日"
-                  tabIndex={5}
-                  onChange={(e) =>
-                    setBook({
-                      ...book,
-                      finished: dayjs(e.target.value).format('YYYY-MM-DD'),
-                    })
-                  }
-                />
-              </div>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={modalVariants}
+          className="absolute inset-0 z-50 overflow-hidden"
+        >
+          <div className="flex h-full items-center justify-center">
+            <div className="h-3/4 w-full overflow-y-auto bg-white sm:w-1/2">
+              <Modal
+                open={open}
+                onClose={onClose}
+                className="h-3/4 w-full sm:w-1/2"
+              >
+                <div className="flex h-full flex-col justify-between">
+                  <div className="bg-white p-4">
+                    <div className="flex items-center">
+                      <ImagePicker
+                        img={book?.image}
+                        onImageLoad={(image) => {
+                          setBook({ ...book, image })
+                        }}
+                      />
+                      <div className="mr-2 w-2/3">
+                        <BookInputField
+                          value={book?.title}
+                          onChange={(e) =>
+                            setBook({ ...book, title: e.target.value })
+                          }
+                          label="タイトル"
+                          tabIndex={1}
+                        />
+                        <BookInputField
+                          value={book?.author}
+                          onChange={(e) =>
+                            setBook({ ...book, author: e.target.value })
+                          }
+                          label="著者"
+                          tabIndex={2}
+                        />
+                        <BookCreatableSelectBox
+                          label="カテゴリ"
+                          defaultValue={{
+                            value: book?.category,
+                            label: book?.category,
+                          }}
+                          options={options}
+                          tabIndex={3}
+                          onChange={(newValue: {
+                            value: string
+                            label: string
+                          }) => {
+                            setBook({
+                              ...book,
+                              category: newValue?.value ?? '-',
+                            })
+                          }}
+                        />
+                        <div className="flex items-center">
+                          <BookSelectBox
+                            value={book?.impression}
+                            label="感想"
+                            tabIndex={4}
+                            onChange={(e) =>
+                              setBook({ ...book, impression: e.target.value })
+                            }
+                          />
+                          <BookDatePicker
+                            value={dayjs(book?.finished).format('YYYY-MM-DD')}
+                            label="読了日"
+                            tabIndex={5}
+                            onChange={(e) =>
+                              setBook({
+                                ...book,
+                                finished: dayjs(e.target.value).format(
+                                  'YYYY-MM-DD'
+                                ),
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <BookInputField
+                      rows={8}
+                      value={book?.memo}
+                      onChange={(e) =>
+                        setBook({ ...book, memo: e.target.value })
+                      }
+                      label="メモ"
+                      tabIndex={5}
+                    />
+                    <ToggleButton
+                      label="メモを公開する"
+                      checked={!!book?.is_public_memo}
+                      onChange={() => {
+                        setBook({
+                          ...book,
+                          is_public_memo: !book?.is_public_memo,
+                        })
+                      }}
+                    />
+                    <div className="w-full text-center text-gray-900 ">
+                      <SheetAddModal
+                        open={openAdd}
+                        onClose={() => {
+                          setOpenAdd(false)
+                          mutateSheet()
+                        }}
+                      />
+                      {data.sheets.length === 0 ? (
+                        <button
+                          className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white disabled:bg-gray-500"
+                          onClick={() => {
+                            setOpenAdd(true)
+                          }}
+                          disabled={!session}
+                        >
+                          <AiOutlineFileAdd className="mr-1 h-[24px] w-[24px] text-white" />
+                          {session ? 'シートを追加' : 'ログインしてください'}
+                        </button>
+                      ) : (
+                        <select
+                          className="cursor-pointer border p-2 px-4"
+                          onChange={(e) => {
+                            const selectedOption = e.target.selectedOptions[0]
+                            const sheetId =
+                              selectedOption.getAttribute('data-id')
+                            setSheet({
+                              id: Number(sheetId),
+                              name: e.target.value,
+                            })
+                          }}
+                        >
+                          {data.sheets.map((sheet) => {
+                            const { id, name } = sheet
+                            return (
+                              <option key={name} value={name} data-id={id}>
+                                {name}
+                              </option>
+                            )
+                          })}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+                  <div className="border-1 w-full border-t text-center">
+                    {response && (
+                      <div className="absolute bottom-32 left-1/2 z-20 -translate-x-1/2 transform sm:bottom-28">
+                        {response.result ? (
+                          <SuccessAlert
+                            open={!!response}
+                            text={`『${response.bookTitle}』を「${response.sheetName}」に追加しました`}
+                            onClose={() => {
+                              setResponse(null)
+                            }}
+                          />
+                        ) : (
+                          <DangerAlert
+                            open={!!response}
+                            text="本の登録に失敗しました"
+                            onClose={() => {
+                              setResponse(null)
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
+                    {response?.bookId > 0 ? (
+                      <button
+                        className="flex h-12 w-full items-center justify-center rounded-b-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-blue-700"
+                        onClick={() => {
+                          onClose()
+                          router.push(
+                            `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}`
+                          )
+                        }}
+                      >
+                        <span id="rewardId">シートに飛ぶ</span>
+                      </button>
+                    ) : (
+                      <button
+                        className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
+                        onClick={onClickAdd}
+                        tabIndex={6}
+                        disabled={isAnimating || !session}
+                      >
+                        {loading && (
+                          <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
+                        )}
+                        <span id="rewardId">
+                          {session ? '本を登録する' : 'ログインしてください'}
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </Modal>
             </div>
           </div>
-          <BookInputField
-            rows={8}
-            value={book?.memo}
-            onChange={(e) => setBook({ ...book, memo: e.target.value })}
-            label="メモ"
-            tabIndex={5}
-          />
-          <ToggleButton
-            label="メモを公開する"
-            checked={!!book?.is_public_memo}
-            onChange={() => {
-              setBook({ ...book, is_public_memo: !book?.is_public_memo })
-            }}
-          />
-          <div className="w-full text-center text-gray-900 ">
-            <SheetAddModal
-              open={openAdd}
-              onClose={() => {
-                setOpenAdd(false)
-                mutateSheet()
-              }}
-            />
-            {data.sheets.length === 0 ? (
-              <button
-                className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white disabled:bg-gray-500"
-                onClick={() => {
-                  setOpenAdd(true)
-                }}
-                disabled={!session}
-              >
-                <AiOutlineFileAdd className="mr-1 h-[24px] w-[24px] text-white" />
-                {session ? 'シートを追加' : 'ログインしてください'}
-              </button>
-            ) : (
-              <select
-                className="cursor-pointer border p-2 px-4"
-                onChange={(e) => {
-                  const selectedOption = e.target.selectedOptions[0]
-                  const sheetId = selectedOption.getAttribute('data-id')
-                  setSheet({
-                    id: Number(sheetId),
-                    name: e.target.value,
-                  })
-                }}
-              >
-                {data.sheets.map((sheet) => {
-                  const { id, name } = sheet
-                  return (
-                    <option key={name} value={name} data-id={id}>
-                      {name}
-                    </option>
-                  )
-                })}
-              </select>
-            )}
-          </div>
-        </div>
-        <div className="border-1 w-full border-t text-center">
-          {response && (
-            <div className="absolute bottom-32 left-1/2 z-20 -translate-x-1/2 transform sm:bottom-28">
-              {response.result ? (
-                <SuccessAlert
-                  open={!!response}
-                  text={`『${response.bookTitle}』を「${response.sheetName}」に追加しました`}
-                  onClose={() => {
-                    setResponse(null)
-                  }}
-                />
-              ) : (
-                <DangerAlert
-                  open={!!response}
-                  text="本の登録に失敗しました"
-                  onClose={() => {
-                    setResponse(null)
-                  }}
-                />
-              )}
-            </div>
-          )}
-          {response?.bookId > 0 ? (
-            <button
-              className="flex h-12 w-full items-center justify-center rounded-b-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-blue-700"
-              onClick={() => {
-                onClose()
-                router.push(
-                  `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}`
-                )
-              }}
-            >
-              <span id="rewardId">シートに飛ぶ</span>
-            </button>
-          ) : (
-            <button
-              className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
-              onClick={onClickAdd}
-              tabIndex={6}
-              disabled={isAnimating || !session}
-            >
-              {loading && (
-                <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
-              )}
-              <span id="rewardId">
-                {session ? '本を登録する' : 'ログインしてください'}
-              </span>
-            </button>
-          )}
-        </div>
-      </div>
-    </Modal>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
