@@ -23,7 +23,7 @@ export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
         const videoStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment' },
         })
-        if (!videoStream) return
+        if (!videoRef.current) return
         videoRef.current.srcObject = videoStream
 
         // デコード処理

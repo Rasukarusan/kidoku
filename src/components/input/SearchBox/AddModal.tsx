@@ -189,13 +189,14 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
             />
             {data.sheets.length === 0 ? (
               <button
-                className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white"
+                className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white disabled:bg-gray-500"
                 onClick={() => {
                   setOpenAdd(true)
                 }}
+                disabled={!session}
               >
                 <AiOutlineFileAdd className="mr-1 h-[24px] w-[24px] text-white" />
-                シートを追加
+                {session ? 'シートを追加' : 'ログインしてください'}
               </button>
             ) : (
               <select
@@ -257,15 +258,17 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
             </button>
           ) : (
             <button
-              className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-700"
+              className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
               onClick={onClickAdd}
               tabIndex={6}
-              disabled={isAnimating}
+              disabled={isAnimating || !session}
             >
               {loading && (
                 <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
               )}
-              <span id="rewardId">本を登録する</span>
+              <span id="rewardId">
+                {session ? '本を登録する' : 'ログインしてください'}
+              </span>
             </button>
           )}
         </div>
