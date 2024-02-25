@@ -28,6 +28,32 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
 }
 
 /**
+ * ISBNで書籍検索
+ */
+export const searchBooksByIsbn = async (
+  isbn: string
+): Promise<SearchResult> => {
+  const client = new ApiClient()
+  return await client
+    .get(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`)
+    .then((res) => {
+      const item = res.data.items?.pop()
+      if (!item) return undefined
+      const { title, description, authors, categories, imageLinks } =
+        item.volumeInfo
+      const book = {
+        id: item.id,
+        title: title,
+        author: Array.isArray(authors) ? authors.join(',') : '-',
+        category: categories ? categories.join(',') : '-',
+        image: imageLinks ? imageLinks.thumbnail : NO_IMAGE,
+        memo: '',
+      }
+      return book
+    })
+}
+
+/**
  * ユーザー本棚検索
  */
 export const searchUserBooks = async (
