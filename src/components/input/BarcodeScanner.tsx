@@ -54,8 +54,15 @@ function BarcodeScanner() {
       <div className="flex">
         <div className="relative mr-2">
           <video ref={videoRef} className="w-full" autoPlay></video>
+          <div className="absolute bottom-0 left-0 right-0 top-0 flex flex-col items-center justify-center">
+            <div className="animate-bounce font-bold text-white">
+              バーコードの1段目が映るようにすると成功率があがります
+            </div>
+          </div>
           {loading && (
-            <Loading className="absolute left-1/2 top-1/2 h-[36px] w-[36px] border-purple-500" />
+            <div className="absolute bottom-0 left-0 right-0 top-0 flex flex-col items-center justify-center">
+              <Loading className="mb-2 h-[36px] w-[36px] border-green-500" />
+            </div>
           )}
         </div>
         <div className="w-1/2 bg-gray-100">{JSON.stringify(result)}</div>
