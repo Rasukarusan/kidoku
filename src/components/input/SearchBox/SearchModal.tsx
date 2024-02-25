@@ -16,8 +16,10 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
 
   // 検索モーダル開いたら自動でinputフィールドにフォーカスする
   useEffect(() => {
-    ref.current?.focus()
-  }, [open])
+    if (tab !== 'barcode') {
+      ref.current?.focus()
+    }
+  }, [open, tab])
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (tab === 'barcode') {

@@ -14,7 +14,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
       fetch('/api/barcode')
         .then((res) => res.json())
         .then((res) => {
-          console.log(res)
           if (res.result && res.book) {
             setBook(res.book)
             setOpen(true)
