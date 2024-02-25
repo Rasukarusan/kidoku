@@ -10,6 +10,7 @@ interface Props {
 export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const [animate, setAnimate] = useState<boolean>(false)
 
   useEffect(() => {
     const codeReader = new BrowserMultiFormatReader()
@@ -22,6 +23,7 @@ export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
         const videoStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment' },
         })
+        if (!videoStream) return
         videoRef.current.srcObject = videoStream
 
         // デコード処理
@@ -43,6 +45,12 @@ export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
       }
     }
     startScan()
+
+    // 5秒経っても画面を開いている場合、ヒントをアニメーションさせる
+    setTimeout(() => {
+      setAnimate(true)
+    }, 5000)
+
     // コンポーネントのアンマウント時にスキャンを停止
     return () => {
       codeReader.reset()
@@ -64,7 +72,9 @@ export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
           <Loading className="mb-2 h-[36px] w-[36px] border-green-500" />
         </div>
       )}
-      <div className="bg-white pt-2 text-center text-xs font-bold text-gray-600">
+      <div
+        className={`bg-white pt-2 text-center text-xs font-bold text-gray-600 ${animate ? 'animate-bounce text-green-600' : ''}`}
+      >
         バーコードの1段目が映るようにすると成功率があがります
       </div>
     </div>
