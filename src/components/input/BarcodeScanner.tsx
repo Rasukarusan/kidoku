@@ -6,6 +6,8 @@ import {
   // DecodeHintType,
 } from '@zxing/library'
 import { uniq } from '@/utils/array'
+import { searchBooksByIsbn } from '@/utils/search'
+import { Loading } from '@/components/icon/Loading'
 
 function BarcodeScanner() {
   const videoRef = useRef(null)
@@ -15,6 +17,7 @@ function BarcodeScanner() {
   const [barcodes, setBarcodes] = useState([])
   const [screenshot, setScreenshot] = useState('/screenshot1.png')
   const [result, setResult] = useState('')
+  const [loading, setLoading] = useState(false)
 
   // スクリーンショットを取る関数
   const captureScreenshot = () => {
@@ -45,20 +48,28 @@ function BarcodeScanner() {
 
         // デコード処理
         const previewElem = videoRef.current
-        codeReader.decodeFromVideoDevice(null, previewElem, (result, err) => {
-          if (result) {
-            console.log(result)
-            // バーコードが読み取れたらstateを更新
-            const code = result.getText()
-            setBarcodes(uniq([...barcodes, code]))
-            captureScreenshot()
-            // 必要に応じてスキャンを停止
-            // codeReader.reset()
+        codeReader.decodeFromVideoDevice(
+          null,
+          previewElem,
+          async (result, err) => {
+            if (result) {
+              setLoading(true)
+              // バーコードが読み取れたらstateを更新
+              const isbn = result.getText()
+              const books = await searchBooksByIsbn(isbn)
+              console.log(books)
+              setLoading(false)
+
+              setBarcodes(uniq([...barcodes, isbn]))
+              captureScreenshot()
+              // 必要に応じてスキャンを停止
+              // codeReader.reset()
+            }
+            if (err) {
+              // console.log(err)
+            }
           }
-          if (err) {
-            // console.log(err)
-          }
-        })
+        )
       }
     }
 
@@ -182,7 +193,12 @@ function BarcodeScanner() {
         </button>
       </div>
       <div className="mb-2 flex">
-        <video ref={videoRef} className="w-1/2" autoPlay></video>
+        <div className="relative">
+          <video ref={videoRef} className="w-full" autoPlay></video>
+          {loading && (
+            <Loading className="absolute left-1/2 top-1/2 h-[36px] w-[36px] border-purple-500" />
+          )}
+        </div>
         {screenshot && (
           <img
             ref={screenshotRef}
