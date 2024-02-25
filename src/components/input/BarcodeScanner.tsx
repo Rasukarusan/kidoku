@@ -39,6 +39,13 @@ export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
             if (result) {
               setLoading(false)
               onDetect(result)
+              const res: Response = await fetch(`/api/barcode`, {
+                method: 'POST',
+                body: JSON.stringify({ book: result }),
+                headers: {
+                  Accept: 'application/json',
+                },
+              })
             }
           }
         )
