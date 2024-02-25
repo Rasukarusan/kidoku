@@ -29,11 +29,10 @@ interface Response {
 interface Props {
   open: boolean
   item: SearchResult
-  books: SearchResult[]
   onClose: () => void
 }
 
-export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
+export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
   const router = useRouter()
   const { data: session } = useSession()
   const { data, mutate: mutateSheet } = useSWR(`/api/sheets`, fetcher, {
@@ -111,7 +110,7 @@ export const AddModal: React.FC<Props> = ({ open, item, books, onClose }) => {
   }
 
   return (
-    <Modal open={open} onClose={onClose} className="h-3/4 sm:w-1/2">
+    <Modal open={open} onClose={onClose} className="h-3/4 w-full sm:w-1/2">
       <div className="flex h-full flex-col justify-between">
         <div className="bg-white p-4">
           <div className="flex items-center">

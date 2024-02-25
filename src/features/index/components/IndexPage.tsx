@@ -2,7 +2,6 @@ import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
 import { useChat } from 'ai/react'
-import BarcodeScanner from '@/components/input/BarcodeScanner'
 
 interface Props {
   comments: Comment[]
@@ -15,7 +14,6 @@ export const IndexPage = ({ comments }) => {
     })
   return (
     <Container className="p-6">
-      <BarcodeScanner />
       {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && (
         <div className="stretch mx-auto flex w-full max-w-md flex-col py-24">
           {messages.map((m) => (
@@ -36,7 +34,6 @@ export const IndexPage = ({ comments }) => {
       <section>
         <div className="flex items-center">
           <h2 className="p-2 text-2xl font-bold">Comments</h2>
-          <div className="text-xs text-gray-400">5分ごとに更新されます</div>
         </div>
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {comments.map((comment) => (

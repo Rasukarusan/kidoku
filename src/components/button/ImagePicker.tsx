@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   img?: string
@@ -21,6 +21,12 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
     }
     reader.readAsDataURL(file)
   }
+
+  useEffect(() => {
+    if (!image) {
+      setImage(img)
+    }
+  }, [img])
 
   return (
     <button className="mr-4 w-1/3" onClick={() => ref.current.click()}>
