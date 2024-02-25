@@ -21,7 +21,7 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
         open={open}
         item={book}
         onClose={() => {
-          onClose()
+          // onClose()
           setOpen(false)
         }}
       />
