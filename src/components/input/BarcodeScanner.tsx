@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {
+  BrowserBarcodeReader,
   BrowserMultiFormatReader,
   // BarcodeFormat,
   // DecodeHintType,
@@ -9,9 +10,11 @@ import { uniq } from '@/utils/array'
 function BarcodeScanner() {
   const videoRef = useRef(null)
   const imgRef = useRef(null)
+  const screenshotRef = useRef(null)
   const canvasRef = useRef(null)
   const [barcodes, setBarcodes] = useState([])
-  const [screenshot, setScreenshot] = useState(null) // スクリーンショットを保存するためのstate
+  const [screenshot, setScreenshot] = useState('/screenshot1.png')
+  const [result, setResult] = useState('')
 
   // スクリーンショットを取る関数
   const captureScreenshot = () => {
@@ -42,24 +45,20 @@ function BarcodeScanner() {
 
         // デコード処理
         const previewElem = videoRef.current
-        codeReader.decodeFromVideoDevice(
-          undefined,
-          previewElem,
-          (result, err) => {
-            if (result) {
-              console.log(result)
-              // バーコードが読み取れたらstateを更新
-              const code = result.getText()
-              setBarcodes(uniq([...barcodes, code]))
-              captureScreenshot()
-              // 必要に応じてスキャンを停止
-              // codeReader.reset()
-            }
-            if (err) {
-              // console.log(err)
-            }
+        codeReader.decodeFromVideoDevice(null, previewElem, (result, err) => {
+          if (result) {
+            console.log(result)
+            // バーコードが読み取れたらstateを更新
+            const code = result.getText()
+            setBarcodes(uniq([...barcodes, code]))
+            captureScreenshot()
+            // 必要に応じてスキャンを停止
+            // codeReader.reset()
           }
-        )
+          if (err) {
+            // console.log(err)
+          }
+        })
       }
     }
 
@@ -72,90 +71,137 @@ function BarcodeScanner() {
   }, [])
 
   const captureScreenshotAndSplit = () => {
-    if (!imgRef) return
-    const screenshot = imgRef.current
+    if (!screenshotRef) return
+    const screenshot = screenshotRef.current
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
     canvas.width = screenshot.clientWidth
     canvas.height = screenshot.clientHeight
     context.drawImage(screenshot, 0, 0, canvas.width, canvas.height)
 
-    const segmentWidth = canvas.width / 3
-    const segments = [0, 1, 2].map((index) => {
-      const segmentCanvas = document.createElement('canvas')
-      segmentCanvas.width = segmentWidth
-      segmentCanvas.height = canvas.height
-      const segmentContext = segmentCanvas.getContext('2d')
-      console.log(segmentWidth, canvas.height)
-      segmentContext.drawImage(
-        canvas,
-        index * segmentWidth,
-        0,
-        segmentWidth,
-        canvas.height,
-        0,
-        0,
-        segmentWidth,
-        canvas.height
-      )
+    // 縦方向に分割するため、高さに基づいてセグメントを計算
+    const splitCount = 5 // 分割数
+    const segmentHeight = canvas.height / splitCount
+    const segments = Array(splitCount)
+      .fill(0)
+      .map((_, index) => {
+        const segmentCanvas = document.createElement('canvas')
+        segmentCanvas.width = canvas.width
+        segmentCanvas.height = segmentHeight
+        const segmentContext = segmentCanvas.getContext('2d')
+        segmentContext.drawImage(
+          canvas,
+          0,
+          index * segmentHeight, // Y軸に沿って分割
+          canvas.width,
+          segmentHeight,
+          0,
+          0,
+          canvas.width,
+          segmentHeight
+        )
 
-      return segmentCanvas
-    })
+        return segmentCanvas
+      })
 
     drawSegmentsToCanvas(segments, 0)
   }
+
   const drawSegmentsToCanvas = (segments, index) => {
     if (index < segments.length && canvasRef.current) {
-      // 全体のcanvasのサイズを更新する
-      canvasRef.current.width = segments[0].width * (index + 1) // 表示されるセグメントに応じて幅を調整
-      canvasRef.current.height = segments[0].height
+      canvasRef.current.width = segments[0].width // 全体の画像の幅は同じ
+      canvasRef.current.height = segments[0].height * (index + 1) // 縦方向に分割された画像の高さに合わせて調整
       const context = canvasRef.current.getContext('2d')
 
-      // 最初から指定されたindexまでのセグメントを描画する
+      context.imageSmoothingEnabled = true
+      context.imageSmoothingQuality = 'high'
+      // 縦方向にセグメントを描画する
       for (let i = 0; i <= index; i++) {
-        context.drawImage(segments[i], i * segments[i].width, 0)
+        context.drawImage(segments[i], 0, i * segments[i].height)
       }
 
-      // 次のセグメントがあれば、再度この関数を呼び出す
+      // 次のセグメントの描画
       if (index + 1 < segments.length) {
         setTimeout(() => {
           drawSegmentsToCanvas(segments, index + 1)
-        }, 1000) // 次のセグメントを5秒後に描画
+          // Canvasから画像データを取得しimg要素にセット
+          const imageUrl = canvasRef.current.toDataURL('image/png')
+          const img = imgRef.current
+          img.src = imageUrl
+          console.log(img)
+          scanBarcodeFromImage(img)
+        }, 1000) // 指定されたディレイ（ここでは1秒）後に実行
       }
     }
+  }
+
+  const scanBarcodeFromImage = (img) => {
+    console.log(img)
+    const codeReader = new BrowserBarcodeReader()
+    codeReader
+      .decodeFromImage('split')
+      .then((result) => {
+        console.log(result)
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
   return (
     <div>
       <h3>Scanned barcode:</h3>
-      <p>{barcodes.join(', ')}</p>
-      <button
-        onClick={() => {
-          console.log(screenshot)
-          captureScreenshotAndSplit()
-          //   const codeReader = new BrowserBarcodeReader()
-          //   codeReader
-          //     .decodeFromImage(imgRef.current)
-          //     .then((result) => {
-          //       console.log(result)
-          //     })
-          //     .catch((err) => {
-          //       console.error(err)
-          //     })
-        }}
-      >
-        SCAN!
-      </button>
-      <video ref={videoRef} style={{ width: '50%' }} autoPlay></video>
-      {screenshot && (
-        <img
-          ref={imgRef}
-          src={screenshot}
-          alt="Screenshot"
-          className="h-1/3 w-1/3"
-        />
-      )}
+      <p>{barcodes.join(',')}</p>
+      <div className="mb-4">
+        <button
+          className="mr-4 rounded-md bg-blue-100 px-2 py-1"
+          onClick={() => captureScreenshotAndSplit()}
+        >
+          分割しながら描画
+        </button>
+        <button
+          className="rounded-md bg-purple-200 px-2 py-1"
+          onClick={async () => {
+            for (let i = 0; i < 100; i++) {
+              const codeReader = new BrowserBarcodeReader()
+              codeReader
+                .decodeFromImage('split')
+                .then((result) => {
+                  console.log(result)
+                  setResult(JSON.stringify(result))
+                })
+                .catch((err) => {
+                  console.error('エラーです')
+                  // console.error(err)
+                  setResult(JSON.stringify(err))
+                })
+            }
+          }}
+        >
+          分割したものをスキャン
+        </button>
+      </div>
+      <div className="mb-2 flex">
+        <video ref={videoRef} className="w-1/2" autoPlay></video>
+        {screenshot && (
+          <img
+            ref={screenshotRef}
+            src={screenshot}
+            alt="Screenshot"
+            className="h-1/3 w-1/3 bg-gray-100"
+          />
+        )}
+      </div>
       <canvas ref={canvasRef} style={{ width: '300px' }} />
+      <div className="flex">
+        <img
+          id="split"
+          ref={imgRef}
+          className="h-1/3 w-1/3"
+          src="/screenshot1.png"
+        />
+        <pre className="w-1/2 text-wrap bg-gray-50">{result}</pre>
+      </div>
     </div>
   )
 }
