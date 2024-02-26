@@ -21,9 +21,10 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
   const socket = useAtomValue(socketAtom)
 
   const sendMessage = (book) => {
-    if (!socket) return
+    if (!socket || !session) return
     console.log('send')
     const message = {
+      userId: session.user.id,
       event: EventType.AddBook,
       message: book,
     }
