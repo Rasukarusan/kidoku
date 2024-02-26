@@ -41,7 +41,6 @@ async function updateMeiliSearchDocuments() {
     }
   })
   const result = await addDocuments('books', documents)
-  console.log(result)
   return result
 }
 

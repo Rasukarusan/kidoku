@@ -35,7 +35,6 @@ export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
             setLoading(true)
             const isbn = res.getText()
             const result = await searchBooksByIsbn(isbn)
-            console.log(result)
             if (result) {
               setLoading(false)
               onDetect(result)

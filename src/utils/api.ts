@@ -5,6 +5,5 @@ export const isAdmin = (req: NextApiRequest | NextRequest) => {
   const authToken = (req.headers.get('authorization') || '')
     .split('Bearer ')
     .at(1)
-  console.log(authToken)
   return authToken && authToken === process.env.ADMIN_AUTH_TOKEN
 }
