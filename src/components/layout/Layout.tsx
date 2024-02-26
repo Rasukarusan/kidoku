@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { kosugi, notojp } from '@/libs/fonts'
 import { AddModal } from '@/components/input/SearchBox/AddModal'
+import { io } from 'socket.io-client'
+import { EventType } from '@/types/event_queue'
+import { useAtom } from 'jotai'
+import { socketAtom } from '@/store/socket'
 
 interface Props {
   children: React.ReactNode
@@ -9,18 +13,30 @@ interface Props {
 export const Layout: React.FC<Props> = ({ children }) => {
   const [open, setOpen] = useState(false)
   const [book, setBook] = useState(null)
+  const [socket, setSocket] = useAtom(socketAtom)
   useEffect(() => {
-    setInterval(() => {
-      // fetch('/api/barcode')
-      //   .then((res) => res.json())
-      //   .then((res) => {
-      //     if (res.result && res.book) {
-      //       setBook(res.book)
-      //       setOpen(true)
-      //     }
-      //   })
-    }, 1000)
+    fetch('/api/socket').then((res) => {
+      const socket = io()
+      socket.on('connect', () => {
+        console.log('connected!!!')
+      })
+      // サーバーからメッセージ受信時
+      socket.on('message', (message) => {
+        console.log('new message!', JSON.parse(message))
+      })
+      setSocket(socket)
+    })
   }, [])
+
+  const sendMessage = () => {
+    if (!socket) return
+    console.log('send')
+    const message = {
+      event: EventType.AddBook,
+      message: { title: 'hoge', image: 'http://foo.png' },
+    }
+    socket.send(JSON.stringify(message))
+  }
   return (
     <div className={`${kosugi.variable} ${notojp.variable}`}>
       <AddModal
