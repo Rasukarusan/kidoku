@@ -19,7 +19,6 @@ import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 import { AiOutlineFileAdd } from 'react-icons/ai'
 import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { PushButton } from '@/components/button/PushButton'
 
 interface Response {
   result: boolean
@@ -55,7 +54,6 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
     name: null,
   })
   const [openAdd, setOpenAdd] = useState(false)
-  const [openPush, setOpenPush] = useState(false)
 
   // カテゴリ一覧
   const { data: categories } = useSWR(`/api/books/category`, fetcher)
@@ -68,9 +66,6 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
 
   // シート取得次第、一番上のシートを選択状態にする
   useEffect(() => {
-    setTimeout(() => {
-      setOpenPush(!openPush)
-    }, 2000)
     if (data.sheets.length === 0) return
     setSheet({ id: data.sheets[0].id, name: data.sheets[0].name })
   }, [data])
@@ -287,14 +282,6 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
                         </select>
                       )}
                     </div>
-                    <PushButton
-                      open={openPush}
-                      book={book}
-                      onClick={() => {
-                        setOpenPush(false)
-                        onClose()
-                      }}
-                    />
                   </div>
                   <div className="border-1 w-full border-t text-center">
                     {response && (
