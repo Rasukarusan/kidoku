@@ -4,16 +4,12 @@ import Head from 'next/head'
 import { Analytics } from '@vercel/analytics/react'
 import { Header, Footer } from '@/features/global'
 import { LoadingTopBar } from '@/features/global/components/LoadingTopBar'
-import { RecoilRoot } from 'recoil'
 import { DefaultSeo } from 'next-seo'
 import SEO from '../../next-seo.config'
 import './global.css'
-import { RecoilEnv } from 'recoil'
 import { SessionProvider } from 'next-auth/react'
 import { Layout } from '@/components/layout/Layout'
-
-// Expectation Violation: Duplicate atom keyをログに出力させないための設定
-RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false
+import { Provider } from 'jotai'
 
 export default function MyApp(props) {
   const { Component, pageProps } = props
@@ -28,7 +24,7 @@ export default function MyApp(props) {
         <link rel="icon" href="/favicon.png" />
       </Head>
       <DefaultSeo {...SEO} />
-      <RecoilRoot>
+      <Provider>
         <SessionProvider session={pageProps.session}>
           <LoadingTopBar />
           <Layout>
@@ -38,7 +34,7 @@ export default function MyApp(props) {
           </Layout>
           <Footer />
         </SessionProvider>
-      </RecoilRoot>
+      </Provider>
     </>
   )
 }
