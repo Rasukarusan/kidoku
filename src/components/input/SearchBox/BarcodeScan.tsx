@@ -64,7 +64,7 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
               setOpenLoginModal(true)
               return
             }
-            sendMessage(result)
+            // sendMessage(result)
           }}
         />
       </div>

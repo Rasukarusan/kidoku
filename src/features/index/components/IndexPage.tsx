@@ -2,6 +2,7 @@ import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
 import { useChat } from 'ai/react'
+import { useState } from 'react'
 
 interface Props {
   comments: Comment[]
@@ -13,6 +14,7 @@ export const IndexPage = ({ comments }) => {
       api: '/api/batch/chatgpt',
     })
 
+  const [open, setOpen] = useState(false)
   return (
     <Container className="p-6">
       {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && (
