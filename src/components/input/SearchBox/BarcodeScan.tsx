@@ -22,7 +22,6 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
 
   const sendMessage = async (book) => {
     if (!session) return
-    console.log('send')
     const message = {
       userId: session.user.id,
       event: EventType.AddBook,
@@ -35,7 +34,6 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
       },
       body: JSON.stringify(message),
     })
-    console.log(res)
     if (!res.ok) {
       console.error('failed to push data')
     }

@@ -16,11 +16,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    //   async signIn({ user, account, profile, email, credentials }) {
-    //     console.log('signIn')
-    //     console.log(user, account, profile, email, credentials)
-    //     return true
-    //   },
     async session({ session, user, token }) {
       session.user.id = user.id
       session.user.admin = user.admin
@@ -32,8 +27,5 @@ export const authOptions: NextAuthOptions = {
       await initUser(user.user)
     },
   },
-  // pages: {
-  //   newUser: '/auth/init',
-  // },
 }
 export default NextAuth(authOptions)

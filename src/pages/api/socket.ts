@@ -19,7 +19,6 @@ export default async function handler(
     key: process.env.NEXT_PUBLIC_PUSHER_KEY,
     useTLS: true,
   })
-  console.log(req.body)
   const sentFromMobile = req.headers['user-agent'].includes('Mobile')
   pusher.trigger(session.user.id, EventType.AddBook, {
     ...req.body,
