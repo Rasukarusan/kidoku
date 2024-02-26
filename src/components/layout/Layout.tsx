@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { kosugi, notojp } from '@/libs/fonts'
 import { AddModal } from '@/components/input/SearchBox/AddModal'
 import { io } from 'socket.io-client'
-import { EventType } from '@/types/event_queue'
 import { useAtom } from 'jotai'
 import { socketAtom } from '@/store/socket'
 
@@ -22,23 +21,14 @@ export const Layout: React.FC<Props> = ({ children }) => {
       })
       // サーバーからメッセージ受信時
       socket.on('message', (message) => {
-        console.log('new message!', JSON.parse(message))
-        setBook(JSON.parse(message.message))
+        console.log('new message!', message)
+        setBook(JSON.parse(message).message)
         setOpen(true)
       })
       setSocket(socket)
     })
   }, [])
 
-  const sendMessage = () => {
-    if (!socket) return
-    console.log('send')
-    const message = {
-      event: EventType.AddBook,
-      message: { title: 'hoge', image: 'http://foo.png' },
-    }
-    socket.send(JSON.stringify(message))
-  }
   return (
     <div className={`${kosugi.variable} ${notojp.variable}`}>
       <AddModal
