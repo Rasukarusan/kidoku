@@ -23,6 +23,8 @@ export const Layout: React.FC<Props> = ({ children }) => {
       // サーバーからメッセージ受信時
       socket.on('message', (message) => {
         console.log('new message!', JSON.parse(message))
+        setBook(JSON.parse(message.message))
+        setOpen(true)
       })
       setSocket(socket)
     })
