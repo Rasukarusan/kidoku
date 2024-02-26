@@ -20,15 +20,25 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
   const [openLoginModal, setOpenLoginModal] = useState(false)
   const socket = useAtomValue(socketAtom)
 
-  const sendMessage = (book) => {
-    if (!socket || !session) return
+  const sendMessage = async (book) => {
+    if (!session) return
     console.log('send')
     const message = {
       userId: session.user.id,
       event: EventType.AddBook,
-      message: book,
+      book,
     }
-    socket.send(JSON.stringify(message))
+    const res = await fetch('/api/socket', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    })
+    console.log(res)
+    if (!res.ok) {
+      console.error('failed to push data')
+    }
   }
 
   return (
