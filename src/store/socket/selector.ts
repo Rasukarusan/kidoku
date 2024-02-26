@@ -1,5 +1,5 @@
 import { selector } from 'recoil'
-import { selectItemsAtom } from './atom'
+import { socketAtom } from './atom'
 import { SelectItems } from './types'
 import { NO_IMAGE } from '@/libs/constants'
 
@@ -26,7 +26,7 @@ const getCopyText = (selectItems: SelectItems): string => {
 export const selectItemsCopyTextSelector = selector({
   key: 'selectItemsCopyTextSelector',
   get: ({ get }) => {
-    const selectItems = get(selectItemsAtom)
+    const selectItems = get(socketAtom)
     return getCopyText(selectItems)
   },
 })
@@ -37,7 +37,7 @@ export const selectItemsCopyTextSelector = selector({
 export const selectItemsBodySelector = selector({
   key: 'selectItemsBodySelector',
   get: ({ get }) => {
-    const selectItems = get(selectItemsAtom)
+    const selectItems = get(socketAtom)
     const body = getCopyText(selectItems)
       .split('\n')
       .filter((v) => v)
