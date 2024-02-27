@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import dayjs from 'dayjs'
-import { truncate } from '@/utils/string'
+import { getLastModified, truncate } from '@/utils/string'
 
 export interface Comment {
   id: string
@@ -19,7 +18,6 @@ interface Props {
 
 export const BookComment: React.FC<Props> = ({ comment }) => {
   const { title, memo, image, username, userImage, sheet } = comment
-  const updated = dayjs().diff(dayjs(comment.updated), 'day', false) + '日前'
   return (
     <div className="flex items-center p-4">
       <div className="pr-4 text-center">
@@ -43,7 +41,7 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
             >
               {username}
             </Link>
-            <div className="">{updated}</div>
+            <div className="">{getLastModified(comment.updated)}</div>
           </div>
         </div>
       </div>
