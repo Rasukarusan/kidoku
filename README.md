@@ -2,23 +2,16 @@
 
 https://kidoku.net/
 
-<img width="1419" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/8e55ff56-d30e-4bf1-827d-16d144b0df3c">
-<img width="1420" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/542fc3fd-319f-4777-a011-ffeb36022338">
+<img width="1247" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
+<img width="1059" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
 
 
 ## 機能
 
-- 本の検索
-- ユーザー本棚の検索
+- AIによる読書傾向分析
+- 本の検索(バーコードスキャン、タイトル検索、ユーザー本棚検索)
 - 2022年、2023年などシートごとの本の管理
-- 月ごとの冊数、カテゴリ内訳、本の感想、
-
-## 目的
-
-- スプレッドシートで記録していたのをWebアプリ化
-- ビジュアライズして楽しくしたい
-
-<img width="957" alt="image" src="https://user-images.githubusercontent.com/17779386/178728788-8395242c-dee1-4338-babd-20d04855ed97.png">
+- 月ごとの冊数、カテゴリ内訳、本の感想
 
 ## 技術
 
@@ -31,15 +24,18 @@ https://kidoku.net/
 - TiDB
 - MeiliSearch
 - Resend
+- Pusher
 
 ## 環境構築
 
 envファイルの作成
+
 ```sh
 cp .env.example .env
 ```
 
 画面アクセス
+
 ```sh
 yarn
 yarn dev
@@ -47,6 +43,7 @@ open http://localhost:3000
 ```
 
 検索環境(meilisearch)構築
+
 ```sh
 docker-compose up --build
 
