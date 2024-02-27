@@ -32,7 +32,13 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
     setCurrentBook(book)
   }, [book])
 
-  const onClickEdit = () => {
+  const onClickEdit = async () => {
+    // 編集する際はマスキングされていないメモを表示したいので、改めてデータを取得し直す
+    const res = await fetch(`/api/book/${book?.id}`).then((res) => res.json())
+    if (res.result) {
+      setCurrentBook(res.book)
+      setNewBook(res.book)
+    }
     setEdit(true)
   }
 
@@ -57,7 +63,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
         Accept: 'application/json',
       },
     }).then((res) => res.json())
-    setCurrentBook({ ...newBook, image: res.data.image })
+    setCurrentBook({ ...newBook, image: res.data?.image })
     reward()
     setLoading(false)
     setEdit(false)
