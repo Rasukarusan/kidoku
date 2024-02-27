@@ -20,7 +20,7 @@ https://kidoku.net/
 - NextAuth
 - Prisma
 - Framer Motion
-- Recoil
+- Jotai
 - TiDB
 - MeiliSearch
 - Resend
