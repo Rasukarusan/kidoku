@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { SearchResult } from '@/types/search'
 import { useSession } from 'next-auth/react'
 import { LoginModal } from '@/components/layout/LoginModal'
-import { socketAtom } from '@/store/socket'
-import { useAtomValue } from 'jotai'
 import { EventType } from '@/types/event_queue'
 
 interface Props {
@@ -18,7 +16,6 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
   const [open, setOpen] = useState(false)
   const [book, setBook] = useState<SearchResult>(null)
   const [openLoginModal, setOpenLoginModal] = useState(false)
-  const socket = useAtomValue(socketAtom)
 
   const sendMessage = async (book) => {
     if (!session) return

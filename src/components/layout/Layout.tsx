@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import { kosugi, notojp } from '@/libs/fonts'
 import { AddModal } from '@/components/input/SearchBox/AddModal'
-import { useAtom } from 'jotai'
-import { socketAtom } from '@/store/socket'
 import Pusher from 'pusher-js'
 import { EventType } from '@/types/event_queue'
 import { useSession } from 'next-auth/react'
@@ -14,7 +12,6 @@ interface Props {
 export const Layout: React.FC<Props> = ({ children }) => {
   const [open, setOpen] = useState(false)
   const [book, setBook] = useState(null)
-  const [socket, setSocket] = useAtom(socketAtom)
   const { data: session } = useSession()
   useEffect(() => {
     if (!session) return
