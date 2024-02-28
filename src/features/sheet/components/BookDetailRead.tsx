@@ -49,7 +49,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   }
 
   return (
-    <div className="flex h-full min-w-full flex-col justify-between">
+    <div className="flex h-full min-w-full flex-col justify-between rounded-md">
       <div className="p-4">
         {small ? (
           <div className="mb-2 flex items-center">
@@ -145,7 +145,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             <div
               className={`${
                 readmoreBlur ? 'readmore-blur' : ''
-              } no-scrollbar w-full resize-none overflow-auto border-b bg-white py-1 pl-2 text-sm sm:text-base`}
+              } no-scrollbar w-full resize-none overflow-auto border-b bg-white px-1 py-1 text-sm sm:text-base`}
               onScroll={handleScroll}
               style={{ height: `${memoAreaHeight}px` }}
             >
@@ -185,7 +185,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
       {isMine && (
         <div className="border-1 w-full border-t text-center">
           <button
-            className="flex h-12 w-full items-center justify-center bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-800"
+            className="flex h-12 w-full items-center justify-center rounded-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-800"
             onClick={() => {
               setLoading(true)
               onClick()
