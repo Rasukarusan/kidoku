@@ -10,6 +10,7 @@ import { AiFillLock } from 'react-icons/ai'
 import { CheckoutModal } from '@/components/form/CheckoutModal'
 import { MdExpandMore } from 'react-icons/md'
 import { mask } from '@/utils/string'
+import { Loading } from '@/components/icon/Loading'
 
 interface Props {
   book: Book
@@ -20,6 +21,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
   const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
   const returnUrl = () => {
     const url = new URL(window.location.href)
     const path = url.pathname
@@ -182,9 +184,16 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
       {isMine && (
         <div className="border-1 w-full border-t text-center">
           <button
-            className="h-12 w-full bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700"
-            onClick={onClick}
+            className="flex h-12 w-full items-center justify-center bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-800"
+            onClick={() => {
+              setLoading(true)
+              onClick()
+            }}
+            disabled={loading}
           >
+            {loading && (
+              <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
+            )}
             編集する
           </button>
         </div>
