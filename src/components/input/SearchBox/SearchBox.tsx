@@ -36,7 +36,8 @@ export const SearchBox: React.FC = () => {
           className="w-48 cursor-pointer appearance-none rounded-md bg-white py-2 pl-10 pr-2 text-sm text-gray-900 sm:w-96"
           placeholder="本のタイトルを入力..."
           autoComplete="off"
-          onFocus={() => {
+          onFocus={(e) => {
+            e.target.blur()
             setOpen(true)
             document.body.classList.add('no-scroll')
           }}
