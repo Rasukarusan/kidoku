@@ -163,7 +163,7 @@ export const BookDetailEdit: React.FC<Props> = ({
       </div>
       <div className="border-1 w-full border-t text-center">
         <button
-          className="flex h-12 w-full items-center justify-center bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-green-800"
+          className="flex h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-green-800"
           onClick={onClick}
           tabIndex={6}
           disabled={loading}

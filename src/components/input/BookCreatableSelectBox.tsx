@@ -1,6 +1,7 @@
 import CreatableSelect from 'react-select/creatable'
 import { ActionMeta } from 'react-select'
 import type Option from 'react-select'
+import { Label } from './Label'
 
 interface Props {
   label: string
@@ -24,6 +25,8 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
   const customStyles = {
     control: (base, state) => ({
       ...base,
+      height: '30px',
+      minHeight: '30px',
       border: isChanged ? 'solid #f6ad54 2px' : 'unset',
       backgroundColor: '#f1f5f9',
       '&:hover': {
@@ -34,14 +37,25 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
   }
   return (
     <div className="mb-1">
-      <div className="mb-1 text-xs text-gray-400">{label}</div>
+      <Label text={label} />
       <CreatableSelect
+        classNames={{
+          valueContainer: (state) => '!p-0',
+          singleValue: (state) => '!py-0 !px-2 !m-0',
+          input: (state) => '!py-0 !px-2 !m-0',
+          placeholder: (state) => 'text-[0.6rem] sm:text-xs py-0 px-2',
+          dropdownIndicator: (state) => '!p-[2px]',
+          clearIndicator: (state) => '!p-[2px]',
+          indicatorSeparator: (state) => '!my-[6px] !mx-0',
+        }}
+        className="text-sm sm:text-base"
         styles={customStyles}
         defaultValue={defaultValue}
         isClearable
         options={options}
         formatCreateLabel={formatCreateLabel}
         onChange={onChange}
+        placeholder="カテゴリを選択 or 入力して作成"
       />
     </div>
   )
