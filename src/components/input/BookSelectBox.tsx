@@ -1,3 +1,5 @@
+import { Label } from './Label'
+
 interface Props {
   value: string
   label: string
@@ -19,7 +21,7 @@ export const BookSelectBox: React.FC<Props> = ({
   const values = ['-', '◎', '◯', '△', '✗']
   return (
     <div className="mb-1 pr-4 sm:pr-12">
-      <div className="mb-1 text-xs text-gray-400">{label}</div>
+      <Label text={label} />
       <select
         disabled={readonly}
         className={`w-full px-2 py-1 text-sm sm:text-base ${

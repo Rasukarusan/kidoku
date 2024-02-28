@@ -12,6 +12,9 @@ module.exports = {
         light: '#8eacbb',
         ai: '#a782c3',
       },
+      fontSize: {
+        '2xs': '0.5rem',
+      },
     },
   },
   plugins: [require('@tailwindcss/line-clamp')],

@@ -11,6 +11,7 @@ import { CheckoutModal } from '@/components/form/CheckoutModal'
 import { MdExpandMore } from 'react-icons/md'
 import { mask } from '@/utils/string'
 import { Loading } from '@/components/icon/Loading'
+import { Label } from '@/components/input/Label'
 
 interface Props {
   book: Book
@@ -118,7 +119,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
         )}
         {!small && (
           <div className="mb-1 flex items-center">
-            <div className="mr-1 text-xs text-gray-400">メモ</div>
+            <Label text="メモ" />
             {!book.is_public_memo && <AiFillLock className="mr-1 w-[15px]" />}
             {!book.is_public_memo && isMine && (
               <div className="text-[10px] text-gray-400">

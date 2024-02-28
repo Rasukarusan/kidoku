@@ -1,3 +1,5 @@
+import { Label } from './Label'
+
 interface Props {
   value: string
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
@@ -19,7 +21,7 @@ export const BookInputField: React.FC<Props> = ({
 }) => {
   return (
     <div className="mb-1">
-      <div className="mb-1 text-xs text-gray-400">{label}</div>
+      <Label text={label} />
       <textarea
         rows={rows}
         value={value}
