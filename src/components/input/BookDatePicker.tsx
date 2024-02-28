@@ -24,7 +24,7 @@ export const BookDatePicker: React.FC<Props> = ({
       <input
         type="date"
         value={value}
-        className={`w-full py-1 pl-2 text-sm sm:text-base ${
+        className={`w-full rounded-md py-1 pl-2 text-sm sm:text-base ${
           readonly
             ? 'resize-none appearance-none border-b bg-white'
             : 'cursor-pointer bg-slate-100'
