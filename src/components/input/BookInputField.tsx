@@ -25,7 +25,7 @@ export const BookInputField: React.FC<Props> = ({
       <textarea
         rows={rows}
         value={value}
-        className={`w-full py-1  pl-2 text-sm sm:text-base ${
+        className={`no-scrollbar w-full rounded-md py-1 pl-2 text-sm sm:text-base ${
           readonly ? 'resize-none border-b bg-white' : 'bg-slate-100'
         } ${isChanged ? 'border-2 border-orange-400' : ''}`}
         onChange={onChange}

@@ -24,7 +24,7 @@ export const BookSelectBox: React.FC<Props> = ({
       <Label text={label} />
       <select
         disabled={readonly}
-        className={`w-full px-2 py-1 text-sm sm:text-base ${
+        className={`w-full rounded-md px-2 py-1 text-sm sm:text-base ${
           readonly
             ? 'resize-none appearance-none border-b bg-white'
             : 'cursor-pointer bg-slate-100'
