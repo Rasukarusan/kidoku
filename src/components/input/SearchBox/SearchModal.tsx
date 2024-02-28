@@ -65,7 +65,7 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
           }`}
           onClick={() => setTab('title')}
         >
-          タイトル結果
+          タイトル検索
         </button>
         <button
           className={`text-nowrap px-4 py-2 hover:bg-gray-100
