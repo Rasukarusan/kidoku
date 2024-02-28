@@ -1,3 +1,5 @@
+import { Label } from './Label'
+
 interface Props {
   value: string
   label: string
@@ -18,7 +20,7 @@ export const BookDatePicker: React.FC<Props> = ({
 }) => {
   return (
     <div className="mb-1">
-      <div className="mb-1 text-xs text-gray-400">{label}</div>
+      <Label text={label} />
       <input
         type="date"
         value={value}
