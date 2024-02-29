@@ -5,7 +5,7 @@ import { AddModal } from '@/components/input/SearchBox/AddModal'
 import { EventType } from '@/types/event_queue'
 import { useSession } from 'next-auth/react'
 import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
-import { useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { getChannelName } from '@/libs/pusher/util'
 
 interface Props {
@@ -16,10 +16,11 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const [open, setOpen] = useState(false)
   const [book, setBook] = useState(null)
   const { data: session } = useSession()
-  const setPusher = useSetAtom(pusherAtom)
+  const [globalPusher, setGlobalPusher] = useAtom(pusherAtom)
   const setPusherConnection = useSetAtom(pusherConnectionAtom)
   useEffect(() => {
     if (!session) return
+    if (globalPusher) return
     const channelName = getChannelName(session.user.id)
     const eventName = EventType.AddBook
     const channel = pusher.subscribe(channelName)
@@ -41,7 +42,11 @@ export const Layout: React.FC<Props> = ({ children }) => {
     pusher.connection.bind('state_change', function (states) {
       setPusherConnection(states.current)
     })
-    setPusher(pusher)
+    // ユーザー認証使う場合のメッセージ受信
+    // pusher.user.bind(eventName, function (data) {
+    //   console.log(data)
+    // })
+    setGlobalPusher(pusher)
     setPusherConnection(pusher.connection.state)
   }, [session])
 
