@@ -2,19 +2,14 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 import pusher from '@/libs/pusher/server'
-import { getChannelName } from '@/libs/pusher/util'
-
-/**
- * 認証
- */
-function auth(userId: string, channelName: string) {
-  return getChannelName(userId) === channelName
-}
+import { auth } from '@/libs/pusher/util'
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log('チャンネルAUTH')
+  console.log(req.body)
   const session = await getServerSession(req, res, authOptions)
   if (!session) {
     res.status(401).json({ result: false })
@@ -32,6 +27,7 @@ export default async function handler(
       channel_name,
       presenceData
     )
+    console.log(authResponse)
     return res.send(authResponse)
   }
   return res.status(403).json({ result: false })

@@ -6,6 +6,7 @@ import { EventType } from '@/types/event_queue'
 import { useSession } from 'next-auth/react'
 import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
 import { useSetAtom } from 'jotai'
+import { getChannelName } from '@/libs/pusher/util'
 
 interface Props {
   children: React.ReactNode
@@ -19,9 +20,12 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const setPusherConnection = useSetAtom(pusherConnectionAtom)
   useEffect(() => {
     if (!session) return
-    const channelName = 'presence-' + session.user.id
+    const channelName = getChannelName(session.user.id)
     const eventName = EventType.AddBook
     const channel = pusher.subscribe(channelName)
+    channel.bind('pusher:subscription_succeeded', (members) => {
+      console.log(members)
+    })
     channel.bind(eventName, function (data) {
       console.log(data)
       const { userId, event, sentFromMobile, book } = data
