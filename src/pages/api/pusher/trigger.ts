@@ -3,6 +3,7 @@ import { EventType } from '@/types/event_queue'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 import { trigger } from '@/libs/pusher/trigger'
+import { getChannelName } from '@/libs/pusher/util'
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,7 +14,8 @@ export default async function handler(
     res.status(401).json({ result: false })
   }
   const sentFromMobile = req.headers['user-agent'].includes('Mobile')
-  const channel = session.user.id
+  const userId = session.user.id
+  const channel = getChannelName(userId)
   const event = EventType.AddBook
   const data = { ...req.body, sentFromMobile }
   trigger(channel, event, data)

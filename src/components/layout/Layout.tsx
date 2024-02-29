@@ -19,7 +19,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const setPusherConnection = useSetAtom(pusherConnectionAtom)
   useEffect(() => {
     if (!session) return
-    const channelName = session.user.id
+    const channelName = 'presence-' + session.user.id
     const eventName = EventType.AddBook
     const channel = pusher.subscribe(channelName)
     channel.bind(eventName, function (data) {
