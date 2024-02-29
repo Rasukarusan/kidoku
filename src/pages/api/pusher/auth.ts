@@ -8,8 +8,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log('チャンネルAUTH')
-  console.log(req.body)
   const session = await getServerSession(req, res, authOptions)
   if (!session) {
     res.status(401).json({ result: false })
@@ -27,7 +25,6 @@ export default async function handler(
       channel_name,
       presenceData
     )
-    console.log(authResponse)
     return res.send(authResponse)
   }
   return res.status(403).json({ result: false })
