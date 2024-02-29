@@ -4,7 +4,7 @@ import { kosugi, notojp } from '@/libs/fonts'
 import { AddModal } from '@/components/input/SearchBox/AddModal'
 import { EventType } from '@/types/event_queue'
 import { useSession } from 'next-auth/react'
-import { pusherAtom } from '@/store/pusher/atom'
+import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
 import { useSetAtom } from 'jotai'
 
 interface Props {
@@ -16,12 +16,14 @@ export const Layout: React.FC<Props> = ({ children }) => {
   const [book, setBook] = useState(null)
   const { data: session } = useSession()
   const setPusher = useSetAtom(pusherAtom)
+  const setPusherConnection = useSetAtom(pusherConnectionAtom)
   useEffect(() => {
     if (!session) return
     const channelName = session.user.id
     const eventName = EventType.AddBook
     const channel = pusher.subscribe(channelName)
     channel.bind(eventName, function (data) {
+      console.log(data)
       const { userId, event, sentFromMobile, book } = data
       if (
         userId === session.user.id &&
@@ -32,7 +34,11 @@ export const Layout: React.FC<Props> = ({ children }) => {
         setOpen(true)
       }
     })
+    pusher.connection.bind('state_change', function (states) {
+      setPusherConnection(states.current)
+    })
     setPusher(pusher)
+    setPusherConnection(pusher.connection.state)
   }, [session])
 
   return (

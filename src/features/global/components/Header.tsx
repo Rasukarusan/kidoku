@@ -11,6 +11,9 @@ import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 import { Logo } from '@/components/icon/Logo'
 import { AiOutlineBook, AiOutlineSetting } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
+import { useAtomValue } from 'jotai'
+import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
+import { twMerge } from 'tailwind-merge'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -19,6 +22,8 @@ export const Header = () => {
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState(false)
+  const pusher = useAtomValue(pusherAtom)
+  const pusherConnection = useAtomValue(pusherConnectionAtom)
   const variants: Variants = {
     open: {
       opacity: 1,
@@ -81,6 +86,14 @@ export const Header = () => {
                   className="rounded-full"
                 />
               </button>
+              <div
+                className={twMerge(
+                  'absolute right-0 top-1 h-2 w-2 rounded-full bg-gray-400 text-white sm:right-4 sm:top-1',
+                  pusherConnection === 'connected' && 'bg-green-600',
+                  pusherConnection === 'failed' && 'bg-red-500',
+                  pusherConnection === 'disconnected' && 'bg-gray-400'
+                )}
+              ></div>
               <AnimatePresence>
                 {openMenu && (
                   <motion.ul
