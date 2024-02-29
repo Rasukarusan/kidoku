@@ -24,7 +24,7 @@ export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
       event: EventType.AddBook,
       book,
     }
-    const res = await fetch('/api/socket', {
+    const res = await fetch('/api/pusher/trigger', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
