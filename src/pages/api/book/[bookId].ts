@@ -15,6 +15,6 @@ export default async (req, res) => {
     return res.status(200).json({ result: true, book })
   } catch (e) {
     console.error(e)
-    res.status(400).json({ result: false })
+    return res.status(400).json({ result: false })
   }
 }

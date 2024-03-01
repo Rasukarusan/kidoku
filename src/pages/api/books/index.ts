@@ -112,7 +112,7 @@ export default async (req, res) => {
         where: { id, userId },
       })
       if (!book) {
-        res.status(401).json({ result: false })
+        return res.status(401).json({ result: false })
       }
       const data = {
         title: body.title,
@@ -151,6 +151,6 @@ export default async (req, res) => {
     }
   } catch (e) {
     console.error(e)
-    res.status(400).json({ result: false })
+    return res.status(400).json({ result: false })
   }
 }
