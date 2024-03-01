@@ -34,3 +34,7 @@ yarn-error.log*
 
 .vercel
 .react-email
+
+# 遊び用ページ
+src/pages/play.tsx
+src/pages/api/play
