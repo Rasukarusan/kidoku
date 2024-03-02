@@ -38,3 +38,4 @@ yarn-error.log*
 # 遊び用ページ
 src/pages/play.tsx
 src/pages/api/play
+src/app/play
