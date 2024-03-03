@@ -3,6 +3,7 @@ interface Props {
   checked: boolean
   disabled?: boolean
   onChange: () => void
+  className?: string
 }
 
 export const ToggleButton: React.FC<Props> = ({
@@ -10,11 +11,12 @@ export const ToggleButton: React.FC<Props> = ({
   checked,
   disabled = false,
   onChange,
+  className = '',
 }) => {
   return (
-    <div>
+    <div className={className}>
       <label
-        className={`relative mb-3 inline-flex items-center ${
+        className={`relative flex items-center ${
           disabled ? 'cursor-not-allowed' : 'cursor-pointer'
         }`}
       >

@@ -11,6 +11,9 @@ import dayjs from 'dayjs'
 import useSWR from 'swr'
 import { fetcher } from '@/libs/swr'
 import { BookCreatableSelectBox } from '@/components/input/BookCreatableSelectBox'
+import { Tooltip } from 'react-tooltip'
+import { Label } from '@/components/input/Label'
+import { HintIcon } from '@/components/icon/HintIcon'
 
 interface Props {
   currentBook: Book // 変更前の本
@@ -119,15 +122,23 @@ export const BookDetailEdit: React.FC<Props> = ({
         </div>
         {isMine && (
           <>
+            <div className="mb-1 flex items-center">
+              <Label text="メモ" className="mb-0 mr-2" />
+              <div data-tooltip-id="toggle-memo-tooltip">
+                <HintIcon />
+              </div>
+              <Tooltip id="toggle-memo-tooltip" className="!w-[300px]">
+                &quot;**&quot;で囲んだ文字はマスキングされ、他のユーザーには&quot;*****&quot;と表示されるようになります。
+              </Tooltip>
+            </div>
             <BookInputField
               rows={8}
               value={book?.memo}
               onChange={(e) => setBook({ ...book, memo: e.target.value })}
-              label="メモ"
               tabIndex={6}
               isChanged={diff.memo}
             />
-            <div className="flex items-end justify-between">
+            <div className="items-start justify-between sm:flex">
               <div>
                 <ToggleButton
                   label="メモを公開する"
@@ -139,24 +150,43 @@ export const BookDetailEdit: React.FC<Props> = ({
                     })
                   }}
                   disabled={false}
+                  className="mb-2"
                 />
                 {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
-                  <ToggleButton
-                    label="課金によるメモの解放を許可する"
-                    checked={book.is_purchasable}
-                    onChange={() => {
-                      setBook({ ...book, is_purchasable: !book.is_purchasable })
-                    }}
-                    disabled={book.is_public_memo}
-                  />
+                  <div className="mb-2 flex items-center">
+                    <ToggleButton
+                      label="課金によるメモの解放を許可する"
+                      checked={book.is_purchasable}
+                      onChange={() => {
+                        setBook({
+                          ...book,
+                          is_purchasable: !book.is_purchasable,
+                        })
+                      }}
+                      disabled={book.is_public_memo}
+                      className="mr-1"
+                    />
+                    <div data-tooltip-id="toggle-purchase-tooltip">
+                      <HintIcon />
+                    </div>
+                    <Tooltip
+                      id="toggle-purchase-tooltip"
+                      className="!sm:w-[400px] !w-[350px]"
+                    >
+                      「ON」に設定することで、他のユーザーが課金することにより、
+                      非公開のメモを閲覧できます。公開されるのは課金したユーザーのみで、また、他の非公開メモは解放されません。
+                    </Tooltip>
+                  </div>
                 )}
               </div>
-              <button
-                className="pr-2 text-sm font-bold text-red-600"
-                onClick={onDelete}
-              >
-                削除する
-              </button>
+              <div className="flex justify-end">
+                <button
+                  className="pr-2 text-right text-sm font-bold text-red-600"
+                  onClick={onDelete}
+                >
+                  削除する
+                </button>
+              </div>
             </div>
           </>
         )}
