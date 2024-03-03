@@ -74,11 +74,11 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                 />
                 {book.is_public_memo ? (
                   <p className="absolute right-[-5px] top-[-3px] sm:right-[40px] sm:top-[-10px]">
-                    <FaCommentDots size={20} color="#616A6B" />
+                    <FaCommentDots size={20} />
                   </p>
                 ) : (
                   <p className="absolute right-[-5px] top-[-3px] sm:right-[45px] sm:top-[-10px]">
-                    <AiFillLock size={25} color="black" />
+                    <AiFillLock size={25} />
                   </p>
                 )}
                 {hovers[i] && (
