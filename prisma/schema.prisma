@@ -83,7 +83,6 @@ model User {
   yearly_top_books YearlyTopBook[]
   books            books[]
   AiSummaries      AiSummaries[]
-  EventQueues      EventQueues[]
 
   @@map("users")
 }
@@ -122,17 +121,4 @@ model AiSummaries {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_summaries")
-}
-
-model EventQueues {
-  id      Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId  String   @map("user_id")
-  event   String   @db.VarChar(32)
-  message String   @db.Text
-  created DateTime @default(now()) @db.DateTime(0)
-  updated DateTime @default(now()) @db.DateTime(0)
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, event], map: "uniq_user_event")
-  @@map("event_queues")
 }
