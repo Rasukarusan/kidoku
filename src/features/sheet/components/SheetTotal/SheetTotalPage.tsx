@@ -12,7 +12,7 @@ import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { Menu } from '../Menu'
 import { NextSeo } from 'next-seo'
-import { AiSummaries, AiSummariesJson } from '../AiSummaries/AiSummaries'
+import { AiSummaries, AiSummariesJson } from '../AiSummaries'
 
 interface Props {
   total: number

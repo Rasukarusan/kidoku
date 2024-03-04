@@ -19,7 +19,7 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaListUl } from 'react-icons/fa'
-import { AiSummaries, AiSummariesJson } from './AiSummaries/AiSummaries'
+import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
 
 const TreemapGraph = dynamic(
