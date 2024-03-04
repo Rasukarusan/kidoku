@@ -7,6 +7,9 @@ interface Props extends IconBaseProps {
 
 export const HintIcon: React.FC<Props> = ({ className = '', ...props }) => {
   return (
-    <FaQuestionCircle className={twMerge('h-3 w-3', className)} {...props} />
+    <FaQuestionCircle
+      className={twMerge('h-3 w-3 text-slate-500', className)}
+      {...props}
+    />
   )
 }
