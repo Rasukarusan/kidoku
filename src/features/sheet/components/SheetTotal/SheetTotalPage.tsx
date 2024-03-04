@@ -12,7 +12,7 @@ import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { Menu } from '../Menu'
 import { NextSeo } from 'next-seo'
-import { AiSummary, AiSummaryJson } from '../AiSummary/AiSummary'
+import { AiSummaries, AiSummariesJson } from '../AiSummaries/AiSummaries'
 
 interface Props {
   total: number
@@ -21,7 +21,7 @@ interface Props {
   sheets: string[]
   username: string
   yearlyTopBooks: YearlyTopBook[]
-  aiSummary: AiSummaryJson
+  aiSummaries: AiSummariesJson
 }
 export const SheetTotalPage: React.FC<Props> = ({
   total,
@@ -30,7 +30,7 @@ export const SheetTotalPage: React.FC<Props> = ({
   sheets,
   username,
   yearlyTopBooks,
-  aiSummary,
+  aiSummaries,
 }) => {
   const [tab, setTab] = useState('total')
   const router = useRouter()
@@ -63,8 +63,8 @@ export const SheetTotalPage: React.FC<Props> = ({
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={total} unit="冊" />
         <div className="mb-10">
-          <AiSummary
-            aiSummary={aiSummary}
+          <AiSummaries
+            aiSummaries={aiSummaries}
             username={username}
             bookCount={total}
             sheet="total"
