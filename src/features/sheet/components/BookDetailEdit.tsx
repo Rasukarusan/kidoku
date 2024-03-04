@@ -122,7 +122,7 @@ export const BookDetailEdit: React.FC<Props> = ({
         </div>
         {isMine && (
           <>
-            <div className="mb-1 flex items-center">
+            <div className="mb-2 flex items-center">
               <Label text="メモ" className="mb-0 mr-2" />
               <div data-tooltip-id="toggle-memo-tooltip">
                 <HintIcon />
