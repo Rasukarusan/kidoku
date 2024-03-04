@@ -1,7 +1,6 @@
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
 import { fetcher } from '@/libs/swr'
-import { SearchResult } from '@/types/search'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import useSWR from 'swr'
@@ -19,6 +18,9 @@ import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 import { AiOutlineFileAdd } from 'react-icons/ai'
 import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAtom, useAtomValue } from 'jotai'
+import { openAddModalAtom } from '@/store/modal/atom'
+import { addBookAtom } from '@/store/book/atom'
 
 interface Response {
   result: boolean
@@ -27,14 +29,10 @@ interface Response {
   sheetName: string
 }
 
-interface Props {
-  open: boolean
-  item: SearchResult
-  onClose: () => void
-}
-
-export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
+export const AddModal: React.FC = () => {
   const router = useRouter()
+  const [open, setOpen] = useAtom(openAddModalAtom)
+  const item = useAtomValue(addBookAtom)
   const { data: session } = useSession()
   const { data, mutate: mutateSheet } = useSWR(`/api/sheets`, fetcher, {
     fallbackData: { result: true, sheets: [] },
@@ -135,21 +133,22 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
     },
   }
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          variants={modalVariants}
-          className="absolute inset-0 z-50 overflow-hidden"
+    <div className="flex h-full items-center justify-center">
+      <div className="h-3/4 w-full overflow-y-auto bg-white sm:w-1/2">
+        <Modal
+          open={open}
+          onClose={() => {
+            setOpen(false)
+          }}
+          className="!z-[1200] h-3/4 w-full sm:w-1/2"
         >
-          <div className="flex h-full items-center justify-center">
-            <div className="h-3/4 w-full overflow-y-auto bg-white sm:w-1/2">
-              <Modal
-                open={open}
-                onClose={onClose}
-                className="h-3/4 w-full sm:w-1/2"
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={modalVariants}
               >
                 <div className="flex h-full flex-col justify-between">
                   <div className="bg-white p-4">
@@ -309,7 +308,7 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
                       <button
                         className="flex h-12 w-full items-center justify-center rounded-b-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-blue-700"
                         onClick={() => {
-                          onClose()
+                          setOpen(false)
                           router.push(
                             `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}`
                           )
@@ -334,11 +333,11 @@ export const AddModal: React.FC<Props> = ({ open, item, onClose }) => {
                     )}
                   </div>
                 </div>
-              </Modal>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Modal>
+      </div>
+    </div>
   )
 }

@@ -1,11 +1,12 @@
+import { useAtom, useSetAtom } from 'jotai'
 import { SearchResult } from '@/types/search'
 import { truncate } from '@/utils/string'
 import { useEffect, useState } from 'react'
-import { AddModal } from './AddModal'
 // import { items } from './mock'
 import { useSession } from 'next-auth/react'
 import { searchBooks } from '@/utils/search'
-import { LoginModal } from '@/components/layout/LoginModal'
+import { openAddModalAtom, openLoginModalAtom } from '@/store/modal/atom'
+import { addBookAtom } from '@/store/book/atom'
 
 interface Props {
   input: string
@@ -13,9 +14,9 @@ interface Props {
 }
 
 export const Books: React.FC<Props> = ({ input, onClose }) => {
-  const [openLoginModal, setOpenLoginModal] = useState(false)
-  const [openAddModal, setOpenAddModal] = useState(false)
-  const [selectItem, setSelectItem] = useState<SearchResult>(null)
+  const setOpenLoginModal = useSetAtom(openLoginModalAtom)
+  const setOpenAddModal = useSetAtom(openAddModalAtom)
+  const [selectItem, setSelectItem] = useAtom(addBookAtom)
   const [books, setBooks] = useState<SearchResult[]>([])
   // const [books, setBooks] = useState<SearchResult[]>(items)
   const { data: session } = useSession()
@@ -36,18 +37,6 @@ export const Books: React.FC<Props> = ({ input, onClose }) => {
 
   return (
     <>
-      <LoginModal
-        open={openLoginModal}
-        onClose={() => setOpenLoginModal(false)}
-      />
-      <AddModal
-        open={openAddModal}
-        item={selectItem}
-        onClose={() => {
-          onClose()
-          setOpenAddModal(false)
-        }}
-      />
       <div className="flex overflow-x-auto border-x p-2 text-gray-900 sm:p-4">
         {books.map((item: SearchResult, i: number) => {
           const { id, title, memo, author, image } = item
