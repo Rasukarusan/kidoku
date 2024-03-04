@@ -1,64 +1,21 @@
-import pusher from '@/libs/pusher/client'
-import { useEffect, useState } from 'react'
 import { kosugi, notojp } from '@/libs/fonts'
 import { AddModal } from '@/components/input/SearchBox/AddModal'
-import { EventType } from '@/types/event_queue'
-import { useSession } from 'next-auth/react'
-import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
-import { useAtom, useSetAtom } from 'jotai'
-import { getChannelName } from '@/libs/pusher/util'
+import { usePusher } from '@/hooks/usePusher'
+import { SearchModal } from '../input/SearchBox/SearchModal'
+import { LoginModal } from './LoginModal'
 
 interface Props {
   children: React.ReactNode
 }
 
 export const Layout: React.FC<Props> = ({ children }) => {
-  const [open, setOpen] = useState(false)
-  const [book, setBook] = useState(null)
-  const { data: session } = useSession()
-  const [globalPusher, setGlobalPusher] = useAtom(pusherAtom)
-  const setPusherConnection = useSetAtom(pusherConnectionAtom)
-  useEffect(() => {
-    if (!session) return
-    if (globalPusher) return
-    const channelName = getChannelName(session.user.id)
-    const eventName = EventType.AddBook
-    const channel = pusher.subscribe(channelName)
-    channel.bind('pusher:subscription_succeeded', (members) => {
-      console.log(members)
-    })
-    channel.bind(eventName, function (data) {
-      console.log(data)
-      const { userId, event, sentFromMobile, book } = data
-      if (
-        userId === session.user.id &&
-        sentFromMobile &&
-        event === EventType.AddBook
-      ) {
-        setBook(book)
-        setOpen(true)
-      }
-    })
-    pusher.connection.bind('state_change', function (states) {
-      setPusherConnection(states.current)
-    })
-    // ユーザー認証使う場合のメッセージ受信
-    // pusher.user.bind(eventName, function (data) {
-    //   console.log(data)
-    // })
-    setGlobalPusher(pusher)
-    setPusherConnection(pusher.connection.state)
-  }, [session])
+  usePusher()
 
   return (
     <div className={`${kosugi.variable} ${notojp.variable}`}>
-      <AddModal
-        open={open}
-        item={book}
-        onClose={() => {
-          setOpen(false)
-        }}
-      />
+      <SearchModal />
+      <AddModal />
+      <LoginModal />
       {children}
     </div>
   )

@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useAtom } from 'jotai'
 import { useHotkeys } from 'react-hotkeys-hook'
 import { AiOutlineSearch } from 'react-icons/ai'
-import { SearchModal } from './SearchModal'
+import { openSearchModalAtom } from '@/store/modal/atom'
 
 export const SearchBox: React.FC = () => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useAtom(openSearchModalAtom)
   useHotkeys(
     'meta+k, ctrl+k',
     () => {
@@ -14,13 +14,6 @@ export const SearchBox: React.FC = () => {
   )
   return (
     <>
-      <SearchModal
-        open={open}
-        onClose={() => {
-          setOpen(false)
-          document.body.classList.remove('no-scroll')
-        }}
-      />
       <div className="relative rounded-md border border-gray-200 text-gray-600 focus-within:text-gray-400">
         <span className="absolute inset-y-0 left-0 flex items-center pl-2">
           <button
@@ -39,7 +32,6 @@ export const SearchBox: React.FC = () => {
           onFocus={(e) => {
             e.target.blur()
             setOpen(true)
-            document.body.classList.add('no-scroll')
           }}
         />
       </div>

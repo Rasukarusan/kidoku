@@ -3,7 +3,6 @@ import { fetcher } from '@/libs/swr'
 import { useRouter } from 'next/router'
 import { signOut, useSession } from 'next-auth/react'
 import { Container } from '@/components/layout/Container'
-import { LoginModal } from '@/components/layout/LoginModal'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
@@ -11,16 +10,17 @@ import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 import { Logo } from '@/components/icon/Logo'
 import { AiOutlineBook, AiOutlineSetting } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
 import { twMerge } from 'tailwind-merge'
+import { openLoginModalAtom } from '@/store/modal/atom'
 
 // レスポンシブヘッダー
 export const Header = () => {
   const router = useRouter()
   const dropdownRef = useRef(null)
   const { data: session } = useSession()
-  const [open, setOpen] = useState(false)
+  const setOpen = useSetAtom(openLoginModalAtom)
   const [openMenu, setOpenMenu] = useState(false)
   const pusher = useAtomValue(pusherAtom)
   const pusherConnection = useAtomValue(pusherConnectionAtom)
@@ -145,7 +145,6 @@ export const Header = () => {
               >
                 ログイン
               </button>
-              <LoginModal open={open} onClose={() => setOpen(false)} />
             </>
           )}
         </Container>

@@ -4,12 +4,11 @@ import { AiOutlineSearch } from 'react-icons/ai'
 import { Books } from './Books'
 import { UserBooks } from './UserBooks'
 import { BarcodeScan } from './BarcodeScan'
+import { openSearchModalAtom } from '@/store/modal/atom'
+import { useAtom } from 'jotai'
 
-interface Props {
-  open: boolean
-  onClose: () => void
-}
-export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
+export const SearchModal: React.FC = () => {
+  const [open, setOpen] = useAtom(openSearchModalAtom)
   const ref = useRef<HTMLInputElement>(null)
   const [tab, setTab] = useState<'title' | 'barcode' | 'user'>('barcode')
   const [inputValue, setInputValue] = useState('')
@@ -26,6 +25,10 @@ export const SearchModal: React.FC<Props> = ({ open, onClose }) => {
       setTab('title')
     }
     setInputValue(e.target.value)
+  }
+
+  const onClose = () => {
+    setOpen(false)
   }
 
   return (

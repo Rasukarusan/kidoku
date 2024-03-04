@@ -3,15 +3,17 @@ import { signIn } from 'next-auth/react'
 import { SignInWithGoogleButton } from '@/components/button/SignInWithGoogleButton'
 import { Logo } from '@/components/icon/Logo'
 import { Modal } from '@/components/layout/Modal'
+import { useAtom } from 'jotai'
+import { openLoginModalAtom } from '@/store/modal/atom'
 
-interface Props {
-  open: boolean
-  onClose: () => void
-}
-
-export const LoginModal: React.FC<Props> = ({ open, onClose }) => {
+export const LoginModal: React.FC = () => {
+  const [open, setOpen] = useAtom(openLoginModalAtom)
   return (
-    <Modal open={open} onClose={onClose} className="!h-auto !w-auto p-4">
+    <Modal
+      open={open}
+      onClose={() => setOpen(false)}
+      className="!h-auto !w-auto p-4"
+    >
       <div className="text-center">
         <Link href="/" legacyBehavior>
           <div className="flex items-center justify-center font-['Nico_Moji'] text-2xl font-bold tracking-[.3rem]">
