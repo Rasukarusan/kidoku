@@ -65,11 +65,11 @@ export const getStaticProps = async (ctx) => {
     },
     orderBy: { year: 'desc' },
   })
-  const aiSummary = await prisma.aiSummaries.findFirst({
+  const aiSummaries = await prisma.aiSummaries.findFirst({
     where: { userId, sheet_id: 0 },
     select: { analysis: true },
   })
-  const analysis = aiSummary ? parse(aiSummary.analysis) : null
+  const analysis = aiSummaries ? parse(aiSummaries.analysis) : null
   return {
     props: {
       total: books.length,
@@ -78,7 +78,7 @@ export const getStaticProps = async (ctx) => {
       sheets: sheets.length === 0 ? [] : sheets.map((sheet) => sheet.name),
       username,
       yearlyTopBooks,
-      aiSummary: analysis,
+      aiSummaries: analysis,
     },
     revalidate: 5,
   }

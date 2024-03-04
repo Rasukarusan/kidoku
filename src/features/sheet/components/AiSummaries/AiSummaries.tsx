@@ -7,7 +7,7 @@ import { AiGenerateButton } from './AiGenerateButton'
 import { Error } from './Error'
 import { Empty } from './Empty'
 
-export type AiSummaryJson = {
+export type AiSummariesJson = {
   reading_trend_analysis: string
   sentiment_analysis: string
   what_if_scenario: string
@@ -53,22 +53,22 @@ const Item = ({ itemKey, text }) => {
 
 interface Props {
   username: string
-  aiSummary?: AiSummaryJson
+  aiSummaries?: AiSummariesJson
   bookCount: number
   sheet: string
   isTotal: boolean
   isMine: boolean
 }
-export const AiSummary: React.FC<Props> = ({
+export const AiSummaries: React.FC<Props> = ({
   username,
-  aiSummary,
+  aiSummaries,
   bookCount,
   sheet,
   isTotal,
   isMine,
 }) => {
   const minimum = 1
-  const [json, setJson] = useState(aiSummary)
+  const [json, setJson] = useState(aiSummaries)
   const [error, setError] = useState(null)
   const [generating, setGenerating] = useState(false)
 
@@ -87,7 +87,7 @@ export const AiSummary: React.FC<Props> = ({
   }
 
   useEffect(() => {
-    setJson(aiSummary)
+    setJson(aiSummaries)
   }, [sheet])
 
   if (!json) {
