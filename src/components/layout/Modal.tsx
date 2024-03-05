@@ -1,3 +1,4 @@
+import { toggleNoScrollBody } from '@/utils/element'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
 
@@ -15,11 +16,7 @@ export const Modal: React.FC<Props> = ({
   className = '',
 }) => {
   useEffect(() => {
-    if (open) {
-      document.body.classList.add('no-scroll')
-    } else {
-      document.body.classList.remove('no-scroll')
-    }
+    toggleNoScrollBody(open)
   }, [open])
 
   return (
