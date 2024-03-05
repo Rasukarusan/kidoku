@@ -42,7 +42,7 @@ export const Loading: React.FC = () => {
   }, [])
   return (
     <>
-      <div className="mx-auto mb-4 flex w-full items-center justify-center rounded-lg bg-[#f7f6f3] bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
+      <div className="mx-auto mb-4 flex w-full items-center justify-center rounded-lg bg-ai-bg bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
         <div className="flex items-center rounded-md px-2 py-1 hover:font-bold">
           <FaCircleNotch size={25} className="mr-2 animate-spin text-ai" />
           <span className="animate-pulse">AI分析中...</span>

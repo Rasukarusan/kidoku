@@ -12,6 +12,7 @@ module.exports = {
         main: '#FDFEFE',
         light: '#8eacbb',
         ai: '#a782c3',
+        'ai-bg': '#f7f6f3',
       },
       fontSize: {
         '2xs': '0.5rem',
