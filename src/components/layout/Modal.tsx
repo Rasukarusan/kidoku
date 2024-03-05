@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
 
 interface Props {
@@ -21,19 +22,25 @@ export const Modal: React.FC<Props> = ({
     }
   }, [open])
 
-  if (!open) return null
-
   return (
-    <div
-      className="fixed left-0 top-0 z-[1000] flex h-full w-full items-center justify-center overflow-y-hidden bg-[rgba(0,0,0,0.1)] p-4 backdrop-blur-[4px] sm:p-8"
-      onClick={onClose}
-    >
-      <div
-        className={`m-2 flex flex-col rounded-md bg-white text-gray-700 sm:m-0 ${className}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {children}
-      </div>
-    </div>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed left-0 top-0 z-[1000] flex h-full w-full items-center justify-center overflow-y-hidden bg-[rgba(0,0,0,0.1)] p-4 backdrop-blur-[4px] sm:p-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ opacity: { duration: 0.2 } }}
+          onClick={onClose}
+        >
+          <div
+            className={`m-2 flex flex-col rounded-md bg-white text-gray-700 sm:m-0 ${className}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {children}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }
