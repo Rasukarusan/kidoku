@@ -4,6 +4,7 @@ import { Error } from './Error'
 import { Empty } from './Empty'
 import { AiSummary } from './AiSummary'
 import type { AiSummariesJson } from './types'
+import { Loading } from './Loading'
 
 interface Props {
   username: string
@@ -24,11 +25,11 @@ export const AiSummaries: React.FC<Props> = ({
   const minimum = 1
   const [json, setJson] = useState(aiSummaries)
   const [error, setError] = useState(null)
-  const [generating, setGenerating] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const onClickGenerate = async () => {
-    if (generating) return
-    setGenerating(true)
+    if (loading) return
+    setLoading(true)
     const res = await fetch('/api/ai-summary', {
       method: 'POST',
       body: JSON.stringify({ sheetName: sheet, isTotal }),
@@ -54,10 +55,11 @@ export const AiSummaries: React.FC<Props> = ({
     ) {
       return <Empty />
     }
+    if (loading) {
+      return <Loading />
+    }
     if (process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true') {
-      return (
-        <AiGenerateButton onClick={onClickGenerate} generating={generating} />
-      )
+      return <AiGenerateButton onClick={onClickGenerate} loading={loading} />
     }
   }
   return (
