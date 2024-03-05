@@ -25,7 +25,6 @@ export const YearlyTopBooks: React.FC<Props> = ({
   const onClickAdd = (order: number) => {
     setOpen(true)
     setOrder(order)
-    document.body.classList.add('no-scroll')
   }
 
   return (
@@ -35,7 +34,6 @@ export const YearlyTopBooks: React.FC<Props> = ({
         open={open}
         onClose={() => {
           setOpen(false)
-          document.body.classList.remove('no-scroll')
         }}
         year={year}
         order={order}
