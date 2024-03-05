@@ -20,7 +20,8 @@
     "react/prop-types": "off",
     "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-imports-ts": "warn",
-    "react/no-unknown-property": "off"
+    "react/no-unknown-property": "off",
+    "@typescript-eslint/no-empty-function": "off"
   },
   "ignorePatterns": ["*.config.js"],
   "settings": {
