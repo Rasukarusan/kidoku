@@ -8,7 +8,7 @@ interface Props {
 
 export const AiGenerateButton: React.FC<Props> = ({ onClick, loading }) => {
   return (
-    <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-ai-bg bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
+    <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-ai-summary bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
       <button
         type="button"
         className={twMerge(
