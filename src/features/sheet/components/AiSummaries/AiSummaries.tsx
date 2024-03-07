@@ -66,7 +66,14 @@ export const AiSummaries: React.FC<Props> = ({
       return <Empty />
     }
     if (process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true') {
-      return <AiGenerateButton onClick={onClickGenerate} loading={loading} />
+      return (
+        <AiGenerateButton
+          open={open}
+          setOpen={setOpen}
+          onClick={onClickGenerate}
+          loading={loading}
+        />
+      )
     }
   }
   return (
