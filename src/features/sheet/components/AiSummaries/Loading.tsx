@@ -48,6 +48,9 @@ export const Loading: React.FC = () => {
           <span className="animate-pulse">AI分析中...</span>
         </div>
       </div>
+      <div className="mb-2 text-center text-xs text-gray-400">
+        分析に1分〜3分ほどかかります。
+      </div>
       <div className="mx-auto w-full sm:w-3/4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {Object.keys(json).map((key, i) => {
