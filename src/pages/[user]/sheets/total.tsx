@@ -1,6 +1,6 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
-import prisma, { parse } from '@/libs/prisma'
+import prisma from '@/libs/prisma'
 
 export default SheetTotalPage
 
@@ -65,11 +65,10 @@ export const getStaticProps = async (ctx) => {
     },
     orderBy: { year: 'desc' },
   })
-  const aiSummaries = await prisma.aiSummaries.findFirst({
+  const aiSummaries = await prisma.aiSummaries.findMany({
     where: { userId, sheet_id: 0 },
     select: { analysis: true },
   })
-  const analysis = aiSummaries ? parse(aiSummaries.analysis) : null
   return {
     props: {
       total: books.length,
@@ -78,7 +77,7 @@ export const getStaticProps = async (ctx) => {
       sheets: sheets.length === 0 ? [] : sheets.map((sheet) => sheet.name),
       username,
       yearlyTopBooks,
-      aiSummaries: analysis,
+      aiSummaries: aiSummaries.map((v) => v.analysis),
     },
     revalidate: 5,
   }

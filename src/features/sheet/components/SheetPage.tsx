@@ -33,7 +33,7 @@ interface Props {
   sheets: string[]
   username: string
   yearlyTopBooks: YearlyTopBook[]
-  aiSummaries: AiSummariesJson
+  aiSummaries: AiSummariesJson[]
 }
 
 export const SheetPage: React.FC<Props> = ({
