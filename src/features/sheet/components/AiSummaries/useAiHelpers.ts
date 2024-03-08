@@ -1,11 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toggleNoScrollBody } from '@/utils/element'
 
-const useAiHelpers = () => {
+const useAiHelpers = (sheet, aiSummaries) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [json, setJson] = useState(null)
   const [error, setError] = useState(null)
+  const [summaryIndex, setSummaryIndex] = useState(0)
+
+  useEffect(() => {
+    setSummaryIndex(0)
+  }, [sheet])
+
+  useEffect(() => {
+    setJson(aiSummaries[summaryIndex])
+  }, [sheet, summaryIndex])
 
   const generateSummary = async (sheetName, isTotal) => {
     if (loading) return
@@ -36,6 +45,8 @@ const useAiHelpers = () => {
     setJson,
     open,
     setOpen,
+    summaryIndex,
+    setSummaryIndex,
   }
 }
 

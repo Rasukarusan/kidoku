@@ -13,7 +13,7 @@ export const AiSummary: React.FC<Props> = ({ jsonKey, text }) => {
         <Icon color="a782c3" className="mr-2" />
         <div className="font-bold text-gray-700">{title}</div>
       </div>
-      <div className="flex justify-center pb-2 text-sm text-gray-700">
+      <div className="flex justify-center pb-2 text-left text-sm text-gray-700">
         {text}
       </div>
     </>

@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { AiGenerateButton } from './AiGenerateButton'
 import { Error } from './Error'
 import { Empty } from './Empty'
@@ -8,10 +7,11 @@ import { Loading } from './Loading'
 import { AiReGenerateButton } from './AiReGenerateButton'
 import useAiHelpers from './useAiHelpers'
 import { Confirm } from './Confirm'
+import { StepIndicator } from './StepIndicator'
 
 interface Props {
   username: string
-  aiSummaries?: AiSummariesJson
+  aiSummaries: AiSummariesJson[]
   bookCount: number
   sheet: string
   isTotal: boolean
@@ -26,12 +26,17 @@ export const AiSummaries: React.FC<Props> = ({
   isMine,
 }) => {
   const minimum = 1
-  const { generateSummary, loading, json, setJson, error, open, setOpen } =
-    useAiHelpers()
-
-  useEffect(() => {
-    setJson(aiSummaries)
-  }, [sheet])
+  const {
+    generateSummary,
+    loading,
+    json,
+    setJson,
+    error,
+    open,
+    setOpen,
+    summaryIndex,
+    setSummaryIndex,
+  } = useAiHelpers(sheet, aiSummaries)
 
   if (loading) {
     return <Loading />
@@ -80,7 +85,7 @@ export const AiSummaries: React.FC<Props> = ({
       )}
       {json && (
         <div className="relative mx-auto w-full text-center sm:w-3/4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mb-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Object.keys(json).map((key, value) => {
               return (
                 <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
@@ -89,7 +94,22 @@ export const AiSummaries: React.FC<Props> = ({
               )
             })}
           </div>
-          <div className="w-full pt-1 text-left text-xs text-gray-400 sm:text-right">
+          {aiSummaries.length > 1 && (
+            <StepIndicator
+              step={summaryIndex}
+              maxStep={aiSummaries.length}
+              onBack={() => {
+                if (summaryIndex === 0) return
+                setSummaryIndex(summaryIndex - 1)
+              }}
+              onNext={() => {
+                const newSummaryIndex = summaryIndex + 1
+                if (newSummaryIndex === aiSummaries.length) return
+                setSummaryIndex(newSummaryIndex)
+              }}
+            />
+          )}
+          <div className="w-full text-left text-xs text-gray-400 sm:text-right">
             ※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。
           </div>
         </div>
