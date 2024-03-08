@@ -21,7 +21,7 @@ interface Props {
   sheets: string[]
   username: string
   yearlyTopBooks: YearlyTopBook[]
-  aiSummaries: AiSummariesJson
+  aiSummaries: AiSummariesJson[]
 }
 export const SheetTotalPage: React.FC<Props> = ({
   total,
