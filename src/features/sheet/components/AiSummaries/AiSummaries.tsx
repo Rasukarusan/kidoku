@@ -8,6 +8,7 @@ import { AiReGenerateButton } from './AiReGenerateButton'
 import useAiHelpers from './useAiHelpers'
 import { Confirm } from './Confirm'
 import { StepIndicator } from './StepIndicator'
+import { CourseId } from '@/types/user'
 
 interface Props {
   username: string
@@ -57,7 +58,7 @@ export const AiSummaries: React.FC<Props> = ({
   }
   return (
     <>
-      {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && (
+      {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && isMine && (
         <div className="text-center">
           <Confirm
             open={open}
@@ -66,7 +67,8 @@ export const AiSummaries: React.FC<Props> = ({
               setOpen(false)
               await generateSummary(sheet, isTotal)
             }}
-            isReset={!!json}
+            courseId={CourseId.Free}
+            sheetName={sheet}
           />
           {json ? (
             <AiReGenerateButton

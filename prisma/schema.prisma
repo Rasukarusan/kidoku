@@ -115,6 +115,7 @@ model AiSummaries {
   id       Int       @id @default(autoincrement()) @db.UnsignedInt
   userId   String    @map("user_id")
   sheet_id Int
+  token    Int
   analysis Json
   created  DateTime? @default(now()) @db.DateTime(0)
   updated  DateTime? @default(now()) @db.DateTime(0)
