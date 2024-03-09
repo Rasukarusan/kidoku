@@ -2,6 +2,8 @@ import prisma from '@/libs/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth/[...nextauth]'
 import { chat } from '@/libs/openai/gpt'
+import { aiSummaryPrompt as prompt } from '@/libs/openai/prompt'
+import { getToken } from '@/libs/openai/token'
 
 export default async (req, res) => {
   try {
@@ -18,7 +20,7 @@ export default async (req, res) => {
           where: { userId, name: sheetName },
           select: { id: true, name: true },
         })
-    if ((!isTotal && !sheet) || sheet.name !== sheetName) {
+    if (!sheet) {
       return res.status(401).json({ result: false })
     }
     const books = isTotal
@@ -37,6 +39,10 @@ export default async (req, res) => {
           },
           take: 10,
         })
+
+    const token = await getToken(prompt + JSON.stringify(books))
+    console.log(token)
+    // return res.status(200).json({ result: true })
     const result = await chat(JSON.stringify(books))
     const json = JSON.parse(result.choices[0].message.content)
     const {
@@ -55,6 +61,7 @@ export default async (req, res) => {
           what_if_scenario,
           overall_feedback,
         },
+        token: token.token,
       },
     })
     return res.status(200).json({ result: true, data: json })
