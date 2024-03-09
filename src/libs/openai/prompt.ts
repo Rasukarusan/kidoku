@@ -29,8 +29,8 @@ Feedback should consist of 4 sections: "Reading Trend Analysis", "Sentiment Anal
 The body of each analysis should start directly with the topic, without using phrases like "The user", "This user" or "You".
 Avoid ambiguity and use extreme expressions.
 Limit each section to 400 ~ 600characters.
-Output should be in JSON format with keys "reading_trend_analysis", "sentiment_analysis", "what_if_scenario", and "overall_feedback". Values should be in Japanese.
-If there is insufficient data for analysis, each value should be "分析に必要なデータが足りません" (Data insufficient for analysis).
+Output should be in JSON format with keys "reading_trend_analysis", "sentiment_analysis", "what_if_scenario", and "overall_feedback".
+Values should be in Japanese and be a string.
 Sections:
 
 Reading Trend Analysis: Analyze the user's preferred genres, authors, and themes, and visualize the trends.

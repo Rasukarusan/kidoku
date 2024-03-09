@@ -1,7 +1,7 @@
-import { chat } from '@/libs/openai/sse'
+import openai from '@/libs/openai'
 import type { NextApiResponse, NextApiRequest } from 'next'
-// import { isAdmin } from '@/utils/api'
-// import prisma from '@/libs/prisma/edge'
+import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { ChatCompletionRequestMessage } from 'openai-edge'
 
 export const runtime = 'edge'
 
@@ -9,19 +9,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // const books = await prisma.books.findMany({
-  //   where: { is_public_memo: true, sheet: { name: '2023' } },
-  //   select: {
-  //     category: true,
-  //     memo: true,
-  //   },
-  // })
-  // console.log(books)
-  // fs.writeFileSync('file.txt', JSON.stringify(books))
-  // const result = await chat(JSON.stringify(books))
-  // if (!isAdmin(req)) {
-  //   return new Response('false')
-  // }
-
-  return await chat('適当な自己紹介をしてください。50字程度で。')
+  const prompt = 'JSONでkeyは英語、valueは日本語で出力してください'
+  const content = '適当な自己紹介をしてください'
+  const messages: ChatCompletionRequestMessage[] = [
+    {
+      role: 'user',
+      content: prompt,
+    },
+    {
+      role: 'user',
+      content,
+    },
+  ]
+  const response = await openai.createChatCompletion({
+    model: 'gpt-3.5-turbo-0125',
+    stream: true,
+    messages,
+  })
+  const stream = OpenAIStream(response)
+  return new StreamingTextResponse(stream)
 }
