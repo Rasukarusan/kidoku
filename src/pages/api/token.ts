@@ -37,20 +37,20 @@ export default async (req, res) => {
           },
         })
       : await prisma.books.findMany({
-          where: { userId, is_public_memo: true, sheet: { name: sheetName } },
+          where: { userId, is_public_memo: true, sheet: { id: sheet.id } },
           select: {
             category: true,
             memo: true,
           },
           // take: 10,
         })
+
     // 分析に必要なトークン数を取得
     const token = await getToken(prompt + JSON.stringify(books))
 
     // 今月使用したトークン数を取得
     const start = dayjs().startOf('month').toDate()
     const end = dayjs().endOf('month').toDate()
-    console.log(start, end)
     const aiSummaries = await prisma.aiSummaries.findMany({
       where: {
         userId,
