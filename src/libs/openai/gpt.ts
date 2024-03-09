@@ -20,7 +20,7 @@ export async function chat(content) {
   console.time('ai-summary')
   const chatCompletion = await openai.chat.completions.create({
     messages,
-    model: 'gpt-4-0125-preview',
+    model: 'gpt-3.5-turbo-0125',
     response_format: {
       type: 'json_object',
     },
