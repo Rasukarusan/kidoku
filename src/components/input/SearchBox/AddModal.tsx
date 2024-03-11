@@ -207,14 +207,14 @@ export const AddModal: React.FC = () => {
                             value={dayjs(book?.finished).format('YYYY-MM-DD')}
                             label="読了日"
                             tabIndex={5}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               setBook({
                                 ...book,
-                                finished: dayjs(e.target.value).format(
-                                  'YYYY-MM-DD'
-                                ),
+                                finished: e.target.value
+                                  ? dayjs(e.target.value).format('YYYY-MM-DD')
+                                  : null,
                               })
-                            }
+                            }}
                           />
                         </div>
                       </div>
