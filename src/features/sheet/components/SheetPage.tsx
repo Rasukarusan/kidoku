@@ -118,7 +118,6 @@ export const SheetPage: React.FC<Props> = ({
           username={username}
           bookCount={data.length}
           sheet={year}
-          isTotal={false}
           isMine={isMine}
           books={data}
         />

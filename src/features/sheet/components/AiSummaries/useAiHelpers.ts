@@ -16,14 +16,14 @@ const useAiHelpers = (sheet, aiSummaries) => {
     setJson(aiSummaries[summaryIndex])
   }, [sheet, summaryIndex])
 
-  const generateSummary = async (sheetName, isTotal, months, categories) => {
+  const generateSummary = async (sheetName, months, categories) => {
     if (loading) return
     toggleNoScrollBody(false)
     setLoading(true)
     try {
       const res = await fetch('/api/ai-summary', {
         method: 'POST',
-        body: JSON.stringify({ sheetName, isTotal, months, categories }),
+        body: JSON.stringify({ sheetName, months, categories }),
       }).then((res) => res.json())
       setLoading(false)
       if (!res.result) {

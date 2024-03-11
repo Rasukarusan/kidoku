@@ -12,7 +12,7 @@ import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { Menu } from '../Menu'
 import { NextSeo } from 'next-seo'
-import { AiSummaries, AiSummariesJson } from '../AiSummaries'
+import { AiSummariesJson } from '../AiSummaries'
 
 interface Props {
   total: number
@@ -62,16 +62,6 @@ export const SheetTotalPage: React.FC<Props> = ({
       <div className="mb-10 mt-32 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={total} unit="冊" />
-        <div className="mb-10">
-          <AiSummaries
-            aiSummaries={aiSummaries}
-            username={username}
-            bookCount={total}
-            sheet="total"
-            isTotal={true}
-            isMine={isMine}
-          />
-        </div>
 
         <div className="m-auto mb-4 h-[200px] w-full sm:h-[300px] sm:w-3/4">
           <CategoryMap categories={categories} />

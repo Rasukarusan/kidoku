@@ -3,15 +3,10 @@ import { twMerge } from 'tailwind-merge'
 
 interface Props {
   sheet: string
-  isTotal: boolean
   onClick: () => void
 }
 
-export const AiGenerateButton: React.FC<Props> = ({
-  sheet,
-  isTotal,
-  onClick,
-}) => {
+export const AiGenerateButton: React.FC<Props> = ({ sheet, onClick }) => {
   return (
     <>
       <div className="mx-auto flex w-full items-center justify-center rounded-lg bg-ai-summary bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
