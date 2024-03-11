@@ -39,20 +39,19 @@ export const Confirm: React.FC<Props> = ({
   const [categories, setCategories] = useState(initialCategories)
 
   const { data: total, isLoading: isLoadingTotal } = useSWR(
-    `/api/token?sheetName=${sheetName}&isTotal=0`,
+    `/api/token?sheetName=${sheetName}`,
     fetcher
   )
   const { data, mutate, isLoading } = useSWR(`/api/token`, (url) =>
     fetcher(url, {
       sheetName,
-      isTotal: '0',
       months: months.join(','),
       categories: categories.join(','),
     })
   )
   useEffect(() => {
     mutate(
-      `/api/token?sheetName=${sheetName}&isTotal=0&months=${months.join(',')}&categories=${categories.join(',')}`
+      `/api/token?sheetName=${sheetName}&months=${months.join(',')}&categories=${categories.join(',')}`
     )
   }, [months, categories])
   return (

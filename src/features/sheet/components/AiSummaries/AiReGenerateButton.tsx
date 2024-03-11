@@ -1,14 +1,9 @@
 interface Props {
   sheet: string
-  isTotal: boolean
   onClick: () => void
 }
 
-export const AiReGenerateButton: React.FC<Props> = ({
-  sheet,
-  isTotal,
-  onClick,
-}) => {
+export const AiReGenerateButton: React.FC<Props> = ({ sheet, onClick }) => {
   return (
     <>
       <button

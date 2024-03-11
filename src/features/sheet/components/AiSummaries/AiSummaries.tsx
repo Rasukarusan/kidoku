@@ -16,7 +16,6 @@ interface Props {
   aiSummaries: AiSummariesJson[]
   bookCount: number
   sheet: string
-  isTotal: boolean
   isMine: boolean
   books: Book[]
 }
@@ -25,7 +24,6 @@ export const AiSummaries: React.FC<Props> = ({
   aiSummaries,
   bookCount,
   sheet,
-  isTotal,
   isMine,
   books,
 }) => {
@@ -68,29 +66,16 @@ export const AiSummaries: React.FC<Props> = ({
             onCancel={() => setOpen(false)}
             onConfirm={async (settings) => {
               setOpen(false)
-              await generateSummary(
-                sheet,
-                isTotal,
-                settings.months,
-                settings.categories
-              )
+              await generateSummary(sheet, settings.months, settings.categories)
             }}
             courseId={CourseId.Free}
             sheetName={sheet}
             books={books}
           />
           {json ? (
-            <AiReGenerateButton
-              onClick={() => setOpen(true)}
-              sheet={sheet}
-              isTotal={isTotal}
-            />
+            <AiReGenerateButton onClick={() => setOpen(true)} sheet={sheet} />
           ) : (
-            <AiGenerateButton
-              onClick={() => setOpen(true)}
-              sheet={sheet}
-              isTotal={isTotal}
-            />
+            <AiGenerateButton onClick={() => setOpen(true)} sheet={sheet} />
           )}
         </div>
       )}

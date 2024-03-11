@@ -13,41 +13,30 @@ export default async (req, res) => {
       return res.status(401).json({ result: false })
     }
     const body = JSON.parse(req.body)
-    const { sheetName, isTotal, months, categories } = body
+    const { sheetName, months, categories } = body
 
     const userId = session.user.id
-    const sheet = isTotal
-      ? { id: 0, name: sheetName }
-      : await prisma.sheets.findFirst({
-          where: { userId, name: sheetName },
-          select: { id: true, name: true },
-        })
+    const sheet = await prisma.sheets.findFirst({
+      where: { userId, name: sheetName },
+      select: { id: true, name: true },
+    })
     if (!sheet) {
       return res.status(401).json({ result: false })
     }
-    const books = isTotal
-      ? await prisma.books.findMany({
-          where: { userId, is_public_memo: true, NOT: { finished: null } },
-          select: {
-            category: true,
-            memo: true,
-            finished: true,
-          },
-        })
-      : await prisma.books.findMany({
-          where: {
-            userId,
-            is_public_memo: true,
-            sheet: { id: sheet.id },
-            NOT: { finished: null },
-          },
-          select: {
-            category: true,
-            memo: true,
-            finished: true,
-          },
-          take: 10,
-        })
+    const books = await prisma.books.findMany({
+      where: {
+        userId,
+        is_public_memo: true,
+        sheet: { id: sheet.id },
+        NOT: { finished: null },
+      },
+      select: {
+        category: true,
+        memo: true,
+        finished: true,
+      },
+      take: 10,
+    })
     const targetBooks = books.filter((book) => {
       const month = dayjs(book.finished).month() + 1
       if (months.includes(month) && categories.includes(book.category)) {
@@ -69,7 +58,7 @@ export default async (req, res) => {
     await prisma.aiSummaries.create({
       data: {
         userId,
-        sheet_id: isTotal ? 0 : sheet.id,
+        sheet_id: sheet.id,
         analysis: {
           reading_trend_analysis,
           sentiment_analysis,

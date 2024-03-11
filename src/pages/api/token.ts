@@ -15,42 +15,30 @@ export default async (req, res) => {
     if (!session) {
       return res.status(401).json({ result: false })
     }
-    const { sheetName, isTotal, months, categories } = req.query
-    const isTotalSheet = isTotal === '1' && sheetName === 'total'
+    const { sheetName, months, categories } = req.query
     const userId = session.user.id
-    const sheet = isTotalSheet
-      ? { id: 0, name: 'total' }
-      : await prisma.sheets.findFirst({
-          where: { userId, name: sheetName },
-          select: { id: true, name: true },
-        })
+    const sheet = await prisma.sheets.findFirst({
+      where: { userId, name: sheetName },
+      select: { id: true, name: true },
+    })
 
     if (!sheet || sheet.name !== sheetName) {
       return res.status(401).json({ result: false })
     }
     // 分析対象のメモを取得
-    const books = isTotalSheet
-      ? await prisma.books.findMany({
-          where: { userId, is_public_memo: true, NOT: { finished: null } },
-          select: {
-            category: true,
-            memo: true,
-            finished: true,
-          },
-        })
-      : await prisma.books.findMany({
-          where: {
-            userId,
-            is_public_memo: true,
-            sheet: { id: sheet.id },
-            NOT: { finished: null },
-          },
-          select: {
-            category: true,
-            memo: true,
-            finished: true,
-          },
-        })
+    const books = await prisma.books.findMany({
+      where: {
+        userId,
+        is_public_memo: true,
+        sheet: { id: sheet.id },
+        NOT: { finished: null },
+      },
+      select: {
+        category: true,
+        memo: true,
+        finished: true,
+      },
+    })
     const targetMonths = months
       ? months.split(',')
       : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
