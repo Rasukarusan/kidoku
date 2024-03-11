@@ -78,7 +78,7 @@ export default async (req, res) => {
         impression,
         memo,
         is_public_memo,
-        finished: new Date(finished),
+        finished: finished ? new Date(finished) : null,
       }
       data['image'] = image === NO_IMAGE || image.includes('http') ? image : ''
       // await setTimeout(500)
@@ -122,7 +122,7 @@ export default async (req, res) => {
         impression: body.impression,
         memo: body.memo,
         is_public_memo: body.is_public_memo,
-        finished: new Date(body.finished),
+        finished: body.finished ? new Date(body.finished) : null,
         updated: new Date(),
       }
       const { image } = body
