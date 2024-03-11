@@ -5,6 +5,7 @@ import { aiSummaryPrompt as prompt } from '@/libs/openai/prompt'
 import { getToken } from '@/libs/openai/token'
 import dayjs from 'dayjs'
 import { setTimeout } from 'timers/promises'
+import { uniq } from '@/utils/array'
 
 export default async (req, res) => {
   await setTimeout(2000)
@@ -14,7 +15,7 @@ export default async (req, res) => {
     if (!session) {
       return res.status(401).json({ result: false })
     }
-    const { sheetName, isTotal } = req.query
+    const { sheetName, isTotal, months, categories } = req.query
     const isTotalSheet = isTotal === '1' && sheetName === 'total'
     const userId = session.user.id
     const sheet = isTotalSheet
@@ -30,23 +31,44 @@ export default async (req, res) => {
     // 分析対象のメモを取得
     const books = isTotalSheet
       ? await prisma.books.findMany({
-          where: { userId, is_public_memo: true },
+          where: { userId, is_public_memo: true, NOT: { finished: null } },
           select: {
             category: true,
             memo: true,
+            finished: true,
           },
         })
       : await prisma.books.findMany({
-          where: { userId, is_public_memo: true, sheet: { id: sheet.id } },
+          where: {
+            userId,
+            is_public_memo: true,
+            sheet: { id: sheet.id },
+            NOT: { finished: null },
+          },
           select: {
             category: true,
             memo: true,
+            finished: true,
           },
-          // take: 10,
         })
+    const targetMonths = months
+      ? months.split(',')
+      : ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+    const targetCategories = categories
+      ? categories.split(',')
+      : uniq(books.map((book) => book.category))
+    const targetBooks = books.filter((book) => {
+      const month = dayjs(book.finished).month() + 1
+      if (
+        targetMonths.includes(`${month}`) &&
+        targetCategories.includes(book.category)
+      ) {
+        return book
+      }
+    })
 
     // 分析に必要なトークン数を取得
-    const token = await getToken(prompt + JSON.stringify(books))
+    const token = await getToken(prompt + JSON.stringify(targetBooks))
 
     // 今月使用したトークン数を取得
     const start = dayjs().startOf('month').toDate()

@@ -120,6 +120,7 @@ export const SheetPage: React.FC<Props> = ({
           sheet={year}
           isTotal={false}
           isMine={isMine}
+          books={data}
         />
       </div>
 

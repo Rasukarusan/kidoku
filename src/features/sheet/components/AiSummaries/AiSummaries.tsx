@@ -9,6 +9,7 @@ import useAiHelpers from './useAiHelpers'
 import { Confirm } from './Confirm'
 import { StepIndicator } from './StepIndicator'
 import { CourseId } from '@/types/user'
+import { Book } from '@/types/book'
 
 interface Props {
   username: string
@@ -17,6 +18,7 @@ interface Props {
   sheet: string
   isTotal: boolean
   isMine: boolean
+  books: Book[]
 }
 export const AiSummaries: React.FC<Props> = ({
   username,
@@ -25,6 +27,7 @@ export const AiSummaries: React.FC<Props> = ({
   sheet,
   isTotal,
   isMine,
+  books,
 }) => {
   const minimum = 1
   const {
@@ -63,12 +66,18 @@ export const AiSummaries: React.FC<Props> = ({
           <Confirm
             open={open}
             onCancel={() => setOpen(false)}
-            onConfirm={async () => {
+            onConfirm={async (settings) => {
               setOpen(false)
-              await generateSummary(sheet, isTotal)
+              await generateSummary(
+                sheet,
+                isTotal,
+                settings.months,
+                settings.categories
+              )
             }}
             courseId={CourseId.Free}
             sheetName={sheet}
+            books={books}
           />
           {json ? (
             <AiReGenerateButton
