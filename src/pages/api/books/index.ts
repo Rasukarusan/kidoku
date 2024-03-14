@@ -118,22 +118,22 @@ export default async (req, res) => {
         title: body.title,
         author: body.author,
         category: body.category,
-        image: body.image,
         impression: body.impression,
         memo: body.memo,
+        image: body.image,
         is_public_memo: body.is_public_memo,
         finished: body.finished ? new Date(body.finished) : null,
         updated: new Date(),
       }
       const { image } = body
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
-      if (image !== NO_IMAGE && !image.includes('http')) {
+      if (image !== NO_IMAGE && !image.startsWith('http')) {
         const imageBuffer = Buffer.from(image, 'base64')
         const buffer = await bufferToWebp(imageBuffer)
         const { url } = await put(`${book.id}.webp`, buffer, {
           access: 'public',
         })
-        data.image = url
+        data['image'] = url
       }
       await prisma.books.update({
         where: { id, userId },
