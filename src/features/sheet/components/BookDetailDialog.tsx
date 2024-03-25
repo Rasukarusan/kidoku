@@ -33,7 +33,14 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   }, [book])
 
   const onClickEdit = async () => {
-    // 編集する際はマスキングされていないメモを表示したいので、改めてデータを取得し直す
+    // 編集する際はマスキングされていないメモを表示したいので、改めてデータを取得し直す。
+    // ただし、すでに編集中の場合はそちらを表示したいので改めて取得はしない。
+    const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])
+    console.log(isDiff)
+    if (isDiff) {
+      setEdit(true)
+      return
+    }
     const res = await fetch(`/api/book/${book?.id}`).then((res) => res.json())
     if (res.result) {
       setCurrentBook(res.book)
@@ -45,12 +52,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
   const onClickSave = async () => {
     setLoading(true)
     // 更新前と差分があるかをチェック
-    let isDiff = false
-    Object.keys(book).forEach((key) => {
-      if (book[key] !== newBook[key]) {
-        isDiff = true
-      }
-    })
+    const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])
     if (!isDiff) {
       setLoading(false)
       setEdit(false)
