@@ -50,6 +50,16 @@ export const getLastModified = (updated: string) => {
   return year + '年前'
 }
 
+export const randomStr = (length = 4) => {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  let string = ''
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length)
+    string += characters[randomIndex]
+  }
+  return string
+}
+
 export const getUniqueStr = (strong = 1000) => {
   return (
     new Date().getTime().toString(16) +
