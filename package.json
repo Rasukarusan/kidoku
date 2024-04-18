@@ -33,6 +33,7 @@
     "@zxing/library": "^0.20.0",
     "ai": "^2.2.34",
     "axios": "^0.27.2",
+    "cohere-ai": "^7.9.5",
     "dayjs": "^1.11.3",
     "framer-motion": "^6.5.1",
     "jotai": "^2.6.5",

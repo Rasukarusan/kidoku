@@ -1,7 +1,8 @@
 import prisma from '@/libs/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth/[...nextauth]'
-import { chat } from '@/libs/ai/openai/gpt'
+// import { chat } from '@/libs/ai/openai/gpt'
+import { chat } from '@/libs/ai/cohere/chat'
 import { aiSummaryPrompt as prompt } from '@/libs/ai/prompt'
 import { getToken } from '@/libs/ai/token'
 import dayjs from 'dayjs'
@@ -46,9 +47,8 @@ export default async (req, res) => {
 
     const token = await getToken(prompt + JSON.stringify(targetBooks))
     console.log(token)
-    // return res.status(200).json({ result: true })
     const result = await chat(JSON.stringify(targetBooks))
-    const json = JSON.parse(result.choices[0].message.content)
+    const json = JSON.parse(result.text)
     const {
       reading_trend_analysis,
       sentiment_analysis,
