@@ -1,6 +1,6 @@
 import OpenAI from 'openai'
 import { ChatCompletionMessageParam } from 'openai/resources'
-import { aiSummaryPrompt as prompt } from './prompt'
+import { aiSummaryPrompt as prompt } from '../prompt'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

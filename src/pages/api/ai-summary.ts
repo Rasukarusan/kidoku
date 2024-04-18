@@ -1,9 +1,9 @@
 import prisma from '@/libs/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from './auth/[...nextauth]'
-import { chat } from '@/libs/openai/gpt'
-import { aiSummaryPrompt as prompt } from '@/libs/openai/prompt'
-import { getToken } from '@/libs/openai/token'
+import { chat } from '@/libs/ai/openai/gpt'
+import { aiSummaryPrompt as prompt } from '@/libs/ai/prompt'
+import { getToken } from '@/libs/ai/token'
 import dayjs from 'dayjs'
 
 export default async (req, res) => {

@@ -1,4 +1,4 @@
-import openai from '@/libs/openai'
+import openai from '@/libs/ai/openai'
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { ChatCompletionRequestMessage } from 'openai-edge'
