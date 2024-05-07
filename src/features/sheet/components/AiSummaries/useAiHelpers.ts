@@ -9,7 +9,6 @@ const useAiHelpers = (sheet, aiSummaries) => {
   const [error, setError] = useState(null)
   const [summaryIndex, setSummaryIndex] = useState(0)
   const { data: session } = useSession()
-  const [messages, setMessages] = useState('')
 
   useEffect(() => {
     setSummaryIndex(0)
@@ -33,6 +32,7 @@ const useAiHelpers = (sheet, aiSummaries) => {
       const reader = response.body?.getReader()
       if (!reader) return
 
+      let json = ''
       const decoder = new TextDecoder()
       // eslint-disable-next-line
       while (true) {
@@ -40,13 +40,13 @@ const useAiHelpers = (sheet, aiSummaries) => {
         if (done) break
         if (!value) continue
         const text = decoder.decode(value)
-        // console.log(text)
         if (text === 'COMPLETE') {
           setLoading(false)
         } else {
-          setMessages((prev) => prev + text)
+          json = json + text
           try {
-            setJson(JSON.parse(text))
+            const newJson = JSON.parse(json + '"}')
+            setJson(newJson)
           } catch (e) {
             //
           }
@@ -68,7 +68,6 @@ const useAiHelpers = (sheet, aiSummaries) => {
     setOpen,
     summaryIndex,
     setSummaryIndex,
-    messages,
   }
 }
 

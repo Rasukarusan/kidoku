@@ -3,7 +3,6 @@ import { Error } from './Error'
 import { Empty } from './Empty'
 import { AiSummary } from './AiSummary'
 import type { AiSummariesJson } from './types'
-import { Loading } from './Loading'
 import { AiReGenerateButton } from './AiReGenerateButton'
 import useAiHelpers from './useAiHelpers'
 import { Confirm } from './Confirm'
@@ -40,10 +39,6 @@ export const AiSummaries: React.FC<Props> = ({
     setSummaryIndex,
   } = useAiHelpers(sheet, aiSummaries)
 
-  if (loading) {
-    return <Loading />
-  }
-
   if (error) {
     return <Error text={error} />
   }
@@ -73,9 +68,17 @@ export const AiSummaries: React.FC<Props> = ({
             books={books}
           />
           {json ? (
-            <AiReGenerateButton onClick={() => setOpen(true)} sheet={sheet} />
+            <AiReGenerateButton
+              onClick={() => setOpen(true)}
+              sheet={sheet}
+              disabled={loading}
+            />
           ) : (
-            <AiGenerateButton onClick={() => setOpen(true)} sheet={sheet} />
+            <AiGenerateButton
+              onClick={() => setOpen(true)}
+              sheet={sheet}
+              disabled={loading}
+            />
           )}
         </div>
       )}
