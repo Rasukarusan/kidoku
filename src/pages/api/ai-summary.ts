@@ -1,28 +1,34 @@
-import prisma from '@/libs/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from './auth/[...nextauth]'
-// import { chat } from '@/libs/ai/openai/gpt'
-import { chat } from '@/libs/ai/cohere/chat'
-import { aiSummaryPrompt as prompt } from '@/libs/ai/prompt'
-import { getToken } from '@/libs/ai/token'
+import prisma from '@/libs/prisma/edge'
 import dayjs from 'dayjs'
+import { aiSummaryPrompt } from '@/libs/ai/prompt'
+import cohere from '@/libs/ai/cohere'
+
+export const runtime = 'edge'
 
 export default async (req, res) => {
   try {
-    const session = await getServerSession(req, res, authOptions)
-    if (!session) {
-      return res.status(401).json({ result: false })
-    }
-    const body = JSON.parse(req.body)
-    const { sheetName, months, categories } = body
+    const cookies = req.headers.get('cookie').split('; ')
+    const cookieSession = cookies.find((cookie) =>
+      cookie.startsWith('next-auth.session-token=')
+    )
+    const sessionToken = cookieSession.split('=')[1]
 
-    const userId = session.user.id
+    const body = await req.json()
+    console.log(body)
+    const { sheetName, months, categories, userId } = body
+    const user = await prisma.session.findFirst({
+      where: { sessionToken },
+    })
+    if (!user || user?.userId !== userId) {
+      return new Response(JSON.stringify({ result: false }))
+    }
+
     const sheet = await prisma.sheets.findFirst({
       where: { userId, name: sheetName },
       select: { id: true, name: true },
     })
     if (!sheet) {
-      return res.status(401).json({ result: false })
+      return new Response(JSON.stringify({ result: false }))
     }
     const books = await prisma.books.findMany({
       where: {
@@ -45,32 +51,62 @@ export default async (req, res) => {
       }
     })
 
-    const token = await getToken(prompt + JSON.stringify(targetBooks))
-    console.log(token)
-    const result = await chat(JSON.stringify(targetBooks))
-    const json = JSON.parse(result.text)
-    const {
-      reading_trend_analysis,
-      sentiment_analysis,
-      what_if_scenario,
-      overall_feedback,
-    } = json
-    await prisma.aiSummaries.create({
-      data: {
-        userId,
-        sheet_id: sheet.id,
-        analysis: {
-          reading_trend_analysis,
-          sentiment_analysis,
-          what_if_scenario,
-          overall_feedback,
-        },
-        token: token.token,
+    const response = await cohere.chatStream({
+      model: 'command-r-plus',
+      message: `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`,
+    })
+
+    const encoder = new TextEncoder()
+    const stream = new ReadableStream({
+      async start(controller) {
+        for await (const event of response) {
+          if (event.eventType === 'text-generation') {
+            console.log(event.text)
+            controller.enqueue(encoder.encode(event.text))
+          }
+          if (
+            event.eventType === 'stream-end' &&
+            event.finishReason === 'COMPLETE'
+          ) {
+            console.log(event.response.text)
+            console.log(event.response.meta)
+            const text = event.response.text
+            const token =
+              event.response.meta.tokens.inputTokens +
+              event.response.meta.tokens.outputTokens
+            controller.enqueue(encoder.encode(text))
+            const json = JSON.parse(text)
+            const {
+              reading_trend_analysis,
+              sentiment_analysis,
+              what_if_scenario,
+              overall_feedback,
+            } = json
+            await prisma.aiSummaries.create({
+              data: {
+                userId,
+                sheet_id: sheet.id,
+                analysis: {
+                  reading_trend_analysis,
+                  sentiment_analysis,
+                  what_if_scenario,
+                  overall_feedback,
+                },
+                token,
+              },
+            })
+          }
+        }
+        controller.enqueue(encoder.encode('COMPLETE'))
+        controller.close()
       },
     })
-    return res.status(200).json({ result: true, data: json })
+
+    return new Response(stream, {
+      headers: { 'Content-Type': 'text/event-stream; charset=utf-8' },
+    })
   } catch (e) {
     console.error(e)
-    return res.status(400).json({ result: false })
+    return new Response(JSON.stringify({ result: false }))
   }
 }
