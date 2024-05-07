@@ -2,17 +2,14 @@ import prisma from '@/libs/prisma/edge'
 import dayjs from 'dayjs'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
 import cohere from '@/libs/ai/cohere'
+import { RequestCookies } from '@edge-runtime/cookies'
 
 export const runtime = 'edge'
 
 export default async (req, res) => {
   try {
-    const cookies = req.headers.get('cookie').split('; ')
-    const cookieSession = cookies.find((cookie) =>
-      cookie.startsWith('next-auth.session-token=')
-    )
-    const sessionToken = cookieSession.split('=')[1]
-
+    const cookies = new RequestCookies(req.headers)
+    const sessionToken = cookies.get('next-auth.session-token')?.value
     const body = await req.json()
     console.log(body)
     const { sheetName, months, categories, userId } = body
@@ -47,7 +44,8 @@ export default async (req, res) => {
     const targetBooks = books.filter((book) => {
       const month = dayjs(book.finished).month() + 1
       if (months.includes(month) && categories.includes(book.category)) {
-        return book
+        const memo = book.memo.replace(/\*.*\*/g, '***')
+        return { ...book, memo }
       }
     })
 
