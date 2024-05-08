@@ -22,10 +22,11 @@ const useAiHelpers = (sheet, aiSummaries) => {
     if (loading || !session) return
     toggleNoScrollBody(false)
     setLoading(true)
+    setJson(null)
     try {
       const userId = session.user.id
 
-      const response = await fetch(`/api/ai-summary`, {
+      const response = await fetch(`/api/ai-summary/exec`, {
         method: 'POST',
         body: JSON.stringify({ sheetName, months, categories, userId }),
       })

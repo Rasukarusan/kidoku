@@ -4,12 +4,9 @@ import { authOptions } from './auth/[...nextauth]'
 import { aiSummaryPrompt as prompt } from '@/libs/ai/prompt'
 import { getToken } from '@/libs/ai/token'
 import dayjs from 'dayjs'
-import { setTimeout } from 'timers/promises'
 import { uniq } from '@/utils/array'
 
 export default async (req, res) => {
-  await setTimeout(2000)
-
   try {
     const session = await getServerSession(req, res, authOptions)
     if (!session) {
