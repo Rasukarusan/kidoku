@@ -1,6 +1,5 @@
 import { AiGenerateButton } from './AiGenerateButton'
 import { Error } from './Error'
-import { Empty } from './Empty'
 import { AiSummary } from './AiSummary'
 import type { AiSummariesJson } from './types'
 import { AiReGenerateButton } from './AiReGenerateButton'
@@ -9,6 +8,7 @@ import { Confirm } from './Confirm'
 import { StepIndicator } from './StepIndicator'
 import { CourseId } from '@/types/user'
 import { Book } from '@/types/book'
+import { FaCircleNotch } from 'react-icons/fa'
 
 interface Props {
   username: string
@@ -43,15 +43,6 @@ export const AiSummaries: React.FC<Props> = ({
     return <Error text={error} />
   }
 
-  // 以下はNEXT_PUBLIC_FLAG_KIDOKU_2=trueにしたら丸ごと不要になる。AiGenerateButtonが同じ役割を果たすため。
-  if (
-    !json &&
-    (process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 !== 'true' ||
-      bookCount < minimum ||
-      !isMine)
-  ) {
-    return <Empty />
-  }
   return (
     <>
       {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && isMine && (
@@ -67,7 +58,7 @@ export const AiSummaries: React.FC<Props> = ({
             sheetName={sheet}
             books={books}
           />
-          {json ? (
+          {loading ? null : json ? (
             <AiReGenerateButton
               onClick={() => setOpen(true)}
               sheet={sheet}
@@ -80,6 +71,14 @@ export const AiSummaries: React.FC<Props> = ({
               disabled={loading}
             />
           )}
+        </div>
+      )}
+      {loading && (
+        <div className="mx-auto mb-4 flex w-full items-center justify-center rounded-lg bg-ai-summary bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
+          <div className="flex items-center rounded-md px-2 py-1 hover:font-bold">
+            <FaCircleNotch size={25} className="mr-2 animate-spin text-ai" />
+            <span className="animate-pulse">AI分析中...</span>
+          </div>
         </div>
       )}
       {json && (

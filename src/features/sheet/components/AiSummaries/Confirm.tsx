@@ -6,7 +6,8 @@ import { fetcher } from '@/libs/swr'
 import { Book } from '@/types/book'
 import { uniq } from '@/utils/array'
 import dayjs from 'dayjs'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { twMerge } from 'tailwind-merge'
 
 export type DetailSettings = {
   months: string[]
@@ -30,7 +31,7 @@ export const Confirm: React.FC<Props> = ({
   sheetName,
   books,
 }) => {
-  const MAX_TOKEN = 10000
+  const MONTHLY_LIMIT = 3
   const initialMonths = uniq(
     books.filter((b) => b.finished).map((b) => dayjs(b.finished).month() + 1)
   )
@@ -38,39 +39,32 @@ export const Confirm: React.FC<Props> = ({
   const [months, setMonths] = useState(initialMonths)
   const [categories, setCategories] = useState(initialCategories)
 
-  const { data: total, isLoading: isLoadingTotal } = useSWR(
-    `/api/token?sheetName=${sheetName}`,
-    fetcher
-  )
-  const { data, mutate, isLoading } = useSWR(`/api/token`, (url) =>
+  const { data, mutate, isLoading } = useSWR(`/api/ai-summary/usage`, (url) =>
     fetcher(url, {
       sheetName,
       months: months.join(','),
       categories: categories.join(','),
     })
   )
-  useEffect(() => {
-    mutate(
-      `/api/token?sheetName=${sheetName}&months=${months.join(',')}&categories=${categories.join(',')}`
-    )
-  }, [months, categories])
+
+  const isLimited = data?.count >= MONTHLY_LIMIT
   return (
     <Modal open={open} onClose={onCancel}>
       <div className="w-full rounded-md p-6 sm:w-[450px] sm:p-10">
         <div className="mb-2 text-center text-sm font-bold leading-5">
-          今月の残りトークン数：
-          <span className="">
-            {isLoadingTotal ? ' ...' : MAX_TOKEN - total?.used_token}/
-            {MAX_TOKEN}
+          今月の残り：
+          <span className="fon-bold mx-1">
+            {MONTHLY_LIMIT - data?.count}/{MONTHLY_LIMIT}
           </span>
-          <br />
-          分析に必要なトークン数：
-          <span className="">
-            {isLoading || !data?.token ? ' ...' : data.token}
-          </span>
+          回
         </div>
-        <div className="mb-2 text-center text-sm font-bold">
-          AI分析を実行しますか？
+        <div
+          className={twMerge(
+            'mb-2 text-center text-sm font-bold',
+            isLimited && 'text-red-500'
+          )}
+        >
+          {isLimited ? '今月の上限に達しました' : 'AI分析を実行しますか？'}
         </div>
         <div className="mb-2 flex items-center justify-evenly">
           <button
@@ -79,16 +73,15 @@ export const Confirm: React.FC<Props> = ({
           >
             キャンセル
           </button>
-          <button
-            className="w-[90px] rounded-md border border-ai py-2 text-xs text-ai hover:brightness-125 sm:w-[130px] sm:text-sm"
-            onClick={() => onConfirm({ months: months, categories })}
-          >
-            OK
-          </button>
+          {!isLimited && (
+            <button
+              className="w-[90px] rounded-md border border-ai py-2 text-xs text-ai hover:brightness-125 sm:w-[130px] sm:text-sm"
+              onClick={() => onConfirm({ months: months, categories })}
+            >
+              OK
+            </button>
+          )}
         </div>
-        <button className="mb-2 text-center text-xs text-blue-400 underline">
-          アップグレードして最大トークン数を上げる
-        </button>
         <Accordion title="詳細設定" className="text-sm">
           <div className="p-2 text-left">
             <div className="mb-2 flex justify-start">
