@@ -27,7 +27,8 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
     return process.env.NEXT_PUBLIC_HOST + path + `?book=${book.id}`
   }
 
-  const [memoAreaHeight, setMemoAreaHeight] = useState(200)
+  const initialMemoHeight = 200
+  const [memoAreaHeight, setMemoAreaHeight] = useState(initialMemoHeight)
   const [isExpand, setIsExpand] = useState(false)
   const [readmoreBlur, setReadmoreBlur] = useState(true)
 
@@ -49,8 +50,8 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           <div className="font-bold">{book.title}</div>
         </div>
       ) : (
-        <div className="mb-4">
-          <div className="mb-4 rounded-md bg-slate-50 p-4">
+        <div className="mb-2">
+          <div className="mb-2 rounded-md bg-slate-50 p-4">
             {isMine && (
               <button
                 className="ml-auto mr-0 block rounded-full bg-gray-200 p-2 hover:brightness-95"
@@ -67,14 +68,14 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
                 )}
               </button>
             )}
-            <div className="mx-auto mb-4 w-[200px]">
+            <div className="mx-auto mb-2 w-[200px]">
               <a
                 href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
                 target="_blank"
                 rel="noreferrer"
               >
                 <img
-                  className="mx-auto my-0 drop-shadow-lg"
+                  className="mx-auto my-0 max-h-[150px] drop-shadow-lg"
                   src={book.image}
                   alt={book.title}
                   loading="lazy"
@@ -82,7 +83,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
               </a>
             </div>
             <div
-              className="mx-auto mb-1 w-[300px] truncate text-center text-lg font-bold"
+              className="mx-auto mb-1 w-[300px] truncate text-center text-base font-bold"
               data-tooltip-id="book-title"
             >
               {book.title}
@@ -90,11 +91,11 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             <Tooltip id="book-title" className="max-w-[300px] sm:max-w-[400px]">
               {book.title}
             </Tooltip>
-            <div className="mx-auto mb-4 w-[300px] truncate text-center text-xs text-gray-400">
+            <div className="mx-auto mb-2 w-[300px] truncate text-center text-xs text-gray-400">
               {book.author}
             </div>
           </div>
-          <div className="flex items-center justify-around p-4">
+          <div className="flex items-center justify-between p-4">
             <div className="text-center">
               <div className="mb-1 text-xs font-bold text-gray-300">
                 カテゴリ
@@ -148,21 +149,27 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             </div>
           </div>
         )}
-        <button
-          className="flex w-full items-center justify-center text-center"
-          onClick={() => {
-            if (isExpand) {
-              setIsExpand(false)
-              setMemoAreaHeight(200)
-            } else {
-              setIsExpand(true)
-              setMemoAreaHeight(window.innerHeight * 0.8 - 100)
-            }
-          }}
-        >
-          <MdExpandMore className={twMerge('mr-1', isExpand && 'rotate-180')} />
-          <span className="text-xs">{isExpand ? '閉じる' : '全文を表示'}</span>
-        </button>
+        {(!readmoreBlur || isExpand) && (
+          <button
+            className="flex w-full items-center justify-center text-center"
+            onClick={() => {
+              if (isExpand) {
+                setIsExpand(false)
+                setMemoAreaHeight(initialMemoHeight)
+              } else {
+                setIsExpand(true)
+                setMemoAreaHeight(window.innerHeight * 0.8 - 100)
+              }
+            }}
+          >
+            <MdExpandMore
+              className={twMerge('mr-1', isExpand && 'rotate-180')}
+            />
+            <span className="text-xs">
+              {isExpand ? '閉じる' : '全文を表示'}
+            </span>
+          </button>
+        )}
       </div>
       {!isMine && !book.is_public_memo && (
         <div className="relative">
