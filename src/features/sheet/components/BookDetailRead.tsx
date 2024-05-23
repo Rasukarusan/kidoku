@@ -103,7 +103,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
               {book.author}
             </div>
           </div>
-          <div className="flex items-center justify-around">
+          <div className="flex items-center justify-around p-4">
             <div className="text-center">
               <div className="mb-1 text-xs font-bold text-gray-300">
                 カテゴリ
@@ -161,7 +161,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             <div
               className={`${
                 readmoreBlur ? 'readmore-blur' : ''
-              } no-scrollbar w-full resize-none overflow-auto border-b bg-white px-1 py-1 text-sm sm:text-base`}
+              } no-scrollbar w-full resize-none overflow-auto border-b bg-white px-1 py-1 text-sm`}
               onScroll={handleScroll}
               style={{ height: `${memoAreaHeight}px` }}
             >

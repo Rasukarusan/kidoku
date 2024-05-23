@@ -20,12 +20,12 @@ export const BookInputField: React.FC<Props> = ({
   isChanged = false,
 }) => {
   return (
-    <div className="mb-1">
+    <div>
       {label && <Label text={label} />}
       <textarea
         rows={rows}
         value={value}
-        className={`no-scrollbar w-full rounded-md px-2 py-1 text-sm sm:text-base ${
+        className={`no-scrollbar w-full rounded-md px-2 py-1 text-sm ${
           readonly ? 'resize-none border-b bg-white' : 'bg-slate-100'
         } ${isChanged ? 'border-2 border-orange-400' : ''}`}
         onChange={onChange}

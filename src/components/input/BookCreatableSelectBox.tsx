@@ -36,7 +36,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
     }),
   }
   return (
-    <div className="mb-1">
+    <div>
       <Label text={label} />
       <CreatableSelect
         classNames={{
@@ -48,14 +48,14 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
           clearIndicator: (state) => '!p-[2px]',
           indicatorSeparator: (state) => '!my-[6px] !mx-0',
         }}
-        className="text-sm sm:text-base"
+        className="text-sm"
         styles={customStyles}
         defaultValue={defaultValue}
         isClearable
         options={options}
         formatCreateLabel={formatCreateLabel}
         onChange={onChange}
-        placeholder="カテゴリを選択 or 入力して作成"
+        placeholder="入力して作成"
       />
     </div>
   )

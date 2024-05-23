@@ -34,7 +34,7 @@ export const ToggleButton: React.FC<Props> = ({
           }`}
         ></div>
         <span
-          className={`ml-3 text-sm ${checked ? 'font-bold' : 'font-medium'}
+          className={`ml-3 text-xs ${checked ? 'font-bold' : 'font-medium'}
           ${disabled ? 'text-gray-300' : 'text-gray-900 '}
           `}
         >
