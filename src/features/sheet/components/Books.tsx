@@ -3,7 +3,7 @@ import { fetcher } from '@/libs/swr'
 import { Fragment, useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
-import { BookDetailDialog } from './BookDetailDialog'
+import { BookDetailModal } from './BookDetailModal'
 import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
 import { FaCommentDots } from 'react-icons/fa'
@@ -93,7 +93,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
           )
         })}
       </div>
-      <BookDetailDialog
+      <BookDetailModal
         open={open}
         book={selectBook}
         onClose={() => {

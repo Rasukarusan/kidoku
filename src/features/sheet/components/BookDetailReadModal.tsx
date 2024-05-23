@@ -16,7 +16,7 @@ interface Props {
   onClick: () => void
 }
 
-export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
+export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
   const [open, setOpen] = useState(false)

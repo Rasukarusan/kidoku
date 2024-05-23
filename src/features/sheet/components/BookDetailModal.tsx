@@ -2,8 +2,8 @@ import { Book } from '@/types/book'
 import { Modal } from '@/components/layout/Modal'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
-import { BookDetailRead } from './BookDetailRead'
-import { BookDetailEdit } from './BookDetailEdit'
+import { BookDetailReadModal } from './BookDetailReadModal'
+import { BookDetailEditModal } from './BookDetailEditModal'
 import { useReward } from 'react-rewards'
 import { useSWRConfig } from 'swr'
 import { useRouter } from 'next/router'
@@ -14,7 +14,7 @@ interface Props {
   onClose: () => void
 }
 
-export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
+export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
   const router = useRouter()
   const { mutate } = useSWRConfig()
   const { data: session } = useSession()
@@ -103,7 +103,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
       className="w-full sm:w-[480px]"
     >
       {edit ? (
-        <BookDetailEdit
+        <BookDetailEditModal
           currentBook={currentBook}
           book={newBook}
           onClick={onClickSave}
@@ -114,7 +114,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
           onDelete={onDelete}
         />
       ) : (
-        <BookDetailRead book={currentBook} onClick={onClickEdit} />
+        <BookDetailReadModal book={currentBook} onClick={onClickEdit} />
       )}
       <span id="rewardId" className="text-center"></span>
     </Modal>
