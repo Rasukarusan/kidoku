@@ -9,6 +9,7 @@ import { MdEdit, MdExpandMore } from 'react-icons/md'
 import { mask } from '@/utils/string'
 import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
+import { twMerge } from 'tailwind-merge'
 
 interface Props {
   book: Book
@@ -26,28 +27,18 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
     return process.env.NEXT_PUBLIC_HOST + path + `?book=${book.id}`
   }
 
-  const [scale, setScale] = useState(1)
   const [memoAreaHeight, setMemoAreaHeight] = useState(200)
-  const [small, setSmall] = useState(false)
+  const [isExpand, setIsExpand] = useState(false)
   const [readmoreBlur, setReadmoreBlur] = useState(true)
 
   const handleScroll = (event) => {
     const scrollTop = event.target.scrollTop
-    const newScale = Math.max(0.5, 1 - scrollTop / 500)
-    const newHeight = small
-      ? window.innerHeight * 0.8 - 100
-      : Math.min(800, 200 + scrollTop / 2)
-    setScale(newScale)
-    setMemoAreaHeight(newHeight)
     setReadmoreBlur(scrollTop === 0)
-    if (scale <= 0.7) {
-      setSmall(true)
-    }
   }
 
   return (
     <div className="flex h-full min-w-full flex-col justify-between rounded-md">
-      {small ? (
+      {isExpand ? (
         <div className="mb-2 flex items-center px-4 pt-4">
           <img
             className="mr-4 max-h-[40px] drop-shadow-lg"
@@ -58,7 +49,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
           <div className="font-bold">{book.title}</div>
         </div>
       ) : (
-        <div className="mb-4" style={{ transform: `scale(${scale})` }}>
+        <div className="mb-4">
           <div className="mb-4 rounded-md bg-slate-50 p-4">
             {isMine && (
               <button
@@ -124,7 +115,7 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
         </div>
       )}
       <div className="p-4">
-        {!small && (
+        {!isExpand && (
           <div className="mb-1 flex items-center">
             <div className="text-xs font-bold text-gray-300">メモ</div>
             {!book.is_public_memo && (
@@ -144,18 +135,6 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             )}
           </div>
         )}
-        {small && (
-          <button
-            className="w-full text-center"
-            onClick={() => {
-              setSmall(false)
-              setMemoAreaHeight(200)
-              setScale(1)
-            }}
-          >
-            <MdExpandMore className="mx-auto" />
-          </button>
-        )}
         {(isMine || book.is_public_memo) && (
           <div className="relative mb-1 block">
             <div
@@ -169,6 +148,21 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             </div>
           </div>
         )}
+        <button
+          className="flex w-full items-center justify-center text-center"
+          onClick={() => {
+            if (isExpand) {
+              setIsExpand(false)
+              setMemoAreaHeight(200)
+            } else {
+              setIsExpand(true)
+              setMemoAreaHeight(window.innerHeight * 0.8 - 100)
+            }
+          }}
+        >
+          <MdExpandMore className={twMerge('mr-1', isExpand && 'rotate-180')} />
+          <span className="text-xs">{isExpand ? '閉じる' : '全文を表示'}</span>
+        </button>
       </div>
       {!isMine && !book.is_public_memo && (
         <div className="relative">

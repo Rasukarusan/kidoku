@@ -36,7 +36,6 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
     // 編集する際はマスキングされていないメモを表示したいので、改めてデータを取得し直す。
     // ただし、すでに編集中の場合はそちらを表示したいので改めて取得はしない。
     const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])
-    console.log(isDiff)
     if (isDiff) {
       setEdit(true)
       return
