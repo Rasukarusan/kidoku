@@ -24,7 +24,7 @@ interface Props {
   loading: boolean
 }
 
-export const BookDetailEdit: React.FC<Props> = ({
+export const BookDetailEditModal: React.FC<Props> = ({
   currentBook,
   book,
   onClick,
