@@ -69,6 +69,7 @@ export const AddModal: React.FC = () => {
   }, [data])
 
   useEffect(() => {
+    setResponse(null)
     if (!item) return
     const finished = dayjs().format('YYYY-MM-DD')
     setBook({
