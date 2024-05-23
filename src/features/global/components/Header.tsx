@@ -66,11 +66,8 @@ export const Header = () => {
     <>
       <div className="fixed top-0 z-50 w-full bg-main text-white">
         <Container className="flex items-center p-2">
-          <Link
-            href="/"
-            className="mr-8 font-['Nico_Moji'] text-xl font-bold tracking-[.3rem] no-underline"
-          >
-            <Logo className="h-8 w-8 text-gray-700" />
+          <Link href="/" className="mr-4 no-underline">
+            <Logo className="h-8 w-8" />
           </Link>
           <SearchBox />
           <div className="flex-grow"></div>
