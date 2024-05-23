@@ -9,7 +9,9 @@ import { MdEdit, MdExpandMore } from 'react-icons/md'
 import { mask } from '@/utils/string'
 import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
+import { motion, useAnimate } from 'framer-motion'
 import { twMerge } from 'tailwind-merge'
+import { Memo } from './Memo'
 
 interface Props {
   book: Book
@@ -21,6 +23,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
   const isMine = session?.user?.id === book.userId
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+
   const returnUrl = () => {
     const url = new URL(window.location.href)
     const path = url.pathname
@@ -131,9 +134,6 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
                 )}
               </>
             )}
-            {!book.is_public_memo && isMine && (
-              <div className="text-[10px] text-gray-400"></div>
-            )}
           </div>
         )}
         {(isMine || book.is_public_memo) && (
@@ -157,8 +157,9 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
                 setIsExpand(false)
                 setMemoAreaHeight(initialMemoHeight)
               } else {
+                const height = window.innerHeight * 0.8 - 100
                 setIsExpand(true)
-                setMemoAreaHeight(window.innerHeight * 0.8 - 100)
+                setMemoAreaHeight(height)
               }
             }}
           >
@@ -200,23 +201,5 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
         </div>
       )}
     </div>
-  )
-}
-
-/**
- * \nを<br>に変換したコンポーネント
- */
-export const Memo = ({ memo }) => {
-  if (!memo) return null
-  const texts = memo.split(/(\n)/).map((item, index) => {
-    return <Fragment key={index}>{item.match(/\n/) ? <br /> : item}</Fragment>
-  })
-  return (
-    <Linkify
-      as="div"
-      options={{ className: 'text-blue-500', target: '_blank' }}
-    >
-      {texts}
-    </Linkify>
   )
 }

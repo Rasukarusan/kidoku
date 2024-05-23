@@ -12,7 +12,7 @@ export const AiReGenerateButton: React.FC<Props> = ({
   return (
     <>
       <button
-        className="m-4 rounded-md border border-ai px-6 py-3 text-ai hover:brightness-110 disabled:border-gray-400   disabled:text-gray-400"
+        className="m-4 mb-6 rounded-md border border-ai px-6 py-3 text-ai hover:brightness-110 disabled:border-gray-400 disabled:text-gray-400"
         onClick={onClick}
         disabled={disabled}
       >
