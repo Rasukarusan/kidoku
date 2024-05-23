@@ -189,19 +189,17 @@ export const BookDetailEditModal: React.FC<Props> = ({
           </div>
         </div>
       </div>
-      <div className="border-1 w-full border-t text-center">
-        <button
-          className="flex h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-green-800"
-          onClick={onClick}
-          tabIndex={6}
-          disabled={loading}
-        >
-          {loading && (
-            <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
-          )}
-          <span>保存する</span>
-        </button>
-      </div>
+      <button
+        className="flex h-12 w-full items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-green-800"
+        onClick={onClick}
+        tabIndex={6}
+        disabled={loading}
+      >
+        {loading && (
+          <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
+        )}
+        <span>保存する</span>
+      </button>
     </>
   )
 }
