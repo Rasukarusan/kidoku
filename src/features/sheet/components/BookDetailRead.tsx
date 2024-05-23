@@ -3,15 +3,12 @@ import Linkify from 'linkify-react'
 import { Fragment, useState } from 'react'
 import { Book } from '@/types/book'
 import { useSession } from 'next-auth/react'
-import { BookInputField } from '@/components/input/BookInputField'
-import { BookSelectBox } from '@/components/input/BookSelectBox'
-import { BookDatePicker } from '@/components/input/BookDatePicker'
 import { AiFillLock } from 'react-icons/ai'
 import { CheckoutModal } from '@/components/form/CheckoutModal'
-import { MdExpandMore } from 'react-icons/md'
+import { MdEdit, MdExpandMore } from 'react-icons/md'
 import { mask } from '@/utils/string'
 import { Loading } from '@/components/icon/Loading'
-import { Label } from '@/components/input/Label'
+import { Tooltip } from 'react-tooltip'
 
 interface Props {
   book: Book
@@ -50,23 +47,36 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
 
   return (
     <div className="flex h-full min-w-full flex-col justify-between rounded-md">
-      <div className="p-4">
-        {small ? (
-          <div className="mb-2 flex items-center">
-            <img
-              className="mr-4 max-h-[40px] drop-shadow-lg"
-              src={book.image}
-              alt={book.title}
-              loading="lazy"
-            />
-            <div className="font-bold text-gray-500">{book.title}</div>
-          </div>
-        ) : (
-          <div
-            className="flex items-center"
-            style={{ transform: `scale(${scale})` }}
-          >
-            <div className="mr-4 w-1/3">
+      {small ? (
+        <div className="mb-2 flex items-center px-4 pt-4">
+          <img
+            className="mr-4 max-h-[40px] drop-shadow-lg"
+            src={book.image}
+            alt={book.title}
+            loading="lazy"
+          />
+          <div className="font-bold">{book.title}</div>
+        </div>
+      ) : (
+        <div className="mb-4" style={{ transform: `scale(${scale})` }}>
+          <div className="mb-4 rounded-md bg-slate-50 p-4">
+            {isMine && (
+              <button
+                className="ml-auto mr-0 block rounded-full bg-gray-200 p-2 hover:brightness-95"
+                onClick={() => {
+                  setLoading(true)
+                  onClick()
+                }}
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loading className="h-[18px] w-[18px] border-[3px] border-black" />
+                ) : (
+                  <MdEdit className="" size={18} />
+                )}
+              </button>
+            )}
+            <div className="mx-auto mb-4 w-[200px]">
               <a
                 href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
                 target="_blank"
@@ -80,51 +90,57 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
                 />
               </a>
             </div>
-            <div className="mb-2 mr-2 w-2/3">
-              <BookInputField
-                value={book.title}
-                label="タイトル"
-                tabIndex={1}
-                readonly={true}
-              />
-              <BookInputField
-                value={book.author}
-                label="著者"
-                tabIndex={2}
-                readonly={true}
-              />
-              <BookInputField
-                value={book.category}
-                label="カテゴリ"
-                tabIndex={3}
-                readonly={true}
-              />
-              <div className="flex items-center">
-                <BookSelectBox
-                  key={book.id}
-                  value={book.impression}
-                  label="感想"
-                  tabIndex={4}
-                  readonly={true}
-                />
-                <BookDatePicker
-                  value={dayjs(book.finished).format('YYYY-MM-DD')}
-                  label="読了日"
-                  tabIndex={5}
-                  readonly={true}
-                />
+            <div
+              className="mx-auto mb-1 w-[300px] truncate text-center text-lg font-bold"
+              data-tooltip-id="book-title"
+            >
+              {book.title}
+            </div>
+            <Tooltip id="book-title" className="max-w-[300px] sm:max-w-[400px]">
+              {book.title}
+            </Tooltip>
+            <div className="mx-auto mb-4 w-[300px] truncate text-center text-xs text-gray-400">
+              {book.author}
+            </div>
+          </div>
+          <div className="flex items-center justify-around">
+            <div className="text-center">
+              <div className="mb-1 text-xs font-bold text-gray-300">
+                カテゴリ
+              </div>
+              <div className="text-center text-sm">{book.category}</div>
+            </div>
+            <div className="text-center">
+              <div className="mb-1 text-xs font-bold text-gray-300">感想</div>
+              <div className="text-center text-sm">{book.impression}</div>
+            </div>
+            <div className="text-center">
+              <div className="mb-1 text-xs font-bold text-gray-300">読了日</div>
+              <div className="text-center text-sm">
+                {dayjs(book.finished).format('YYYY-MM-DD')}
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
+      <div className="p-4">
         {!small && (
           <div className="mb-1 flex items-center">
-            <Label text="メモ" />
-            {!book.is_public_memo && <AiFillLock className="mr-1 w-[15px]" />}
+            <div className="text-xs font-bold text-gray-300">メモ</div>
+            {!book.is_public_memo && (
+              <>
+                <div data-tooltip-id="memo-lock">
+                  <AiFillLock className="mx-1 w-[15px]" />
+                </div>
+                {isMine && (
+                  <Tooltip id="memo-lock" className="">
+                    非公開のメモは他のユーザーには表示されません
+                  </Tooltip>
+                )}
+              </>
+            )}
             {!book.is_public_memo && isMine && (
-              <div className="text-[10px] text-gray-400">
-                非公開のメモは他のユーザーには表示されません
-              </div>
+              <div className="text-[10px] text-gray-400"></div>
             )}
           </div>
         )}
@@ -153,50 +169,33 @@ export const BookDetailRead: React.FC<Props> = ({ book, onClick }) => {
             </div>
           </div>
         )}
-        {!isMine && !book.is_public_memo && (
-          <div className="relative">
-            <div className="absolute h-40 w-full bg-gray-200 blur-sm"></div>
-            <div className="flex h-40 items-center justify-center rounded-md">
-              <div>
-                <div className="mb-2 flex items-center blur-none">
-                  <div className="font-bold blur-none">非公開のメモです</div>
-                </div>
-                {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
-                  <>
-                    <CheckoutModal
-                      open={open}
-                      onClose={() => setOpen(false)}
-                      returnUrl={returnUrl()}
-                      purchaseText="￥50でコメントを開放する"
-                    />
-                    <button
-                      className="w-full rounded-md bg-blue-600 py-1 text-center font-bold text-white blur-none"
-                      onClick={() => setOpen(true)}
-                    >
-                      開放する
-                    </button>
-                  </>
-                )}
+      </div>
+      {!isMine && !book.is_public_memo && (
+        <div className="relative">
+          <div className="absolute h-40 w-full bg-gray-200 blur-sm"></div>
+          <div className="flex h-40 items-center justify-center rounded-md">
+            <div>
+              <div className="mb-2 flex items-center blur-none">
+                <div className="font-bold blur-none">非公開のメモです</div>
               </div>
+              {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
+                <>
+                  <CheckoutModal
+                    open={open}
+                    onClose={() => setOpen(false)}
+                    returnUrl={returnUrl()}
+                    purchaseText="￥50でコメントを開放する"
+                  />
+                  <button
+                    className="w-full rounded-md bg-blue-600 py-1 text-center font-bold text-white blur-none"
+                    onClick={() => setOpen(true)}
+                  >
+                    開放する
+                  </button>
+                </>
+              )}
             </div>
           </div>
-        )}
-      </div>
-      {isMine && (
-        <div className="border-1 w-full border-t text-center">
-          <button
-            className="flex h-12 w-full items-center justify-center rounded-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-blue-800"
-            onClick={() => {
-              setLoading(true)
-              onClick()
-            }}
-            disabled={loading}
-          >
-            {loading && (
-              <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
-            )}
-            編集する
-          </button>
         </div>
       )}
     </div>

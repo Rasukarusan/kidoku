@@ -101,7 +101,7 @@ export const BookDetailDialog: React.FC<Props> = ({ book, open, onClose }) => {
         }
       }}
       open={open}
-      className="w-full sm:w-1/2"
+      className="w-full sm:w-[480px]"
     >
       {edit ? (
         <BookDetailEdit
