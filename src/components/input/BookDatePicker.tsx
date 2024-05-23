@@ -19,12 +19,12 @@ export const BookDatePicker: React.FC<Props> = ({
   isChanged = false,
 }) => {
   return (
-    <div className="mb-1">
+    <div>
       <Label text={label} />
       <input
         type="date"
         value={value}
-        className={`w-full rounded-md py-1 pl-2 text-sm sm:text-base ${
+        className={`w-full rounded-md py-1 pl-2 text-sm ${
           readonly
             ? 'resize-none appearance-none border-b bg-white'
             : 'cursor-pointer bg-slate-100'

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Modal } from '../layout/Modal'
-import { FaEdit, FaLink } from 'react-icons/fa'
+import { FaLink } from 'react-icons/fa'
+import { MdEdit } from 'react-icons/md'
 
 interface Props {
   img?: string
@@ -62,7 +63,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   return (
     <>
       <button
-        className="relative mr-4 w-1/3 hover:brightness-75"
+        className="relative mr-4 w-1/3 hover:brightness-90"
         onClick={() => setOpen(true)}
       >
         <img className="mx-auto my-0 drop-shadow-lg" src={image} alt="" />
@@ -72,11 +73,8 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
           onChange={handleChange}
           className="hidden"
         />
-        <div className="absolute top-1/2 mx-auto flex h-full w-full -translate-y-1/2 transform items-center justify-center opacity-0  hover:opacity-100  hover:brightness-75">
-          <FaEdit
-            size={25}
-            className="bg-transparent text-gray-100 opacity-100"
-          />
+        <div className="absolute top-1/2 mx-auto flex h-full w-full -translate-y-1/2 transform items-center justify-center opacity-0  hover:opacity-100">
+          <MdEdit size={30} className="rounded-full bg-black p-1 text-white" />
         </div>
       </button>
       <Modal
