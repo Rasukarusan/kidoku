@@ -6,7 +6,6 @@ import { useSession } from 'next-auth/react'
 import { AiFillLock } from 'react-icons/ai'
 import { CheckoutModal } from '@/components/form/CheckoutModal'
 import { MdEdit, MdExpandMore } from 'react-icons/md'
-import { mask } from '@/utils/string'
 import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
 import { motion, useAnimate } from 'framer-motion'
@@ -145,7 +144,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
               onScroll={handleScroll}
               style={{ height: `${memoAreaHeight}px` }}
             >
-              <Memo memo={mask(book.memo)} />
+              <Memo memo={book.memo} />
             </div>
           </div>
         )}
