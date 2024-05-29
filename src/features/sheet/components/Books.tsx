@@ -6,7 +6,6 @@ import { HoverBook } from './HoverBook'
 import { BookDetailModal } from './BookDetailModal'
 import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
-import { FaCommentDots } from 'react-icons/fa'
 import { AiFillLock } from 'react-icons/ai'
 
 interface Props {
@@ -72,11 +71,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                   onMouseLeave={() => onMouseLeave(i)}
                   loading={i > 6 ? 'lazy' : 'eager'}
                 />
-                {book.is_public_memo ? (
-                  <p className="absolute right-[-5px] top-[-3px] sm:right-[40px] sm:top-[-10px]">
-                    <FaCommentDots size={20} />
-                  </p>
-                ) : (
+                {!book.is_public_memo && (
                   <p className="absolute right-[-5px] top-[-3px] sm:right-[45px] sm:top-[-10px]">
                     <AiFillLock size={25} />
                   </p>
