@@ -17,10 +17,11 @@ import { NO_IMAGE } from '@/libs/constants'
 import { Menu } from './Menu'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { BsFillGrid3X3GapFill } from 'react-icons/bs'
 import { FaListUl } from 'react-icons/fa'
 import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
+import { IoGrid } from 'react-icons/io5'
+import { twMerge } from 'tailwind-merge'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -170,24 +171,29 @@ export const SheetPage: React.FC<Props> = ({
       </div>
 
       <div className="mb-8 flex justify-end">
-        <button
-          className={`flex items-center justify-center rounded-l-md border border-gray-400 bg-gray-50 px-2 py-1 text-xs ${
-            mode === 'grid' ? 'bg-gray-300' : ''
-          }`}
-          onClick={() => handleChange('grid')}
-        >
-          <BsFillGrid3X3GapFill className="mr-1" />
-          Grid
-        </button>
-        <button
-          className={`flex items-center justify-center rounded-r-md border border-gray-400 bg-gray-50 px-2  py-1 text-xs ${
-            mode === 'row' ? 'bg-gray-300' : ''
-          }`}
-          onClick={() => handleChange('row')}
-        >
-          <FaListUl className="mr-1" />
-          List
-        </button>
+        {['grid', 'row'].map((v: 'grid' | 'row') => (
+          <button
+            key={v}
+            className={twMerge(
+              'flex items-center justify-center border border-gray-400 bg-gray-50 px-2 py-1 text-xs font-bold',
+              mode === v && 'brightness-95',
+              v === 'grid' ? 'rounded-l-md' : 'rounded-r-md'
+            )}
+            onClick={() => handleChange(v)}
+          >
+            {v === 'grid' ? (
+              <>
+                <IoGrid className="mr-1" />
+                Grid
+              </>
+            ) : (
+              <>
+                <FaListUl className="mr-1" />
+                List
+              </>
+            )}
+          </button>
+        ))}
       </div>
 
       <div className="mb-8">
