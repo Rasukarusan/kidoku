@@ -10,6 +10,8 @@ import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
 import { twMerge } from 'tailwind-merge'
 import { openLoginModalAtom } from '@/store/modal/atom'
 import { UserMenu } from './UserMenu'
+import useSWR from 'swr'
+import { fetcher } from '@/libs/swr'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -37,6 +39,15 @@ export const Header = () => {
     }
   }, [])
 
+  const { data: sheets } = useSWR(`/api/sheets`, fetcher, {
+    fallbackData: { result: true, sheets: [] },
+  })
+  const url = !session
+    ? '/'
+    : sheets.sheets.length > 0
+      ? `/${session.user.name}/sheets/${sheets.sheets[0].name}`
+      : `/${session.user.name}/sheets/total`
+
   if (router.asPath.startsWith('/auth/init')) {
     return null
   }
@@ -48,30 +59,37 @@ export const Header = () => {
           <Link href="/" className="mr-4 no-underline">
             <Logo className="h-8 w-8" />
           </Link>
+          {session && (
+            <Link className="mr-4 text-base font-bold text-black" href={url}>
+              {session.user.name}
+            </Link>
+          )}
           <SearchBox />
           <div className="flex-grow"></div>
           {session && (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                className="h-[34px] w-[34px] rounded-full bg-gray-200 sm:mr-4 sm:h-[40px] sm:w-[40px]"
-                onClick={() => setOpenMenu(!openMenu)}
-              >
-                <img
-                  src={session.user.image}
-                  alt="ユーザーアイコン"
-                  className="rounded-full"
-                />
-              </button>
-              <div
-                className={twMerge(
-                  'absolute right-0 top-1 h-2 w-2 rounded-full bg-gray-400 text-white sm:right-4 sm:top-1',
-                  pusherConnection === 'connected' && 'bg-green-600',
-                  pusherConnection === 'failed' && 'bg-red-500',
-                  pusherConnection === 'disconnected' && 'bg-gray-400'
-                )}
-              ></div>
-              <UserMenu open={openMenu} setOpen={setOpenMenu} />
-            </div>
+            <>
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  className="h-[34px] w-[34px] rounded-full bg-gray-200 sm:mr-4 sm:h-[40px] sm:w-[40px]"
+                  onClick={() => setOpenMenu(!openMenu)}
+                >
+                  <img
+                    src={session.user.image}
+                    alt="ユーザーアイコン"
+                    className="rounded-full"
+                  />
+                </button>
+                <div
+                  className={twMerge(
+                    'absolute right-0 top-1 h-2 w-2 rounded-full bg-gray-400 text-white sm:right-4 sm:top-1',
+                    pusherConnection === 'connected' && 'bg-green-600',
+                    pusherConnection === 'failed' && 'bg-red-500',
+                    pusherConnection === 'disconnected' && 'bg-gray-400'
+                  )}
+                ></div>
+                <UserMenu open={openMenu} setOpen={setOpenMenu} url={url} />
+              </div>
+            </>
           )}
           {session === null && (
             <>
