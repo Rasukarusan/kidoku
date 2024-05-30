@@ -1,22 +1,18 @@
-import useSWR from 'swr'
 import Link from 'next/link'
 import { Dispatch, SetStateAction } from 'react'
 import { BiExit } from 'react-icons/bi'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { signOut, useSession } from 'next-auth/react'
 import { AiOutlineBook, AiOutlineSetting } from 'react-icons/ai'
-import { fetcher } from '@/libs/swr'
 
 interface Props {
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
+  url: string
 }
 
-export const UserMenu: React.FC<Props> = ({ open, setOpen }) => {
+export const UserMenu: React.FC<Props> = ({ open, setOpen, url }) => {
   const { data: session } = useSession()
-  const { data: sheets } = useSWR(`/api/sheets`, fetcher, {
-    fallbackData: { result: true, sheets: [] },
-  })
 
   const variants: Variants = {
     open: {
@@ -26,11 +22,6 @@ export const UserMenu: React.FC<Props> = ({ open, setOpen }) => {
     },
     closed: { opacity: 0, y: 20, transition: { duration: 0.2 } },
   }
-  const url = !session
-    ? '/'
-    : sheets.sheets.length > 0
-      ? `/${session.user.name}/sheets/${sheets.sheets[0].name}`
-      : `/${session.user.name}/sheets/total`
 
   return (
     <AnimatePresence>
