@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import Linkify from 'linkify-react'
 import { Fragment, useState } from 'react'
 import { Book } from '@/types/book'
 import { useSession } from 'next-auth/react'
@@ -8,9 +7,10 @@ import { CheckoutModal } from '@/components/form/CheckoutModal'
 import { MdEdit, MdExpandMore } from 'react-icons/md'
 import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
-import { motion, useAnimate } from 'framer-motion'
 import { twMerge } from 'tailwind-merge'
 import { Memo } from './Memo'
+import { FaLink } from 'react-icons/fa'
+import { useRouter } from 'next/router'
 
 interface Props {
   book: Book
@@ -22,6 +22,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
   const isMine = session?.user?.id === book.userId
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   const returnUrl = () => {
     const url = new URL(window.location.href)
@@ -53,23 +54,51 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
         </div>
       ) : (
         <div className="mb-2">
-          <div className="mb-2 rounded-md bg-slate-50 p-4">
-            {isMine && (
+          <div className=" mb-2 rounded-md bg-slate-50 p-4">
+            <div className="flex items-center justify-end">
               <button
-                className="ml-auto mr-0 block rounded-full bg-gray-200 p-2 hover:brightness-95"
-                onClick={() => {
-                  setLoading(true)
-                  onClick()
+                className="mr-2 block rounded-full p-2"
+                onClick={async () => {
+                  await global.navigator.clipboard.writeText(
+                    process.env.NEXT_PUBLIC_HOST +
+                      router.asPath +
+                      `?book=${book.id}`
+                  )
                 }}
-                disabled={loading}
+                data-tooltip-id="copy"
               >
-                {loading ? (
-                  <Loading className="h-[18px] w-[18px] border-[3px] border-black" />
-                ) : (
-                  <MdEdit className="" size={18} />
-                )}
+                <FaLink />
+                <Tooltip
+                  style={{ zIndex: 999999 }}
+                  id="copy"
+                  content="URLをコピーしました"
+                  openOnClick={true}
+                  closeEvents={{
+                    mouseleave: true,
+                    blur: true,
+                    click: true,
+                    dblclick: true,
+                    mouseup: true,
+                  }}
+                />
               </button>
-            )}
+              {isMine && (
+                <button
+                  className="block rounded-full bg-gray-200 p-2 hover:brightness-95"
+                  onClick={() => {
+                    setLoading(true)
+                    onClick()
+                  }}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Loading className="h-[18px] w-[18px] border-[3px] border-black" />
+                  ) : (
+                    <MdEdit className="" size={18} />
+                  )}
+                </button>
+              )}
+            </div>
             <div className="mx-auto mb-2 w-[200px]">
               <a
                 href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
