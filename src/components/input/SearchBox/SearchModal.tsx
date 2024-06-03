@@ -14,7 +14,7 @@ export const SearchModal: React.FC = () => {
   const [tab, setTab] = useState<'title' | 'barcode' | 'template' | 'user'>(
     'title'
   )
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue, setInputValue] = useState('ほりえ')
 
   // 検索モーダル開いたら自動でinputフィールドにフォーカスする
   useEffect(() => {
@@ -35,7 +35,11 @@ export const SearchModal: React.FC = () => {
   }
 
   return (
-    <Modal open={open} onClose={onClose} className="h-3/4 w-full sm:w-1/2">
+    <Modal
+      open={open}
+      onClose={onClose}
+      className="h-3/4 w-full overflow-auto sm:w-1/2"
+    >
       <div className="flex shrink-0 items-center border-b border-b-[#f1f5f9] px-2 pt-2">
         <div className="relative w-full text-gray-600">
           <span className="absolute inset-y-0 left-0 flex items-center pl-2">
@@ -57,7 +61,7 @@ export const SearchModal: React.FC = () => {
           />
         </div>
       </div>
-      <div className="flex items-center px-4 pt-4 text-sm">
+      <div className="flex h-9 items-center overflow-x-auto overflow-y-hidden p-6 text-sm">
         <button
           className={`flex text-nowrap px-4 py-2 hover:bg-gray-100
             ${tab === 'barcode' ? 'font-bold' : 'text-gray-400 '}`}
