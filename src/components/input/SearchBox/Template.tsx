@@ -5,6 +5,7 @@ import useSWR from 'swr'
 import { useSetAtom } from 'jotai'
 import { openAddModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
+import { FaRegTrashAlt } from 'react-icons/fa'
 
 interface Props {
   input: string
@@ -13,7 +14,8 @@ interface Props {
 
 export const Template: React.FC<Props> = ({ input, onClose }) => {
   const [open, setOpen] = useState(false)
-  const { data } = useSWR('/api/template/books', fetcher)
+  const [hoverTemplate, setHoverTemplate] = useState(null)
+  const { data, mutate } = useSWR('/api/template/books', fetcher)
   const setOpenAddModal = useSetAtom(openAddModalAtom)
   const setSelectItem = useSetAtom(addBookAtom)
 
@@ -28,11 +30,31 @@ export const Template: React.FC<Props> = ({ input, onClose }) => {
       <div className="p-8">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {data?.templates.map((template) => (
-            <div key={template.id}>
+            <div key={template.id} className="relative">
               <button
+                className="absolute right-4 top-0 z-10 bg-white"
+                onClick={async () => {
+                  const yes = confirm(`${template.name}を削除しますか?`)
+                  if (!yes) return
+                  const res = await fetch(`/api/template/books`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({
+                      id: template.id,
+                    }),
+                    headers: {
+                      Accept: 'application/json',
+                    },
+                  }).then((res) => res.json())
+                  mutate()
+                  alert(res.result ? '削除しました' : '削除に失敗しました')
+                }}
+              >
+                {hoverTemplate?.id === template.id && <FaRegTrashAlt />}
+              </button>
+              <button
+                onMouseEnter={() => setHoverTemplate(template)}
                 className="m-2 h-[140px] w-[96px] rounded-md text-2xl shadow-md hover:brightness-95 sm:h-[156px] sm:w-[108px]"
                 onClick={() => {
-                  onClose()
                   const { id, title, memo, author, category, image } = template
                   setSelectItem({
                     id,
@@ -47,7 +69,9 @@ export const Template: React.FC<Props> = ({ input, onClose }) => {
               >
                 <img src={template.image} alt="" />
               </button>
-              <div>{template.name}</div>
+              <div className="truncate text-center text-sm">
+                {template.name}
+              </div>
             </div>
           ))}
           <button
