@@ -75,7 +75,7 @@ export const AddModal: React.FC = () => {
     setBook({
       ...item,
       is_public_memo: false,
-      memo: '[期待]\n\n[感想]\n',
+      memo: item.memo ? item.memo : '[期待]\n\n[感想]\n',
       impression: '-',
       finished,
     })
@@ -195,15 +195,17 @@ export const AddModal: React.FC = () => {
                             })
                           }}
                         />
-                        <div className="flex items-center">
-                          <BookSelectBox
-                            value={book?.impression}
-                            label="感想"
-                            tabIndex={4}
-                            onChange={(e) =>
-                              setBook({ ...book, impression: e.target.value })
-                            }
-                          />
+                        <div className="mt-2 flex items-center">
+                          <div className="mr-4">
+                            <BookSelectBox
+                              value={book?.impression}
+                              label="感想"
+                              tabIndex={4}
+                              onChange={(e) =>
+                                setBook({ ...book, impression: e.target.value })
+                              }
+                            />
+                          </div>
                           <BookDatePicker
                             value={dayjs(book?.finished).format('YYYY-MM-DD')}
                             label="読了日"

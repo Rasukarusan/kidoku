@@ -20,7 +20,7 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
           author: Array.isArray(authors) ? authors.join(',') : '-',
           category: categories ? categories.join(',') : '-',
           image: imageLinks ? imageLinks.thumbnail : NO_IMAGE,
-          memo: description ?? '',
+          memo: '',
         })
       })
     })

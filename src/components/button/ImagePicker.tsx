@@ -55,9 +55,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   }
 
   useEffect(() => {
-    if (!image) {
-      setImage(img)
-    }
+    setImage(img)
   }, [img])
 
   return (
