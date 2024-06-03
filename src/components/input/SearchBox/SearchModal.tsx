@@ -6,11 +6,14 @@ import { UserBooks } from './UserBooks'
 import { BarcodeScan } from './BarcodeScan'
 import { openSearchModalAtom } from '@/store/modal/atom'
 import { useAtom } from 'jotai'
+import { Template } from './Template'
 
 export const SearchModal: React.FC = () => {
   const [open, setOpen] = useAtom(openSearchModalAtom)
   const ref = useRef<HTMLInputElement>(null)
-  const [tab, setTab] = useState<'title' | 'barcode' | 'user'>('barcode')
+  const [tab, setTab] = useState<'title' | 'barcode' | 'template' | 'user'>(
+    'title'
+  )
   const [inputValue, setInputValue] = useState('')
 
   // 検索モーダル開いたら自動でinputフィールドにフォーカスする
@@ -71,6 +74,14 @@ export const SearchModal: React.FC = () => {
           タイトル検索
         </button>
         <button
+          className={`text-nowrap px-4 py-2 hover:bg-gray-100 ${
+            tab === 'template' ? 'font-bold' : 'text-gray-400'
+          }`}
+          onClick={() => setTab('template')}
+        >
+          テンプレートから登録
+        </button>
+        <button
           className={`text-nowrap px-4 py-2 hover:bg-gray-100
             ${tab === 'user' ? 'font-bold' : 'text-gray-400 '}`}
           onClick={() => setTab('user')}
@@ -82,6 +93,8 @@ export const SearchModal: React.FC = () => {
         <Books input={inputValue} onClose={onClose} />
       ) : tab === 'barcode' ? (
         <BarcodeScan input={inputValue} onClose={onClose} />
+      ) : tab === 'template' ? (
+        <Template input={inputValue} onClose={onClose} />
       ) : (
         <UserBooks input={inputValue} onClose={onClose} />
       )}

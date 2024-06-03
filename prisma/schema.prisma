@@ -71,18 +71,19 @@ model Session {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  name             String?         @unique(map: "uniq_name")
-  email            String?         @unique
-  emailVerified    DateTime?       @map("email_verified")
+  id               String           @id @default(cuid())
+  name             String?          @unique(map: "uniq_name")
+  email            String?          @unique
+  emailVerified    DateTime?        @map("email_verified")
   image            String?
-  admin            Boolean         @default(false)
+  admin            Boolean          @default(false)
   accounts         Account[]
   sessions         Session[]
   sheets           sheets[]
   yearly_top_books YearlyTopBook[]
   books            books[]
   AiSummaries      AiSummaries[]
+  template_books   template_books[]
 
   @@map("users")
 }
@@ -115,11 +116,26 @@ model AiSummaries {
   id       Int       @id @default(autoincrement()) @db.UnsignedInt
   userId   String    @map("user_id")
   sheet_id Int
-  token    Int
   analysis Json
+  token    Int
   created  DateTime? @default(now()) @db.DateTime(0)
   updated  DateTime? @default(now()) @db.DateTime(0)
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_summaries")
+}
+
+model template_books {
+  id             Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId         String   @map("user_id")
+  name           String   @db.VarChar(120)
+  title          String   @db.VarChar(120)
+  author         String   @db.VarChar(120)
+  category       String   @db.VarChar(120)
+  image          String   @db.VarChar(255)
+  memo           String   @db.Text
+  is_public_memo Boolean  @default(false)
+  created        DateTime @default(now()) @db.DateTime(0)
+  updated        DateTime @default(now()) @db.DateTime(0)
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
