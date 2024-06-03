@@ -14,7 +14,7 @@ export const SearchModal: React.FC = () => {
   const [tab, setTab] = useState<'title' | 'barcode' | 'template' | 'user'>(
     'title'
   )
-  const [inputValue, setInputValue] = useState('ほりえ')
+  const [inputValue, setInputValue] = useState('')
 
   // 検索モーダル開いたら自動でinputフィールドにフォーカスする
   useEffect(() => {
