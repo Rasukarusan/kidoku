@@ -50,6 +50,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
         }}
         className="text-sm"
         styles={customStyles}
+        menuPosition="fixed"
         defaultValue={defaultValue}
         isClearable
         options={options}
