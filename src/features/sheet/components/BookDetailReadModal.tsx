@@ -206,7 +206,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClick }) => {
           <div className="flex h-40 items-center justify-center rounded-md">
             <div>
               <div className="mb-2 flex items-center blur-none">
-                <div className="font-bold blur-none">非公開のメモです</div>
+                <div className="z-10 font-bold blur-none">非公開のメモです</div>
               </div>
               {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
                 <>

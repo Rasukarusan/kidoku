@@ -127,7 +127,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
               <HintIcon />
             </div>
             <Tooltip id="toggle-memo-tooltip" className="!w-[300px]">
-              &quot;**&quot;で囲んだ文字はマスキングされ、他のユーザーには&quot;*****&quot;と表示されるようになります。
+              &quot;**&quot;で囲んだ文字はマスキングされ、他のユーザーには&quot;*****&quot;と表示されるようになります。例：「**マスク**さん」は「*****さん」と表示されます。
             </Tooltip>
           </div>
           <BookInputField

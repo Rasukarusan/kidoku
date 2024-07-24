@@ -41,7 +41,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
               <div className="flex h-20 items-center justify-center rounded-md">
                 <div>
                   <div className="mb-2 flex items-center justify-center blur-none">
-                    <div className="text-center text-sm font-bold blur-none">
+                    <div className="z-10 text-center text-sm font-bold blur-none">
                       非公開のメモです
                     </div>
                   </div>
