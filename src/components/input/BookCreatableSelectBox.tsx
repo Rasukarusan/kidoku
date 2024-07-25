@@ -25,6 +25,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
   const customStyles = {
     control: (base, state) => ({
       ...base,
+      minWidth: '120px',
       height: '30px',
       minHeight: '30px',
       border: isChanged ? 'solid #f6ad54 2px' : 'unset',
@@ -50,7 +51,6 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
         }}
         className="text-sm"
         styles={customStyles}
-        menuPosition="fixed"
         defaultValue={defaultValue}
         isClearable
         options={options}
