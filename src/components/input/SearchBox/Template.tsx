@@ -29,7 +29,7 @@ export const Template: React.FC<Props> = ({ input, onClose }) => {
       />
       <div className="p-8">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {data?.templates.map((template) => (
+          {data?.templates?.map((template) => (
             <div key={template.id} className="relative mx-auto">
               <button
                 className="absolute right-0 top-0 z-10 bg-white"
