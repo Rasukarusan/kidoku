@@ -14,6 +14,7 @@ import { BookCreatableSelectBox } from '@/components/input/BookCreatableSelectBo
 import { Tooltip } from 'react-tooltip'
 import { Label } from '@/components/input/Label'
 import { HintIcon } from '@/components/icon/HintIcon'
+import { MaskingHint } from '@/components/label/MaskingHint'
 
 interface Props {
   currentBook: Book // 変更前の本
@@ -122,12 +123,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
       <div className="mb-4">
         <div className="mb-2 flex items-center">
           <Label text="メモ" className="mb-0 mr-2" />
-          <div data-tooltip-id="toggle-memo-tooltip">
-            <HintIcon />
-          </div>
-          <Tooltip id="toggle-memo-tooltip" className="!w-[300px]">
-            &quot;**&quot;で囲んだ文字はマスキングされ、他のユーザーには&quot;*****&quot;と表示されるようになります。例：「**マスク**さん」は「*****さん」と表示されます。
-          </Tooltip>
+          <MaskingHint />
         </div>
         <BookInputField
           rows={8}
