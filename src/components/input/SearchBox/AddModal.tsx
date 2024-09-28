@@ -21,6 +21,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useAtom, useAtomValue } from 'jotai'
 import { openAddModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
+import { Label } from '../Label'
+import { MaskingHint } from '@/components/label/MaskingHint'
 
 interface Response {
   result: boolean
@@ -153,7 +155,7 @@ export const AddModal: React.FC = () => {
               >
                 <div className="flex h-full flex-col justify-between">
                   <div className="bg-white p-4">
-                    <div className="flex items-center">
+                    <div className="mb-2 flex items-center">
                       <ImagePicker
                         img={book?.image}
                         onImageLoad={(image) => {
@@ -222,13 +224,16 @@ export const AddModal: React.FC = () => {
                         </div>
                       </div>
                     </div>
+                    <div className="mb-2 flex items-center">
+                      <Label text="メモ" className="mb-0 mr-2" />
+                      <MaskingHint />
+                    </div>
                     <BookInputField
                       rows={8}
                       value={book?.memo}
                       onChange={(e) =>
                         setBook({ ...book, memo: e.target.value })
                       }
-                      label="メモ"
                       tabIndex={5}
                     />
                     <ToggleButton
