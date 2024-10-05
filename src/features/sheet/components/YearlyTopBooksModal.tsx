@@ -1,4 +1,6 @@
+import useSWR from 'swr'
 import { Book } from '@/types/book'
+import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import { truncate } from '@/utils/string'
@@ -31,6 +33,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
     spread: 100,
   })
   const [message, setMessage] = useState('')
+  const { mutate } = useSWR(`/api/yearly?year=${year}`, fetcher)
 
   useEffect(() => {
     if (!yearlyTopBooks) return
@@ -70,6 +73,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
       }).then((res) => res.json())
       setMessage(`『${order}位の設定を削除しました`)
     }
+    mutate()
     reward()
     setLoading(false)
   }
