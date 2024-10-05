@@ -1,3 +1,5 @@
+import useSWR from 'swr'
+import { fetcher } from '@/libs/swr'
 import { Book } from '@/types/book'
 import { YearlyTopBook } from '@/types/book'
 import { useState } from 'react'
@@ -21,6 +23,14 @@ export const YearlyTopBooks: React.FC<Props> = ({
   const [order, setOrder] = useState(null)
   const isMine =
     session && books.length > 0 && session.user.id === books[0].userId
+  // 自分のページの場合、最新の情報を取得
+  // 設定した直後は以前設定していたものが表示されてしまうため、取得し直す
+  const { data: latestYearlyBooks } = useSWR(
+    isMine ? `/api/yearly?year=${year}` : null,
+    fetcher,
+    { fallbackData: { result: true, yearlyTopBooks } }
+  )
+  console.log('でたー', isMine, latestYearlyBooks)
 
   const onClickAdd = (order: number) => {
     setOpen(true)
@@ -37,7 +47,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
         }}
         year={year}
         order={order}
-        yearlyTopBooks={yearlyTopBooks}
+        yearlyTopBooks={latestYearlyBooks.yearlyTopBooks}
       />
       <div className="mb-8 text-center">
         <div className="mb-4">
@@ -45,7 +55,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
         </div>
         <div className="flex justify-between">
           {[1, 2, 3].map((v) => {
-            const yearlyTopBook = yearlyTopBooks
+            const yearlyTopBook = latestYearlyBooks.yearlyTopBooks
               .filter((book) => book.order === v)
               .pop()
             return (
