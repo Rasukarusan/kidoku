@@ -30,7 +30,6 @@ export const YearlyTopBooks: React.FC<Props> = ({
     fetcher,
     { fallbackData: { result: true, yearlyTopBooks } }
   )
-  console.log('でたー', isMine, latestYearlyBooks)
 
   const onClickAdd = (order: number) => {
     setOpen(true)
