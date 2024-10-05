@@ -8,7 +8,6 @@ import { initUser } from '@/libs/auth/init'
 import { randomStr } from '@/utils/string'
 
 export const authOptions: NextAuthOptions = {
-  // @ts-expect-error hoge
   adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     GoogleProvider({
