@@ -6,6 +6,7 @@ import { useSetAtom } from 'jotai'
 import { openAddModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
 import { FaRegTrashAlt } from 'react-icons/fa'
+import { Loading } from '@/components/icon/Loading'
 
 interface Props {
   input: string
@@ -28,6 +29,7 @@ export const Template: React.FC<Props> = ({ input, onClose }) => {
         }}
       />
       <div className="p-8">
+        {!data && <Loading className="mr-2 h-[18px] w-[18px] border-[3px]" />}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {data?.templates?.map((template) => (
             <div key={template.id} className="relative mx-auto">
