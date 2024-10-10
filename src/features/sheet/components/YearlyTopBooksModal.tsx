@@ -3,7 +3,6 @@ import { Book } from '@/types/book'
 import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
-import { truncate } from '@/utils/string'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { Loading } from '@/components/icon/Loading'
 import { YearlyTopBook } from '@/types/book'
@@ -81,16 +80,16 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   return (
     <Modal open={open} onClose={onClose} className="h-3/4 sm:w-2/3">
       <div className="h-full p-4">
-        <h2 className="mb-4 shrink-0 text-center text-2xl font-bold">
-          {year}年ベスト<span className="underline">{order}位</span>を設定
+        <h2 className="mb-4 shrink-0 text-center text-2xl">
+          {year}年ベスト<span className="font-bold">{order}位</span>を設定
         </h2>
         <div className="flex h-full w-full flex-wrap justify-center overflow-y-auto p-4 pb-12 text-gray-900">
           {books.map((book, i: number) => {
             return (
               <div
-                className={`m-2 w-3/4 cursor-pointer rounded-md border border-gray-300 px-4 py-2 shadow hover:bg-gray-100 sm:w-[200px] ${
+                className={`m-2 w-3/4 cursor-pointer rounded-md px-4 py-2 text-center hover:bg-gray-100 sm:w-[200px] ${
                   selectItem?.id === book.id
-                    ? 'bg-pink-200 hover:bg-pink-200'
+                    ? 'bg-blue-200 hover:bg-blue-300'
                     : 'bg-white'
                 }`}
                 key={book.id}
@@ -98,15 +97,13 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
                   setSelectItem(selectItem?.id === book.id ? null : book)
                 }
               >
-                <div className="mb-1 font-bold">{truncate(book.title, 15)}</div>
-                <div className="mb-1 text-xs">{book.author}</div>
                 <img
                   className="m-auto mb-1 h-[150px] object-contain"
                   src={book.image}
                   alt={book.title}
                   loading="lazy"
                 />
-                <div className="text-sm">{truncate(book.memo, 30)}</div>
+                <div className="mb-1 text-sm font-bold">{book.title}</div>
               </div>
             )
           })}
