@@ -93,10 +93,21 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
   return (
     <Modal
       onClose={() => {
-        if (edit) {
-          setEdit(false)
-        } else {
+        if (!edit) {
           onClose()
+          return
+        }
+        const isDiff = Object.keys(book).some(
+          (key) => book[key] !== newBook[key]
+        )
+        if (!isDiff) {
+          setEdit(false)
+          return
+        }
+        if (
+          confirm('変更内容が保存されていません。破棄してもよろしいですか？')
+        ) {
+          setEdit(false)
         }
       }}
       open={open}
