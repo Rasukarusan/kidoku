@@ -5,9 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 import { Logo } from '@/components/icon/Logo'
-import { useAtomValue, useSetAtom } from 'jotai'
-import { pusherAtom, pusherConnectionAtom } from '@/store/pusher/atom'
-import { twMerge } from 'tailwind-merge'
+import { useSetAtom } from 'jotai'
 import { openLoginModalAtom } from '@/store/modal/atom'
 import { UserMenu } from './UserMenu'
 import useSWR from 'swr'
@@ -20,8 +18,6 @@ export const Header = () => {
   const { data: session } = useSession()
   const setOpen = useSetAtom(openLoginModalAtom)
   const [openMenu, setOpenMenu] = useState(false)
-  const pusher = useAtomValue(pusherAtom)
-  const pusherConnection = useAtomValue(pusherConnectionAtom)
 
   /**
    * 画面上をクリックしたらメニューを非表示
@@ -55,38 +51,36 @@ export const Header = () => {
   return (
     <>
       <div className="fixed top-0 z-50 w-full bg-main text-white">
-        <Container className="flex items-center p-2">
-          <Link href="/" className="mr-4 no-underline">
-            <Logo className="h-8 w-8" />
+        <Container className="flex max-h-16 items-center p-2">
+          <Link href="/" className="mr-2 no-underline sm:mr-4">
+            <Logo className="h-8 min-h-8 w-8 min-w-8" />
           </Link>
-          {session && (
-            <Link className="mr-4 text-base font-bold text-black" href={url}>
-              {session.user.name}
-            </Link>
-          )}
-          <SearchBox />
+          <div className="mr-2 sm:mr-4">
+            <SearchBox />
+          </div>
           <div className="flex-grow"></div>
           {session && (
             <>
-              <div className="relative" ref={dropdownRef}>
+              <Link
+                className="mr-2 truncate text-base font-bold text-black sm:mr-4"
+                href={url}
+              >
+                {session.user.name}
+              </Link>
+              <div
+                className="relative max-h-[40px] max-w-[40px]"
+                ref={dropdownRef}
+              >
                 <button
-                  className="h-[34px] w-[34px] rounded-full bg-gray-200 sm:mr-4 sm:h-[40px] sm:w-[40px]"
+                  className="h-[34px] w-[34px] rounded-full bg-gray-200 sm:mr-2 sm:mr-4 sm:h-[40px] sm:w-[40px]"
                   onClick={() => setOpenMenu(!openMenu)}
                 >
                   <img
                     src={session.user.image}
                     alt="ユーザーアイコン"
-                    className="rounded-full"
+                    className="max-h-[40px]  max-w-[40px] rounded-full "
                   />
                 </button>
-                <div
-                  className={twMerge(
-                    'absolute right-0 top-1 h-2 w-2 rounded-full bg-gray-400 text-white sm:right-4 sm:top-1',
-                    pusherConnection === 'connected' && 'bg-green-600',
-                    pusherConnection === 'failed' && 'bg-red-500',
-                    pusherConnection === 'disconnected' && 'bg-gray-400'
-                  )}
-                ></div>
                 <UserMenu open={openMenu} setOpen={setOpenMenu} url={url} />
               </div>
             </>
