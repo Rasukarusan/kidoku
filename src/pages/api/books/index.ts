@@ -81,12 +81,13 @@ export default async (req, res) => {
         finished: finished ? new Date(finished) : null,
       }
       data['image'] = image === NO_IMAGE || image.includes('http') ? image : ''
-      // await setTimeout(500)
       const book = await prisma.books.create({ data })
 
       // 画像選択された場合はVercel Blobにアップロードする
       if (image !== NO_IMAGE && !image.includes('http')) {
-        const imageBuffer = Buffer.from(image, 'base64')
+        // 先頭の「data:image/png;base64,」部分を除き、Base64部分のみを取得
+        const base64Image = image.split(',')[1]
+        const imageBuffer = Buffer.from(base64Image, 'base64')
         const buffer = await bufferToWebp(imageBuffer)
         const { url } = await put(`${book.id}.webp`, buffer, {
           access: 'public',
@@ -128,7 +129,8 @@ export default async (req, res) => {
       const { image } = body
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
       if (image !== NO_IMAGE && !image.startsWith('http')) {
-        const imageBuffer = Buffer.from(image, 'base64')
+        const base64Image = image.split(',')[1]
+        const imageBuffer = Buffer.from(base64Image, 'base64')
         const buffer = await bufferToWebp(imageBuffer)
         const { url } = await put(`${book.id}.webp`, buffer, {
           access: 'public',

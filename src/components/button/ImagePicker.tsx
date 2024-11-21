@@ -10,7 +10,6 @@ interface Props {
 export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   const ref = useRef(null)
   const [image, setImage] = useState(img)
-  const [base64, setBase64] = useState('')
   const [open, setOpen] = useState(false)
 
   // URLから画像を読み込む
@@ -24,9 +23,6 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
         const ctx = canvas.getContext('2d')
         ctx.drawImage(img, 0, 0)
         const dataURL = canvas.toDataURL()
-        // Base64部分のみを返す
-        const base64Image = dataURL.split(',')[1]
-        setBase64(base64Image)
         setImage(dataURL)
       }
       img.onerror = reject
@@ -43,14 +39,13 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
     setImage(url)
     const reader = new FileReader()
     reader.onload = (e) => {
-      const base64Image = (e.target.result as string).split(',')[1]
-      setBase64(base64Image)
+      setImage(e.target.result as string)
     }
     reader.readAsDataURL(file)
   }
 
   const onSubmit = async (e) => {
-    onImageLoad && onImageLoad(base64)
+    onImageLoad && onImageLoad(image)
     setOpen(false)
   }
 
@@ -77,7 +72,11 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
       </button>
       <Modal
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          // 初期画像に戻す
+          setImage(img)
+          setOpen(false)
+        }}
         className="w-full sm:w-[500px]"
       >
         <div className="mx-auto w-full rounded-md bg-white p-4 text-center sm:w-10/12">
