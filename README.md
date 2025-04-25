@@ -1,64 +1,84 @@
-# kidoku
+# Turborepo starter
 
-https://kidoku.net/
+This Turborepo starter is maintained by the Turborepo core team.
 
-<img width="1247" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
-<img width="1059" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
+## Using this example
 
-## 機能
-
-- AIによる読書傾向分析
-- 本の検索(バーコードスキャン、タイトル検索、ユーザー本棚検索)
-- 2022年、2023年などシートごとの本の管理
-- 月ごとの冊数、カテゴリ内訳、本の感想
-
-## 技術
-
-- Next.js
-- Tailwind
-- NextAuth
-- Prisma
-- Framer Motion
-- Jotai
-- TiDB
-- MeiliSearch
-- Resend
-- Pusher
-
-## 環境構築
-
-envファイルの作成
+Run the following command:
 
 ```sh
-cp .env.example .env
+npx create-turbo@latest
 ```
 
-画面アクセス
+## What's inside?
 
-```sh
-yarn
-yarn dev
-open http://localhost:3000
+This Turborepo includes the following packages/apps:
+
+### Apps and Packages
+
+- `docs`: a [Next.js](https://nextjs.org/) app
+- `web`: another [Next.js](https://nextjs.org/) app
+- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+
+### Utilities
+
+This Turborepo has some additional tools already setup for you:
+
+- [TypeScript](https://www.typescriptlang.org/) for static type checking
+- [ESLint](https://eslint.org/) for code linting
+- [Prettier](https://prettier.io) for code formatting
+
+### Build
+
+To build all apps and packages, run the following command:
+
+```
+cd my-turborepo
+pnpm build
 ```
 
-検索環境(meilisearch)構築
+### Develop
 
-```sh
-docker-compose up --build
-
-# meiliearchが構築できていることを確認
-open http://localhost:7700
-
-# meilisearchにドキュメント登録
-curl -XPOST -H "Authorization: Bearer ${ADMIN_AUTH_TOKEN}" http://localhost:3000/api/batch/meilisearch
-# {"result":true}
-```
-
-## MeiliSearchの起動に失敗した場合
-
-`dockuer-compose up`で下記エラーが出た場合、`data/meilisearch`の`meilisearch`ディレクトリを削除してから再度`docker-compose up`すると起動できます。
+To develop all apps and packages, run the following command:
 
 ```
-Error: Meilisearch (v1.4.2) failed to infer the version of the database.
-To update Meilisearch please follow our guide on https://www.meilisearch.com/docs/learn/update_and_migration/updating.
+cd my-turborepo
+pnpm dev
 ```
+
+### Remote Caching
+
+> [!TIP]
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+
+Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+
+By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+
+```
+cd my-turborepo
+npx turbo login
+```
+
+This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+
+Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+
+```
+npx turbo link
+```
+
+## Useful Links
+
+Learn more about the power of Turborepo:
+
+- [Tasks](https://turborepo.com/docs/core-concepts/monorepos/running-tasks)
+- [Caching](https://turborepo.com/docs/core-concepts/caching)
+- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
+- [Filtering](https://turborepo.com/docs/core-concepts/monorepos/filtering)
+- [Configuration Options](https://turborepo.com/docs/reference/configuration)
+- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
