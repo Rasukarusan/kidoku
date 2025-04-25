@@ -14,7 +14,7 @@ const Row = ({ title, description }) => {
 export const AboutPage: React.FC = () => {
   return (
     <Container>
-      <NextSeo title="kidokuについて | kidoku" />
+      <NextSeo title="kidokuについて" />
       <div className="p-4 text-center">
         <Logo className="mx-auto h-10 w-10 text-gray-700" />
         <h2 className="p-4 text-[24px] font-normal text-black">
