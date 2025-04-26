@@ -2,7 +2,7 @@
 /node_modules
 /.pnp
 .pnp.js
-/data/meilisearch
+/docker/meilisearch/data/meilisearch
 **/node_modules
 
 # testing
