@@ -8,7 +8,7 @@ services:
     ports:
       - '7700:7700'
     volumes:
-      - ./data/meilisearch:/meili_data/data.ms
+      - ./docker/meilisearch/data/meilisearch:/meili_data/data.ms
     environment:
       - MEILI_HTTP_ADDR=${MEILI_HTTP_ADDR}
       - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
