@@ -18,7 +18,7 @@
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
-    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
     "unused-imports/no-unused-imports-ts": "warn",
     "react/no-unknown-property": "off",
     "@typescript-eslint/no-empty-function": "off"
