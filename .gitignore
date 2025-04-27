@@ -3,6 +3,8 @@
 /.pnp
 .pnp.js
 /docker/meilisearch/data/meilisearch
+/docker/mysql/data/*
+!/docker/mysql/data/.gitkeep
 **/node_modules
 
 # testing

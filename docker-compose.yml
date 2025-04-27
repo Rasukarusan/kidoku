@@ -12,3 +12,15 @@ services:
     environment:
       - MEILI_HTTP_ADDR=${MEILI_HTTP_ADDR}
       - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+  db:
+    image: mysql:8.0
+    container_name: kidoku_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
