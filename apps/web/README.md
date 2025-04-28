@@ -57,7 +57,7 @@ curl -XPOST -H "Authorization: Bearer ${ADMIN_AUTH_TOKEN}" http://localhost:3000
 
 ## MeiliSearchの起動に失敗した場合
 
-`dockuer-compose up`で下記エラーが出た場合、`data/meilisearch`の`meilisearch`ディレクトリを削除してから再度`docker-compose up`すると起動できます。
+`dockuer-compose up`で下記エラーが出た場合、`docker/meilisearch/data/meilisearch`を削除してから再度`docker-compose up`すると起動できます。
 
 ```
 Error: Meilisearch (v1.4.2) failed to infer the version of the database.
