@@ -13,6 +13,11 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: 'select_account',
+        },
+      },
       profile: async (profile) => {
         // ユーザー名が重複している場合、ランダムな文字列を付与する
         const user = await prisma.user.findUnique({
