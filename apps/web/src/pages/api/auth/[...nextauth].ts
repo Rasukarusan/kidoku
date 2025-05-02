@@ -1,11 +1,20 @@
 import NextAuth from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
-import prisma from '@/libs/prisma/edge'
 import type { NextAuthOptions } from 'next-auth'
 import type { Adapter } from 'next-auth/adapters'
 import { initUser } from '@/libs/auth/init'
 import { randomStr } from '@/utils/string'
+
+const isEdge =
+  process.env.NEXT_RUNTIME === 'edge' ||
+  process.env.NEXT_PUBLIC_USE_EDGE === 'true'
+
+const prisma = isEdge
+  ? // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('@/libs/prisma/edge').default
+  : // eslint-disable-next-line @typescript-eslint/no-var-requires
+    require('@/libs/prisma').default
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
