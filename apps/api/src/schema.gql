@@ -6,6 +6,11 @@ type HelloResponseDto {
   message: String!
 }
 
+type GetSheetsResponseDto {
+  message: String!
+}
+
 type Query {
   hello: HelloResponseDto!
+  sheets: GetSheetsResponseDto!
 }
