@@ -15,8 +15,8 @@ export const sheets = mysqlTable(
     userId: varchar('user_id', { length: 191 }).notNull(),
     name: varchar({ length: 120 }).notNull(),
     order: int().default(1),
-    created: datetime({ mode: 'string' }).default(sql`(CURRENT_TIMESTAMP)`),
-    updated: datetime({ mode: 'string' }).default(sql`(CURRENT_TIMESTAMP)`),
+    created: datetime({ mode: 'date' }).default(sql`(CURRENT_TIMESTAMP)`),
+    updated: datetime({ mode: 'date' }).default(sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [
     primaryKey({ columns: [table.id], name: 'sheets_id' }),

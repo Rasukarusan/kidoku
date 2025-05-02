@@ -16,10 +16,10 @@ export const yearlyTopBooks = mysqlTable(
     bookId: int('book_id').notNull(),
     order: int().default(1).notNull(),
     year: varchar({ length: 120 }).notNull(),
-    created: datetime({ mode: 'string' })
+    created: datetime({ mode: 'date' })
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
-    updated: datetime({ mode: 'string' })
+    updated: datetime({ mode: 'date' })
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
   },

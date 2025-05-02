@@ -16,8 +16,8 @@ export const aiSummaries = mysqlTable(
     sheetId: int('sheet_id').notNull(),
     analysis: json().notNull(),
     token: int().notNull(),
-    created: datetime({ mode: 'string' }).default(sql`(CURRENT_TIMESTAMP)`),
-    updated: datetime({ mode: 'string' }).default(sql`(CURRENT_TIMESTAMP)`),
+    created: datetime({ mode: 'date' }).default(sql`(CURRENT_TIMESTAMP)`),
+    updated: datetime({ mode: 'date' }).default(sql`(CURRENT_TIMESTAMP)`),
   },
   (table) => [primaryKey({ columns: [table.id], name: 'ai_summaries_id' })],
 );
