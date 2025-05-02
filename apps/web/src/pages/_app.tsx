@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import Head from 'next/head'
 import { Analytics } from '@vercel/analytics/react'
 import { Header, Footer } from '@/features/global'
@@ -10,10 +9,9 @@ import './global.css'
 import { SessionProvider } from 'next-auth/react'
 import { Layout } from '@/components/layout/Layout'
 import { Provider } from 'jotai'
+import { AppProps } from 'next/app'
 
-export default function MyApp(props) {
-  const { Component, pageProps } = props
-
+export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
@@ -37,9 +35,4 @@ export default function MyApp(props) {
       </Provider>
     </>
   )
-}
-
-MyApp.propTypes = {
-  Component: PropTypes.elementType.isRequired,
-  pageProps: PropTypes.object.isRequired,
 }
