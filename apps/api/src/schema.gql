@@ -2,10 +2,10 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Hello {
+type HelloResponseDto {
   message: String!
 }
 
 type Query {
-  getHello: Hello!
+  hello: HelloResponseDto!
 }
