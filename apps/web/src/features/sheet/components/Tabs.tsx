@@ -14,6 +14,7 @@ interface Props {
 export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const router = useRouter()
   const { data: session } = useSession()
+  console.log(session)
   const [tab, setTab] = useState(value)
   const { data } = useSWR(`/api/user/image?username=${username}`, fetcher)
 

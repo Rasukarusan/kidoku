@@ -1,9 +1,8 @@
 import NextAuth, { type NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
-import { encode } from 'next-auth/jwt' // ★ JWT 文字列を生成
 import { randomStr } from '@/utils/string'
 import { initUser } from '@/libs/auth/init'
-import { PrismaAdapter } from '@auth/prisma-adapter'
+import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { SignJWT } from 'jose'
 
 const isEdge =
@@ -16,7 +15,7 @@ const prisma = isEdge
   : // eslint-disable-next-line @typescript-eslint/no-var-requires
     require('@/libs/prisma').default
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET! // Nest と共有
+const JWT_SECRET = process.env.NEXTAUTH_SECRET // Nest と共有
 
 export const authOptions: NextAuthOptions = {
   /* ───────────── セッションは署名付き JWT ───────────── */
@@ -33,8 +32,8 @@ export const authOptions: NextAuthOptions = {
   /* ───────────── プロバイダ ───────────── */
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       authorization: { params: { prompt: 'select_account' } },
       profile: async (profile) => {
         const duplicated = await prisma.user.findUnique({
