@@ -9,6 +9,6 @@ export class GetSheetsUseCase {
   async execute(userId: string): Promise<GetSheetsResponseDto> {
     const sheets = await this.sheetsRepository.findByUserId(userId);
     console.log(sheets);
-    return { message: 'hoge' };
+    return { sheets };
   }
 }
