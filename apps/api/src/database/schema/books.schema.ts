@@ -23,11 +23,11 @@ export const books = mysqlTable(
     memo: text().notNull(),
     isPublicMemo: tinyint('is_public_memo').default(0).notNull(),
     isPurchasable: tinyint('is_purchasable').default(0).notNull(),
-    finished: datetime({ mode: 'string' }),
-    created: datetime({ mode: 'string' })
+    finished: datetime({ mode: 'date' }),
+    created: datetime({ mode: 'date' })
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
-    updated: datetime({ mode: 'string' })
+    updated: datetime({ mode: 'date' })
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
   },

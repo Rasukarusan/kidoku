@@ -5,7 +5,7 @@ export const verificationtokens = mysqlTable(
   {
     identifier: varchar({ length: 191 }).notNull(),
     token: varchar({ length: 191 }).notNull(),
-    expires: datetime({ mode: 'string', fsp: 3 }).notNull(),
+    expires: datetime({ mode: 'date', fsp: 3 }).notNull(),
   },
   (table) => [
     unique('verificationtokens_identifier_token_key').on(
