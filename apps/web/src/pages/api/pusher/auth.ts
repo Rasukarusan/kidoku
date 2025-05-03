@@ -9,7 +9,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const session = await getServerSession(req, res, authOptions)
-  if (!session) {
+  if (!session || !session?.user) {
     res.status(401).json({ result: false })
   }
   const { socket_id, channel_name } = req.body
