@@ -18,18 +18,13 @@ const prisma = isEdge
 const JWT_SECRET = process.env.NEXTAUTH_SECRET // Nest と共有
 
 export const authOptions: NextAuthOptions = {
-  /* ───────────── セッションは署名付き JWT ───────────── */
+  // TODO: サーバー側で無効化できるようにDB管理にする
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 60, // 30 分
-    updateAge: 10 * 60, // 10 分ごとに再署名
+    maxAge: 30 * 24 * 60 * 60, // 30日間
   },
   secret: JWT_SECRET,
-
-  /* ───────────── DB 連携 ───────────── */
   adapter: PrismaAdapter(prisma),
-
-  /* ───────────── プロバイダ ───────────── */
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -50,7 +45,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  /* ───────────── コールバック ───────────── */
   callbacks: {
     /* 1. JWT ペイロードに userId / admin を埋め込む */
     async jwt({ token, user }) {
@@ -77,7 +71,7 @@ export const authOptions: NextAuthOptions = {
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
         .setExpirationTime('30m')
-        .sign(new TextEncoder().encode(JWT_SECRET)) // ← NEXTAUTH_SECRET と同値
+        .sign(new TextEncoder().encode(JWT_SECRET))
 
       session.accessToken = jws // ← ３区切りの HS256 JWS
 
@@ -85,7 +79,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
 
-  /* ───────────── イベント ───────────── */
   events: {
     createUser: async ({ user }) => {
       await initUser(user) // 初回ユーザ作成ロジック
