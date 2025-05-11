@@ -10,6 +10,9 @@ import { SessionProvider } from 'next-auth/react'
 import { Layout } from '@/components/layout/Layout'
 import { Provider } from 'jotai'
 import { AppProps } from 'next/app'
+import { ApolloProvider } from '@apollo/client'
+import apolloClient from '@/libs/apollo'
+import { StoreAccessToken } from '@/features/global/components/StoreAccessToken'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -23,15 +26,18 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <DefaultSeo {...SEO} />
       <Provider>
-        <SessionProvider session={pageProps.session}>
-          <LoadingTopBar />
-          <Layout>
-            <Header />
-            <Component {...pageProps} />
-            <Analytics />
-          </Layout>
-          <Footer />
-        </SessionProvider>
+        <ApolloProvider client={apolloClient}>
+          <SessionProvider session={pageProps.session}>
+            <StoreAccessToken />
+            <LoadingTopBar />
+            <Layout>
+              <Header />
+              <Component {...pageProps} />
+              <Analytics />
+            </Layout>
+            <Footer />
+          </SessionProvider>
+        </ApolloProvider>
       </Provider>
     </>
   )

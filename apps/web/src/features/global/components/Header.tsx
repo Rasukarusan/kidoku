@@ -10,6 +10,21 @@ import { openLoginModalAtom } from '@/store/modal/atom'
 import { UserMenu } from './UserMenu'
 import useSWR from 'swr'
 import { fetcher } from '@/libs/swr'
+import { gql, useQuery } from '@apollo/client'
+
+const GET_USERS = gql`
+  query GetUsers {
+    sheets {
+      sheets {
+        id
+        name
+        order
+        created
+        updated
+      }
+    }
+  }
+`
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -18,6 +33,8 @@ export const Header = () => {
   const { data: session } = useSession()
   const setOpen = useSetAtom(openLoginModalAtom)
   const [openMenu, setOpenMenu] = useState(false)
+  const { data, loading, error } = useQuery(GET_USERS)
+  console.log(data)
 
   /**
    * 画面上をクリックしたらメニューを非表示
