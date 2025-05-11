@@ -13,15 +13,13 @@ import { fetcher } from '@/libs/swr'
 import { gql, useQuery } from '@apollo/client'
 
 const GET_USERS = gql`
-  query GetUsers {
+  query GetSheets {
     sheets {
-      sheets {
-        id
-        name
-        order
-        created
-        updated
-      }
+      id
+      name
+      order
+      created
+      updated
     }
   }
 `

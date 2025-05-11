@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { SheetsRepository } from '../../../infrastructure/repositories/sheets.repository';
-import { GetSheetsResponseDto } from '../dto/get-sheets-response.dto';
+import { Sheet } from '../models/sheet.model';
 
 @Injectable()
 export class GetSheetsUseCase {
   constructor(private readonly sheetsRepository: SheetsRepository) {}
 
-  async execute(userId: string): Promise<GetSheetsResponseDto> {
+  async execute(userId: string): Promise<Sheet[]> {
     const sheets = await this.sheetsRepository.findByUserId(userId);
-    console.log(sheets);
-    return { sheets };
+    return sheets;
   }
 }
