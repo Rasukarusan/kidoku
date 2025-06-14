@@ -33,7 +33,7 @@ export default function BookPage({ book }: BookPageProps) {
     )
   }
 
-  const isOwner = session?.user?.name === book.user.name
+  const isOwner = session?.user?.id === book.userId
 
   const handleClose = () => {
     router.back()
