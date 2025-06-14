@@ -1,40 +1,22 @@
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { Container } from '@/components/layout/Container'
-import { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 import { Logo } from '@/components/icon/Logo'
 import { useSetAtom } from 'jotai'
-import { openLoginModalAtom } from '@/store/modal/atom'
-import { UserMenu } from './UserMenu'
+import { openLoginModalAtom, openNavSidebarAtom } from '@/store/modal/atom'
 import { useQuery } from '@apollo/client'
 import { GET_SHEETS } from '@/libs/apollo/queries'
 
 // レスポンシブヘッダー
 export const Header = () => {
   const router = useRouter()
-  const dropdownRef = useRef(null)
   const { data: session } = useSession()
   const setOpen = useSetAtom(openLoginModalAtom)
-  const [openMenu, setOpenMenu] = useState(false)
+  const setOpenSidebar = useSetAtom(openNavSidebarAtom)
   const { data } = useQuery(GET_SHEETS)
-
-  /**
-   * 画面上をクリックしたらメニューを非表示
-   */
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenMenu(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
 
   const sheets = data?.sheets || []
   const url = !session
@@ -49,40 +31,22 @@ export const Header = () => {
 
   return (
     <>
-      <div className="fixed top-0 z-50 w-full bg-main text-white">
+      <div className="sticky top-0 z-40 h-16 w-full bg-main border-b border-gray-200 text-white">
         <Container className="flex max-h-16 items-center p-2">
           <Link href="/" className="mr-2 no-underline sm:mr-4">
             <Logo className="h-8 min-h-8 w-8 min-w-8" />
           </Link>
-          <div className="mr-2 sm:mr-4">
+          <div className="mr-2 sm:mr-4 lg:ml-12">
             <SearchBox />
           </div>
           <div className="flex-grow"></div>
           {session && (
-            <>
-              <Link
-                className="mr-2 truncate text-base font-bold text-black sm:mr-4"
-                href={url}
-              >
-                {session.user.name}
-              </Link>
-              <div
-                className="relative max-h-[40px] max-w-[40px]"
-                ref={dropdownRef}
-              >
-                <button
-                  className="h-[34px] w-[34px] rounded-full bg-gray-200 sm:mr-2 sm:mr-4 sm:h-[40px] sm:w-[40px]"
-                  onClick={() => setOpenMenu(!openMenu)}
-                >
-                  <img
-                    src={session.user.image}
-                    alt="ユーザーアイコン"
-                    className="max-h-[40px]  max-w-[40px] rounded-full "
-                  />
-                </button>
-                <UserMenu open={openMenu} setOpen={setOpenMenu} url={url} />
-              </div>
-            </>
+            <button
+              className="mr-2 truncate text-base font-bold text-black sm:mr-4 lg:hidden"
+              onClick={() => setOpenSidebar(true)}
+            >
+              {session.user.name}
+            </button>
           )}
           {session === null && (
             <>
@@ -96,7 +60,6 @@ export const Header = () => {
           )}
         </Container>
       </div>
-      <div style={{ marginBottom: '70px' }}></div>
     </>
   )
 }
