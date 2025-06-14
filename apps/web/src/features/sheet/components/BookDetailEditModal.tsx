@@ -121,9 +121,14 @@ export const BookDetailEditModal: React.FC<Props> = ({
         />
       </div>
       <div className="mb-4">
-        <div className="mb-2 flex items-center">
-          <Label text="メモ" className="mb-0 mr-2" />
-          <MaskingHint />
+        <div className="mb-2 flex items-center justify-between">
+          <div className="flex items-center">
+            <Label text="メモ" className="mb-0 mr-2" />
+            <MaskingHint />
+          </div>
+          <div className="text-xs text-gray-500">
+            {book?.memo?.length || 0} / 16,777,215 文字
+          </div>
         </div>
         <BookInputField
           rows={8}
