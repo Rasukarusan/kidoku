@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Modal } from '@/components/layout/Modal'
 import { Loading } from '@/components/icon/Loading'
+import { useMutation } from '@apollo/client'
+import { DELETE_SHEET } from '@/libs/apollo/queries'
 
 interface Props {
   sheet: string
@@ -15,9 +17,9 @@ export const SheetDeleteModal: React.FC<Props> = ({
   onClose,
   username,
 }) => {
-  const [loading, setLoading] = useState(false)
   const [input, setInput] = useState('')
   const ref = useRef<HTMLInputElement>(null)
+  const [deleteSheet, { loading }] = useMutation(DELETE_SHEET)
 
   useEffect(() => {
     ref.current?.focus()
@@ -54,21 +56,19 @@ export const SheetDeleteModal: React.FC<Props> = ({
           className="mx-auto flex items-center justify-center rounded-md bg-red-700 px-4 py-1 font-bold text-white disabled:bg-gray-300"
           disabled={input !== sheet || loading}
           onClick={async () => {
-            setLoading(true)
-            const res = await fetch('/api/sheets', {
-              method: 'DELETE',
-              body: JSON.stringify({ name: input }),
-              headers: {
-                Accept: 'application/json',
-              },
-            }).then((res) => res.json())
-            if (!res.result) {
-              setLoading(false)
+            try {
+              await deleteSheet({
+                variables: {
+                  input: {
+                    name: input,
+                  },
+                },
+              })
+              alert('削除しました')
+              location.href = `${process.env.NEXT_PUBLIC_HOST}/${username}/sheets/total`
+            } catch (error) {
               alert('シートの削除に失敗しました')
-              return
             }
-            alert('削除しました')
-            location.href = `${process.env.NEXT_PUBLIC_HOST}/${username}/sheets/total`
           }}
         >
           {loading ? (

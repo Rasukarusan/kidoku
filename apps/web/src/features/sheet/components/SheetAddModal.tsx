@@ -3,6 +3,8 @@ import { Modal } from '@/components/layout/Modal'
 import { useReward } from 'react-rewards'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { DangerAlert } from '@/components/label/DangerAlert'
+import { useMutation } from '@apollo/client'
+import { CREATE_SHEET } from '@/libs/apollo/queries'
 
 interface Props {
   open: boolean
@@ -19,6 +21,7 @@ export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
     elementCount: 200,
   })
   const [response, setResponse] = useState<Response>(null)
+  const [createSheet] = useMutation(CREATE_SHEET)
 
   useEffect(() => {
     ref.current?.focus()
@@ -70,16 +73,18 @@ export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
           className="rounded-md bg-blue-700 px-4 py-1 font-bold text-white disabled:bg-blue-300"
           disabled={!newSheet}
           onClick={async () => {
-            const res = await fetch('/api/sheets', {
-              method: 'POST',
-              body: JSON.stringify({ name: newSheet }),
-              headers: {
-                Accept: 'application/json',
-              },
-            }).then((res) => res.json())
-            setResponse(res)
-            if (res.result) {
+            try {
+              await createSheet({
+                variables: {
+                  input: {
+                    name: newSheet,
+                  },
+                },
+              })
+              setResponse({ result: true })
               reward()
+            } catch (error) {
+              setResponse({ result: false })
             }
           }}
         >
