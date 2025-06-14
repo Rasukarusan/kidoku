@@ -1,0 +1,11 @@
+{
+  "buildCommand": "turbo run build",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "functions": {
+    "apps/web/pages/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "crons": []
+}
