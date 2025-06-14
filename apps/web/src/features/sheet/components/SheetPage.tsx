@@ -57,11 +57,11 @@ export const SheetPage: React.FC<Props> = ({
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
   const [filter, setFilter] = useState('')
-  
+
   // サイドバー用の状態管理
   const [openSidebar, setOpenSidebar] = useState(false)
   const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
-  
+
   // フルページモーダル用の状態管理
   const [openFullPageModal, setOpenFullPageModal] = useState(false)
   const [fullPageBook, setFullPageBook] = useState<Book>(null)
@@ -217,7 +217,7 @@ export const SheetPage: React.FC<Props> = ({
           <BookRows books={currentData} />
         )}
       </div>
-      
+
       <BookDetailSidebar
         open={openSidebar}
         book={sidebarBook}
@@ -233,7 +233,7 @@ export const SheetPage: React.FC<Props> = ({
           }
         }}
       />
-      
+
       <BookDetailModal
         open={openFullPageModal}
         book={fullPageBook}
