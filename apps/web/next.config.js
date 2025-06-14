@@ -19,6 +19,12 @@ const nextConfig = {
     ...(process.env.VERCEL && {
       outputFileTracingRoot: path.join(__dirname, '../../'),
     }),
+    // ISR最適化
+    isrMemoryCacheSize: 0, // メモリキャッシュを無効化してディスクキャッシュを優先
+  },
+  // 静的生成の最適化
+  generateBuildId: async () => {
+    return process.env.VERCEL_GIT_COMMIT_SHA || 'development'
   },
   images: {
     domains: [

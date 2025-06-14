@@ -40,22 +40,35 @@ export async function getStaticProps(ctx) {
   const next = Math.ceil(total / limit) > page
   return {
     props: { comments, next, page },
-    revalidate: 5,
+    revalidate: 600, // 10分に延長
   }
 }
 
 export async function getStaticPaths() {
+  // ビルド時は最初の数ページのみ生成
+  if (process.env.NODE_ENV === 'production') {
+    return {
+      paths: [
+        { params: { page: '1' } },
+        { params: { page: '2' } },
+        { params: { page: '3' } },
+      ],
+      fallback: 'blocking',
+    }
+  }
+  
+  // 開発時は全ページ生成
   const count = await prisma.books.count({
     where: { is_public_memo: true },
   })
   const limit = 20
-  const pages = Math.ceil(count / limit)
+  const pages = Math.min(Math.ceil(count / limit), 10) // 最初の10ページまで
   const paths = []
   for (let i = 1; i <= pages; i++) {
     paths.push({ params: { page: `${i}` } })
   }
   return {
     paths,
-    fallback: 'blocking', // キャッシュが存在しない場合はSSR
+    fallback: 'blocking',
   }
 }
