@@ -7,7 +7,7 @@ export default SheetPage
 type Props = { params: { year: string } }
 export async function getStaticProps(context) {
   const { user: username, year } = context.params
-  
+
   try {
     // 一つのクエリで必要なデータを取得
     const [user, userWithSheets] = await Promise.all([
@@ -25,16 +25,16 @@ export async function getStaticProps(context) {
         },
       }),
     ])
-    
+
     if (!user || !userWithSheets) {
       return { notFound: true }
     }
-    
+
     const sheet = userWithSheets.sheets.find((s) => s.name === year)
     if (!sheet) {
       return { notFound: true }
     }
-    
+
     // 並列でデータ取得
     const [books, yearlyTopBooks, aiSummaries] = await Promise.all([
       prisma.books.findMany({
@@ -60,7 +60,9 @@ export async function getStaticProps(context) {
         select: {
           year: true,
           order: true,
-          book: { select: { id: true, title: true, author: true, image: true } },
+          book: {
+            select: { id: true, title: true, author: true, image: true },
+          },
         },
         orderBy: { order: 'asc' },
       }),
@@ -69,7 +71,7 @@ export async function getStaticProps(context) {
         select: { analysis: true },
       }),
     ])
-    
+
     const data = books.map((book) => {
       const month = book.finished
         ? dayjs(book.finished).format('M') + '月'
@@ -77,7 +79,7 @@ export async function getStaticProps(context) {
       const memo = book.is_public_memo ? mask(book.memo) : ''
       return { ...book, month, memo }
     })
-    
+
     return {
       props: {
         data: parse(data),
@@ -102,7 +104,7 @@ export async function getStaticPaths() {
       fallback: 'blocking',
     }
   }
-  
+
   // 開発時は一部のパスのみ生成
   const users = await prisma.user.findMany({
     select: { name: true, sheets: { select: { name: true } } },
@@ -110,7 +112,8 @@ export async function getStaticPaths() {
   })
   const paths = users
     .map((user) => {
-      return user.sheets.slice(0, 3).map((sheet) => { // 最初の3シートのみ
+      return user.sheets.slice(0, 3).map((sheet) => {
+        // 最初の3シートのみ
         return { params: { user: user.name, year: sheet.name } }
       })
     })

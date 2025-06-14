@@ -56,7 +56,7 @@ export async function getStaticPaths() {
       fallback: 'blocking',
     }
   }
-  
+
   // 開発時は全ページ生成
   const count = await prisma.books.count({
     where: { is_public_memo: true },

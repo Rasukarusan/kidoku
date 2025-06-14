@@ -19,8 +19,8 @@ const nextConfig = {
     ...(process.env.VERCEL && {
       outputFileTracingRoot: path.join(__dirname, '../../'),
     }),
-    // ISR最適化
-    isrMemoryCacheSize: 0, // メモリキャッシュを無効化してディスクキャッシュを優先
+    // ISR最適化（Next.js 15で対応予定）
+    // isrMemoryCacheSize: 0,
   },
   // 静的生成の最適化
   generateBuildId: async () => {
