@@ -10,7 +10,7 @@ import {
 export class SheetObject {
   /** 主キー ─ 数値なら Int でも OK。一般的には ID 推奨 */
   @Field(() => ID)
-  id: number;
+  id: string;
 
   @Field()
   name: string;
