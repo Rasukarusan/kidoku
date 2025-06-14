@@ -125,7 +125,11 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
           onDelete={onDelete}
         />
       ) : (
-        <BookDetailReadModal book={currentBook} onClick={onClickEdit} />
+        <BookDetailReadModal
+          book={currentBook}
+          onClose={() => {}}
+          onEdit={onClickEdit}
+        />
       )}
       <span id="rewardId" className="text-center"></span>
     </Modal>

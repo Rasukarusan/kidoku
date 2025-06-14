@@ -7,7 +7,8 @@ interface Props {
   label: string
   tabIndex: number
   onChange?: (newValue: unknown, actionMeta: ActionMeta<unknown>) => void
-  defaultValue: unknown
+  defaultValue?: unknown
+  value?: unknown
   options: Option[]
   isChanged?: boolean
 }
@@ -16,6 +17,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
   label,
   tabIndex,
   defaultValue,
+  value,
   options,
   // eslint-disable-next-line
   onChange = () => {},
@@ -51,7 +53,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
         }}
         className="text-sm"
         styles={customStyles}
-        defaultValue={defaultValue}
+        value={value !== undefined ? value : defaultValue}
         isClearable
         options={options}
         formatCreateLabel={formatCreateLabel}
