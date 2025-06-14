@@ -6,3 +6,6 @@ export const openLoginModalAtom = atom<boolean>(false)
 export const openAddModalAtom = atom<boolean>(false)
 export const openBookSidebarAtom = atom<boolean>(false)
 export const sidebarBookAtom = atom<Book | null>(null)
+
+// Navigation sidebar state
+export const openNavSidebarAtom = atom<boolean>(false)

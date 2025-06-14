@@ -20,5 +20,5 @@ export const LoadingTopBar: React.FC<IProps> = (props) => {
     }
   }, [])
 
-  return <LoadingBar color="#f11946" ref={ref} {...props} />
+  return <LoadingBar color="#f11946" ref={ref} height={3} {...props} />
 }
