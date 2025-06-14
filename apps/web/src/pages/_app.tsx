@@ -34,8 +34,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               <Header />
               <Component {...pageProps} />
               <Analytics />
+              <Footer />
             </Layout>
-            <Footer />
           </SessionProvider>
         </ApolloProvider>
       </Provider>
