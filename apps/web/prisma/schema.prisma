@@ -30,7 +30,7 @@ model books {
   category         String          @db.VarChar(120)
   image            String          @db.VarChar(255)
   impression       String          @db.VarChar(5)
-  memo             String          @db.Text
+  memo             String          @db.MediumText
   is_public_memo   Boolean         @default(false)
   is_purchasable   Boolean         @default(false)
   finished         DateTime?       @db.DateTime(0)
@@ -133,7 +133,7 @@ model template_books {
   author         String   @db.VarChar(120)
   category       String   @db.VarChar(120)
   image          String   @db.VarChar(255)
-  memo           String   @db.Text
+  memo           String   @db.MediumText
   is_public_memo Boolean  @default(false)
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
