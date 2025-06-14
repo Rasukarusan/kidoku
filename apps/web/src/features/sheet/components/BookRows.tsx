@@ -23,7 +23,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
       setOpenSidebar(true)
       return
     }
-    
+
     // 通常クリックで展開/折りたたみ
     const current = expands[i]
     const newExpands = [...expands]
@@ -114,12 +114,12 @@ export const BookRows: React.FC<Props> = ({ books }) => {
           ))}
         </tbody>
       </table>
-      
+
       {/* 操作説明 */}
       <div className="mt-4 text-center text-xs text-gray-500 sm:text-sm">
         <p>クリック: 展開/折りたたみ | Ctrl/Cmd + クリック: サイドバー表示</p>
       </div>
-      
+
       <BookDetailSidebar
         open={openSidebar}
         book={sidebarBook}

@@ -17,7 +17,11 @@ interface Props {
   onEdit?: () => void
 }
 
-export const BookDetailReadModal: React.FC<Props> = ({ book, onClose, onEdit }) => {
+export const BookDetailReadModal: React.FC<Props> = ({
+  book,
+  onClose,
+  onEdit,
+}) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
   const [open, setOpen] = useState(false)
@@ -46,7 +50,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClose, onEdit }) 
               <FaLink size={18} />
             </button>
             <Tooltip id="share-button" />
-            
+
             {isMine && onEdit && (
               <button
                 className="block rounded-full bg-gray-200 p-2 hover:brightness-95"
@@ -65,7 +69,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClose, onEdit }) 
             )}
           </div>
         </div>
-        
+
         <div className="px-4">
           <div className="mx-auto mb-4 w-[200px]">
             <a
@@ -81,11 +85,11 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClose, onEdit }) 
               />
             </a>
           </div>
-          
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold mb-2">{book.title}</h1>
-            <p className="text-gray-600 mb-4">{book.author}</p>
-            
+
+          <div className="mb-6 text-center">
+            <h1 className="mb-2 text-2xl font-bold">{book.title}</h1>
+            <p className="mb-4 text-gray-600">{book.author}</p>
+
             <div className="flex justify-center space-x-8 text-sm text-gray-500">
               <div>
                 <span className="font-semibold">カテゴリ:</span> {book.category}
@@ -94,12 +98,13 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClose, onEdit }) 
                 <span className="font-semibold">評価:</span> {book.impression}
               </div>
               <div>
-                <span className="font-semibold">読了日:</span> {dayjs(book.finished).format('YYYY-MM-DD')}
+                <span className="font-semibold">読了日:</span>{' '}
+                {dayjs(book.finished).format('YYYY-MM-DD')}
               </div>
             </div>
           </div>
         </div>
-        
+
         <div className="px-4">
           <div className="mb-4">
             <div className="mb-2 flex items-center">
@@ -117,17 +122,19 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClose, onEdit }) 
                 </>
               )}
             </div>
-            
+
             {(isMine || book.is_public_memo) && (
-              <div className="bg-gray-50 rounded-lg p-4">
+              <div className="rounded-lg bg-gray-50 p-4">
                 <Memo memo={book.memo} />
               </div>
             )}
-            
+
             {!isMine && !book.is_public_memo && (
-              <div className="bg-gray-100 rounded-lg p-8 text-center">
+              <div className="rounded-lg bg-gray-100 p-8 text-center">
                 <AiFillLock className="mx-auto mb-2 text-gray-400" size={24} />
-                <p className="text-gray-600">このメモは非公開に設定されています</p>
+                <p className="text-gray-600">
+                  このメモは非公開に設定されています
+                </p>
                 <button
                   className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                   onClick={() => setOpen(true)}
@@ -139,12 +146,8 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onClose, onEdit }) 
           </div>
         </div>
       </div>
-      
-      <CheckoutModal
-        open={open}
-        onClose={() => setOpen(false)}
-        book={book}
-      />
+
+      <CheckoutModal open={open} onClose={() => setOpen(false)} book={book} />
     </div>
   )
 }

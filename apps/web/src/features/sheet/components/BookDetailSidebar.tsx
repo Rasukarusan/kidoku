@@ -16,11 +16,11 @@ interface Props {
   onExpandToFullPage: () => void
 }
 
-export const BookDetailSidebar: React.FC<Props> = ({ 
-  book, 
-  open, 
-  onClose, 
-  onExpandToFullPage 
+export const BookDetailSidebar: React.FC<Props> = ({
+  book,
+  open,
+  onClose,
+  onExpandToFullPage,
 }) => {
   const router = useRouter()
   const { mutate } = useSWRConfig()
@@ -97,16 +97,12 @@ export const BookDetailSidebar: React.FC<Props> = ({
       onClose()
       return
     }
-    const isDiff = Object.keys(book).some(
-      (key) => book[key] !== newBook[key]
-    )
+    const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])
     if (!isDiff) {
       setEdit(false)
       return
     }
-    if (
-      confirm('変更内容が保存されていません。破棄してもよろしいですか？')
-    ) {
+    if (confirm('変更内容が保存されていません。破棄してもよろしいですか？')) {
       setEdit(false)
     }
   }
@@ -125,7 +121,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
             exit={{ opacity: 0 }}
             onClick={handleClose}
           />
-          
+
           {/* サイドバー */}
           <motion.div
             className="fixed right-0 top-0 z-[1000] flex h-full w-full bg-white shadow-2xl md:w-[480px] lg:w-[540px]"
@@ -146,13 +142,13 @@ export const BookDetailSidebar: React.FC<Props> = ({
                     className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 sm:block"
                     title="フルページで開く"
                   >
-                    <IoMdExpand size={18} className="sm:w-5 sm:h-5" />
+                    <IoMdExpand size={18} className="sm:h-5 sm:w-5" />
                   </button>
                   <button
                     onClick={handleClose}
                     className="rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                   >
-                    <IoMdClose size={18} className="sm:w-5 sm:h-5" />
+                    <IoMdClose size={18} className="sm:h-5 sm:w-5" />
                   </button>
                 </div>
               </div>
@@ -171,7 +167,11 @@ export const BookDetailSidebar: React.FC<Props> = ({
                     onDelete={onDelete}
                   />
                 ) : (
-                  <BookDetailReadModal book={currentBook} onClose={handleClose} onEdit={onClickEdit} />
+                  <BookDetailReadModal
+                    book={currentBook}
+                    onClose={handleClose}
+                    onEdit={onClickEdit}
+                  />
                 )}
                 <span id="sidebarRewardId" className="text-center"></span>
               </div>
