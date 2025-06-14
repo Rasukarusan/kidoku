@@ -171,7 +171,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
                     onDelete={onDelete}
                   />
                 ) : (
-                  <BookDetailReadModal book={currentBook} onClick={onClickEdit} />
+                  <BookDetailReadModal book={currentBook} onClose={handleClose} onEdit={onClickEdit} />
                 )}
                 <span id="sidebarRewardId" className="text-center"></span>
               </div>
