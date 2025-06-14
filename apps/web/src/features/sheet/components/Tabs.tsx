@@ -23,39 +23,39 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   return (
     <div className="no-scrollbar flex items-center justify-start overflow-x-auto">
       <div className="flex items-center">
-      <button
-        className={twMerge(
-          'flex max-h-11 items-center justify-between whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100',
-          tab === 'total'
-            ? 'border-b-2 border-gray-900'
-            : 'border-b border-gray-200'
-        )}
-        onClick={() => onClick('total')}
-      >
-        {data?.image ? (
-          <img
-            src={data?.image}
-            className="mr-4 h-6 min-h-6 w-6 min-w-6 rounded-full"
-          />
-        ) : (
-          <FaUser className="mr-4" size={18} />
-        )}
-        <span className="mr-4">total</span>
-      </button>
-      {sheets.map((sheet) => (
         <button
-          key={sheet}
           className={twMerge(
-            'max-h-11 whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100',
-            tab === sheet
+            'flex max-h-11 items-center justify-between whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100',
+            tab === 'total'
               ? 'border-b-2 border-gray-900'
-              : 'border-b border-gray-200 '
+              : 'border-b border-gray-200'
           )}
-          onClick={() => onClick(sheet)}
+          onClick={() => onClick('total')}
         >
-          {sheet}
+          {data?.image ? (
+            <img
+              src={data?.image}
+              className="mr-4 h-6 min-h-6 w-6 min-w-6 rounded-full"
+            />
+          ) : (
+            <FaUser className="mr-4" size={18} />
+          )}
+          <span className="mr-4">total</span>
         </button>
-      ))}
+        {sheets.map((sheet) => (
+          <button
+            key={sheet}
+            className={twMerge(
+              'max-h-11 whitespace-nowrap px-8 py-3 text-center text-sm uppercase text-gray-600 duration-300 ease-in hover:bg-gray-100',
+              tab === sheet
+                ? 'border-b-2 border-gray-900'
+                : 'border-b border-gray-200 '
+            )}
+            onClick={() => onClick(sheet)}
+          >
+            {sheet}
+          </button>
+        ))}
       </div>
     </div>
   )
