@@ -1,11 +1,5 @@
 {
-  "buildCommand": "turbo run build",
+  "buildCommand": "cd apps/web && npm run build",
   "installCommand": "pnpm install",
-  "framework": "nextjs",
-  "functions": {
-    "apps/web/pages/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
-  "crons": []
+  "outputDirectory": "apps/web/.next"
 }
