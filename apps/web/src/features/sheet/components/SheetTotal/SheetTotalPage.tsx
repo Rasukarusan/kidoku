@@ -47,13 +47,15 @@ export const SheetTotalPage: React.FC<Props> = ({
   return (
     <Container>
       <NextSeo title={`${username}/Total | kidoku`} />
-      <div className="fixed left-0 top-[53px] z-10 flex w-full items-center bg-white sm:top-[54px] sm:px-32">
-        <Tabs sheets={sheets} value="total" username={username} />
-        <Menu
-          currentSheet="total"
-          username={username}
-          activate={{ edit: false, delete: false }}
-        />
+      <div className="fixed left-0 top-[64px] z-30 flex w-full items-center bg-white lg:left-60 lg:w-[calc(100%-240px)]">
+        <Container className="flex w-full items-center px-0">
+          <Tabs sheets={sheets} value="total" username={username} />
+          <Menu
+            currentSheet="total"
+            username={username}
+            activate={{ edit: false, delete: false }}
+          />
+        </Container>
       </div>
       <div className="mb-10 mt-32 text-center">
         <TitleWithLine text="累計読書数" />

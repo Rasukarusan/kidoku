@@ -69,7 +69,7 @@ export default async (req, res) => {
         sheet,
       } = body
       const data = {
-        sheet_id: sheet.id,
+        sheet_id: Number(sheet.id),
         userId,
         title,
         author,
