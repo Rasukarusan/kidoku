@@ -4,6 +4,7 @@ import { Fragment, useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
 import { BookDetailModal } from './BookDetailModal'
+import { BookDetailSidebar } from './BookDetailSidebar'
 import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
 import { AiFillLock } from 'react-icons/ai'
@@ -20,20 +21,35 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   const [selectBook, setSelectBook] = useState<Book>(null)
   const [hovers, setHovers] = useState(initialHovers)
   const { mutate } = useSWR(`/api/books/${year}`, fetcher)
+  
+  // サイドバー用の状態管理
+  const [openSidebar, setOpenSidebar] = useState(false)
+  const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
+  const [viewMode, setViewMode] = useState<'sidebar' | 'fullpage'>('sidebar')
 
   // URLクエリで指定された本を開く
   useEffect(() => {
     if (bookId) {
       const book = books.filter((book) => book.id === Number(bookId))
       if (!book) return
-      setSelectBook(book[0])
-      setOpen(true)
+      // デフォルトでサイドバー表示
+      setSidebarBook(book[0])
+      setOpenSidebar(true)
     }
   }, [bookId])
 
-  const onClickImage = (book: Book) => {
-    setSelectBook(book)
-    setOpen(true)
+  const onClickImage = (book: Book, event?: React.MouseEvent) => {
+    // Ctrl/Cmd + クリックでフルページ表示
+    if (event && (event.ctrlKey || event.metaKey)) {
+      setSelectBook(book)
+      setOpen(true)
+      setViewMode('fullpage')
+    } else {
+      // 通常クリックでサイドバー表示
+      setSidebarBook(book)
+      setOpenSidebar(true)
+      setViewMode('sidebar')
+    }
     setHovers(initialHovers)
   }
 
@@ -66,7 +82,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                   src={book.image === '-' ? NO_IMAGE : book.image}
                   width={128}
                   height={186}
-                  onClick={() => onClickImage(book)}
+                  onClick={(e) => onClickImage(book, e)}
                   onMouseEnter={() => onMouseEnter(i)}
                   onMouseLeave={() => onMouseLeave(i)}
                   loading={i > 6 ? 'lazy' : 'eager'}
@@ -80,7 +96,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                   <HoverBook
                     book={book}
                     onMouseLeave={onMouseLeave}
-                    onClick={onClickImage}
+                    onClick={(book, e) => onClickImage(book, e)}
                   />
                 )}
               </div>
@@ -88,12 +104,36 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
           )
         })}
       </div>
+      
+      {/* 操作説明 */}
+      <div className="mt-4 text-center text-xs text-gray-500 sm:text-sm">
+        <p>クリック: サイドバー表示 | Ctrl/Cmd + クリック: フルページ表示</p>
+      </div>
+      
       <BookDetailModal
         open={open}
         book={selectBook}
         onClose={() => {
           mutate()
           setOpen(false)
+        }}
+      />
+      
+      <BookDetailSidebar
+        open={openSidebar}
+        book={sidebarBook}
+        onClose={() => {
+          mutate()
+          setOpenSidebar(false)
+          setSidebarBook(null)
+        }}
+        onExpandToFullPage={() => {
+          if (sidebarBook) {
+            setSelectBook(sidebarBook)
+            setOpen(true)
+            setOpenSidebar(false)
+            setViewMode('fullpage')
+          }
         }}
       />
     </>
