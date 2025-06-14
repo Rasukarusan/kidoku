@@ -4,6 +4,7 @@ import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import useSWR from 'swr'
+import { useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
 import { Modal } from '@/components/layout/Modal'
 import { ImagePicker } from '@/components/button/ImagePicker'
@@ -24,6 +25,8 @@ import { addBookAtom } from '@/store/book/atom'
 import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
 
+import { GET_SHEETS } from '@/libs/apollo/queries'
+
 interface Response {
   result: boolean
   bookTitle: string
@@ -36,9 +39,8 @@ export const AddModal: React.FC = () => {
   const [open, setOpen] = useAtom(openAddModalAtom)
   const item = useAtomValue(addBookAtom)
   const { data: session } = useSession()
-  const { data, mutate: mutateSheet } = useSWR(`/api/sheets`, fetcher, {
-    fallbackData: { result: true, sheets: [] },
-  })
+  const { data: sheetsData, refetch: refetchSheets } = useQuery(GET_SHEETS)
+  const sheets = sheetsData?.sheets || []
   const { mutate } = useSWR(
     `/api/books/${router.asPath.split('/').pop()}`,
     fetcher
@@ -66,9 +68,9 @@ export const AddModal: React.FC = () => {
 
   // シート取得次第、一番上のシートを選択状態にする
   useEffect(() => {
-    if (data.sheets.length === 0) return
-    setSheet({ id: data.sheets[0].id, name: data.sheets[0].name })
-  }, [data])
+    if (sheets.length === 0) return
+    setSheet({ id: sheets[0].id, name: sheets[0].name })
+  }, [sheets])
 
   useEffect(() => {
     setResponse(null)
@@ -251,10 +253,10 @@ export const AddModal: React.FC = () => {
                         open={openAdd}
                         onClose={() => {
                           setOpenAdd(false)
-                          mutateSheet()
+                          refetchSheets()
                         }}
                       />
-                      {data.sheets.length === 0 ? (
+                      {sheets.length === 0 ? (
                         <button
                           className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white disabled:bg-gray-500"
                           onClick={() => {
@@ -278,7 +280,7 @@ export const AddModal: React.FC = () => {
                             })
                           }}
                         >
-                          {data.sheets.map((sheet) => {
+                          {sheets.map((sheet) => {
                             const { id, name } = sheet
                             return (
                               <option key={name} value={name} data-id={id}>
