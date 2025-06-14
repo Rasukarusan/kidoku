@@ -175,13 +175,18 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
                 />
               </div>
             </div>
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-700">メモ</label>
+              <div className="text-xs text-gray-500">
+                {template?.memo?.length || 0} / 16,777,215 文字
+              </div>
+            </div>
             <BookInputField
               rows={8}
               value={template?.memo}
               onChange={(e) =>
                 setTemplate({ ...template, memo: e.target.value })
               }
-              label="メモ"
               tabIndex={5}
             />
             <ToggleButton

@@ -7,6 +7,8 @@ import { BarGraph } from './BarGraph'
 import { Tabs } from './Tabs'
 import { Books } from './Books'
 import { BookRows } from './BookRows'
+import { BookDetailSidebar } from './BookDetailSidebar'
+import { BookDetailModal } from './BookDetailModal'
 import { fetcher } from '@/libs/swr'
 import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
@@ -55,6 +57,14 @@ export const SheetPage: React.FC<Props> = ({
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
   const [filter, setFilter] = useState('')
+
+  // サイドバー用の状態管理
+  const [openSidebar, setOpenSidebar] = useState(false)
+  const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
+
+  // フルページモーダル用の状態管理
+  const [openFullPageModal, setOpenFullPageModal] = useState(false)
+  const [fullPageBook, setFullPageBook] = useState<Book>(null)
 
   const isMine =
     data.length > 0 && session && session.user.id === data[0].userId
@@ -199,6 +209,31 @@ export const SheetPage: React.FC<Props> = ({
           <BookRows books={currentData} />
         )}
       </div>
+
+      <BookDetailSidebar
+        open={openSidebar}
+        book={sidebarBook}
+        onClose={() => {
+          setOpenSidebar(false)
+          setSidebarBook(null)
+        }}
+        onExpandToFullPage={() => {
+          if (sidebarBook) {
+            setFullPageBook(sidebarBook)
+            setOpenFullPageModal(true)
+            setOpenSidebar(false)
+          }
+        }}
+      />
+
+      <BookDetailModal
+        open={openFullPageModal}
+        book={fullPageBook}
+        onClose={() => {
+          setOpenFullPageModal(false)
+          setFullPageBook(null)
+        }}
+      />
     </Container>
   )
 }
