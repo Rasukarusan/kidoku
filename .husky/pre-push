@@ -1,0 +1,4 @@
+echo "🔍 Running build and lint:fix before push..."
+pnpm lint:fix
+pnpm build
+echo "✅ Pre-push checks completed successfully!"

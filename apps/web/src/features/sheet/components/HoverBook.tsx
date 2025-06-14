@@ -4,7 +4,7 @@ import { Book } from '@/types/book'
 
 interface Props {
   book: Book
-  onClick: (book: Book) => void
+  onClick: (book: Book, event?: React.MouseEvent) => void
   onMouseLeave: (i: number) => void
 }
 
@@ -17,7 +17,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
       className="absolute top-0 z-10 w-[350px] max-w-[350px] overflow-x-hidden rounded border-2 border-[#507C8F] bg-white p-0"
       animate={{ scale: 1.2, color: '#263238' }}
       onMouseLeave={() => onMouseLeave(-1)}
-      onClick={() => onClick(book)}
+      onClick={(e) => onClick(book, e)}
     >
       <div className="flex w-full">
         <div className="min-w-[128px]">
