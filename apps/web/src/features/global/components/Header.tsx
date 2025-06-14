@@ -8,21 +8,8 @@ import { Logo } from '@/components/icon/Logo'
 import { useSetAtom } from 'jotai'
 import { openLoginModalAtom } from '@/store/modal/atom'
 import { UserMenu } from './UserMenu'
-import useSWR from 'swr'
-import { fetcher } from '@/libs/swr'
-import { gql, useQuery } from '@apollo/client'
-
-const GET_USERS = gql`
-  query GetSheets {
-    sheets {
-      id
-      name
-      order
-      created
-      updated
-    }
-  }
-`
+import { useQuery } from '@apollo/client'
+import { GET_SHEETS } from '@/libs/apollo/queries'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -31,8 +18,7 @@ export const Header = () => {
   const { data: session } = useSession()
   const setOpen = useSetAtom(openLoginModalAtom)
   const [openMenu, setOpenMenu] = useState(false)
-  const { data, loading, error } = useQuery(GET_USERS)
-  console.log(data)
+  const { data } = useQuery(GET_SHEETS)
 
   /**
    * 画面上をクリックしたらメニューを非表示
@@ -50,13 +36,11 @@ export const Header = () => {
     }
   }, [])
 
-  const { data: sheets } = useSWR(`/api/sheets`, fetcher, {
-    fallbackData: { result: true, sheets: [] },
-  })
+  const sheets = data?.sheets || []
   const url = !session
     ? '/'
-    : sheets.sheets.length > 0
-      ? `/${session.user.name}/sheets/${sheets.sheets[0].name}`
+    : sheets.length > 0
+      ? `/${session.user.name}/sheets/${sheets[0].name}`
       : `/${session.user.name}/sheets/total`
 
   if (router.asPath.startsWith('/auth/init')) {
