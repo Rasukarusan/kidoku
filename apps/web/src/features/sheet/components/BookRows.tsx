@@ -2,6 +2,7 @@ import { truncate } from '@/utils/string'
 import { Book } from '@/types/book'
 import { useState } from 'react'
 import { Memo } from './Memo'
+import { BookDetailSidebar } from './BookDetailSidebar'
 import { useSession } from 'next-auth/react'
 
 interface Props {
@@ -12,10 +13,20 @@ export const BookRows: React.FC<Props> = ({ books }) => {
   const [expands, setExpands] = useState(Array(books.length).fill(false))
   const { data: session } = useSession()
   const pc = 'hidden sm:table-cell'
+  const [openSidebar, setOpenSidebar] = useState(false)
+  const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
 
-  const onClickRow = (i: number) => {
+  const onClickRow = (i: number, event?: React.MouseEvent) => {
+    // Ctrl/Cmd + クリックでサイドバー表示
+    if (event && (event.ctrlKey || event.metaKey)) {
+      setSidebarBook(books[i])
+      setOpenSidebar(true)
+      return
+    }
+    
+    // 通常クリックで展開/折りたたみ
     const current = expands[i]
-    const newExpands = [...expands] //Array(books.length).fill(false)
+    const newExpands = [...expands]
     newExpands[i] = !current
     setExpands(newExpands)
   }
@@ -52,7 +63,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
             <tr
               className="border-b bg-white hover:cursor-pointer hover:bg-gray-50"
               key={`${book.title}-${i}`}
-              onClick={() => onClickRow(i)}
+              onClick={(e) => onClickRow(i, e)}
             >
               <td className="p-2 text-center">{i + 1}</td>
               <th
@@ -103,6 +114,23 @@ export const BookRows: React.FC<Props> = ({ books }) => {
           ))}
         </tbody>
       </table>
+      
+      {/* 操作説明 */}
+      <div className="mt-4 text-center text-xs text-gray-500 sm:text-sm">
+        <p>クリック: 展開/折りたたみ | Ctrl/Cmd + クリック: サイドバー表示</p>
+      </div>
+      
+      <BookDetailSidebar
+        open={openSidebar}
+        book={sidebarBook}
+        onClose={() => {
+          setOpenSidebar(false)
+          setSidebarBook(null)
+        }}
+        onExpandToFullPage={() => {
+          setOpenSidebar(false)
+        }}
+      />
     </div>
   )
 }
