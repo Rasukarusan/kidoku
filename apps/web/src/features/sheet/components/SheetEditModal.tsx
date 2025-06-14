@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Modal } from '@/components/layout/Modal'
 import { Loading } from '@/components/icon/Loading'
+import { useMutation } from '@apollo/client'
+import { UPDATE_SHEET } from '@/libs/apollo/queries'
 
 interface Props {
   sheet: string
@@ -15,9 +17,9 @@ export const SheetEditModal: React.FC<Props> = ({
   onClose,
   username,
 }) => {
-  const [loading, setLoading] = useState(false)
   const [input, setInput] = useState(sheet)
   const ref = useRef<HTMLInputElement>(null)
+  const [updateSheet, { loading }] = useMutation(UPDATE_SHEET)
 
   useEffect(() => {
     ref.current?.focus()
@@ -51,21 +53,20 @@ export const SheetEditModal: React.FC<Props> = ({
           className="mx-auto flex items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white disabled:bg-gray-300"
           disabled={input === sheet || loading}
           onClick={async () => {
-            setLoading(true)
-            const res = await fetch('/api/sheets', {
-              method: 'PUT',
-              body: JSON.stringify({ oldName: sheet, newName: input }),
-              headers: {
-                Accept: 'application/json',
-              },
-            }).then((res) => res.json())
-            if (!res.result) {
-              setLoading(false)
+            try {
+              await updateSheet({
+                variables: {
+                  input: {
+                    oldName: sheet,
+                    newName: input,
+                  },
+                },
+              })
+              alert('更新しました')
+              location.href = `/${username}/sheets`
+            } catch (error) {
               alert('シート名の更新に失敗しました')
-              return
             }
-            alert('更新しました')
-            location.href = `/${username}/sheets`
           }}
         >
           {loading ? (
