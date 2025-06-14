@@ -147,9 +147,9 @@ export const BookDetailReadModal: React.FC<Props> = ({
         </div>
       </div>
 
-      <CheckoutModal 
-        open={open} 
-        onClose={() => setOpen(false)} 
+      <CheckoutModal
+        open={open}
+        onClose={() => setOpen(false)}
         returnUrl={`${window.location.origin}/books/${book.id}`}
         purchaseText="書籍を購入"
       />
