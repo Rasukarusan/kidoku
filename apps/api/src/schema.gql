@@ -24,3 +24,22 @@ type Query {
   hello: HelloResponseDto!
   sheets: [SheetObject!]!
 }
+
+type Mutation {
+  createSheet(input: CreateSheetInput!): SheetObject!
+  updateSheet(input: UpdateSheetInput!): SheetObject!
+  deleteSheet(input: DeleteSheetInput!): Boolean!
+}
+
+input CreateSheetInput {
+  name: String!
+}
+
+input UpdateSheetInput {
+  oldName: String!
+  newName: String!
+}
+
+input DeleteSheetInput {
+  name: String!
+}
