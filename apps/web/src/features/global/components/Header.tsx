@@ -9,6 +9,7 @@ import { useSetAtom } from 'jotai'
 import { openLoginModalAtom, openNavSidebarAtom } from '@/store/modal/atom'
 import { useQuery } from '@apollo/client'
 import { GET_SHEETS } from '@/libs/apollo/queries'
+import { twMerge } from 'tailwind-merge'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -31,7 +32,12 @@ export const Header = () => {
 
   return (
     <>
-      <div className="sticky top-0 z-40 h-16 w-full bg-main border-b border-gray-200 text-white">
+      <div
+        className={twMerge(
+          'sticky top-0 z-40 h-16 w-full border-b border-gray-200 bg-main text-white',
+          session && 'lg:left-60 lg:w-[calc(100%-240px)]'
+        )}
+      >
         <Container className="flex max-h-16 items-center p-2">
           <Link href="/" className="mr-2 no-underline sm:mr-4">
             <Logo className="h-8 min-h-8 w-8 min-w-8" />

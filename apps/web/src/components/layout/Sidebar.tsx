@@ -174,6 +174,11 @@ export const Sidebar: React.FC = () => {
     },
   }
 
+  // 未ログイン時はサイドバーを表示しない
+  if (!session) {
+    return null
+  }
+
   return (
     <>
       {/* Desktop Sidebar */}
