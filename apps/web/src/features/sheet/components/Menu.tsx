@@ -75,7 +75,7 @@ export const Menu: React.FC<Props> = ({
                 animate="open"
                 exit="closed"
                 variants={variants}
-                className="absolute right-4 z-[1000] m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg sm:right-20"
+                className="absolute right-0 z-[1000] m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
               >
                 <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
                   <AiOutlineFileAdd className="mr-2 h-[24px] w-[24px] text-slate-300" />

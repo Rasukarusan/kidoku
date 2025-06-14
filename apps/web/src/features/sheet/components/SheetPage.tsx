@@ -78,13 +78,9 @@ export const SheetPage: React.FC<Props> = ({
     return (
       <Container>
         <NextSeo title={`${username}/${year} | kidoku`} />
-        <div className="flex items-center">
-          <div className="mb-8 w-[90%] border-b border-gray-200">
-            <Tabs sheets={sheets} value={year} username={username} />
-          </div>
-          <div className="w-[10%]">
-            <Menu currentSheet={year} username={username} />
-          </div>
+        <div className="mb-8 flex items-center border-b border-gray-200">
+          <Tabs sheets={sheets} value={year} username={username} />
+          <Menu currentSheet={year} username={username} />
         </div>
         <div className="p-10 text-center">
           <div className="mb-4 text-2xl font-bold">
@@ -100,12 +96,8 @@ export const SheetPage: React.FC<Props> = ({
     <Container className="mb-12">
       <NextSeo title={`${username}/${year} | kidoku`} />
       <div className="fixed left-0 top-[53px] z-10 flex w-full items-center bg-white sm:top-[54px] sm:px-32">
-        <div className="w-[90%] pr-4">
-          <Tabs sheets={sheets} value={year} username={username} />
-        </div>
-        <div className="w-[10%]">
-          <Menu currentSheet={year} username={username} />
-        </div>
+        <Tabs sheets={sheets} value={year} username={username} />
+        <Menu currentSheet={year} username={username} />
       </div>
 
       <div className="mt-32 text-center">
