@@ -2,7 +2,30 @@ const withPlugins = require('next-compose-plugins')
 const path = require('path')
 
 const nextConfig = {
-  swcMinify: false, // framer-motionでエラーが出るのでfalseにした
+  swcMinify: true, // SWCを有効にしてビルド高速化
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  experimental: {
+    // Turbotrace を有効にして依存関係の最適化
+    turbotrace: {
+      logLevel: 'error',
+    },
+    // Server Components の最適化
+    serverComponentsExternalPackages: ['sharp', '@prisma/client'],
+    // 最適化フラグ
+    optimizePackageImports: ['@apollo/client', 'recharts', 'react-icons'],
+    // Vercel環境でのさらなる最適化
+    ...(process.env.VERCEL && {
+      outputFileTracingRoot: path.join(__dirname, '../../'),
+    }),
+    // ISR最適化（Next.js 15で対応予定）
+    // isrMemoryCacheSize: 0,
+  },
+  // 静的生成の最適化
+  generateBuildId: async () => {
+    return process.env.VERCEL_GIT_COMMIT_SHA || 'development'
+  },
   images: {
     domains: [
       'books.google.com',
@@ -12,8 +35,19 @@ const nextConfig = {
       'image.gihyo.co.jp',
     ],
   },
+  // ESM最適化
+  transpilePackages: ['@apollo/client', 'graphql'],
   webpack(config, options) {
     config.resolve.alias['@'] = path.join(__dirname, 'src')
+    
+    // self is not definedエラーの修正
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+    }
+    
     return config
   },
 }
