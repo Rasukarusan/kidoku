@@ -15,6 +15,10 @@ const nextConfig = {
     serverComponentsExternalPackages: ['sharp', '@prisma/client'],
     // 最適化フラグ
     optimizePackageImports: ['@apollo/client', 'recharts', 'react-icons'],
+    // Vercel環境でのさらなる最適化
+    ...(process.env.VERCEL && {
+      outputFileTracingRoot: path.join(__dirname, '../../'),
+    }),
   },
   images: {
     domains: [
