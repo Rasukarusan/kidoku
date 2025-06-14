@@ -3,11 +3,11 @@ import { fetcher } from '@/libs/swr'
 import { Fragment, useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
-import { BookDetailModal } from './BookDetailModal'
 import { BookDetailSidebar } from './BookDetailSidebar'
 import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
 import { AiFillLock } from 'react-icons/ai'
+import { useRouter } from 'next/router'
 
 interface Props {
   bookId: string
@@ -17,15 +17,13 @@ interface Props {
 export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   const initialHovers = Array(books.length).fill(false)
   const { data: session } = useSession()
-  const [open, setOpen] = useState(false)
-  const [selectBook, setSelectBook] = useState<Book>(null)
+  const router = useRouter()
   const [hovers, setHovers] = useState(initialHovers)
   const { mutate } = useSWR(`/api/books/${year}`, fetcher)
   
   // サイドバー用の状態管理
   const [openSidebar, setOpenSidebar] = useState(false)
   const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
-  const [viewMode, setViewMode] = useState<'sidebar' | 'fullpage'>('sidebar')
 
   // URLクエリで指定された本を開く
   useEffect(() => {
@@ -39,16 +37,13 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   }, [bookId])
 
   const onClickImage = (book: Book, event?: React.MouseEvent) => {
-    // Ctrl/Cmd + クリックでフルページ表示
+    // Ctrl/Cmd + クリックでフルページ表示（新しいタブで開く）
     if (event && (event.ctrlKey || event.metaKey)) {
-      setSelectBook(book)
-      setOpen(true)
-      setViewMode('fullpage')
+      router.push(`/books/${book.id}`)
     } else {
       // 通常クリックでサイドバー表示
       setSidebarBook(book)
       setOpenSidebar(true)
-      setViewMode('sidebar')
     }
     setHovers(initialHovers)
   }
@@ -110,15 +105,6 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
         <p>クリック: サイドバー表示 | Ctrl/Cmd + クリック: フルページ表示</p>
       </div>
       
-      <BookDetailModal
-        open={open}
-        book={selectBook}
-        onClose={() => {
-          mutate()
-          setOpen(false)
-        }}
-      />
-      
       <BookDetailSidebar
         open={openSidebar}
         book={sidebarBook}
@@ -129,10 +115,8 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
         }}
         onExpandToFullPage={() => {
           if (sidebarBook) {
-            setSelectBook(sidebarBook)
-            setOpen(true)
+            router.push(`/books/${sidebarBook.id}`)
             setOpenSidebar(false)
-            setViewMode('fullpage')
           }
         }}
       />
