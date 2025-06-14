@@ -168,7 +168,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
                       category:
                         typeof category === 'string'
                           ? category
-                          : category?.value || '',
+                          : (category as { value: string } | null)?.value || '',
                     })
                   }
                   tabIndex={3}
