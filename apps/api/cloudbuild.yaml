@@ -3,6 +3,8 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
+      - '-f'
+      - 'Dockerfile.api'
       - '-t'
       - 'gcr.io/$PROJECT_ID/kidoku-api:$COMMIT_SHA'
       - '-t'
@@ -31,7 +33,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--port'
-      - '3000'
+      - '4000'
       - '--memory'
       - '256Mi'
       - '--cpu'

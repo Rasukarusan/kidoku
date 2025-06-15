@@ -6,8 +6,9 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# 依存関係ファイルをコピー
-COPY package.json pnpm-lock.yaml ./
+# ルートディレクトリからlockファイルをコピー
+COPY ../../pnpm-lock.yaml ./
+COPY package.json ./
 
 # 依存関係をインストール
 RUN pnpm install --frozen-lockfile
@@ -30,8 +31,9 @@ RUN adduser -S nestjs -u 1001
 
 WORKDIR /app
 
-# 依存関係ファイルをコピー
-COPY package.json pnpm-lock.yaml ./
+# ルートディレクトリからlockファイルをコピー
+COPY ../../pnpm-lock.yaml ./
+COPY package.json ./
 
 # 本番用の依存関係のみインストール
 RUN pnpm install --prod --frozen-lockfile
@@ -43,7 +45,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 USER nestjs
 
 # ポートを公開
-EXPOSE 3000
+EXPOSE 4000
 
 # アプリケーションを起動
 CMD ["node", "dist/main"]
