@@ -8,6 +8,15 @@ on:
     paths:
       - 'apps/api/**'
       - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'デプロイ環境'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -18,6 +27,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: Production
     
     permissions:
       contents: read
