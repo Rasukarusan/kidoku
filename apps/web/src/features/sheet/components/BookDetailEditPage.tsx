@@ -21,7 +21,6 @@ interface Props {
   onCancel: () => void
 }
 
-
 export const BookDetailEditPage: React.FC<Props> = ({
   book: initialBook,
   onClose,

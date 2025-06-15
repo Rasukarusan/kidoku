@@ -25,7 +25,6 @@ interface Props {
   loading: boolean
 }
 
-
 export const BookDetailEditModal: React.FC<Props> = ({
   currentBook,
   book,

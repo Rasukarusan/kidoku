@@ -1,14 +1,18 @@
 import CreatableSelect from 'react-select/creatable'
 import { ActionMeta } from 'react-select'
-import type Option from 'react-select'
 import { Label } from './Label'
+
+interface OptionType {
+  value: string
+  label: string
+}
 
 interface Props {
   label: string
   onChange?: (newValue: unknown, actionMeta: ActionMeta<unknown>) => void
   defaultValue?: unknown
   value?: unknown
-  options: Option[]
+  options: OptionType[]
   isChanged?: boolean
 }
 
