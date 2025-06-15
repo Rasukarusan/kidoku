@@ -32,14 +32,18 @@ RUN adduser -S nestjs -u 1001
 WORKDIR /app
 
 # 依存関係ファイルをコピー
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
 
-# 本番用の依存関係のみインストール（prepareスクリプトをスキップ）
+# 本番用の依存関係のみインストール
+ENV HUSKY=0
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # ビルド済みのアプリケーションをコピー
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
+
+# ディレクトリの権限を設定
+RUN chown -R nestjs:nodejs /app
 
 # ユーザーを切り替え
 USER nestjs
@@ -48,5 +52,4 @@ USER nestjs
 EXPOSE 4000
 
 # アプリケーションを起動
-WORKDIR /app/apps/api
-CMD ["node", "dist/src/main"]
+CMD ["node", "apps/api/dist/src/main"]
