@@ -35,7 +35,7 @@ export const Header = () => {
       <div
         className={twMerge(
           'sticky top-0 z-40 h-16 w-full border-b border-gray-200 bg-main text-white',
-          session && 'lg:left-60 lg:w-[calc(100%-240px)]'
+          session && 'lg:left-60'
         )}
       >
         <Container className="flex max-h-16 items-center p-2">
