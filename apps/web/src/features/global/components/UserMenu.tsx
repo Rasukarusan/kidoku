@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Dispatch, SetStateAction } from 'react'
 import { BiExit } from 'react-icons/bi'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
-import { signOut, useSession } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 import { AiOutlineBook, AiOutlineSetting } from 'react-icons/ai'
 
 interface Props {
@@ -12,8 +12,6 @@ interface Props {
 }
 
 export const UserMenu: React.FC<Props> = ({ open, setOpen, url }) => {
-  const { data: session } = useSession()
-
   const variants: Variants = {
     open: {
       opacity: 1,

@@ -27,7 +27,6 @@ export const Confirm: React.FC<Props> = ({
   open,
   onCancel,
   onConfirm,
-  courseId,
   sheetName,
   books,
 }) => {
@@ -39,7 +38,7 @@ export const Confirm: React.FC<Props> = ({
   const [months, setMonths] = useState(initialMonths)
   const [categories, setCategories] = useState(initialCategories)
 
-  const { data, mutate, isLoading } = useSWR(`/api/ai-summary/usage`, (url) =>
+  const { data } = useSWR(`/api/ai-summary/usage`, (url) =>
     fetcher(url, {
       sheetName,
       months: months.join(','),

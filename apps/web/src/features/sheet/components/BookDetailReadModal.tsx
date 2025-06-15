@@ -9,7 +9,6 @@ import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
 import { Memo } from './Memo'
 import { FaLink } from 'react-icons/fa'
-import { useRouter } from 'next/router'
 
 interface Props {
   book: Book
@@ -17,16 +16,11 @@ interface Props {
   onEdit?: () => void
 }
 
-export const BookDetailReadModal: React.FC<Props> = ({
-  book,
-  onClose,
-  onEdit,
-}) => {
+export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   const returnUrl = () => {
     return `${process.env.NEXT_PUBLIC_HOST}/books/${book.id}`

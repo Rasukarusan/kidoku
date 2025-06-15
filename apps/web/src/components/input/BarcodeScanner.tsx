@@ -30,7 +30,7 @@ export const BarcodeScanner: React.FC<Props> = ({ onDetect }) => {
         codeReader.decodeFromVideoDevice(
           null,
           videoRef.current,
-          async (res, err) => {
+          async (res) => {
             if (!res) return
             setLoading(true)
             const isbn = res.getText()

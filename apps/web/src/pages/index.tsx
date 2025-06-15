@@ -4,7 +4,7 @@ export default IndexPage
 import prisma, { parse } from '@/libs/prisma'
 import { mask } from '@/utils/string'
 
-export const getStaticProps = async (ctx) => {
+export const getStaticProps = async () => {
   const books = await prisma.books.findMany({
     include: {
       user: { select: { name: true, image: true } },
@@ -29,7 +29,6 @@ export const getStaticProps = async (ctx) => {
       sheet: book.sheet.name,
     })
   })
-  const result = []
   return {
     props: { comments },
     revalidate: 5,

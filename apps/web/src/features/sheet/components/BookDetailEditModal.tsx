@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
-import { useSession } from 'next-auth/react'
 import { Loading } from '@/components/icon/Loading'
 import { ImagePicker } from '@/components/button/ImagePicker'
 import { BookInputField } from '@/components/input/BookInputField'
@@ -33,8 +32,6 @@ export const BookDetailEditModal: React.FC<Props> = ({
   setBook,
   loading,
 }) => {
-  const { data: session } = useSession()
-  const isMine = session?.user?.id === book.userId
   const [diff, setDiff] = useState({
     title: false,
     author: false,

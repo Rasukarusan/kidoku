@@ -12,8 +12,7 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
     .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
     .then((res) => {
       res.data.items?.map((item) => {
-        const { title, description, authors, categories, imageLinks } =
-          item.volumeInfo
+        const { title, authors, categories, imageLinks } = item.volumeInfo
         result.push({
           id: item.id,
           title: title,
@@ -39,8 +38,7 @@ export const searchBooksByIsbn = async (
     .then((res) => {
       const item = res.data.items?.pop()
       if (!item) return undefined
-      const { title, description, authors, categories, imageLinks } =
-        item.volumeInfo
+      const { title, authors, categories, imageLinks } = item.volumeInfo
       const book = {
         id: item.id,
         title: title,

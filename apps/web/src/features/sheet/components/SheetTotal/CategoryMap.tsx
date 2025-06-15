@@ -30,13 +30,13 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
   }, [categories])
 
   const [hovers, setHovers] = useState<boolean[]>(initialHovers)
-  const onMouseEnter = (node, e) => {
+  const onMouseEnter = (node) => {
     const newHovers = [...initialHovers]
     newHovers[node.index] = true
     setHovers(newHovers)
   }
 
-  const onMouseLeave = (node, e) => {
+  const onMouseLeave = () => {
     setHovers([...initialHovers])
   }
   return (
