@@ -13,6 +13,7 @@ import { Tooltip } from 'react-tooltip'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { useReward } from 'react-rewards'
+import { CategoriesResponse } from '@/types/api'
 
 interface Props {
   book: Book
@@ -20,10 +21,6 @@ interface Props {
   onCancel: () => void
 }
 
-interface CategoriesResponse {
-  result: boolean
-  categories: string[]
-}
 
 export const BookDetailEditPage: React.FC<Props> = ({
   book: initialBook,

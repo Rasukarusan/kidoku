@@ -1,7 +1,7 @@
-export const fetcher = (
+export const fetcher = <T = any>(
   url: string,
   params?: Record<string, string>
-): Promise<unknown> => {
+): Promise<T> => {
   if (params) {
     const query = new URLSearchParams(params).toString()
     url += '?' + query
