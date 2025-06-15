@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const BookComment: React.FC<Props> = ({ comment }) => {
-  const { title, memo, image, username, userImage, sheet } = comment
+  const { memo, image, username, userImage, sheet } = comment
   return (
     <div className="flex items-center p-4">
       <div className="pr-4 text-center">

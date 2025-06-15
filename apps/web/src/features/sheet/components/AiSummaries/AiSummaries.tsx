@@ -19,19 +19,15 @@ interface Props {
   books: Book[]
 }
 export const AiSummaries: React.FC<Props> = ({
-  username,
   aiSummaries,
-  bookCount,
   sheet,
   isMine,
   books,
 }) => {
-  const minimum = 1
   const {
     generateSummary,
     loading,
     json,
-    setJson,
     error,
     open,
     setOpen,
@@ -84,7 +80,7 @@ export const AiSummaries: React.FC<Props> = ({
       {json && (
         <div className="relative mx-auto w-full text-center sm:w-3/4">
           <div className="mb-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {Object.keys(json).map((key, value) => {
+            {Object.keys(json).map((key) => {
               return (
                 <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
                   <AiSummary key={key} jsonKey={key} text={json[key]} />

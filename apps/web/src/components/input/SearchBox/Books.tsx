@@ -12,7 +12,7 @@ interface Props {
   onClose: () => void
 }
 
-export const Books: React.FC<Props> = ({ input, onClose }) => {
+export const Books: React.FC<Props> = ({ input }) => {
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const setOpenAddModal = useSetAtom(openAddModalAtom)
   const [selectItem, setSelectItem] = useAtom(addBookAtom)
@@ -38,7 +38,7 @@ export const Books: React.FC<Props> = ({ input, onClose }) => {
     <>
       <div className="grid grid-cols-2 items-center justify-center gap-8 p-2 text-gray-900 sm:grid-cols-3 sm:p-4">
         {books.map((item: SearchResult, i: number) => {
-          const { id, title, memo, author, image } = item
+          const { title, author, image } = item
           return (
             <div
               className="relative mx-auto w-[156px] cursor-pointer px-2 py-2 text-center hover:brightness-95 "

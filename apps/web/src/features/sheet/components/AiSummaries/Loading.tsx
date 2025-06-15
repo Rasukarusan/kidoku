@@ -3,10 +3,6 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { getTitleAndIcon } from './util'
 
-interface Props {
-  jsonKey: string
-  text: string
-}
 export const Loading: React.FC = () => {
   const [json, setJson] = useState({
     reading_trend_analysis: '',

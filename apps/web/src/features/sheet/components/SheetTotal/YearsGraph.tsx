@@ -38,7 +38,7 @@ export const YearsGraph: React.FC<Props> = ({ years }) => {
         <XAxis dataKey="year" tick={{ fontSize: 12 }} />
         <YAxis dataKey="count" tick={{ fontSize: 12 }} dx={0} />
         <CartesianGrid stroke="#f5f5f5" />
-        <Tooltip formatter={(value, name, props) => [`${value}冊`]} />
+        <Tooltip formatter={(value) => [`${value}冊`]} />
         <Bar dataKey="count" barSize={30}>
           {years.map((entry, i) => (
             <Cell key={`cell-${i}`} cursor="pointer" fill={colors[i % 12]} />

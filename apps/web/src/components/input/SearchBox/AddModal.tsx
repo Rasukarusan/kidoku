@@ -99,7 +99,7 @@ export const AddModal: React.FC = () => {
       },
     })
       .then((res) => res.json())
-      .catch((e) => {
+      .catch(() => {
         return {
           result: false,
           message: '本の登録に失敗しました。画像は3MBまで登録できます。',

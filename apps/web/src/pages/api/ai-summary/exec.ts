@@ -6,7 +6,7 @@ import { RequestCookies } from '@edge-runtime/cookies'
 
 export const runtime = 'edge'
 
-export default async (req, res) => {
+export default async (req) => {
   try {
     const cookies = new RequestCookies(req.headers)
     const sessionToken = cookies.get('next-auth.session-token')?.value

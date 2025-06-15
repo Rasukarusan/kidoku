@@ -13,7 +13,7 @@ interface Props {
   onClose: () => void
 }
 
-export const Template: React.FC<Props> = ({ input, onClose }) => {
+export const Template: React.FC<Props> = () => {
   const [open, setOpen] = useState(false)
   const [hoverTemplate, setHoverTemplate] = useState(null)
   const { data, mutate } = useSWR('/api/template/books', fetcher)

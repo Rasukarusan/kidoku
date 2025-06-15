@@ -9,7 +9,7 @@ interface Props {
   comments: Comment[]
 }
 
-export const CommentsPage = ({ comments, next, page }) => {
+export const CommentsPage: React.FC<Props> = ({ comments, next, page }) => {
   return (
     <Container className="p-6">
       <NextSeo title="コメント一覧 | kidoku" />

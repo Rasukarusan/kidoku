@@ -39,7 +39,6 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
     const current = yearlyTopBooks.filter((book) => book.order === order).pop()
     setCurrent(current)
     if (current) {
-      const b = books.filter((book) => book.id === current.book.id).pop()
       setSelectItem(books.filter((book) => book.id === current.book.id).pop())
     } else {
       setSelectItem(null)
@@ -50,7 +49,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
     setLoading(true)
     if (selectItem) {
       // 新規で設定
-      const res = await fetch(`/api/yearly`, {
+      await fetch(`/api/yearly`, {
         method: 'POST',
         body: JSON.stringify({ bookId: selectItem.id, year, order }),
         headers: {
@@ -63,7 +62,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
       const current = yearlyTopBooks
         .filter((book) => book.order === order)
         .pop()
-      const res = await fetch(`/api/yearly`, {
+      await fetch(`/api/yearly`, {
         method: 'DELETE',
         body: JSON.stringify({ bookId: current.book.id, year, order }),
         headers: {
@@ -84,7 +83,7 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
           {year}年ベスト<span className="font-bold">{order}位</span>を設定
         </h2>
         <div className="flex h-full w-full flex-wrap justify-center overflow-y-auto p-4 pb-12 text-gray-900">
-          {books.map((book, i: number) => {
+          {books.map((book) => {
             return (
               <div
                 className={`m-2 w-3/4 cursor-pointer rounded-md px-4 py-2 text-center hover:bg-gray-100 sm:w-[200px] ${

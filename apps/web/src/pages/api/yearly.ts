@@ -25,7 +25,7 @@ export default async (req, res) => {
       return res.status(200).json({ result: true, yearlyTopBooks })
     } else if (req.method === 'POST') {
       const { year, order, bookId } = JSON.parse(req.body)
-      const result = await prisma.yearlyTopBook.upsert({
+      await prisma.yearlyTopBook.upsert({
         create: {
           year,
           order,
@@ -43,8 +43,8 @@ export default async (req, res) => {
       })
       return res.status(200).json({ result: true })
     } else if (req.method === 'DELETE') {
-      const { year, order, bookId } = JSON.parse(req.body)
-      const result = await prisma.yearlyTopBook.delete({
+      const { year, order } = JSON.parse(req.body)
+      await prisma.yearlyTopBook.delete({
         where: {
           userId_order_year: {
             year,
