@@ -10,7 +10,10 @@ export const SearchPage: React.FC = () => {
   const router = useRouter()
   const { q } = router.query
   const page = Number(router.query.page as string) || 1
-  const { data } = useSWR<SearchResponse>(`/api/search/shelf?q=${q}&page=${page}`, fetcher)
+  const { data } = useSWR<SearchResponse>(
+    `/api/search/shelf?q=${q}&page=${page}`,
+    fetcher
+  )
   if (!q) return null
   return (
     <Container>
