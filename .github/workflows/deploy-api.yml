@@ -68,8 +68,8 @@ jobs:
             --memory 256Mi \
             --cpu 1 \
             --min-instances 0 \
-            --max-instances 10 \
-            --timeout 60 \
+            --max-instances 2 \
+            --timeout 30 \
             --set-env-vars "NODE_ENV=production" \
             --set-env-vars "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" \
             --set-env-vars "DB_HOST=${{ secrets.DB_HOST }}" \
