@@ -1,0 +1,55 @@
+# ビルドステージ
+FROM node:22-alpine AS builder
+
+# pnpmをインストール
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# 依存関係ファイルをコピー
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+
+# ワークスペース全体の依存関係をインストール
+RUN pnpm install --frozen-lockfile
+
+# ソースコードをコピー
+COPY apps/api ./apps/api
+
+# NestJSアプリケーションをビルド
+RUN pnpm --filter api run build
+
+# 本番ステージ
+FROM node:22-alpine AS production
+
+# pnpmをインストール
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# 非rootユーザーを作成
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+WORKDIR /app
+
+# 依存関係ファイルをコピー
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
+
+# 本番用の依存関係のみインストール
+ENV HUSKY=0
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
+
+# ビルド済みのアプリケーションをコピー
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
+
+# ディレクトリの権限を設定
+RUN chown -R nestjs:nodejs /app
+
+# ユーザーを切り替え
+USER nestjs
+
+# ポートを公開
+EXPOSE 4000
+
+# アプリケーションを起動
+CMD ["node", "apps/api/dist/src/main"]

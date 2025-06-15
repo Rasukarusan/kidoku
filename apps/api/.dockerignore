@@ -1,0 +1,118 @@
+# 依存関係
+node_modules
+*/node_modules
+
+# ビルド成果物
+dist
+*/dist
+build
+*/build
+
+# ログファイル
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# OS関連
+.DS_Store
+Thumbs.db
+
+# IDE/エディタ
+.idea
+.vscode
+*.swp
+*.swo
+*.swn
+*.bak
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# テスト関連
+coverage
+.nyc_output
+*.lcov
+.coverage
+*.coveragexml
+htmlcov/
+.pytest_cache/
+.phpunit.result.cache
+
+# 環境変数
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+circle.yml
+jenkins/
+.circleci
+
+# ドキュメント
+README.md
+CHANGELOG.md
+LICENSE
+docs
+*.md
+
+# その他
+.npmrc
+.yarnrc
+.eslintcache
+.stylelintcache
+*.pid
+*.seed
+*.pid.lock
+.cache
+.parcel-cache
+.next
+out
+.nuxt
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# TypeScript
+*.tsbuildinfo
+
+# テスト用ファイル
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+__tests__
+test
+tests
+
+# 開発用設定
+.prettierrc
+.eslintrc*
+.stylelintrc*
+jest.config.*
+tsconfig.json
+tsconfig.*.json
+nest-cli.json

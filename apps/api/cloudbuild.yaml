@@ -1,0 +1,53 @@
+steps:
+  # Dockerイメージをビルド
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'Dockerfile.api'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/kidoku-api:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/kidoku-api:latest'
+      - '.'
+
+  # イメージをContainer Registryにプッシュ
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/kidoku-api'
+
+  # Cloud Runにデプロイ
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'kidoku-api'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/kidoku-api:$COMMIT_SHA'
+      - '--region'
+      - 'asia-northeast1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '4000'
+      - '--memory'
+      - '256Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+      - '--timeout'
+      - '60'
+      - '--set-env-vars'
+      - 'NODE_ENV=production'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  
+timeout: 1200s
