@@ -4,12 +4,13 @@ import { useRouter } from 'next/router'
 import { Container } from '@/components/layout/Container'
 import { fetcher } from '@/libs/swr'
 import { SkeltonView } from './SkeltonView'
+import { SearchResponse } from '@/types/api'
 
 export const SearchPage: React.FC = () => {
   const router = useRouter()
   const { q } = router.query
   const page = Number(router.query.page as string) || 1
-  const { data } = useSWR(`/api/search/shelf?q=${q}&page=${page}`, fetcher)
+  const { data } = useSWR<SearchResponse>(`/api/search/shelf?q=${q}&page=${page}`, fetcher)
   if (!q) return null
   return (
     <Container>
