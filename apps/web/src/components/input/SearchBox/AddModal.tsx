@@ -34,6 +34,11 @@ interface Response {
   sheetName: string
 }
 
+interface CategoriesResponse {
+  result: boolean
+  categories: string[]
+}
+
 export const AddModal: React.FC = () => {
   const router = useRouter()
   const [open, setOpen] = useAtom(openAddModalAtom)
@@ -58,7 +63,7 @@ export const AddModal: React.FC = () => {
   const [openAdd, setOpenAdd] = useState(false)
 
   // カテゴリ一覧
-  const { data: categories } = useSWR(`/api/books/category`, fetcher)
+  const { data: categories } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
   const options =
     categories && categories.result
       ? categories.categories.map((category) => {

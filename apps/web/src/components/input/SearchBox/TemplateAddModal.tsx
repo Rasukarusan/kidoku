@@ -18,6 +18,11 @@ interface Response {
   result: boolean
 }
 
+interface CategoriesResponse {
+  result: boolean
+  categories: string[]
+}
+
 interface Props {
   open: boolean
   onClose: () => void
@@ -34,7 +39,7 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
   })
 
   // カテゴリ一覧
-  const { data: categories } = useSWR(`/api/books/category`, fetcher)
+  const { data: categories } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
   const options =
     categories && categories.result
       ? categories.categories.map((category) => {
