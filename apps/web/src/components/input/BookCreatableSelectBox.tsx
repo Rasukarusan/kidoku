@@ -9,6 +9,7 @@ interface OptionType {
 
 interface Props {
   label: string
+  tabIndex?: number
   onChange?: (newValue: unknown, actionMeta: ActionMeta<unknown>) => void
   defaultValue?: unknown
   value?: unknown
@@ -18,6 +19,8 @@ interface Props {
 
 export const BookCreatableSelectBox: React.FC<Props> = ({
   label,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  tabIndex,
   defaultValue,
   value,
   options,
