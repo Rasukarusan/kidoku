@@ -42,9 +42,8 @@ jobs:
           gcloud auth configure-docker
 
       - name: Build and push Docker image
-        working-directory: ./apps/api
         run: |
-          docker build -t ${{ env.IMAGE }}:${{ github.sha }} -t ${{ env.IMAGE }}:latest .
+          docker build -f Dockerfile.api -t ${{ env.IMAGE }}:${{ github.sha }} -t ${{ env.IMAGE }}:latest .
           docker push ${{ env.IMAGE }}:${{ github.sha }}
           docker push ${{ env.IMAGE }}:latest
 
@@ -55,7 +54,7 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --port 3000 \
+            --port 4000 \
             --memory 256Mi \
             --cpu 1 \
             --min-instances 0 \

@@ -54,13 +54,14 @@ gcloud iam service-accounts keys create key.json \
 
 ### Dockerイメージのビルドとテスト
 ```bash
-cd apps/api
+# プロジェクトルートから実行
+cd /path/to/kidoku
 
-# イメージをビルド
-docker build -t kidoku-api:local .
+# イメージをビルド（プロジェクトルートから）
+docker build -f Dockerfile.api -t kidoku-api:local .
 
 # ローカルで実行
-docker run -p 3000:3000 \
+docker run -p 4000:4000 \
   -e NODE_ENV=production \
   -e FRONTEND_URL=http://localhost:3001 \
   -e DB_HOST=localhost \
@@ -72,7 +73,7 @@ docker run -p 3000:3000 \
   kidoku-api:local
 
 # ヘルスチェック
-curl http://localhost:3000/health
+curl http://localhost:4000/health
 ```
 
 ## デプロイ
@@ -96,7 +97,7 @@ gcloud run deploy kidoku-api \
   --region asia-northeast1 \
   --platform managed \
   --allow-unauthenticated \
-  --port 3000 \
+  --port 4000 \
   --memory 256Mi \
   --cpu 1 \
   --min-instances 0 \

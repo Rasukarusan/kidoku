@@ -6,18 +6,18 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-# ルートディレクトリからlockファイルをコピー
-COPY ../../pnpm-lock.yaml ./
-COPY package.json ./
+# 依存関係ファイルをコピー
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json ./apps/api/
 
-# 依存関係をインストール
+# ワークスペース全体の依存関係をインストール
 RUN pnpm install --frozen-lockfile
 
 # ソースコードをコピー
-COPY . .
+COPY apps/api ./apps/api
 
 # NestJSアプリケーションをビルド
-RUN pnpm run build
+RUN pnpm --filter api run build
 
 # 本番ステージ
 FROM node:22-alpine AS production
@@ -31,15 +31,15 @@ RUN adduser -S nestjs -u 1001
 
 WORKDIR /app
 
-# ルートディレクトリからlockファイルをコピー
-COPY ../../pnpm-lock.yaml ./
-COPY package.json ./
+# 依存関係ファイルをコピー
+COPY package.json pnpm-lock.yaml ./
+COPY apps/api/package.json ./apps/api/
 
-# 本番用の依存関係のみインストール
-RUN pnpm install --prod --frozen-lockfile
+# 本番用の依存関係のみインストール（prepareスクリプトをスキップ）
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # ビルド済みのアプリケーションをコピー
-COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
 
 # ユーザーを切り替え
 USER nestjs
@@ -48,4 +48,5 @@ USER nestjs
 EXPOSE 4000
 
 # アプリケーションを起動
-CMD ["node", "dist/main"]
+WORKDIR /app/apps/api
+CMD ["node", "dist/src/main"]
