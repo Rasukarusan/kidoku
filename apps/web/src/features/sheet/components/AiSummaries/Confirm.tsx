@@ -8,6 +8,7 @@ import { uniq } from '@/utils/array'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { AiSummaryUsageResponse } from '@/types/api'
 
 export type DetailSettings = {
   months: string[]
@@ -38,12 +39,9 @@ export const Confirm: React.FC<Props> = ({
   const [months, setMonths] = useState(initialMonths)
   const [categories, setCategories] = useState(initialCategories)
 
-  const { data } = useSWR(`/api/ai-summary/usage`, (url) =>
-    fetcher(url, {
-      sheetName,
-      months: months.join(','),
-      categories: categories.join(','),
-    })
+  const { data } = useSWR<AiSummaryUsageResponse>(
+    `/api/ai-summary/usage?sheetName=${sheetName}&months=${months.join(',')}&categories=${categories.join(',')}`,
+    fetcher
   )
 
   const isLimited = data?.count >= MONTHLY_LIMIT

@@ -33,3 +33,21 @@ export interface SearchResponse {
   hits: SearchHit[]
   next: boolean
 }
+
+export interface AiSummaryUsageResponse {
+  count: number
+}
+
+export interface BooksResponse {
+  result: boolean
+  books: import('./book').Book[]
+}
+
+export interface UserImageResponse {
+  image: string
+}
+
+export interface YearlyTopBooksResponse {
+  result: boolean
+  yearlyTopBooks: import('./book').YearlyTopBook[]
+}

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { FaUser } from 'react-icons/fa'
 import { twMerge } from 'tailwind-merge'
+import { UserImageResponse } from '@/types/api'
 
 interface Props {
   sheets: string[]
@@ -13,7 +14,10 @@ interface Props {
 export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const router = useRouter()
   const [tab, setTab] = useState(value)
-  const { data } = useSWR(`/api/user/image?username=${username}`, fetcher)
+  const { data } = useSWR<UserImageResponse>(
+    `/api/user/image?username=${username}`,
+    fetcher
+  )
 
   const onClick = (value: string) => {
     setTab(value)
