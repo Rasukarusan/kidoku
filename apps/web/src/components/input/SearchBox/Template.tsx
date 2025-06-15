@@ -7,16 +7,20 @@ import { openAddModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { Loading } from '@/components/icon/Loading'
+import { TemplatesResponse } from '@/types/api'
 
 interface Props {
   input: string
   onClose: () => void
 }
 
-export const Template: React.FC<Props> = ({ input, onClose }) => {
+export const Template: React.FC<Props> = () => {
   const [open, setOpen] = useState(false)
   const [hoverTemplate, setHoverTemplate] = useState(null)
-  const { data, mutate } = useSWR('/api/template/books', fetcher)
+  const { data, mutate } = useSWR<TemplatesResponse>(
+    '/api/template/books',
+    fetcher
+  )
   const setOpenAddModal = useSetAtom(openAddModalAtom)
   const setSelectItem = useSetAtom(addBookAtom)
 

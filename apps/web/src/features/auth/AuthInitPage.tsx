@@ -10,7 +10,7 @@ interface Props {
   >
 }
 
-export const AuthInitPage: React.FC<Props> = ({ providers }) => {
+export const AuthInitPage: React.FC<Props> = () => {
   const onClick = async () => {
     const body = {}
     const res = await fetch(`/api/auth/init`, {

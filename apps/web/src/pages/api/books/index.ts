@@ -58,7 +58,6 @@ export default async (req, res) => {
       const body = JSON.parse(req.body)
       const {
         title,
-        description,
         author,
         image,
         category,
@@ -146,7 +145,7 @@ export default async (req, res) => {
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
       const id = body.id
-      const book = await prisma.books.delete({
+      await prisma.books.delete({
         where: { id, userId },
       })
       return res.status(200).json({ result: true })

@@ -6,7 +6,7 @@ interface Props {
   comments: Comment[]
 }
 
-export const IndexPage = ({ comments }) => {
+export const IndexPage: React.FC<Props> = ({ comments }) => {
   return (
     <Container className="p-6">
       <section>

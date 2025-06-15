@@ -24,6 +24,7 @@ import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
 import { IoGrid } from 'react-icons/io5'
 import { twMerge } from 'tailwind-merge'
+import { BooksResponse } from '@/types/api'
 
 const TreemapGraph = dynamic(
   () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
@@ -50,7 +51,7 @@ export const SheetPage: React.FC<Props> = ({
   const router = useRouter()
   const { data: session } = useSession()
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
-  const { data: res } = useSWR(`/api/books/${year}`, fetcher, {
+  const { data: res } = useSWR<BooksResponse>(`/api/books/${year}`, fetcher, {
     fallbackData: { result: true, books: data },
   })
   const [currentData, setCurrentData] = useState<Book[]>(data)
@@ -70,7 +71,7 @@ export const SheetPage: React.FC<Props> = ({
     data.length > 0 && session && session.user.id === data[0].userId
   useEffect(() => {
     if (isMine) {
-      setCurrentData(res.books)
+      setCurrentData(res?.books || [])
     } else {
       setCurrentData(data)
     }

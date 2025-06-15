@@ -17,7 +17,7 @@ interface Response {
 export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
   const [newSheet, setNewSheet] = useState('')
   const ref = useRef<HTMLInputElement>(null)
-  const { reward, isAnimating } = useReward('rewardId', 'confetti', {
+  const { reward } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
   const [response, setResponse] = useState<Response>(null)

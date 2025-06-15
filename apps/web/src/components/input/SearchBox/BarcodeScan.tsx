@@ -1,7 +1,7 @@
 import { BarcodeScanner } from '@/components/input/BarcodeScanner'
 import { useSession } from 'next-auth/react'
 import { EventType } from '@/types/event_queue'
-import { useAtom, useSetAtom } from 'jotai'
+import { useSetAtom } from 'jotai'
 import { openAddModalAtom, openLoginModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
 
@@ -10,10 +10,10 @@ interface Props {
   onClose: () => void
 }
 
-export const BarcodeScan: React.FC<Props> = ({ input, onClose }) => {
+export const BarcodeScan: React.FC<Props> = () => {
   const { data: session } = useSession()
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
-  const [open, setOpen] = useAtom(openAddModalAtom)
+  const setOpen = useSetAtom(openAddModalAtom)
   const setBook = useSetAtom(addBookAtom)
 
   const sendMessage = async (book) => {

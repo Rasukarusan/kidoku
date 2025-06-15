@@ -1,10 +1,4 @@
-import Pusher from 'pusher'
 import pusher from '@/libs/pusher/server'
-export const trigger = async (
-  channel: string,
-  event: string,
-  data,
-  params?: Pusher.TriggerParams
-) => {
+export const trigger = async (channel: string, event: string, data) => {
   return await pusher.trigger(channel, event, data)
 }

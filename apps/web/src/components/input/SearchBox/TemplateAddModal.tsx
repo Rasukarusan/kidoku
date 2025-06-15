@@ -9,11 +9,11 @@ import { ImagePicker } from '@/components/button/ImagePicker'
 import { DangerAlert } from '@/components/label/DangerAlert'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { BookInputField } from '../BookInputField'
-import { useRouter } from 'next/router'
 import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { NO_IMAGE } from '@/libs/constants'
+import { CategoriesResponse } from '@/types/api'
 
 interface Response {
   result: boolean
@@ -25,7 +25,6 @@ interface Props {
 }
 
 export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
-  const router = useRouter()
   const { data: session } = useSession()
   const { mutate } = useSWR('/api/template/books', fetcher)
   const [loading, setLoading] = useState(false)
@@ -36,7 +35,10 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
   })
 
   // カテゴリ一覧
-  const { data: categories } = useSWR(`/api/books/category`, fetcher)
+  const { data: categories } = useSWR<CategoriesResponse>(
+    `/api/books/category`,
+    fetcher
+  )
   const options =
     categories && categories.result
       ? categories.categories.map((category) => {
@@ -70,7 +72,7 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
       },
     })
       .then((res) => res.json())
-      .catch((e) => {
+      .catch(() => {
         return {
           result: false,
           message:

@@ -7,8 +7,6 @@ import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 import { Logo } from '@/components/icon/Logo'
 import { useSetAtom } from 'jotai'
 import { openLoginModalAtom, openNavSidebarAtom } from '@/store/modal/atom'
-import { useQuery } from '@apollo/client'
-import { GET_SHEETS } from '@/libs/apollo/queries'
 import { twMerge } from 'tailwind-merge'
 
 // レスポンシブヘッダー
@@ -17,14 +15,6 @@ export const Header = () => {
   const { data: session } = useSession()
   const setOpen = useSetAtom(openLoginModalAtom)
   const setOpenSidebar = useSetAtom(openNavSidebarAtom)
-  const { data } = useQuery(GET_SHEETS)
-
-  const sheets = data?.sheets || []
-  const url = !session
-    ? '/'
-    : sheets.length > 0
-      ? `/${session.user.name}/sheets/${sheets[0].name}`
-      : `/${session.user.name}/sheets/total`
 
   if (router.asPath.startsWith('/auth/init')) {
     return null

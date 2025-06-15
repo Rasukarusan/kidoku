@@ -24,6 +24,7 @@ import { openAddModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
 import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
+import { CategoriesResponse } from '@/types/api'
 
 import { GET_SHEETS } from '@/libs/apollo/queries'
 
@@ -58,7 +59,10 @@ export const AddModal: React.FC = () => {
   const [openAdd, setOpenAdd] = useState(false)
 
   // カテゴリ一覧
-  const { data: categories } = useSWR(`/api/books/category`, fetcher)
+  const { data: categories } = useSWR<CategoriesResponse>(
+    `/api/books/category`,
+    fetcher
+  )
   const options =
     categories && categories.result
       ? categories.categories.map((category) => {
@@ -99,7 +103,7 @@ export const AddModal: React.FC = () => {
       },
     })
       .then((res) => res.json())
-      .catch((e) => {
+      .catch(() => {
         return {
           result: false,
           message: '本の登録に失敗しました。画像は3MBまで登録できます。',

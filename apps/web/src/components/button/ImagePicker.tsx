@@ -44,7 +44,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
     reader.readAsDataURL(file)
   }
 
-  const onSubmit = async (e) => {
+  const onSubmit = async () => {
     onImageLoad && onImageLoad(image)
     setOpen(false)
   }

@@ -24,7 +24,7 @@ interface Data {
   children: Book[]
 }
 
-const formatter = (value, name, props) => {
+const formatter = (value, name) => {
   const label = name === 'sum' ? '累計' : '今月'
   return [`${value}冊`, label]
 }

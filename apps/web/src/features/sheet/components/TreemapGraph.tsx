@@ -88,13 +88,13 @@ export const TreemapGraph: React.FC<Props> = ({
     }
   }
 
-  const onMouseEnter = (node, e) => {
+  const onMouseEnter = (node) => {
     const newHovers = [...initialHovers]
     newHovers[node.root.index] = true
     setHovers(newHovers)
   }
 
-  const onMouseLeave = (node, e) => {
+  const onMouseLeave = () => {
     setHovers([...initialHovers])
   }
 

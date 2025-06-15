@@ -26,7 +26,7 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   }
   const onSubmit = async () => {
     setLoading(true)
-    const res = await fetch(`/api/me`, {
+    await fetch(`/api/me`, {
       method: 'PUT',
       body: JSON.stringify({ name: currentName }),
       headers: {
