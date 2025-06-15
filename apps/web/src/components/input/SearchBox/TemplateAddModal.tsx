@@ -13,15 +13,12 @@ import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { NO_IMAGE } from '@/libs/constants'
+import { CategoriesResponse } from '@/types/api'
 
 interface Response {
   result: boolean
 }
 
-interface CategoriesResponse {
-  result: boolean
-  categories: string[]
-}
 
 interface Props {
   open: boolean
@@ -39,7 +36,10 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
   })
 
   // カテゴリ一覧
-  const { data: categories } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
+  const { data: categories } = useSWR<CategoriesResponse>(
+    `/api/books/category`,
+    fetcher
+  )
   const options =
     categories && categories.result
       ? categories.categories.map((category) => {

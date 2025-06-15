@@ -14,6 +14,7 @@ import { Tooltip } from 'react-tooltip'
 import { Label } from '@/components/input/Label'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
+import { CategoriesResponse } from '@/types/api'
 
 interface Props {
   currentBook: Book // 変更前の本
@@ -24,10 +25,6 @@ interface Props {
   loading: boolean
 }
 
-interface CategoriesResponse {
-  result: boolean
-  categories: string[]
-}
 
 export const BookDetailEditModal: React.FC<Props> = ({
   currentBook,
