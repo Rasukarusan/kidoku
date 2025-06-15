@@ -1,0 +1,49 @@
+# This file specifies files that are *not* uploaded to Google Cloud
+# using gcloud functions deploy or gcloud app deploy
+
+# Node.js dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+.next/
+.nuxt/
+.cache/
+
+# Development files
+*.ts
+!*.d.ts
+*.tsx
+*.map
+.env*
+!.env.example
+
+# Version control
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+*.test.ts
+*.spec.ts
+
+# Documentation
+*.md
+docs/
+
+# Docker files (we build in Cloud Build)
+Dockerfile
+.dockerignore
+docker-compose*.yml
