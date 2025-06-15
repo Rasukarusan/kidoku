@@ -4,11 +4,7 @@ interface Props {
   disabled: boolean
 }
 
-export const AiReGenerateButton: React.FC<Props> = ({
-  sheet,
-  onClick,
-  disabled,
-}) => {
+export const AiReGenerateButton: React.FC<Props> = ({ onClick, disabled }) => {
   return (
     <>
       <button

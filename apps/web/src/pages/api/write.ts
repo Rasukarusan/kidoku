@@ -10,7 +10,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const response = await fetch(GAS_ENDPOINT, {
+  await fetch(GAS_ENDPOINT, {
     method: 'POST',
     body: JSON.stringify(req.body),
   })

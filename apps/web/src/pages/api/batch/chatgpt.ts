@@ -1,14 +1,10 @@
 import openai from '@/libs/ai/openai'
-import type { NextApiResponse, NextApiRequest } from 'next'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import { ChatCompletionRequestMessage } from 'openai-edge'
 
 export const runtime = 'edge'
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler() {
   const prompt = 'JSONでkeyは英語、valueは日本語で出力してください'
   const content = '適当な自己紹介をしてください'
   const messages: ChatCompletionRequestMessage[] = [

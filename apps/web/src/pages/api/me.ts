@@ -11,7 +11,7 @@ export default async (req, res) => {
     const body = JSON.parse(req.body)
     const { name } = body
     const id = session.user.id
-    const user = await prisma.user.update({
+    await prisma.user.update({
       where: { id },
       data: { name },
     })

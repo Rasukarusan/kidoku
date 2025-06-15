@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
-import { useSession } from 'next-auth/react'
 import { Loading } from '@/components/icon/Loading'
 import { ImagePicker } from '@/components/button/ImagePicker'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
@@ -14,6 +13,7 @@ import { Tooltip } from 'react-tooltip'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { useReward } from 'react-rewards'
+import { CategoriesResponse } from '@/types/api'
 
 interface Props {
   book: Book
@@ -26,16 +26,15 @@ export const BookDetailEditPage: React.FC<Props> = ({
   onClose,
   onCancel,
 }) => {
-  const { data: session } = useSession()
   const [book, setBook] = useState<Book>(initialBook)
   const [loading, setLoading] = useState(false)
-  const { reward, isAnimating } = useReward('saveRewardId', 'balloons', {
+  const { reward } = useReward('saveRewardId', 'balloons', {
     lifetime: 200,
     spread: 100,
   })
 
   // カテゴリ一覧
-  const { data } = useSWR(`/api/books/category`, fetcher)
+  const { data } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
   const options =
     data && data.result
       ? data.categories.map((category) => {

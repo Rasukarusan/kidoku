@@ -13,7 +13,6 @@ interface Props {
 
 export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
   const router = useRouter()
-  const [selectItem, setSelectItem] = useState<SearchResult>(null)
   const [books, setBooks] = useState<SearchResult[]>([])
   // const [books, setBooks] = useState<SearchResult[]>(userBooks)
 
@@ -34,7 +33,7 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
   return (
     <>
       <div className="mb-4 block overflow-y-auto border-x p-2 text-gray-900 sm:flex sm:overflow-x-auto sm:overflow-y-hidden sm:p-4">
-        {books.map((item: SearchResult, i: number) => {
+        {books.map((item: SearchResult) => {
           const { id, title, memo, author, image, username, userImage, sheet } =
             item
           return (

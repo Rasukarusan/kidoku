@@ -4,7 +4,6 @@ import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { mask } from '@/utils/string'
 export default SheetPage
 
-type Props = { params: { year: string } }
 export async function getStaticProps(context) {
   const { user: username, year } = context.params
   const user = await prisma.user.findUnique({

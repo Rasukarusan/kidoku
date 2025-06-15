@@ -1,20 +1,25 @@
 import CreatableSelect from 'react-select/creatable'
 import { ActionMeta } from 'react-select'
-import type Option from 'react-select'
 import { Label } from './Label'
+
+interface OptionType {
+  value: string
+  label: string
+}
 
 interface Props {
   label: string
-  tabIndex: number
+  tabIndex?: number
   onChange?: (newValue: unknown, actionMeta: ActionMeta<unknown>) => void
   defaultValue?: unknown
   value?: unknown
-  options: Option[]
+  options: OptionType[]
   isChanged?: boolean
 }
 
 export const BookCreatableSelectBox: React.FC<Props> = ({
   label,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   tabIndex,
   defaultValue,
   value,
@@ -25,7 +30,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
 }) => {
   const formatCreateLabel = (inputValue) => `「${inputValue}」を作成`
   const customStyles = {
-    control: (base, state) => ({
+    control: (base) => ({
       ...base,
       minWidth: '120px',
       height: '30px',
@@ -43,13 +48,13 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
       <Label text={label} />
       <CreatableSelect
         classNames={{
-          valueContainer: (state) => '!p-0',
-          singleValue: (state) => '!py-0 !px-2 !m-0',
-          input: (state) => '!py-0 !px-2 !m-0',
-          placeholder: (state) => 'text-[0.6rem] sm:text-xs py-0 px-2',
-          dropdownIndicator: (state) => '!p-[2px]',
-          clearIndicator: (state) => '!p-[2px]',
-          indicatorSeparator: (state) => '!my-[6px] !mx-0',
+          valueContainer: () => '!p-0',
+          singleValue: () => '!py-0 !px-2 !m-0',
+          input: () => '!py-0 !px-2 !m-0',
+          placeholder: () => 'text-[0.6rem] sm:text-xs py-0 px-2',
+          dropdownIndicator: () => '!p-[2px]',
+          clearIndicator: () => '!p-[2px]',
+          indicatorSeparator: () => '!my-[6px] !mx-0',
         }}
         className="text-sm"
         styles={customStyles}

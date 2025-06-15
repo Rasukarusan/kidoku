@@ -4,7 +4,6 @@ import { Fragment, useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
 import { BookDetailSidebar } from './BookDetailSidebar'
-import { useSession } from 'next-auth/react'
 import { NO_IMAGE } from '@/libs/constants'
 import { AiFillLock } from 'react-icons/ai'
 import { useRouter } from 'next/router'
@@ -16,7 +15,6 @@ interface Props {
 }
 export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   const initialHovers = Array(books.length).fill(false)
-  const { data: session } = useSession()
   const router = useRouter()
   const [hovers, setHovers] = useState(initialHovers)
   const { mutate } = useSWR(`/api/books/${year}`, fetcher)

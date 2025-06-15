@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
-import { useSession } from 'next-auth/react'
 import { Loading } from '@/components/icon/Loading'
 import { ImagePicker } from '@/components/button/ImagePicker'
 import { BookInputField } from '@/components/input/BookInputField'
@@ -15,6 +14,7 @@ import { Tooltip } from 'react-tooltip'
 import { Label } from '@/components/input/Label'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
+import { CategoriesResponse } from '@/types/api'
 
 interface Props {
   currentBook: Book // 変更前の本
@@ -33,8 +33,6 @@ export const BookDetailEditModal: React.FC<Props> = ({
   setBook,
   loading,
 }) => {
-  const { data: session } = useSession()
-  const isMine = session?.user?.id === book.userId
   const [diff, setDiff] = useState({
     title: false,
     author: false,
@@ -44,7 +42,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
     memo: false,
   })
   // カテゴリ一覧
-  const { data } = useSWR(`/api/books/category`, fetcher)
+  const { data } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
   const options =
     data && data.result
       ? data.categories.map((category) => {
