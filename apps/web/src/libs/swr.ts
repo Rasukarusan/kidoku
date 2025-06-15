@@ -1,4 +1,4 @@
-export const fetcher = <T = any>(
+export const fetcher = <T = unknown>(
   url: string,
   params?: Record<string, string>
 ): Promise<T> => {

@@ -19,7 +19,6 @@ interface Response {
   result: boolean
 }
 
-
 interface Props {
   open: boolean
   onClose: () => void
