@@ -1,18 +1,14 @@
-import { useState } from 'react'
-import { useRouter } from 'next/router'
 import { Tabs } from '../Tabs'
 import { Category, Year } from '../../types'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { Rankings } from './Rankings'
 import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
-import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { Menu } from '../Menu'
 import { NextSeo } from 'next-seo'
-import { AiSummariesJson } from '../AiSummaries'
 
 interface Props {
   total: number
@@ -21,7 +17,6 @@ interface Props {
   sheets: string[]
   username: string
   yearlyTopBooks: YearlyTopBook[]
-  aiSummaries: AiSummariesJson[]
 }
 export const SheetTotalPage: React.FC<Props> = ({
   total,
@@ -30,32 +25,19 @@ export const SheetTotalPage: React.FC<Props> = ({
   sheets,
   username,
   yearlyTopBooks,
-  aiSummaries,
 }) => {
-  const [tab, setTab] = useState('total')
-  const router = useRouter()
-  const { data: session } = useSession()
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setTab(newValue)
-    if (session) {
-      router.push(`/${session.user.name}/sheets/${newValue}`)
-    }
-  }
   const average = years.length === 0 ? 0 : Math.ceil(total / years.length)
-  const isMine = session && session.user.name === username
 
   return (
     <Container>
       <NextSeo title={`${username}/Total | kidoku`} />
-      <div className="fixed left-0 top-[64px] z-30 flex w-full items-center bg-white lg:left-60 lg:w-[calc(100%-240px)]">
-        <Container className="flex w-full items-center px-0">
-          <Tabs sheets={sheets} value="total" username={username} />
-          <Menu
-            currentSheet="total"
-            username={username}
-            activate={{ edit: false, delete: false }}
-          />
-        </Container>
+      <div className="sticky left-0 top-[64px] z-30 flex w-full items-center bg-white lg:left-20">
+        <Tabs sheets={sheets} value="total" username={username} />
+        <Menu
+          currentSheet="total"
+          username={username}
+          activate={{ edit: false, delete: false }}
+        />
       </div>
       <div className="mb-10 mt-32 text-center">
         <TitleWithLine text="累計読書数" />
