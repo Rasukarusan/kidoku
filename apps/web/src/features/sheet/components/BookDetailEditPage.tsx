@@ -20,6 +20,11 @@ interface Props {
   onCancel: () => void
 }
 
+interface CategoriesResponse {
+  result: boolean
+  categories: string[]
+}
+
 export const BookDetailEditPage: React.FC<Props> = ({
   book: initialBook,
   onClose,
@@ -33,7 +38,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
   })
 
   // カテゴリ一覧
-  const { data } = useSWR(`/api/books/category`, fetcher)
+  const { data } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
   const options =
     data && data.result
       ? data.categories.map((category) => {

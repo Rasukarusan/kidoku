@@ -24,6 +24,11 @@ interface Props {
   loading: boolean
 }
 
+interface CategoriesResponse {
+  result: boolean
+  categories: string[]
+}
+
 export const BookDetailEditModal: React.FC<Props> = ({
   currentBook,
   book,
@@ -41,7 +46,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
     memo: false,
   })
   // カテゴリ一覧
-  const { data } = useSWR(`/api/books/category`, fetcher)
+  const { data } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
   const options =
     data && data.result
       ? data.categories.map((category) => {
