@@ -74,11 +74,7 @@ export async function getStaticProps(context) {
     props: {
       data: parse(data),
       year,
-      sheets: sheets.map((sheet) => ({
-        id: sheet.id.toString(),
-        name: sheet.name,
-        order: sheet.order || 0,
-      })),
+      sheets: sheets.map((sheet) => sheet.name),
       username,
       yearlyTopBooks,
       aiSummaries: aiSummaries.map((v) => v.analysis),

@@ -41,9 +41,3 @@ export const DELETE_SHEET = gql`
     deleteSheet(input: $input)
   }
 `
-
-export const UPDATE_SHEET_ORDERS = gql`
-  mutation UpdateSheetOrders($input: UpdateSheetOrdersInput!) {
-    updateSheetOrders(input: $input)
-  }
-`

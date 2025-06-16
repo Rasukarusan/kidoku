@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { SheetsRepository } from '../../infrastructure/repositories/sheets.repository';
 import { SheetObject } from './dto/sheet.object';
-import { UpdateSheetOrdersInput } from './dto/update-sheet-orders.input';
 
 @Injectable()
 export class SheetsService {
@@ -32,11 +31,7 @@ export class SheetsService {
     oldName: string,
     newName: string,
   ): Promise<SheetObject> {
-    const updated = await this.sheetsRepository.update(
-      userId,
-      oldName,
-      newName,
-    );
+    const updated = await this.sheetsRepository.update(userId, oldName, newName);
 
     return {
       id: updated.id.toString(),
@@ -50,18 +45,5 @@ export class SheetsService {
 
   async deleteSheet(userId: string, name: string): Promise<void> {
     await this.sheetsRepository.delete(userId, name);
-  }
-
-  async updateSheetOrders(
-    userId: string,
-    input: UpdateSheetOrdersInput,
-  ): Promise<boolean> {
-    const sheetUpdates = input.sheets.map((sheet) => ({
-      id: sheet.id,
-      order: sheet.order,
-    }));
-
-    await this.sheetsRepository.updateOrders(sheetUpdates);
-    return true;
   }
 }
