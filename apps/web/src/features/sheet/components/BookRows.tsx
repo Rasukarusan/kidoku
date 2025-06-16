@@ -115,7 +115,6 @@ export const BookRows: React.FC<Props> = ({ books }) => {
         </tbody>
       </table>
 
-
       <BookDetailSidebar
         open={openSidebar}
         book={sidebarBook}
