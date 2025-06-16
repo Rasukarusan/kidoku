@@ -8,7 +8,6 @@ import { openNavSidebarAtom } from '@/store/modal/atom'
 import {
   AiOutlineHome,
   AiOutlineBook,
-  AiOutlinePieChart,
   AiOutlineSetting,
   AiOutlineClose,
 } from 'react-icons/ai'
@@ -108,7 +107,6 @@ export const Sidebar: React.FC = () => {
     const isHomePage = router.pathname === '/'
     const isSheetsPage =
       router.pathname.includes('/sheets') && !router.pathname.includes('/total')
-    const isTotalPage = router.pathname.includes('/total')
     const isSettingsPage = router.pathname.includes('/settings')
 
     return [
@@ -123,12 +121,6 @@ export const Sidebar: React.FC = () => {
         href: defaultUrl,
         icon: AiOutlineBook,
         isActive: isSheetsPage,
-      },
-      {
-        name: '統計',
-        href: session ? `/${session.user.name}/sheets/total` : '/',
-        icon: AiOutlinePieChart,
-        isActive: isTotalPage,
       },
       {
         name: '設定',
