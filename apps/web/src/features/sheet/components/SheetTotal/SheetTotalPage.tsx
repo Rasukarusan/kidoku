@@ -1,3 +1,4 @@
+import { Tabs } from '../Tabs'
 import { Category, Year } from '../../types'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { Rankings } from './Rankings'
@@ -6,7 +7,7 @@ import { YearsGraph } from './YearsGraph'
 import { YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
-import { SheetTabsWithMenu } from '../SheetTabsWithMenu'
+import { Menu } from '../Menu'
 import { NextSeo } from 'next-seo'
 
 interface Props {
@@ -30,12 +31,14 @@ export const SheetTotalPage: React.FC<Props> = ({
   return (
     <Container>
       <NextSeo title={`${username}/Total | kidoku`} />
-      <SheetTabsWithMenu
-        sheets={sheets}
-        currentSheet="total"
-        username={username}
-        menuActivate={{ edit: false, delete: false }}
-      />
+      <div className="sticky top-[64px] z-30 -mx-4 flex items-center bg-white px-4 sm:-mx-6 sm:px-6">
+        <Tabs sheets={sheets} value="total" username={username} />
+        <Menu
+          currentSheet="total"
+          username={username}
+          activate={{ edit: false, delete: false }}
+        />
+      </div>
       <div className="mb-10 mt-32 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={total} unit="冊" />

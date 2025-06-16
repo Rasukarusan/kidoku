@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { Container } from '@/components/layout/Container'
 import { Book } from '@/types/book'
 import { BarGraph } from './BarGraph'
+import { Tabs } from './Tabs'
 import { Books } from './Books'
 import { BookRows } from './BookRows'
 import { BookDetailSidebar } from './BookDetailSidebar'
@@ -15,7 +16,7 @@ import { YearlyTopBooks } from './YearlyTopBooks'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { NO_IMAGE } from '@/libs/constants'
-import { SheetTabsWithMenu } from './SheetTabsWithMenu'
+import { Menu } from './Menu'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { FaListUl } from 'react-icons/fa'
@@ -88,12 +89,10 @@ export const SheetPage: React.FC<Props> = ({
     return (
       <Container>
         <NextSeo title={`${username}/${year} | kidoku`} />
-        <SheetTabsWithMenu
-          sheets={sheets}
-          currentSheet={year}
-          username={username}
-          variant="simple"
-        />
+        <div className="mb-8 flex items-center border-b border-gray-200">
+          <Tabs sheets={sheets} value={year} username={username} />
+          <Menu currentSheet={year} username={username} />
+        </div>
         <div className="p-10 text-center">
           <div className="mb-4 text-2xl font-bold">
             <span className="text-4xl">🐘 </span>あなたの本がここに表示されます
@@ -107,11 +106,10 @@ export const SheetPage: React.FC<Props> = ({
   return (
     <Container className="mb-12">
       <NextSeo title={`${username}/${year} | kidoku`} />
-      <SheetTabsWithMenu
-        sheets={sheets}
-        currentSheet={year}
-        username={username}
-      />
+      <div className="sticky top-[64px] z-30 -mx-4 flex items-center bg-white px-4 sm:-mx-6 sm:px-6">
+        <Tabs sheets={sheets} value={year} username={username} />
+        <Menu currentSheet={year} username={username} />
+      </div>
 
       <div className="mt-32 text-center">
         <TitleWithLine text="累計読書数" />
