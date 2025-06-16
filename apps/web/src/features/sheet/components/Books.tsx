@@ -98,11 +98,6 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
         })}
       </div>
 
-      {/* 操作説明 */}
-      <div className="mt-4 text-center text-xs text-gray-500 sm:text-sm">
-        <p>クリック: サイドバー表示 | Ctrl/Cmd + クリック: フルページ表示</p>
-      </div>
-
       <BookDetailSidebar
         open={openSidebar}
         book={sidebarBook}
