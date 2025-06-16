@@ -125,12 +125,6 @@ export const Sidebar: React.FC = () => {
         isActive: isSheetsPage,
       },
       {
-        name: '統計',
-        href: session ? `/${session.user.name}/sheets/total` : '/',
-        icon: AiOutlinePieChart,
-        isActive: isTotalPage,
-      },
-      {
         name: '設定',
         href: '/settings/profile',
         icon: AiOutlineSetting,
