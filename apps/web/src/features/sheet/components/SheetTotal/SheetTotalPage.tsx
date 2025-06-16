@@ -14,7 +14,7 @@ interface Props {
   total: number
   categories: Category[]
   years: Year[]
-  sheets: string[]
+  sheets: Array<{ id: string; name: string; order: number }>
   username: string
   yearlyTopBooks: YearlyTopBook[]
 }
