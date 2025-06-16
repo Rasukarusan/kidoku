@@ -233,7 +233,11 @@ export const Sidebar: React.FC = () => {
             aria-label="ユーザーアカウント"
           >
             <div className="w-full space-y-2">
-              <div className="flex items-center rounded-lg p-2 transition-colors duration-150 hover:bg-white/30">
+              <Link
+                href="/settings/profile"
+                className="flex items-center rounded-lg p-2 transition-colors duration-150 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
+                aria-label="アカウント設定に移動"
+              >
                 <div className="mr-3">
                   <img
                     className="h-9 w-9 rounded-full ring-2 ring-white"
@@ -249,7 +253,7 @@ export const Sidebar: React.FC = () => {
                     {session.user.email}
                   </p>
                 </div>
-              </div>
+              </Link>
               <button
                 onClick={() => signOut()}
                 className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-white/50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
@@ -353,7 +357,12 @@ export const Sidebar: React.FC = () => {
                   aria-label="ユーザーアカウント"
                 >
                   <div className="w-full space-y-3">
-                    <div className="flex items-center rounded-lg p-2 transition-colors duration-150 hover:bg-white/30">
+                    <Link
+                      href="/settings/profile"
+                      onClick={closeSidebar}
+                      className="flex items-center rounded-lg p-2 transition-colors duration-150 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
+                      aria-label="アカウント設定に移動"
+                    >
                       <div className="mr-3">
                         <img
                           className="h-10 w-10 rounded-full ring-2 ring-white"
@@ -369,7 +378,7 @@ export const Sidebar: React.FC = () => {
                           {session.user.email}
                         </p>
                       </div>
-                    </div>
+                    </Link>
                     <button
                       onClick={() => {
                         signOut()
