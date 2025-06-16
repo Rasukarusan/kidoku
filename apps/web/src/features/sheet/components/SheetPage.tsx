@@ -92,6 +92,7 @@ export const SheetPage: React.FC<Props> = ({
           sheets={sheets}
           currentSheet={year}
           username={username}
+          variant="simple"
         />
         <div className="p-10 text-center">
           <div className="mb-4 text-2xl font-bold">
