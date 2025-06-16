@@ -34,7 +34,7 @@ const TreemapGraph = dynamic(
 interface Props {
   data: Book[]
   year: string
-  sheets: string[]
+  sheets: Array<{ id: string; name: string; order: number }>
   username: string
   yearlyTopBooks: YearlyTopBook[]
   aiSummaries: AiSummariesJson[]

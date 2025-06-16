@@ -70,7 +70,14 @@ export const getStaticProps = async (ctx) => {
       total: books.length,
       categories,
       years,
-      sheets: sheets.length === 0 ? [] : sheets.map((sheet) => sheet.name),
+      sheets:
+        sheets.length === 0
+          ? []
+          : sheets.map((sheet) => ({
+              id: sheet.id.toString(),
+              name: sheet.name,
+              order: sheet.order || 0,
+            })),
       username,
       yearlyTopBooks,
     },

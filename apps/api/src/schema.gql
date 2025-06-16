@@ -29,6 +29,7 @@ type Mutation {
   createSheet(input: CreateSheetInput!): SheetObject!
   updateSheet(input: UpdateSheetInput!): SheetObject!
   deleteSheet(input: DeleteSheetInput!): Boolean!
+  updateSheetOrders(input: UpdateSheetOrdersInput!): Boolean!
 }
 
 input CreateSheetInput {
@@ -42,4 +43,13 @@ input UpdateSheetInput {
 
 input DeleteSheetInput {
   name: String!
+}
+
+input UpdateSheetOrdersInput {
+  sheets: [SheetOrderItem!]!
+}
+
+input SheetOrderItem {
+  id: String!
+  order: Float!
 }
