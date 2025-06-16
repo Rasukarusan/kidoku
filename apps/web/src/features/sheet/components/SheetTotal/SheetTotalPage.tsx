@@ -31,7 +31,7 @@ export const SheetTotalPage: React.FC<Props> = ({
   return (
     <Container>
       <NextSeo title={`${username}/Total | kidoku`} />
-      <div className="sticky left-0 top-[64px] z-30 flex w-full items-center bg-white lg:left-20">
+      <div className="sticky top-[64px] z-30 -mx-4 flex items-center bg-white px-4 sm:-mx-6 sm:px-6">
         <Tabs sheets={sheets} value="total" username={username} />
         <Menu
           currentSheet="total"
