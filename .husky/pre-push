@@ -1,4 +1,33 @@
+#\!/bin/sh
+
 echo "🔍 Running build and lint:fix before push..."
-pnpm lint:fix
-pnpm build
-echo "✅ Pre-push checks completed successfully!"
+
+# Run lint:fix
+npm run lint:fix
+
+# Check if there are any changes after lint:fix
+if \! git diff --quiet; then
+    echo "📝 Lint:fix made changes, committing them..."
+    
+    # Add all changes
+    git add .
+    
+    # Commit the lint fixes
+    git commit -m "style: lint:fix による自動修正
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+    
+    echo "✅ Lint fixes committed successfully\!"
+fi
+
+# Run build to make sure everything compiles
+npm run build
+
+if [ $? -ne 0 ]; then
+    echo "❌ Build failed, push aborted\!"
+    exit 1
+fi
+
+echo "✅ Pre-push checks completed successfully\!"
