@@ -9,7 +9,6 @@ import { SheetObject } from './dto/sheet.object';
 import { CreateSheetInput } from './dto/create-sheet.input';
 import { UpdateSheetInput } from './dto/update-sheet.input';
 import { DeleteSheetInput } from './dto/delete-sheet.input';
-import { UpdateSheetOrdersInput } from './dto/update-sheet-orders.input';
 
 @Resolver(() => SheetsResponseDto)
 @UseGuards(GqlAuthGuard)
@@ -61,13 +60,5 @@ export class SheetsResolver {
   ): Promise<boolean> {
     await this.sheetsService.deleteSheet(user.id, input.name);
     return true;
-  }
-
-  @Mutation(() => Boolean)
-  async updateSheetOrders(
-    @CurrentUser() user: { id: string; admin: boolean },
-    @Args('input') input: UpdateSheetOrdersInput,
-  ): Promise<boolean> {
-    return await this.sheetsService.updateSheetOrders(user.id, input);
   }
 }

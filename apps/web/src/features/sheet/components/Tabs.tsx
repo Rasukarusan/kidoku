@@ -6,22 +6,17 @@ import { FaUser } from 'react-icons/fa'
 import { twMerge } from 'tailwind-merge'
 import { UserImageResponse } from '@/types/api'
 import { Reorder } from 'framer-motion'
-import { useMutation } from '@apollo/client'
-import { UPDATE_SHEET_ORDERS } from '@/libs/apollo/queries'
 
 interface Props {
-  sheets: Array<{ id: string; name: string; order: number }>
+  sheets: string[]
   value: string
   username: string
 }
 export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const router = useRouter()
   const [tab, setTab] = useState(value)
-  const [orderedSheets, setOrderedSheets] = useState(
-    sheets.map((sheet) => sheet.name)
-  )
+  const [orderedSheets, setOrderedSheets] = useState(sheets)
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
-  const [updateSheetOrders] = useMutation(UPDATE_SHEET_ORDERS)
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   )
@@ -33,12 +28,9 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
 
   useEffect(() => {
     // 新しいシートが追加された場合のみ更新
-    const sheetNames = sheets.map((sheet) => sheet.name)
-    const newSheets = sheetNames.filter(
-      (sheet) => !orderedSheets.includes(sheet)
-    )
+    const newSheets = sheets.filter((sheet) => !orderedSheets.includes(sheet))
     const existingSheets = orderedSheets.filter((sheet) =>
-      sheetNames.includes(sheet)
+      sheets.includes(sheet)
     )
     if (
       newSheets.length > 0 ||
@@ -61,32 +53,6 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
 
   const handleDragEnd = () => {
     setDraggedItem(null)
-  }
-
-  const handleReorder = async (newOrder: string[]) => {
-    setOrderedSheets(newOrder)
-
-    try {
-      const sheetOrderUpdates = newOrder
-        .map((sheetName, index) => {
-          const sheet = sheets.find((s) => s.name === sheetName)
-          return {
-            id: sheet?.id || '',
-            order: newOrder.length - index,
-          }
-        })
-        .filter((update) => update.id !== '')
-
-      await updateSheetOrders({
-        variables: {
-          input: {
-            sheets: sheetOrderUpdates,
-          },
-        },
-      })
-    } catch (error) {
-      console.error('Failed to update sheet orders:', error)
-    }
   }
 
   return (
@@ -119,7 +85,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
           as="div"
           axis="x"
           values={orderedSheets}
-          onReorder={handleReorder}
+          onReorder={setOrderedSheets}
           className="flex items-center"
           style={{ listStyle: 'none' }}
           layoutScroll

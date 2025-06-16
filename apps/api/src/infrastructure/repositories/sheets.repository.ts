@@ -76,17 +76,4 @@ export class SheetsRepository {
       .delete(sheets)
       .where(and(eq(sheets.userId, userId), eq(sheets.name, name)));
   }
-
-  async updateOrders(
-    sheetUpdates: Array<{ id: string; order: number }>,
-  ): Promise<void> {
-    await this.db.transaction(async (tx) => {
-      for (const update of sheetUpdates) {
-        await tx
-          .update(sheets)
-          .set({ order: update.order, updated: new Date() })
-          .where(eq(sheets.id, parseInt(update.id)));
-      }
-    });
-  }
 }
