@@ -35,6 +35,7 @@ interface Props {
   year: string
   sheets: Array<{ id: string; name: string; order: number }>
   username: string
+  userId: string
   yearlyTopBooks: YearlyTopBook[]
   aiSummaries: AiSummariesJson[]
 }
@@ -44,6 +45,7 @@ export const SheetPage: React.FC<Props> = ({
   year,
   sheets,
   username,
+  userId,
   yearlyTopBooks,
   aiSummaries,
 }) => {
@@ -66,8 +68,7 @@ export const SheetPage: React.FC<Props> = ({
   const [openFullPageModal, setOpenFullPageModal] = useState(false)
   const [fullPageBook, setFullPageBook] = useState<Book>(null)
 
-  const isMine =
-    data.length > 0 && session && session.user.id === data[0].userId
+  const isMine = session && session.user.id === userId
   useEffect(() => {
     if (isMine) {
       setCurrentData(res?.books || [])
@@ -92,6 +93,7 @@ export const SheetPage: React.FC<Props> = ({
           sheets={sheets}
           currentSheet={year}
           username={username}
+          userId={userId}
           variant="simple"
         />
         <div className="p-10 text-center">
@@ -111,6 +113,7 @@ export const SheetPage: React.FC<Props> = ({
         sheets={sheets}
         currentSheet={year}
         username={username}
+        userId={userId}
       />
 
       <div className="mt-32 text-center">

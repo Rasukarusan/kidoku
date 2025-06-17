@@ -14,8 +14,9 @@ interface Props {
   sheets: Array<{ id: string; name: string; order: number }>
   value: string
   username: string
+  userId: string
 }
-export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
+export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
   const router = useRouter()
   const { data: session } = useSession()
   const [tab, setTab] = useState(value)
@@ -27,7 +28,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   )
-  const isMine = session && session.user.name === username
+  const isMine = session && session.user.id === userId
 
   const { data } = useSWR<UserImageResponse>(
     `/api/user/image?username=${username}`,
