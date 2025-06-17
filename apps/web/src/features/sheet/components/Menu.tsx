@@ -14,6 +14,7 @@ import { BsThreeDots } from 'react-icons/bs'
 interface Props {
   currentSheet: string
   username: string
+  userId: string
   activate?: {
     edit: boolean
     delete: boolean
@@ -22,6 +23,7 @@ interface Props {
 export const Menu: React.FC<Props> = ({
   currentSheet,
   username,
+  userId,
   activate = { edit: true, delete: true },
 }) => {
   const dropdownRef = useRef(null)
@@ -30,7 +32,7 @@ export const Menu: React.FC<Props> = ({
   const [openAdd, setOpenAdd] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
   const [openDelete, setOpenDelete] = useState(false)
-  const isMine = session && session.user.name === username
+  const isMine = session && session.user.id === userId
   const variants: Variants = {
     open: {
       opacity: 1,
