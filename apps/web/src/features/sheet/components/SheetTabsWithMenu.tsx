@@ -25,7 +25,12 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
 
   return (
     <div className={containerClass}>
-      <Tabs sheets={sheets} value={currentSheet} username={username} userId={userId} />
+      <Tabs
+        sheets={sheets}
+        value={currentSheet}
+        username={username}
+        userId={userId}
+      />
       <Menu
         currentSheet={currentSheet}
         username={username}
