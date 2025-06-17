@@ -93,7 +93,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   }
 
   return (
-    <div className="no-scrollbar mobile-tab-scroll flex touch-pan-x items-center justify-start overflow-x-auto">
+    <div className="no-scrollbar mobile-tab-scroll flex items-center justify-start overflow-x-auto">
       <div className="flex items-center">
         {/* TOTAL tab - fixed position */}
         <button
@@ -150,10 +150,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
                 stiffness: 600,
                 damping: 30,
               }}
-              drag={isMine}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.1}
-              dragMomentum={false}
+              drag={isMine ? 'x' : false}
             >
               <button
                 className={twMerge(
