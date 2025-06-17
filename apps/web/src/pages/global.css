@@ -27,6 +27,11 @@ div {
     display: none;
   }
 
+  /* モバイルタブスクロール改善 */
+  .mobile-tab-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+
   .readmore-blur::before {
     content: '';
     width: 100%;
