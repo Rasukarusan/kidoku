@@ -8,6 +8,7 @@ import { UserImageResponse } from '@/types/api'
 import { Reorder } from 'framer-motion'
 import { useMutation } from '@apollo/client'
 import { UPDATE_SHEET_ORDERS } from '@/libs/apollo/queries'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   sheets: Array<{ id: string; name: string; order: number }>
@@ -16,6 +17,7 @@ interface Props {
 }
 export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const router = useRouter()
+  const { data: session } = useSession()
   const [tab, setTab] = useState(value)
   const [orderedSheets, setOrderedSheets] = useState(
     sheets.map((sheet) => sheet.name)
@@ -25,6 +27,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   )
+  const isMine = session && session.user.name === username
 
   const { data } = useSWR<UserImageResponse>(
     `/api/user/image?username=${username}`,
@@ -90,7 +93,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
   }
 
   return (
-    <div className="no-scrollbar flex items-center justify-start overflow-x-auto">
+    <div className="no-scrollbar mobile-tab-scroll flex touch-pan-x items-center justify-start overflow-x-auto">
       <div className="flex items-center">
         {/* TOTAL tab - fixed position */}
         <button
@@ -114,12 +117,12 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
           <span className="mr-4">total</span>
         </button>
 
-        {/* Other tabs - draggable */}
+        {/* Other tabs - draggable only for owner */}
         <Reorder.Group
           as="div"
           axis="x"
           values={orderedSheets}
-          onReorder={handleReorder}
+          onReorder={isMine ? handleReorder : () => {}}
           className="flex items-center"
           style={{ listStyle: 'none' }}
           layoutScroll
@@ -130,19 +133,27 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
               value={item}
               className="relative"
               style={{ listStyle: 'none' }}
-              whileDrag={{
-                scale: 1.05,
-                zIndex: 1,
-                cursor: 'grabbing',
-              }}
-              onDragStart={() => handleDragStart(item)}
-              onDragEnd={handleDragEnd}
+              whileDrag={
+                isMine
+                  ? {
+                      scale: 1.05,
+                      zIndex: 1,
+                      cursor: 'grabbing',
+                    }
+                  : {}
+              }
+              onDragStart={isMine ? () => handleDragStart(item) : undefined}
+              onDragEnd={isMine ? handleDragEnd : undefined}
               layoutId={item}
               transition={{
                 type: 'spring',
                 stiffness: 600,
                 damping: 30,
               }}
+              drag={isMine}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.1}
+              dragMomentum={false}
             >
               <button
                 className={twMerge(
@@ -151,30 +162,43 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username }) => {
                   tab === item
                     ? 'border-b-2 border-gray-900'
                     : 'border-b border-gray-200',
-                  draggedItem === item && 'cursor-grabbing opacity-80'
+                  draggedItem === item && 'cursor-grabbing opacity-80',
+                  !isMine && 'cursor-default'
                 )}
                 onClick={() => onClick(item)}
-                onPointerDown={(e) => {
-                  const target = e.currentTarget
-                  const timer = setTimeout(() => {
-                    if (target) {
-                      target.style.cursor = 'grabbing'
-                    }
-                  }, 500)
-                  setLongPressTimer(timer)
-                }}
-                onPointerUp={() => {
-                  if (longPressTimer) {
-                    clearTimeout(longPressTimer)
-                    setLongPressTimer(null)
-                  }
-                }}
-                onPointerLeave={() => {
-                  if (longPressTimer) {
-                    clearTimeout(longPressTimer)
-                    setLongPressTimer(null)
-                  }
-                }}
+                onPointerDown={
+                  isMine
+                    ? (e) => {
+                        const target = e.currentTarget
+                        const timer = setTimeout(() => {
+                          if (target) {
+                            target.style.cursor = 'grabbing'
+                          }
+                        }, 500)
+                        setLongPressTimer(timer)
+                      }
+                    : undefined
+                }
+                onPointerUp={
+                  isMine
+                    ? () => {
+                        if (longPressTimer) {
+                          clearTimeout(longPressTimer)
+                          setLongPressTimer(null)
+                        }
+                      }
+                    : undefined
+                }
+                onPointerLeave={
+                  isMine
+                    ? () => {
+                        if (longPressTimer) {
+                          clearTimeout(longPressTimer)
+                          setLongPressTimer(null)
+                        }
+                      }
+                    : undefined
+                }
               >
                 {item}
               </button>
