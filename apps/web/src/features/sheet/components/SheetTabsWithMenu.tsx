@@ -5,6 +5,7 @@ interface Props {
   sheets: Array<{ id: string; name: string; order: number }>
   currentSheet: string
   username: string
+  userId: string
   menuActivate?: { edit: boolean; delete: boolean }
   variant?: 'sticky' | 'simple'
 }
@@ -13,6 +14,7 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
   sheets,
   currentSheet,
   username,
+  userId,
   menuActivate,
   variant = 'sticky',
 }) => {
@@ -23,10 +25,11 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
 
   return (
     <div className={containerClass}>
-      <Tabs sheets={sheets} value={currentSheet} username={username} />
+      <Tabs sheets={sheets} value={currentSheet} username={username} userId={userId} />
       <Menu
         currentSheet={currentSheet}
         username={username}
+        userId={userId}
         activate={menuActivate}
       />
     </div>
