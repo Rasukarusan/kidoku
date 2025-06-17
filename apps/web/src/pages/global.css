@@ -30,18 +30,6 @@ div {
   /* モバイルタブスクロール改善 */
   .mobile-tab-scroll {
     -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    overscroll-behavior-x: contain;
-  }
-
-  @media (max-width: 768px) {
-    .mobile-tab-scroll {
-      scroll-snap-type: x proximity;
-    }
-    
-    .mobile-tab-scroll > * {
-      scroll-snap-align: start;
-    }
   }
 
   .readmore-blur::before {
