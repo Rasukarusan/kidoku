@@ -80,6 +80,7 @@ export async function getStaticProps(context) {
         order: sheet.order || 0,
       })),
       username,
+      userId,
       yearlyTopBooks,
       aiSummaries: aiSummaries.map((v) => v.analysis),
     },

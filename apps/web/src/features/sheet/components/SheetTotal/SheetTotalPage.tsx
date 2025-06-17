@@ -15,6 +15,7 @@ interface Props {
   years: Year[]
   sheets: Array<{ id: string; name: string; order: number }>
   username: string
+  userId: string
   yearlyTopBooks: YearlyTopBook[]
 }
 export const SheetTotalPage: React.FC<Props> = ({
@@ -23,6 +24,7 @@ export const SheetTotalPage: React.FC<Props> = ({
   years,
   sheets,
   username,
+  userId,
   yearlyTopBooks,
 }) => {
   const average = years.length === 0 ? 0 : Math.ceil(total / years.length)
@@ -34,6 +36,7 @@ export const SheetTotalPage: React.FC<Props> = ({
         sheets={sheets}
         currentSheet="total"
         username={username}
+        userId={userId}
         menuActivate={{ edit: false, delete: false }}
       />
       <div className="mb-10 mt-32 text-center">

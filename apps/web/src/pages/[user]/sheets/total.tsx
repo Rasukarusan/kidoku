@@ -79,6 +79,7 @@ export const getStaticProps = async (ctx) => {
               order: sheet.order || 0,
             })),
       username,
+      userId,
       yearlyTopBooks,
     },
     revalidate: 5,
