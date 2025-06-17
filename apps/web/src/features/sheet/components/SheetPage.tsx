@@ -146,6 +146,7 @@ export const SheetPage: React.FC<Props> = ({
         </div>
         <div className="w-full text-center sm:w-1/2">
           <TitleWithLine text="カテゴリ内訳" className="mb-4" />
+          {/* @ts-ignore */}
           <TreemapGraph
             sheet={year}
             records={data}
