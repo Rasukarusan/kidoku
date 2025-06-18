@@ -80,18 +80,29 @@ export const InfiniteCommentsPage: React.FC = () => {
     }
   }, [hasMore, isLoadingMore, loadMoreComments])
 
+  // 2列表示のため、2つずつグループ化
+  const groupedComments = useMemo(() => {
+    const groups: Comment[][] = []
+    for (let i = 0; i < allComments.length; i += 2) {
+      groups.push(allComments.slice(i, i + 2))
+    }
+    return groups
+  }, [allComments])
+
   const itemRenderer = useCallback(
     (index: number) => {
-      const comment = allComments[index]
-      if (!comment) return <div>Loading...</div>
+      const commentGroup = groupedComments[index]
+      if (!commentGroup) return <div>Loading...</div>
 
       return (
-        <div className="p-2">
-          <BookComment comment={comment} />
+        <div className="grid grid-cols-1 gap-4 p-2 sm:grid-cols-2">
+          {commentGroup.map((comment) => (
+            <BookComment key={comment.id} comment={comment} />
+          ))}
         </div>
       )
     },
-    [allComments]
+    [groupedComments]
   )
 
   const components = useMemo(
@@ -151,7 +162,7 @@ export const InfiniteCommentsPage: React.FC = () => {
       <h2 className="p-2 text-2xl font-bold">Comments</h2>
       <div className="h-[calc(100vh-200px)]">
         <Virtuoso
-          data={allComments}
+          data={groupedComments}
           endReached={endReached}
           itemContent={itemRenderer}
           components={components}
