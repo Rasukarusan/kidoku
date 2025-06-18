@@ -20,9 +20,32 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type CommentObject {
+  id: ID!
+  title: String!
+  memo: String!
+  image: String!
+  updated: DateTime!
+  username: String!
+  userImage: String
+  sheet: String!
+}
+
+type CommentsResponseDto {
+  comments: [CommentObject!]!
+  hasMore: Boolean!
+  total: Float!
+}
+
 type Query {
   hello: HelloResponseDto!
   sheets: [SheetObject!]!
+  comments(input: GetCommentsInput!): CommentsResponseDto!
+}
+
+input GetCommentsInput {
+  limit: Int! = 20
+  offset: Int! = 0
 }
 
 type Mutation {
