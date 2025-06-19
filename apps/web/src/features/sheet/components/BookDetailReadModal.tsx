@@ -9,6 +9,7 @@ import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
 import { Memo } from './Memo'
 import { FaLink } from 'react-icons/fa'
+import { mask } from '@/utils/string'
 
 interface Props {
   book: Book
@@ -119,7 +120,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
 
             {(isMine || book.is_public_memo) && (
               <div className="rounded-lg bg-gray-50 p-4">
-                <Memo memo={book.memo} />
+                <Memo memo={isMine ? book.memo : mask(book.memo)} />
               </div>
             )}
 
