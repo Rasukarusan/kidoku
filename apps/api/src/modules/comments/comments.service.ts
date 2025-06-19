@@ -39,7 +39,7 @@ export class CommentsService {
       .offset(offset);
 
     const results = await commentsQuery;
-    
+
     // hasMoreを判定
     const hasMore = results.length > limit;
     const comments = hasMore ? results.slice(0, limit) : results;
@@ -49,7 +49,7 @@ export class CommentsService {
       .select({ count: count() })
       .from(books)
       .where(eq(books.isPublicMemo, 1));
-    
+
     const total = totalResult[0]?.count || 0;
 
     // データを変換

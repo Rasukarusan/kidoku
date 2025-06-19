@@ -81,6 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     const { getServerSession } = await import('next-auth/next')
     const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
     const { default: prisma, parse } = await import('@/libs/prisma')
+    const { mask } = await import('@/utils/string')
     const dayjs = (await import('dayjs')).default
 
     const session = await getServerSession(req, res, authOptions)
@@ -111,6 +112,9 @@ export const getServerSideProps: GetServerSideProps = async ({
     if (!isOwner && !book.is_public_memo) {
       // 非公開メモの場合、メモ内容を除外
       sanitizedBook.memo = null
+    } else if (!isOwner && book.is_public_memo) {
+      // 公開メモの場合、マスキングを適用
+      sanitizedBook.memo = mask(book.memo || '')
     }
 
     const month = book.finished
