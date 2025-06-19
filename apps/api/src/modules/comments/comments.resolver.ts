@@ -8,7 +8,9 @@ export class CommentsResolver {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Query(() => CommentsResponseDto)
-  async comments(@Args('input') input: GetCommentsInput): Promise<CommentsResponseDto> {
+  async comments(
+    @Args('input') input: GetCommentsInput,
+  ): Promise<CommentsResponseDto> {
     return this.commentsService.getComments(input);
   }
 }
