@@ -2,7 +2,6 @@ import { ApiClient } from '@/libs/apiClient'
 import { NO_IMAGE } from '@/libs/constants'
 import { SearchResult } from '@/types/search'
 import { normalizeISBN, convertISBN10to13 } from './isbn'
-import { isSoftwareDesignISBN } from './softwareDesignApi'
 
 /**
  * Google Books APIで書籍を検索

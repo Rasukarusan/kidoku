@@ -1,5 +1,5 @@
-import { useQuery, gql } from '@apollo/client';
-import { SearchResult } from '@/types/search';
+import { useQuery, gql } from '@apollo/client'
+import { SearchResult } from '@/types/search'
 
 const GET_LATEST_SOFTWARE_DESIGN = gql`
   query GetLatestSoftwareDesign {
@@ -13,7 +13,7 @@ const GET_LATEST_SOFTWARE_DESIGN = gql`
       isbn
     }
   }
-`;
+`
 
 const GET_SOFTWARE_DESIGN_BY_MONTH = gql`
   query GetSoftwareDesignByMonth($year: Int!, $month: Int!) {
@@ -27,7 +27,7 @@ const GET_SOFTWARE_DESIGN_BY_MONTH = gql`
       isbn
     }
   }
-`;
+`
 
 const GET_SOFTWARE_DESIGN_BY_YEAR = gql`
   query GetSoftwareDesignByYear($input: GetSoftwareDesignInput!) {
@@ -44,7 +44,7 @@ const GET_SOFTWARE_DESIGN_BY_YEAR = gql`
       total
     }
   }
-`;
+`
 
 const SEARCH_SOFTWARE_DESIGN_BY_ISBN = gql`
   query SearchSoftwareDesignByISBN($isbn: String!, $year: Int, $month: Int) {
@@ -58,52 +58,56 @@ const SEARCH_SOFTWARE_DESIGN_BY_ISBN = gql`
       isbn
     }
   }
-`;
+`
 
 export const useLatestSoftwareDesign = () => {
-  const { data, loading, error } = useQuery(GET_LATEST_SOFTWARE_DESIGN);
-  
+  const { data, loading, error } = useQuery(GET_LATEST_SOFTWARE_DESIGN)
+
   return {
     softwareDesign: data?.latestSoftwareDesign as SearchResult | undefined,
     loading,
     error,
-  };
-};
+  }
+}
 
 export const useSoftwareDesignByMonth = (year: number, month: number) => {
   const { data, loading, error } = useQuery(GET_SOFTWARE_DESIGN_BY_MONTH, {
     variables: { year, month },
-  });
-  
+  })
+
   return {
     softwareDesign: data?.softwareDesignByMonth as SearchResult | undefined,
     loading,
     error,
-  };
-};
+  }
+}
 
 export const useSoftwareDesignByYear = (year: number) => {
   const { data, loading, error } = useQuery(GET_SOFTWARE_DESIGN_BY_YEAR, {
     variables: { input: { year } },
-  });
-  
+  })
+
   return {
     items: data?.softwareDesignByYear?.items as SearchResult[] | undefined,
     total: data?.softwareDesignByYear?.total,
     loading,
     error,
-  };
-};
+  }
+}
 
-export const useSearchSoftwareDesignByISBN = (isbn: string, year?: number, month?: number) => {
+export const useSearchSoftwareDesignByISBN = (
+  isbn: string,
+  year?: number,
+  month?: number
+) => {
   const { data, loading, error } = useQuery(SEARCH_SOFTWARE_DESIGN_BY_ISBN, {
     variables: { isbn, year, month },
     skip: !isbn,
-  });
-  
+  })
+
   return {
     softwareDesign: data?.searchSoftwareDesignByISBN as SearchResult | null,
     loading,
     error,
-  };
-};
+  }
+}
