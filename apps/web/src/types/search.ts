@@ -46,4 +46,5 @@ export interface SearchResult {
   username?: string
   userImage?: string
   sheet?: string
+  isbn?: string
 }
