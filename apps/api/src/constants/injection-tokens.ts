@@ -1,3 +1,5 @@
 export const INJECTION_TOKENS = {
   DRIZZLE: 'DRIZZLE',
 } as const;
+
+export const DATABASE_CONNECTION = 'DATABASE_CONNECTION';
