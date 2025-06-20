@@ -2,6 +2,7 @@ import { ApiClient } from '@/libs/apiClient'
 import { NO_IMAGE } from '@/libs/constants'
 import { SearchResult } from '@/types/search'
 import { normalizeISBN, convertISBN10to13 } from './isbn'
+import { isSoftwareDesignISBN, searchSoftwareDesign } from './softwareDesignApi'
 
 /**
  * Google Books APIで書籍を検索
@@ -77,6 +78,14 @@ export const searchBookWithMultipleSources = async (
   isbn: string
 ): Promise<SearchResult | undefined> => {
   const normalizedISBN = normalizeISBN(isbn)
+
+  // 0. Software DesignのISBNの場合は専用処理
+  if (isSoftwareDesignISBN(normalizedISBN)) {
+    const sdResult = await searchSoftwareDesign(normalizedISBN)
+    if (sdResult) {
+      return sdResult
+    }
+  }
 
   // 1. まずopenBDで検索（日本の書籍データベース）
   const openBDResult = await searchOpenBD(normalizedISBN)
