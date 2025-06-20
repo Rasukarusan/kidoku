@@ -16,7 +16,7 @@ export default async function handler(
   if (req.method !== 'GET') {
     return res.status(405).json({
       success: false,
-      error: 'Method not allowed'
+      error: 'Method not allowed',
     })
   }
 
@@ -26,29 +26,29 @@ export default async function handler(
     if (!session) {
       return res.status(401).json({
         success: false,
-        error: 'Unauthorized'
+        error: 'Unauthorized',
       })
     }
 
     // 最新のSoftware Designを取得
     const result = await getLatestSoftwareDesign()
-    
+
     if (!result) {
       return res.status(404).json({
         success: false,
-        error: 'Software Design not found'
+        error: 'Software Design not found',
       })
     }
 
     return res.status(200).json({
       success: true,
-      data: result
+      data: result,
     })
   } catch (error) {
     console.error('Error fetching latest Software Design:', error)
     return res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: 'Internal server error',
     })
   }
 }

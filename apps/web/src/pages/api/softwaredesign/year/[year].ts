@@ -16,7 +16,7 @@ export default async function handler(
   if (req.method !== 'GET') {
     return res.status(405).json({
       success: false,
-      error: 'Method not allowed'
+      error: 'Method not allowed',
     })
   }
 
@@ -26,27 +26,31 @@ export default async function handler(
     if (!session) {
       return res.status(401).json({
         success: false,
-        error: 'Unauthorized'
+        error: 'Unauthorized',
       })
     }
 
     // パラメータから年を取得
     const { year } = req.query
-    
+
     if (!year) {
       return res.status(400).json({
         success: false,
-        error: 'Year is required'
+        error: 'Year is required',
       })
     }
 
     const yearNum = parseInt(year as string, 10)
 
     // バリデーション
-    if (isNaN(yearNum) || yearNum < 2000 || yearNum > new Date().getFullYear() + 1) {
+    if (
+      isNaN(yearNum) ||
+      yearNum < 2000 ||
+      yearNum > new Date().getFullYear() + 1
+    ) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid year'
+        error: 'Invalid year',
       })
     }
 
@@ -55,13 +59,13 @@ export default async function handler(
 
     return res.status(200).json({
       success: true,
-      data: results
+      data: results,
     })
   } catch (error) {
     console.error('Error fetching Software Design list:', error)
     return res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: 'Internal server error',
     })
   }
 }

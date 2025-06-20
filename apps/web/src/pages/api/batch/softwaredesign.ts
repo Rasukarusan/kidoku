@@ -7,7 +7,7 @@ type Data = {
   success: boolean
   message?: string
   error?: string
-  data?: any
+  data?: unknown
 }
 
 export default async function handler(
@@ -17,7 +17,7 @@ export default async function handler(
   if (req.method !== 'POST') {
     return res.status(405).json({
       success: false,
-      error: 'Method not allowed'
+      error: 'Method not allowed',
     })
   }
 
@@ -25,18 +25,18 @@ export default async function handler(
   if (!isAdmin(req)) {
     return res.status(401).json({
       success: false,
-      error: 'Unauthorized'
+      error: 'Unauthorized',
     })
   }
 
   try {
     // 最新のSoftware Designを取得
     const latestSD = await getLatestSoftwareDesign()
-    
+
     if (!latestSD) {
       return res.status(404).json({
         success: false,
-        error: 'Latest Software Design not found'
+        error: 'Latest Software Design not found',
       })
     }
 
@@ -44,40 +44,54 @@ export default async function handler(
     const existingBook = await prisma.books.findFirst({
       where: {
         title: latestSD.title,
-      }
+      },
     })
 
     if (existingBook) {
       return res.status(200).json({
         success: true,
         message: 'Latest Software Design already exists',
-        data: existingBook
+        data: existingBook,
+      })
+    }
+
+    // 管理者ユーザーを取得
+    const adminUser = await prisma.user.findFirst({
+      where: {
+        admin: true,
+      },
+    })
+
+    if (!adminUser) {
+      return res.status(500).json({
+        success: false,
+        error: 'Admin user not found',
       })
     }
 
     // テンプレートとして登録（自動追加用）
-    const template = await prisma.templateBooks.create({
+    const template = await prisma.template_books.create({
       data: {
+        userId: adminUser.id,
         name: latestSD.title,
         title: latestSD.title,
         author: latestSD.author,
         category: latestSD.category,
         image: latestSD.image,
-        memo: `自動追加: ${new Date().toLocaleDateString('ja-JP')}`,
-        isbn: latestSD.isbn || '',
-      }
+        memo: `自動追加: ${new Date().toLocaleDateString('ja-JP')}\nISBN: ${latestSD.isbn || '未設定'}`,
+      },
     })
 
     return res.status(200).json({
       success: true,
       message: 'Latest Software Design added as template',
-      data: template
+      data: template,
     })
   } catch (error) {
     console.error('Batch process error:', error)
     return res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: 'Internal server error',
     })
   }
 }
