@@ -2,7 +2,7 @@ import { ApiClient } from '@/libs/apiClient'
 import { NO_IMAGE } from '@/libs/constants'
 import { SearchResult } from '@/types/search'
 import { normalizeISBN, convertISBN10to13 } from './isbn'
-import { isSoftwareDesignISBN, searchSoftwareDesign } from './softwareDesignApi'
+import { isSoftwareDesignISBN } from './softwareDesignApi'
 
 /**
  * Google Books APIで書籍を検索
@@ -80,12 +80,8 @@ export const searchBookWithMultipleSources = async (
   const normalizedISBN = normalizeISBN(isbn)
 
   // 0. Software DesignのISBNの場合は専用処理
-  if (isSoftwareDesignISBN(normalizedISBN)) {
-    const sdResult = await searchSoftwareDesign(normalizedISBN)
-    if (sdResult) {
-      return sdResult
-    }
-  }
+  // Note: NestJS APIへ移行したため、GraphQL経由で取得する必要がある
+  // TODO: Apollo Clientを使用してNestJS APIから取得するように変更
 
   // 1. まずopenBDで検索（日本の書籍データベース）
   const openBDResult = await searchOpenBD(normalizedISBN)
