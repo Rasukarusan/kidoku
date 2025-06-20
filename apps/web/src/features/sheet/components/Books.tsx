@@ -112,6 +112,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
             setOpenSidebar(false)
           }
         }}
+        initialEditMode={router.query.edit === 'true'}
       />
     </>
   )

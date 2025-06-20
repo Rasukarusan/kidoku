@@ -13,6 +13,7 @@ interface Props {
   open: boolean
   onClose: () => void
   onExpandToFullPage: () => void
+  initialEditMode?: boolean
 }
 
 export const BookDetailSidebar: React.FC<Props> = ({
@@ -20,6 +21,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
   open,
   onClose,
   onExpandToFullPage,
+  initialEditMode = false,
 }) => {
   const router = useRouter()
   const { mutate } = useSWRConfig()
@@ -35,7 +37,19 @@ export const BookDetailSidebar: React.FC<Props> = ({
   useEffect(() => {
     setNewBook(book)
     setCurrentBook(book)
-  }, [book])
+    if (initialEditMode && book) {
+      // 編集モードで開く場合、非マスクのデータを取得
+      fetch(`/api/book/${book?.id}`)
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.result) {
+            setCurrentBook(res.book)
+            setNewBook(res.book)
+            setEdit(true)
+          }
+        })
+    }
+  }, [book, initialEditMode])
 
   const onClickEdit = async () => {
     const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])

@@ -319,17 +319,30 @@ export const AddModal: React.FC = () => {
                   </div>
                 )}
                 {response?.bookId > 0 ? (
-                  <button
-                    className="flex h-12 w-full items-center justify-center rounded-b-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-blue-700"
-                    onClick={() => {
-                      setOpen(false)
-                      router.push(
-                        `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}`
-                      )
-                    }}
-                  >
-                    <span id="rewardId">シートに飛ぶ</span>
-                  </button>
+                  <div className="flex">
+                    <button
+                      className="flex h-12 w-1/2 items-center justify-center rounded-bl-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700"
+                      onClick={() => {
+                        setOpen(false)
+                        router.push(
+                          `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}&edit=true`
+                        )
+                      }}
+                    >
+                      <span>編集する</span>
+                    </button>
+                    <button
+                      className="flex h-12 w-1/2 items-center justify-center rounded-br-md border-l border-green-500 bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700"
+                      onClick={() => {
+                        setOpen(false)
+                        router.push(
+                          `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}`
+                        )
+                      }}
+                    >
+                      <span id="rewardId">シートに飛ぶ</span>
+                    </button>
+                  </div>
                 ) : (
                   <button
                     className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
