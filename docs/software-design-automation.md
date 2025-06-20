@@ -2,6 +2,8 @@
 
 このドキュメントでは、Software Design誌の画像を自動的に取得する機能について説明します。
 
+**注意**: このAPIはNestJSに移行されました。詳細は`docs/nestjs-migration.md`を参照してください。
+
 ## 概要
 
 Software Design誌（技術評論社）の表紙画像を自動的に取得し、書籍情報として登録できる機能を実装しました。
@@ -18,32 +20,65 @@ const result = await searchBookWithMultipleSources('978-4-297-14815-7')
 // → 自動的にSoftware Designの画像URLが設定される
 ```
 
-### 2. APIエンドポイント
+### 2. GraphQL APIエンドポイント（NestJS）
+
+GraphQL APIは`http://localhost:3001/graphql`で利用可能です。
 
 #### 最新号を取得
-```
-GET /api/softwaredesign/latest
+```graphql
+query {
+  latestSoftwareDesign {
+    id
+    title
+    author
+    category
+    image
+    memo
+    isbn
+  }
+}
 ```
 
 #### 特定の年月号を取得
-```
-GET /api/softwaredesign/{year}/{month}
-例: /api/softwaredesign/2025/7
+```graphql
+query {
+  softwareDesignByMonth(year: 2025, month: 7) {
+    id
+    title
+    author
+    category
+    image
+    memo
+    isbn
+  }
+}
 ```
 
 #### 年間リストを取得
-```
-GET /api/softwaredesign/year/{year}
-例: /api/softwaredesign/year/2025
+```graphql
+query {
+  softwareDesignByYear(input: { year: 2025 }) {
+    items {
+      id
+      title
+      author
+      category
+      image
+      memo
+      isbn
+    }
+    total
+  }
+}
 ```
 
-### 3. バッチ処理
+### 3. バッチ処理（NestJS REST API）
 
 管理者権限で最新号を自動的にテンプレートとして登録：
 
 ```
-POST /api/batch/softwaredesign
-Headers: Authorization: Bearer {ADMIN_TOKEN}
+POST /api/software-design/batch/add-latest
+Headers: Authorization: Bearer {JWT_TOKEN}
 ```
 
 ## 画像URL構造
