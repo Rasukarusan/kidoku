@@ -27,7 +27,8 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
 }
 
 /**
- * ISBNで書籍検索
+ * ISBNで書籍検索（レガシー版 - 後方互換性のため残す）
+ * 新規実装では searchBookWithRetry を使用してください
  */
 export const searchBooksByIsbn = async (
   isbn: string
