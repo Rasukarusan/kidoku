@@ -1,12 +1,9 @@
 import { Resolver, Query, Args, Int } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
-import { GqlAuthGuard } from '../../auth/gql-auth.guard';
 import { SoftwareDesignService } from './software-design.service';
 import { SoftwareDesignObject, SoftwareDesignListResponseDto } from './dto/software-design.object';
 import { GetSoftwareDesignInput } from './dto/get-software-design.input';
 
 @Resolver(() => SoftwareDesignObject)
-@UseGuards(GqlAuthGuard)
 export class SoftwareDesignResolver {
   constructor(private readonly softwareDesignService: SoftwareDesignService) {}
 
