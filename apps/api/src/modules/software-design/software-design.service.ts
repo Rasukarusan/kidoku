@@ -15,16 +15,6 @@ export class SoftwareDesignService {
   }
 
   /**
-   * Software Designの詳細ページURLを生成
-   */
-  private generateDetailUrl(year: number, month: number): string {
-    const yearStr = year.toString();
-    const monthStr = month.toString().padStart(2, '0');
-    
-    return `https://gihyo.jp/magazine/SD/archive/${yearStr}/${yearStr}${monthStr}`;
-  }
-
-  /**
    * Software DesignのISBNかどうかを判定
    */
   isSoftwareDesignISBN(isbn: string, title?: string): boolean {
@@ -61,7 +51,6 @@ export class SoftwareDesignService {
    */
   async getByYearMonth(year: number, month: number, isbn?: string): Promise<SoftwareDesignObject> {
     const imageUrl = this.generateImageUrl(year, month);
-    const detailUrl = this.generateDetailUrl(year, month);
     
     return {
       id: isbn || `sd-${year}-${month}`,

@@ -98,23 +98,26 @@ https://gihyo.jp/assets/images/cover/{年}/thumb/TH800_64{年月下4桁}.jpg
 ### フロントエンドでの使用
 
 ```typescript
+import { useLatestSoftwareDesign, useSoftwareDesignByMonth } from '@/hooks/useSoftwareDesign';
+
 // 最新号を取得して登録
-const fetchLatestSoftwareDesign = async () => {
-  const response = await fetch('/api/softwaredesign/latest')
-  const data = await response.json()
+const LatestSoftwareDesignComponent = () => {
+  const { softwareDesign, loading, error } = useLatestSoftwareDesign();
   
-  if (data.success && data.data) {
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  
+  if (softwareDesign) {
     // 書籍として追加
-    await addBook(data.data)
+    await addBook(softwareDesign);
   }
 }
 
 // 特定の年月号を取得
-const fetchSpecificIssue = async (year: number, month: number) => {
-  const response = await fetch(`/api/softwaredesign/${year}/${month}`)
-  const data = await response.json()
+const SpecificIssueComponent = ({ year, month }: { year: number; month: number }) => {
+  const { softwareDesign, loading, error } = useSoftwareDesignByMonth(year, month);
   
-  return data.data
+  return softwareDesign;
 }
 ```
 
@@ -123,12 +126,19 @@ const fetchSpecificIssue = async (year: number, month: number) => {
 Vercel Cronやその他のスケジューラーを使用して、毎月自動的に最新号をチェック：
 
 ```javascript
-// vercel.json
-{
-  "crons": [{
-    "path": "/api/batch/softwaredesign",
-    "schedule": "0 0 20 * *"  // 毎月20日に実行
-  }]
+// NestJS APIサーバーでcronジョブを設定
+// src/modules/software-design/software-design.module.ts で@nestjs/scheduleを使用
+
+import { ScheduleModule } from '@nestjs/schedule';
+import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+
+@Injectable()
+export class SoftwareDesignCronService {
+  @Cron('0 0 20 * *') // 毎月20日に実行
+  async addLatestSoftwareDesign() {
+    // POST /api/software-design/batch/add-latest を実行
+  }
 }
 ```
 

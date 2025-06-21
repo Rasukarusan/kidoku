@@ -2,6 +2,59 @@ import { ApiClient } from '@/libs/apiClient'
 import { NO_IMAGE } from '@/libs/constants'
 import { SearchResult } from '@/types/search'
 import { normalizeISBN, convertISBN10to13 } from './isbn'
+import client from '@/libs/apollo'
+import { gql } from '@apollo/client'
+
+const SEARCH_SOFTWARE_DESIGN_BY_ISBN = gql`
+  query SearchSoftwareDesignByISBN($isbn: String!, $year: Int, $month: Int) {
+    searchSoftwareDesignByISBN(isbn: $isbn, year: $year, month: $month) {
+      id
+      title
+      author
+      category
+      image
+      memo
+      isbn
+    }
+  }
+`
+
+/**
+ * Software DesignのISBNかどうかを判定
+ */
+const isSoftwareDesignISBN = (isbn: string, title?: string): boolean => {
+  const normalizedISBN = isbn.replace(/-/g, '')
+
+  // 技術評論社のISBNパターン
+  const isTechReviewISBN = normalizedISBN.startsWith('9784297')
+
+  // タイトルによる判定
+  const isSoftwareDesignTitle = title
+    ? title.toLowerCase().includes('software design') ||
+      title.includes('ソフトウェアデザイン')
+    : false
+
+  return isTechReviewISBN || isSoftwareDesignTitle
+}
+
+/**
+ * Software Design専用の検索
+ */
+const searchSoftwareDesign = async (
+  isbn: string
+): Promise<SearchResult | null> => {
+  try {
+    const { data } = await client.query({
+      query: SEARCH_SOFTWARE_DESIGN_BY_ISBN,
+      variables: { isbn },
+    })
+
+    return data?.searchSoftwareDesignByISBN || null
+  } catch (error) {
+    console.error('Software Design search error:', error)
+    return null
+  }
+}
 
 /**
  * Google Books APIで書籍を検索
@@ -79,8 +132,12 @@ export const searchBookWithMultipleSources = async (
   const normalizedISBN = normalizeISBN(isbn)
 
   // 0. Software DesignのISBNの場合は専用処理
-  // Note: NestJS APIへ移行したため、GraphQL経由で取得する必要がある
-  // TODO: Apollo Clientを使用してNestJS APIから取得するように変更
+  if (isSoftwareDesignISBN(normalizedISBN)) {
+    const softwareDesignResult = await searchSoftwareDesign(normalizedISBN)
+    if (softwareDesignResult) {
+      return softwareDesignResult
+    }
+  }
 
   // 1. まずopenBDで検索（日本の書籍データベース）
   const openBDResult = await searchOpenBD(normalizedISBN)
