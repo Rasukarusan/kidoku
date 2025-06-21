@@ -4,7 +4,6 @@ import { SoftwareDesignService } from './software-design.service';
 import { SoftwareDesignRepository } from './software-design.repository';
 
 @Controller('software-design')
-@UseGuards(JwtAuthGuard)
 export class SoftwareDesignController {
   constructor(
     private readonly softwareDesignService: SoftwareDesignService,
@@ -55,6 +54,7 @@ export class SoftwareDesignController {
   }
 
   @Post('batch/add-latest')
+  @UseGuards(JwtAuthGuard)
   async addLatestAsTemplate() {
     // 最新のSoftware Designを取得
     const latestSD = await this.softwareDesignService.getLatest();
