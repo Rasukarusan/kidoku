@@ -51,15 +51,19 @@ export class SoftwareDesignService {
    */
   async getByYearMonth(year: number, month: number, isbn?: string): Promise<SoftwareDesignObject> {
     const imageUrl = this.generateImageUrl(year, month);
+    const yearStr = year.toString();
+    const monthStr = month.toString().padStart(2, '0');
     
     return {
-      id: isbn || `sd-${year}-${month}`,
+      yearMonth: `${yearStr}${monthStr}`,
       title: `Software Design ${year}年${month}月号`,
+      coverImageUrl: imageUrl,
+      publishDate: `${yearStr}-${monthStr}-01`,
+      isbn: isbn,
       author: '技術評論社',
       category: 'プログラミング/技術雑誌',
       image: imageUrl,
-      memo: '',
-      isbn: isbn || '',
+      memo: `Software Design ${year}年${month}月号`,
     };
   }
 

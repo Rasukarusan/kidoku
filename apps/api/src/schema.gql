@@ -38,13 +38,15 @@ type CommentsResponseDto {
 }
 
 type SoftwareDesignObject {
-  id: ID!
+  yearMonth: String!
   title: String!
+  coverImageUrl: String!
+  publishDate: String!
+  isbn: String
   author: String!
   category: String!
-  image: String!
-  memo: String!
-  isbn: String!
+  image: String
+  memo: String
 }
 
 type SoftwareDesignListResponseDto {

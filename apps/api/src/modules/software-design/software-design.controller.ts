@@ -88,7 +88,7 @@ export class SoftwareDesignController {
       title: latestSD.title,
       author: latestSD.author,
       category: latestSD.category,
-      image: latestSD.image,
+      image: latestSD.image || latestSD.coverImageUrl,
       memo: `自動追加: ${new Date().toLocaleDateString('ja-JP')}\nISBN: ${latestSD.isbn || '未設定'}`,
     });
 

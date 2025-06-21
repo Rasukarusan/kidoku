@@ -2,11 +2,20 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType()
 export class SoftwareDesignObject {
-  @Field(() => ID)
-  id: string;
+  @Field()
+  yearMonth: string;
 
   @Field()
   title: string;
+
+  @Field()
+  coverImageUrl: string;
+
+  @Field()
+  publishDate: string;
+
+  @Field({ nullable: true })
+  isbn?: string;
 
   @Field()
   author: string;
@@ -14,14 +23,11 @@ export class SoftwareDesignObject {
   @Field()
   category: string;
 
-  @Field()
-  image: string;
+  @Field({ nullable: true })
+  image?: string;
 
-  @Field()
-  memo: string;
-
-  @Field()
-  isbn: string;
+  @Field({ nullable: true })
+  memo?: string;
 }
 
 @ObjectType()
