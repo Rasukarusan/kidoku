@@ -6,8 +6,18 @@ import client from '@/libs/apollo'
 import { gql } from '@apollo/client'
 
 const SEARCH_SOFTWARE_DESIGN_BY_ISBN = gql`
-  query SearchSoftwareDesignByISBN($isbn: String!, $year: Int, $month: Int, $title: String) {
-    searchSoftwareDesignByISBN(isbn: $isbn, year: $year, month: $month, title: $title) {
+  query SearchSoftwareDesignByISBN(
+    $isbn: String!
+    $year: Int
+    $month: Int
+    $title: String
+  ) {
+    searchSoftwareDesignByISBN(
+      isbn: $isbn
+      year: $year
+      month: $month
+      title: $title
+    ) {
       id
       title
       author
@@ -78,9 +88,10 @@ export const searchGoogleBooks = async (
       title: title || '不明なタイトル',
       author: Array.isArray(authors) ? authors.join(', ') : '著者不明',
       category: categories ? categories.join(', ') : '未分類',
-      image: imageLinks?.thumbnail?.replace('http:', 'https:') || 
-             imageLinks?.smallThumbnail?.replace('http:', 'https:') || 
-             NO_IMAGE,
+      image:
+        imageLinks?.thumbnail?.replace('http:', 'https:') ||
+        imageLinks?.smallThumbnail?.replace('http:', 'https:') ||
+        NO_IMAGE,
       memo: '',
       isbn:
         industryIdentifiers?.find((id) => id.type === 'ISBN_13')?.identifier ||
@@ -116,7 +127,9 @@ export const searchOpenBD = async (
       author: summary.author || '著者不明',
       category:
         onix?.DescriptiveDetail?.Subject?.[0]?.SubjectHeadingText || '未分類',
-      image: summary.cover ? summary.cover.replace('http:', 'https:') : NO_IMAGE,
+      image: summary.cover
+        ? summary.cover.replace('http:', 'https:')
+        : NO_IMAGE,
       memo: '',
       isbn: summary.isbn,
     }
@@ -139,7 +152,10 @@ export const searchBookWithMultipleSources = async (
   if (openBDResult && openBDResult.title !== '不明なタイトル') {
     // Software DesignのISBNの場合は専用処理で画像を更新
     if (isSoftwareDesignISBN(normalizedISBN, openBDResult.title)) {
-      const softwareDesignResult = await searchSoftwareDesign(normalizedISBN, openBDResult.title)
+      const softwareDesignResult = await searchSoftwareDesign(
+        normalizedISBN,
+        openBDResult.title
+      )
       if (softwareDesignResult) {
         return {
           ...openBDResult,
@@ -155,7 +171,10 @@ export const searchBookWithMultipleSources = async (
   if (googleResult) {
     // Software DesignのISBNの場合は専用処理で画像を更新
     if (isSoftwareDesignISBN(normalizedISBN, googleResult.title)) {
-      const softwareDesignResult = await searchSoftwareDesign(normalizedISBN, googleResult.title)
+      const softwareDesignResult = await searchSoftwareDesign(
+        normalizedISBN,
+        googleResult.title
+      )
       if (softwareDesignResult) {
         return {
           ...googleResult,
@@ -163,7 +182,7 @@ export const searchBookWithMultipleSources = async (
         }
       }
     }
-    
+
     // openBDの部分的な結果とGoogleの結果をマージ
     if (openBDResult) {
       return {
