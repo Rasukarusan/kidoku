@@ -37,15 +37,41 @@ type CommentsResponseDto {
   total: Float!
 }
 
+type SoftwareDesignObject {
+  yearMonth: String!
+  title: String!
+  coverImageUrl: String!
+  publishDate: String!
+  isbn: String
+  author: String!
+  category: String!
+  image: String
+  memo: String
+}
+
+type SoftwareDesignListResponseDto {
+  items: [SoftwareDesignObject!]!
+  total: Float!
+}
+
 type Query {
   hello: HelloResponseDto!
   sheets: [SheetObject!]!
   comments(input: GetCommentsInput!): CommentsResponseDto!
+  latestSoftwareDesign: SoftwareDesignObject!
+  softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignObject!
+  softwareDesignByYear(input: GetSoftwareDesignInput!): SoftwareDesignListResponseDto!
+  searchSoftwareDesignByISBN(isbn: String!, year: Int, month: Int): SoftwareDesignObject
 }
 
 input GetCommentsInput {
   limit: Int! = 20
   offset: Int! = 0
+}
+
+input GetSoftwareDesignInput {
+  year: Int!
+  month: Int
 }
 
 type Mutation {
