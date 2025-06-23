@@ -1,29 +1,40 @@
 import { ApiClient } from '@/libs/apiClient'
 import { NO_IMAGE } from '@/libs/constants'
 import { SearchResult } from '@/types/search'
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 
 /**
  * Software Designの最新号を取得
  */
 const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-    const response = await fetch(`${apiUrl}/software-design/latest`)
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    
-    const result = await response.json()
-    
-    if (result?.success && result?.data) {
-      const sd = result.data
+    const apolloClient = new ApolloClient({
+      uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql',
+      cache: new InMemoryCache(),
+    })
+
+    const { data } = await apolloClient.query({
+      query: gql`
+        query {
+          latestSoftwareDesign {
+            yearMonth
+            title
+            coverImageUrl
+            author
+            category
+          }
+        }
+      `,
+    })
+
+    if (data?.latestSoftwareDesign) {
+      const sd = data.latestSoftwareDesign
       return {
         id: `sd-${sd.yearMonth}`,
         title: sd.title,
         author: sd.author,
         category: sd.category,
-        image: sd.coverImageUrl || sd.image,
+        image: sd.coverImageUrl,
         memo: '最新号',
       }
     }
@@ -39,11 +50,11 @@ const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
 export const searchBooks = async (title: string): Promise<SearchResult[]> => {
   const client = new ApiClient()
   const result: SearchResult[] = []
-  
+
   // Software Design検索の判定
   const searchLower = title.toLowerCase()
-  const shouldIncludeSoftwareDesign = 
-    searchLower.includes('soft') || 
+  const shouldIncludeSoftwareDesign =
+    searchLower.includes('soft') ||
     searchLower.includes('design') ||
     searchLower.includes('sd') ||
     searchLower.includes('技術評論') ||
