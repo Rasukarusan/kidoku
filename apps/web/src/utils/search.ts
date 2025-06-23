@@ -10,7 +10,9 @@ const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
   try {
     // 認証不要のクライアントを作成
     const publicApolloClient = new ApolloClient({
-      uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql',
+      uri:
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
+        'http://localhost:4000/graphql',
       cache: new InMemoryCache(),
     })
 
@@ -36,7 +38,7 @@ const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
         author: sd.author,
         category: sd.category,
         image: sd.coverImageUrl,
-        memo: '最新号',
+        memo: '[期待]\n\n[感想]\n',
       }
     }
   } catch (error) {

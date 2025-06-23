@@ -1,6 +1,9 @@
 import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 import { SoftwareDesignService } from './software-design.service';
-import { SoftwareDesignObject, SoftwareDesignListResponseDto } from './dto/software-design.object';
+import {
+  SoftwareDesignObject,
+  SoftwareDesignListResponseDto,
+} from './dto/software-design.object';
 import { GetSoftwareDesignInput } from './dto/get-software-design.input';
 
 @Resolver(() => SoftwareDesignObject)
@@ -25,14 +28,17 @@ export class SoftwareDesignResolver {
     @Args('input') input: GetSoftwareDesignInput,
   ): Promise<SoftwareDesignListResponseDto> {
     const items = await this.softwareDesignService.getByYear(input.year);
-    
+
     return {
       items,
       total: items.length,
     };
   }
 
-  @Query(() => SoftwareDesignObject, { nullable: true, name: 'searchSoftwareDesignByISBN' })
+  @Query(() => SoftwareDesignObject, {
+    nullable: true,
+    name: 'searchSoftwareDesignByISBN',
+  })
   async searchByISBN(
     @Args('isbn') isbn: string,
     @Args('year', { type: () => Int, nullable: true }) year?: number,
