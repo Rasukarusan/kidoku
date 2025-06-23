@@ -3,11 +3,61 @@ import { NO_IMAGE } from '@/libs/constants'
 import { SearchResult } from '@/types/search'
 
 /**
+ * Software Designの最新号を取得
+ */
+const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const response = await fetch(`${apiUrl}/software-design/latest`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const result = await response.json()
+    
+    if (result?.success && result?.data) {
+      const sd = result.data
+      return {
+        id: `sd-${sd.yearMonth}`,
+        title: sd.title,
+        author: sd.author,
+        category: sd.category,
+        image: sd.coverImageUrl || sd.image,
+        memo: '最新号',
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch latest Software Design:', error)
+  }
+  return null
+}
+
+/**
  * 書籍検索
  */
 export const searchBooks = async (title: string): Promise<SearchResult[]> => {
   const client = new ApiClient()
   const result: SearchResult[] = []
+  
+  // Software Design検索の判定
+  const searchLower = title.toLowerCase()
+  const shouldIncludeSoftwareDesign = 
+    searchLower.includes('soft') || 
+    searchLower.includes('design') ||
+    searchLower.includes('sd') ||
+    searchLower.includes('技術評論') ||
+    searchLower.includes('ソフトウェア')
+
+  // Software Designの最新号を追加
+  if (shouldIncludeSoftwareDesign) {
+    const latestSD = await getLatestSoftwareDesign()
+    if (latestSD) {
+      result.push(latestSD)
+    }
+  }
+
+  // Google Books APIで検索
   await client
     .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
     .then((res) => {
