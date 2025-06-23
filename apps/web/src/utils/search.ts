@@ -82,7 +82,7 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
           title: title,
           author: Array.isArray(authors) ? authors.join(',') : '-',
           category: categories ? categories.join(',') : '-',
-          image: imageLinks ? imageLinks.thumbnail : NO_IMAGE,
+          image: imageLinks?.thumbnail?.replace('http:', 'https:') || NO_IMAGE,
           memo: '',
         })
       })
@@ -109,7 +109,7 @@ export const searchBooksByIsbn = async (
         title: title,
         author: Array.isArray(authors) ? authors.join(',') : '-',
         category: categories ? categories.join(',') : '-',
-        image: imageLinks ? imageLinks.thumbnail : NO_IMAGE,
+        image: imageLinks?.thumbnail?.replace('http:', 'https:') || NO_IMAGE,
         memo: '',
       }
       return book

@@ -2,7 +2,7 @@
 
 このドキュメントでは、Software Design誌の画像を自動的に取得する機能について説明します。
 
-**注意**: このAPIはNestJSに移行されました。詳細は`docs/nestjs-migration.md`を参照してください。
+**注意**: このAPIはNestJSに移行されました。詳細は[`nestjs-migration.md`](./nestjs-migration.md)を参照してください。
 
 ## 概要
 
@@ -15,14 +15,16 @@ Software Design誌（技術評論社）の表紙画像を自動的に取得し�
 Software DesignのISBN（978-4-297で始まる）を検索すると、自動的に技術評論社のサイトから画像を取得します。
 
 ```javascript
-// 例: ISBN検索でSoftware Designを追加
+// 例: ISBN検索でSoftware Designを追加（bookApi.tsを使用）
+import { searchBookWithMultipleSources } from '@/utils/bookApi'
+
 const result = await searchBookWithMultipleSources('978-4-297-14815-7')
 // → 自動的にSoftware Designの画像URLが設定される
 ```
 
 ### 2. GraphQL APIエンドポイント（NestJS）
 
-GraphQL APIは`http://localhost:3001/graphql`で利用可能です。
+GraphQL APIは`http://localhost:4000/graphql`で利用可能です（本番環境では`NEXT_PUBLIC_GRAPHQL_ENDPOINT`環境変数で設定）。
 
 #### 最新号を取得
 ```graphql
@@ -109,6 +111,7 @@ const LatestSoftwareDesignComponent = () => {
   
   if (softwareDesign) {
     // 書籍として追加
+    // 注: addBook関数は実際のプロジェクトで実装する必要があります
     await addBook(softwareDesign);
   }
 }
@@ -125,19 +128,22 @@ const SpecificIssueComponent = ({ year, month }: { year: number; month: number }
 
 Vercel Cronやその他のスケジューラーを使用して、毎月自動的に最新号をチェック：
 
-```javascript
+```typescript
 // NestJS APIサーバーでcronジョブを設定
-// src/modules/software-design/software-design.module.ts で@nestjs/scheduleを使用
+// src/modules/software-design/software-design.service.ts でスケジュール処理を実装
 
-import { ScheduleModule } from '@nestjs/schedule';
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { SoftwareDesignService } from './software-design.service';
 
 @Injectable()
 export class SoftwareDesignCronService {
+  constructor(private readonly softwareDesignService: SoftwareDesignService) {}
+
   @Cron('0 0 20 * *') // 毎月20日に実行
   async addLatestSoftwareDesign() {
-    // POST /api/software-design/batch/add-latest を実行
+    // バッチ処理を実行
+    await this.softwareDesignService.addLatestSoftwareDesignAsTemplate();
   }
 }
 ```
@@ -148,7 +154,7 @@ export class SoftwareDesignCronService {
 
 2. **画像の可用性**: 技術評論社のサイト構造が変更された場合、画像URLのパターンも変更される可能性があります。
 
-3. **エラーハンドリング**: 画像が見つからない場合はデフォルト画像（NO_IMAGE）が使用されます。
+3. **エラーハンドリング**: 画像が見つからない場合はデフォルト画像（`NO_IMAGE`定数）が使用されます。
 
 ## 今後の拡張案
 
@@ -156,3 +162,5 @@ export class SoftwareDesignCronService {
 2. **目次情報の取得**: 各号の目次情報も合わせて取得
 3. **在庫状況の確認**: 購入可能かどうかの情報も取得
 4. **他の技術雑誌への対応**: Web+DB PRESSなど他の技術雑誌にも対応
+5. **キャッシング**: Redis等を使用した画像URL・書籍情報のキャッシング
+6. **画像の最適化**: WebP形式への変換や適切なサイズへのリサイズ

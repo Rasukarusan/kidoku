@@ -23,6 +23,8 @@ apps/api/src/modules/software-design/
 
 ### 2. GraphQL API
 
+GraphQL APIは`http://localhost:4000/graphql`で利用可能です（本番環境では`NEXT_PUBLIC_GRAPHQL_ENDPOINT`環境変数で設定）。
+
 #### クエリ
 
 ```graphql
@@ -68,9 +70,9 @@ query GetSoftwareDesignByYear($input: GetSoftwareDesignInput!) {
   }
 }
 
-# ISBN検索
-query SearchSoftwareDesignByISBN($isbn: String!, $year: Int, $month: Int) {
-  searchSoftwareDesignByISBN(isbn: $isbn, year: $year, month: $month) {
+# ISBN検索（titleパラメータはオプショナル）
+query SearchSoftwareDesignByISBN($isbn: String!, $year: Int, $month: Int, $title: String) {
+  searchSoftwareDesignByISBN(isbn: $isbn, year: $year, month: $month, title: $title) {
     id
     title
     author
@@ -87,9 +89,11 @@ query SearchSoftwareDesignByISBN($isbn: String!, $year: Int, $month: Int) {
 管理者用のバッチ処理エンドポイント：
 
 ```
-POST /api/software-design/batch/add-latest
+POST http://localhost:4000/api/software-design/batch/add-latest
 Headers: Authorization: Bearer {JWT_TOKEN}
 ```
+
+**注意**: JWTトークンは管理者権限が必要です。
 
 レスポンス例：
 ```json
@@ -121,7 +125,7 @@ import { useLatestSoftwareDesign, useSoftwareDesignByMonth } from '@/hooks/useSo
 const { softwareDesign, loading, error } = useLatestSoftwareDesign();
 
 // 特定の年月号を取得
-const { softwareDesign } = useSoftwareDesignByMonth(2025, 7);
+const { softwareDesign, loading, error } = useSoftwareDesignByMonth(2025, 7);
 ```
 
 #### Apollo Clientでの直接クエリ
@@ -174,6 +178,9 @@ NestJSのテストフレームワークを使用：
 ```bash
 cd apps/api
 npm test src/modules/software-design/__tests__/software-design.service.spec.ts
+
+# または、すべてのSoftware Design関連テストを実行
+npm test software-design
 ```
 
 ## 今後の改善点
@@ -181,4 +188,12 @@ npm test src/modules/software-design/__tests__/software-design.service.spec.ts
 1. **キャッシング**: Redisを使用した画像URLのキャッシング
 2. **実際のISBN取得**: 技術評論社のサイトから最新号のISBNを自動取得
 3. **画像検証**: 画像URLの有効性を確認する処理の追加
-4. **バッチ処理の定期実行**: Cronジョブによる自動実行
+4. **バッチ処理の定期実行**: @nestjs/scheduleを使用したCronジョブによる自動実行
+5. **エラー通知**: バッチ処理失敗時の管理者への通知機能
+6. **メトリクス**: GraphQLクエリのパフォーマンス監視
+
+## 注意事項
+
+- GraphQLスキーマは`apps/api/src/schema.gql`に自動生成されます
+- スキーマを手動で編集しないでください（リゾルバーやDTOを修正してください）
+- APIサーバーの起動は`npm run dev`で行います

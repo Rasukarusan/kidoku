@@ -91,7 +91,20 @@ describe('SoftwareDesignService', () => {
       expect(result).toBeNull();
     });
 
-    it('should use current date when year/month not provided', async () => {
+    it('should extract year and month from title when not provided', async () => {
+      const result = await service.searchByISBN(
+        '978-4-297-14815-7',
+        undefined,
+        undefined,
+        'Software Design 2023年6月号'
+      );
+      
+      expect(result).toBeDefined();
+      expect(result?.title).toBe('Software Design 2023年6月号');
+      expect(result?.image).toContain('TH800_642306.jpg');
+    });
+
+    it('should use current date when year/month not provided and no title', async () => {
       const now = new Date();
       const result = await service.searchByISBN('978-4-297-14815-7');
       

@@ -86,19 +86,63 @@ export class SoftwareDesignService {
   }
 
   /**
+   * タイトルから年月を抽出する
+   */
+  private extractYearMonthFromTitle(title: string): { year: number; month: number } | null {
+    // パターン1: "Software Design YYYY年MM月号"
+    const pattern1 = title.match(/Software Design (\d{4})年(\d{1,2})月号/);
+    if (pattern1) {
+      return {
+        year: parseInt(pattern1[1], 10),
+        month: parseInt(pattern1[2], 10),
+      };
+    }
+
+    // パターン2: "ソフトウェアデザイン YYYY年MM月号"
+    const pattern2 = title.match(/ソフトウェアデザイン (\d{4})年(\d{1,2})月号/);
+    if (pattern2) {
+      return {
+        year: parseInt(pattern2[1], 10),
+        month: parseInt(pattern2[2], 10),
+      };
+    }
+
+    return null;
+  }
+
+  /**
    * ISBN検索でSoftware Designを検索
    */
   async searchByISBN(
     isbn: string,
     year?: number,
     month?: number,
+    title?: string,
   ): Promise<SoftwareDesignObject | null> {
-    if (!this.isSoftwareDesignISBN(isbn)) {
+    if (!this.isSoftwareDesignISBN(isbn, title)) {
       return null;
     }
 
-    const targetYear = year || new Date().getFullYear();
-    const targetMonth = month || new Date().getMonth() + 1;
+    let targetYear = year;
+    let targetMonth = month;
+
+    // 年月が指定されていない場合、タイトルから抽出を試みる
+    if (!targetYear || !targetMonth) {
+      if (title) {
+        const extracted = this.extractYearMonthFromTitle(title);
+        if (extracted) {
+          targetYear = extracted.year;
+          targetMonth = extracted.month;
+        }
+      }
+    }
+
+    // それでも年月が取得できない場合は現在の年月を使用
+    if (!targetYear || !targetMonth) {
+      const now = new Date();
+      targetYear = now.getFullYear();
+      targetMonth = now.getMonth() + 1;
+    }
 
     return this.getByYearMonth(targetYear, targetMonth, isbn);
   }
