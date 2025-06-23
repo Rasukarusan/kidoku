@@ -8,12 +8,13 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
  */
 const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
   try {
-    const apolloClient = new ApolloClient({
+    // 認証不要のクライアントを作成
+    const publicApolloClient = new ApolloClient({
       uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql',
       cache: new InMemoryCache(),
     })
 
-    const { data } = await apolloClient.query({
+    const { data } = await publicApolloClient.query({
       query: gql`
         query {
           latestSoftwareDesign {
