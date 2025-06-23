@@ -43,7 +43,8 @@ export class SoftwareDesignResolver {
     @Args('isbn') isbn: string,
     @Args('year', { type: () => Int, nullable: true }) year?: number,
     @Args('month', { type: () => Int, nullable: true }) month?: number,
+    @Args('title', { nullable: true }) title?: string,
   ): Promise<SoftwareDesignObject | null> {
-    return this.softwareDesignService.searchByISBN(isbn, year, month);
+    return this.softwareDesignService.searchByISBN(isbn, year, month, title);
   }
 }

@@ -61,7 +61,7 @@ type Query {
   latestSoftwareDesign: SoftwareDesignObject!
   softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignObject!
   softwareDesignByYear(input: GetSoftwareDesignInput!): SoftwareDesignListResponseDto!
-  searchSoftwareDesignByISBN(isbn: String!, year: Int, month: Int): SoftwareDesignObject
+  searchSoftwareDesignByISBN(isbn: String!, year: Int, month: Int, title: String): SoftwareDesignObject
 }
 
 input GetCommentsInput {
