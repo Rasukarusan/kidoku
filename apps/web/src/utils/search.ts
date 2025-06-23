@@ -1,6 +1,51 @@
 import { ApiClient } from '@/libs/apiClient'
 import { NO_IMAGE } from '@/libs/constants'
 import { SearchResult } from '@/types/search'
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+
+/**
+ * Software Designの最新号を取得
+ */
+const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
+  try {
+    // 認証不要のクライアントを作成
+    const publicApolloClient = new ApolloClient({
+      uri:
+        process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
+        'http://localhost:4000/graphql',
+      cache: new InMemoryCache(),
+    })
+
+    const { data } = await publicApolloClient.query({
+      query: gql`
+        query {
+          latestSoftwareDesign {
+            yearMonth
+            title
+            coverImageUrl
+            author
+            category
+          }
+        }
+      `,
+    })
+
+    if (data?.latestSoftwareDesign) {
+      const sd = data.latestSoftwareDesign
+      return {
+        id: `sd-${sd.yearMonth}`,
+        title: sd.title,
+        author: sd.author,
+        category: sd.category,
+        image: sd.coverImageUrl,
+        memo: '[期待]\n\n[感想]\n',
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch latest Software Design:', error)
+  }
+  return null
+}
 
 /**
  * 書籍検索
@@ -8,6 +53,25 @@ import { SearchResult } from '@/types/search'
 export const searchBooks = async (title: string): Promise<SearchResult[]> => {
   const client = new ApiClient()
   const result: SearchResult[] = []
+
+  // Software Design検索の判定
+  const searchLower = title.toLowerCase()
+  const shouldIncludeSoftwareDesign =
+    searchLower.includes('soft') ||
+    searchLower.includes('design') ||
+    searchLower.includes('sd') ||
+    searchLower.includes('技術評論') ||
+    searchLower.includes('ソフトウェア')
+
+  // Software Designの最新号を追加
+  if (shouldIncludeSoftwareDesign) {
+    const latestSD = await getLatestSoftwareDesign()
+    if (latestSD) {
+      result.push(latestSD)
+    }
+  }
+
+  // Google Books APIで検索
   await client
     .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
     .then((res) => {
