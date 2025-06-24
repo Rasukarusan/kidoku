@@ -32,16 +32,19 @@ export const Header = () => {
           <Link href="/" className="mr-2 no-underline sm:mr-4">
             <Logo className="h-8 min-h-8 w-8 min-w-8" />
           </Link>
-          <div className="mr-2 sm:mr-4 lg:ml-12">
+          <div className="mr-2 flex-grow sm:mr-4 sm:flex-grow-0 lg:ml-12">
             <SearchBox />
           </div>
-          <div className="flex-grow"></div>
           {session && (
             <button
               className="mr-2 truncate text-base font-bold text-black sm:mr-4 lg:hidden"
               onClick={() => setOpenSidebar(true)}
             >
-              {session.user.name}
+              <img
+                className="h-10 w-10 rounded-full ring-2 ring-white"
+                src={session.user.image || ''}
+                alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
+              />
             </button>
           )}
           {session === null && (
