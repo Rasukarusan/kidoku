@@ -16,7 +16,7 @@ export class SoftwareDesignRepository {
       .from(schema.books)
       .where(eq(schema.books.title, title))
       .limit(1);
-    
+
     return books[0] || null;
   }
 
@@ -26,7 +26,7 @@ export class SoftwareDesignRepository {
       .from(schema.users)
       .where(eq(schema.users.admin, 1))
       .limit(1);
-    
+
     return users[0] || null;
   }
 
@@ -39,14 +39,12 @@ export class SoftwareDesignRepository {
     image: string;
     memo: string;
   }) {
-    await this.db
-      .insert(schema.templateBooks)
-      .values({
-        ...data,
-        isPublicMemo: 0,
-        created: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        updated: new Date().toISOString().slice(0, 19).replace('T', ' '),
-      });
+    await this.db.insert(schema.templateBooks).values({
+      ...data,
+      isPublicMemo: 0,
+      created: new Date().toISOString().slice(0, 19).replace('T', ' '),
+      updated: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    });
 
     // 挿入したデータを取得
     const templates = await this.db
