@@ -234,7 +234,7 @@ export const AddModal: React.FC = () => {
                     <MaskingHint />
                   </div>
                   <div className="text-xs text-gray-500">
-                    {book?.memo?.length || 0} / 16,777,215 文字
+                    {book?.memo?.length || 0} 文字
                   </div>
                 </div>
                 <BookInputField
