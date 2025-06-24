@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Param, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  UseGuards,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { SoftwareDesignService } from './software-design.service';
 import { SoftwareDesignRepository } from './software-design.repository';
@@ -11,8 +19,8 @@ export class SoftwareDesignController {
   ) {}
 
   @Get('latest')
-  async getLatest() {
-    const result = await this.softwareDesignService.getLatest();
+  getLatest() {
+    const result = this.softwareDesignService.getLatest();
     return {
       success: true,
       data: result,
@@ -20,10 +28,7 @@ export class SoftwareDesignController {
   }
 
   @Get(':year/:month')
-  async getByMonth(
-    @Param('year') year: string,
-    @Param('month') month: string,
-  ) {
+  getByMonth(@Param('year') year: string, @Param('month') month: string) {
     const yearNum = parseInt(year, 10);
     const monthNum = parseInt(month, 10);
 
@@ -31,7 +36,7 @@ export class SoftwareDesignController {
       throw new HttpException('Invalid year or month', HttpStatus.BAD_REQUEST);
     }
 
-    const result = await this.softwareDesignService.getByYearMonth(yearNum, monthNum);
+    const result = this.softwareDesignService.getByYearMonth(yearNum, monthNum);
     return {
       success: true,
       data: result,
@@ -39,14 +44,18 @@ export class SoftwareDesignController {
   }
 
   @Get('year/:year')
-  async getByYear(@Param('year') year: string) {
+  getByYear(@Param('year') year: string) {
     const yearNum = parseInt(year, 10);
 
-    if (isNaN(yearNum) || yearNum < 2000 || yearNum > new Date().getFullYear() + 1) {
+    if (
+      isNaN(yearNum) ||
+      yearNum < 2000 ||
+      yearNum > new Date().getFullYear() + 1
+    ) {
       throw new HttpException('Invalid year', HttpStatus.BAD_REQUEST);
     }
 
-    const results = await this.softwareDesignService.getByYear(yearNum);
+    const results = this.softwareDesignService.getByYear(yearNum);
     return {
       success: true,
       data: results,
@@ -57,14 +66,19 @@ export class SoftwareDesignController {
   @UseGuards(JwtAuthGuard)
   async addLatestAsTemplate() {
     // 最新のSoftware Designを取得
-    const latestSD = await this.softwareDesignService.getLatest();
-    
+    const latestSD = this.softwareDesignService.getLatest();
+
     if (!latestSD) {
-      throw new HttpException('Latest Software Design not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Latest Software Design not found',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     // データベースに既に存在するかチェック
-    const existingBook = await this.softwareDesignRepository.findBookByTitle(latestSD.title);
+    const existingBook = await this.softwareDesignRepository.findBookByTitle(
+      latestSD.title,
+    );
 
     if (existingBook) {
       return {
@@ -78,7 +92,10 @@ export class SoftwareDesignController {
     const adminUser = await this.softwareDesignRepository.findAdminUser();
 
     if (!adminUser) {
-      throw new HttpException('Admin user not found', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Admin user not found',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     // テンプレートとして登録
