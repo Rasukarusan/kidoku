@@ -147,28 +147,9 @@ export const searchBookWithMultipleSources = async (
 ): Promise<SearchResult | undefined> => {
   const normalizedISBN = normalizeISBN(isbn)
 
-  // 1. まずopenBDで検索（日本の書籍データベース）
-  const openBDResult = await searchOpenBD(normalizedISBN)
-  if (openBDResult && openBDResult.title !== '不明なタイトル') {
-    // Software DesignのISBNの場合は専用処理で画像を更新
-    if (isSoftwareDesignISBN(normalizedISBN, openBDResult.title)) {
-      const softwareDesignResult = await searchSoftwareDesign(
-        normalizedISBN,
-        openBDResult.title
-      )
-      if (softwareDesignResult) {
-        return {
-          ...openBDResult,
-          image: softwareDesignResult.image, // 正しい画像URLに更新
-        }
-      }
-    }
-    return openBDResult
-  }
-
-  // 2. openBDで見つからない場合はGoogle Books APIで検索
+  // 1. まずGoogle Books APIで検索（画像取得の成功率が高い）
   const googleResult = await searchGoogleBooks(normalizedISBN)
-  if (googleResult) {
+  if (googleResult && googleResult.title !== '不明なタイトル') {
     // Software DesignのISBNの場合は専用処理で画像を更新
     if (isSoftwareDesignISBN(normalizedISBN, googleResult.title)) {
       const softwareDesignResult = await searchSoftwareDesign(
@@ -182,23 +163,43 @@ export const searchBookWithMultipleSources = async (
         }
       }
     }
+    return googleResult
+  }
 
-    // openBDの部分的な結果とGoogleの結果をマージ
-    if (openBDResult) {
+  // 2. Google Books APIで見つからない場合はopenBDで検索
+  const openBDResult = await searchOpenBD(normalizedISBN)
+  if (openBDResult) {
+    // Software DesignのISBNの場合は専用処理で画像を更新
+    if (isSoftwareDesignISBN(normalizedISBN, openBDResult.title)) {
+      const softwareDesignResult = await searchSoftwareDesign(
+        normalizedISBN,
+        openBDResult.title
+      )
+      if (softwareDesignResult) {
+        return {
+          ...openBDResult,
+          image: softwareDesignResult.image, // 正しい画像URLに更新
+        }
+      }
+    }
+
+    // Googleの部分的な結果とopenBDの結果をマージ
+    if (googleResult) {
       return {
-        ...googleResult,
-        // openBDの画像やカテゴリがあれば優先
+        ...openBDResult,
+        // Googleの画像があれば優先（画像取得率が高いため）
         image:
-          openBDResult.image !== NO_IMAGE
-            ? openBDResult.image
-            : googleResult.image,
+          googleResult.image !== NO_IMAGE
+            ? googleResult.image
+            : openBDResult.image,
+        // カテゴリーはopenBDを優先（日本の書籍カテゴリー情報が正確）
         category:
           openBDResult.category !== '未分類'
             ? openBDResult.category
             : googleResult.category,
       }
     }
-    return googleResult
+    return openBDResult
   }
 
   // 3. どちらでも見つからない場合、Software DesignのISBNならタイトルなしで検索
@@ -210,7 +211,7 @@ export const searchBookWithMultipleSources = async (
   }
 
   // 4. 最終的に部分的な結果でも返す
-  return openBDResult || googleResult
+  return googleResult || openBDResult
 }
 
 /**

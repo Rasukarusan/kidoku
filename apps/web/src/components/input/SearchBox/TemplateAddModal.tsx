@@ -180,7 +180,7 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
             <div className="mb-2 flex items-center justify-between">
               <label className="text-sm font-medium text-gray-700">メモ</label>
               <div className="text-xs text-gray-500">
-                {template?.memo?.length || 0} / 16,777,215 文字
+                {template?.memo?.length || 0} 文字
               </div>
             </div>
             <BookInputField
