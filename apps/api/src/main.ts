@@ -20,4 +20,4 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`🚀 NestJS ready: http://localhost:${port}`);
 }
-bootstrap();
+void bootstrap();

@@ -35,7 +35,7 @@ export class SoftwareDesignService {
   /**
    * 最新のSoftware Designを取得
    */
-  async getLatest(): Promise<SoftwareDesignObject> {
+  getLatest(): SoftwareDesignObject {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 2; // 今月+1が巻数
@@ -49,11 +49,11 @@ export class SoftwareDesignService {
   /**
    * 指定年月のSoftware Designを取得
    */
-  async getByYearMonth(
+  getByYearMonth(
     year: number,
     month: number,
     isbn?: string,
-  ): Promise<SoftwareDesignObject> {
+  ): SoftwareDesignObject {
     const imageUrl = this.generateImageUrl(year, month);
     const yearStr = year.toString();
     const monthStr = month.toString().padStart(2, '0');
@@ -74,11 +74,11 @@ export class SoftwareDesignService {
   /**
    * 指定年のSoftware Designリストを取得
    */
-  async getByYear(year: number): Promise<SoftwareDesignObject[]> {
+  getByYear(year: number): SoftwareDesignObject[] {
     const results: SoftwareDesignObject[] = [];
 
     for (let month = 1; month <= 12; month++) {
-      const item = await this.getByYearMonth(year, month);
+      const item = this.getByYearMonth(year, month);
       results.push(item);
     }
 
@@ -88,7 +88,9 @@ export class SoftwareDesignService {
   /**
    * タイトルから年月を抽出する
    */
-  private extractYearMonthFromTitle(title: string): { year: number; month: number } | null {
+  private extractYearMonthFromTitle(
+    title: string,
+  ): { year: number; month: number } | null {
     // パターン1: "Software Design YYYY年MM月号"
     const pattern1 = title.match(/Software Design (\d{4})年(\d{1,2})月号/);
     if (pattern1) {
@@ -113,12 +115,12 @@ export class SoftwareDesignService {
   /**
    * ISBN検索でSoftware Designを検索
    */
-  async searchByISBN(
+  searchByISBN(
     isbn: string,
     year?: number,
     month?: number,
     title?: string,
-  ): Promise<SoftwareDesignObject | null> {
+  ): SoftwareDesignObject | null {
     if (!this.isSoftwareDesignISBN(isbn, title)) {
       return null;
     }
