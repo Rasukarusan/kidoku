@@ -30,13 +30,15 @@ GraphQL APIは`http://localhost:4000/graphql`で利用可能です（本番環�
 ```graphql
 query {
   latestSoftwareDesign {
-    id
+    yearMonth
     title
     author
     category
+    coverImageUrl
     image
-    memo
     isbn
+    memo
+    publishDate
   }
 }
 ```
@@ -45,13 +47,15 @@ query {
 ```graphql
 query {
   softwareDesignByMonth(year: 2025, month: 7) {
-    id
+    yearMonth
     title
     author
     category
+    coverImageUrl
     image
-    memo
     isbn
+    memo
+    publishDate
   }
 }
 ```
@@ -61,13 +65,15 @@ query {
 query {
   softwareDesignByYear(input: { year: 2025 }) {
     items {
-      id
+      yearMonth
       title
       author
       category
+      coverImageUrl
       image
-      memo
       isbn
+      memo
+      publishDate
     }
     total
   }

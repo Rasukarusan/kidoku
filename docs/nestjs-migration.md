@@ -31,26 +31,30 @@ GraphQL APIは`http://localhost:4000/graphql`で利用可能です（本番環�
 # 最新号を取得
 query GetLatestSoftwareDesign {
   latestSoftwareDesign {
-    id
+    yearMonth
     title
     author
     category
+    coverImageUrl
     image
-    memo
     isbn
+    memo
+    publishDate
   }
 }
 
 # 特定の年月号を取得
 query GetSoftwareDesignByMonth($year: Int!, $month: Int!) {
   softwareDesignByMonth(year: $year, month: $month) {
-    id
+    yearMonth
     title
     author
     category
+    coverImageUrl
     image
-    memo
     isbn
+    memo
+    publishDate
   }
 }
 
@@ -58,13 +62,15 @@ query GetSoftwareDesignByMonth($year: Int!, $month: Int!) {
 query GetSoftwareDesignByYear($input: GetSoftwareDesignInput!) {
   softwareDesignByYear(input: $input) {
     items {
-      id
+      yearMonth
       title
       author
       category
+      coverImageUrl
       image
-      memo
       isbn
+      memo
+      publishDate
     }
     total
   }
@@ -73,13 +79,15 @@ query GetSoftwareDesignByYear($input: GetSoftwareDesignInput!) {
 # ISBN検索（titleパラメータはオプショナル）
 query SearchSoftwareDesignByISBN($isbn: String!, $year: Int, $month: Int, $title: String) {
   searchSoftwareDesignByISBN(isbn: $isbn, year: $year, month: $month, title: $title) {
-    id
+    yearMonth
     title
     author
     category
+    coverImageUrl
     image
-    memo
     isbn
+    memo
+    publishDate
   }
 }
 ```
