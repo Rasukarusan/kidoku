@@ -11,23 +11,23 @@ export class SoftwareDesignResolver {
   constructor(private readonly softwareDesignService: SoftwareDesignService) {}
 
   @Query(() => SoftwareDesignObject, { name: 'latestSoftwareDesign' })
-  async getLatest(): Promise<SoftwareDesignObject> {
+  getLatest(): SoftwareDesignObject {
     return this.softwareDesignService.getLatest();
   }
 
   @Query(() => SoftwareDesignObject, { name: 'softwareDesignByMonth' })
-  async getByMonth(
+  getByMonth(
     @Args('year', { type: () => Int }) year: number,
     @Args('month', { type: () => Int }) month: number,
-  ): Promise<SoftwareDesignObject> {
+  ): SoftwareDesignObject {
     return this.softwareDesignService.getByYearMonth(year, month);
   }
 
   @Query(() => SoftwareDesignListResponseDto, { name: 'softwareDesignByYear' })
-  async getByYear(
+  getByYear(
     @Args('input') input: GetSoftwareDesignInput,
-  ): Promise<SoftwareDesignListResponseDto> {
-    const items = await this.softwareDesignService.getByYear(input.year);
+  ): SoftwareDesignListResponseDto {
+    const items = this.softwareDesignService.getByYear(input.year);
 
     return {
       items,
@@ -39,12 +39,12 @@ export class SoftwareDesignResolver {
     nullable: true,
     name: 'searchSoftwareDesignByISBN',
   })
-  async searchByISBN(
+  searchByISBN(
     @Args('isbn') isbn: string,
     @Args('year', { type: () => Int, nullable: true }) year?: number,
     @Args('month', { type: () => Int, nullable: true }) month?: number,
     @Args('title', { nullable: true }) title?: string,
-  ): Promise<SoftwareDesignObject | null> {
+  ): SoftwareDesignObject | null {
     return this.softwareDesignService.searchByISBN(isbn, year, month, title);
   }
 }

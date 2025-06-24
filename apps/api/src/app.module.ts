@@ -17,8 +17,10 @@ import { SoftwareDesignModule } from './modules/software-design/software-design.
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      context: ({ req }) => ({
+      context: ({ req }: { req: any }) => ({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         req,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         user: req.user, // JwtStrategy → req.user
       }),
       playground: true,

@@ -8,7 +8,11 @@ import { DatabaseModule } from '../../database/database.module';
 
 @Module({
   imports: [AuthModule, DatabaseModule],
-  providers: [SoftwareDesignResolver, SoftwareDesignService, SoftwareDesignRepository],
+  providers: [
+    SoftwareDesignResolver,
+    SoftwareDesignService,
+    SoftwareDesignRepository,
+  ],
   controllers: [SoftwareDesignController],
   exports: [SoftwareDesignService],
 })

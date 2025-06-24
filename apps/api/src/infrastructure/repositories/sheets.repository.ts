@@ -45,8 +45,8 @@ export class SheetsRepository {
     name: string;
     order: number;
   }): Promise<Sheet> {
-    const result = await this.db.insert(sheets).values(data);
-    const insertId = result[0].insertId;
+    const result = (await this.db.insert(sheets).values(data)) as any[];
+    const insertId = result[0].insertId as number;
     const created = await this.db
       .select()
       .from(sheets)
