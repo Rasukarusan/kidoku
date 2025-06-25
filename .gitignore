@@ -5,6 +5,8 @@
 /docker/meilisearch/data/meilisearch
 /docker/mysql/data/*
 !/docker/mysql/data/.gitkeep
+/docker/prometheus/data
+/docker/grafana/data
 **/node_modules
 
 # testing
