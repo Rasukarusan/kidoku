@@ -23,7 +23,7 @@ docker-compose up -d prometheus grafana node-exporter
 
 ### 2. 各サービスへのアクセス
 
-- **Grafana**: http://localhost:3001
+- **Grafana**: http://localhost:13000
   - 初期ユーザー名: `admin`
   - 初期パスワード: `admin`
 - **Prometheus**: http://localhost:9090
@@ -108,6 +108,24 @@ this.customMetric.inc({ label: 'value' })
 ```
 
 ## トラブルシューティング
+
+### Grafanaがデータソースを見つけられない場合
+
+1. Prometheusコンテナが起動しているか確認
+   ```bash
+   docker-compose ps prometheus
+   ```
+
+2. データソース設定にUIDが含まれているか確認
+   ```bash
+   cat docker/grafana/provisioning/datasources/prometheus.yml
+   ```
+   `uid: prometheus` が設定されていることを確認
+
+3. Grafanaを再起動
+   ```bash
+   docker-compose restart grafana
+   ```
 
 ### Prometheusがメトリクスを取得できない場合
 
