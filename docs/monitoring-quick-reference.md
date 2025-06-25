@@ -17,7 +17,7 @@ docker-compose logs -f prometheus
 
 | サービス | URL | 認証情報 |
 |---------|-----|---------|
-| Grafana | http://localhost:3001 | admin / admin |
+| Grafana | http://localhost:13000 | admin / admin |
 | Prometheus | http://localhost:9090 | なし |
 | Next.js Metrics | http://localhost:3000/api/metrics | なし |
 | NestJS Metrics | http://localhost:4000/metrics | なし |
@@ -169,7 +169,7 @@ httpRequestsTotal.inc({
 
 ## 🔗 便利なリンク
 
-- [Grafanaダッシュボード](http://localhost:3001/d/kidoku-main/kidoku-application-dashboard)
+- [Grafanaダッシュボード](http://localhost:13000/d/kidoku-main/kidoku-application-dashboard)
 - [Prometheusターゲット](http://localhost:9090/targets)
 - [Prometheusアラート](http://localhost:9090/alerts)
 - [メトリクス一覧](http://localhost:9090/graph)
@@ -179,7 +179,7 @@ httpRequestsTotal.inc({
 1. **ダッシュボードのバックアップ**
    ```bash
    # エクスポート
-   curl -s http://admin:admin@localhost:3001/api/dashboards/uid/kidoku-main | jq > dashboard-backup.json
+   curl -s http://admin:admin@localhost:13000/api/dashboards/uid/kidoku-main | jq > dashboard-backup.json
    ```
 
 2. **カスタムアラートのテスト**

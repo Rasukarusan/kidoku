@@ -23,7 +23,7 @@ Kidokuの監視システムは、Prometheus + Grafanaを基盤として構築さ
                                  │
                          ┌───────▼────────┐
                          │    Grafana     │
-                         │     :3001      │
+                         │     :13000      │
                          └────────────────┘
 ```
 
@@ -57,7 +57,7 @@ scrape_configs:
 メトリクスの可視化とダッシュボード機能を提供します。
 
 **アクセス情報**:
-- URL: http://localhost:3001
+- URL: http://localhost:13000
 - 初期ユーザー名: admin
 - 初期パスワード: admin
 
