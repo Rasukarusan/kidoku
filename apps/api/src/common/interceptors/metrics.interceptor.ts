@@ -3,12 +3,14 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-} from '@nestjs/common'
-import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
-import { Counter, Histogram } from 'prom-client'
-import { InjectMetric } from '@willsoto/nestjs-prometheus'
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { Counter, Histogram } from 'prom-client';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Request, Response } from 'express';
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 @Injectable()
 export class MetricsInterceptor implements NestInterceptor {
   constructor(
@@ -19,32 +21,35 @@ export class MetricsInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const startTime = Date.now()
-    const request = context.switchToHttp().getRequest()
-    const response = context.switchToHttp().getResponse()
+    const startTime = Date.now();
+    const request = context.switchToHttp().getRequest<Request>();
+    const response = context.switchToHttp().getResponse<Response>();
 
     return next.handle().pipe(
       tap(() => {
-        const duration = (Date.now() - startTime) / 1000
-        const route = request.route?.path || request.url
-        const method = request.method
-        const statusCode = response.statusCode
+        const duration = (Date.now() - startTime) / 1000;
+        const requestWithRoute = request as Request & {
+          route?: { path?: string };
+        };
+        const route = requestWithRoute.route?.path || request.url;
+        const method = request.method;
+        const statusCode = response.statusCode;
 
         this.httpRequestsTotal.inc({
-          method,
-          route,
+          method: method,
+          route: route,
           status_code: statusCode.toString(),
-        })
+        });
 
         this.httpRequestDuration.observe(
           {
-            method,
-            route,
+            method: method,
+            route: route,
             status_code: statusCode.toString(),
           },
           duration,
-        )
+        );
       }),
-    )
+    );
   }
 }
