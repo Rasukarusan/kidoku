@@ -22,18 +22,18 @@ export class MetricsInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const startTime = Date.now();
-    
+
     // HTTPコンテキストかどうかを確認
     const contextType = context.getType();
-    
+
     if (contextType !== 'http') {
       // HTTP以外（WebSocket、RPCなど）の場合はメトリクス収集をスキップ
       return next.handle();
     }
-    
+
     const request = context.switchToHttp().getRequest<Request>();
     const response = context.switchToHttp().getResponse<Response>();
-    
+
     // GraphQLリクエストかどうかを判定（URLが/graphqlの場合）
     if (request.url?.includes('/graphql')) {
       // GraphQLの場合はメトリクス収集をスキップ
