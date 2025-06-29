@@ -13,16 +13,17 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 
 ### アーキテクチャ
 
-- **フロントエンド**: Next.js + React (TypeScript)
-- **バックエンド**: NestJS + GraphQL
-- **データベース**: MySQL/TiDB + Prisma/Drizzle ORM
-- **認証**: NextAuth.js
+- **フロントエンド**: Next.js 14 (Pages Router) + React 18 (TypeScript 4.5.4)
+- **バックエンド**: NestJS 11 + GraphQL (TypeScript 5.7.3)
+- **データベース**: MySQL + Prisma (フロントエンド) / Drizzle ORM (バックエンド)
+- **認証**: NextAuth.js + JWT
 - **検索エンジン**: MeiliSearch
 - **AI機能**: OpenAI GPT + Cohere
 - **リアルタイム通信**: Pusher
 - **メール送信**: Resend
 - **決済**: Stripe
-- **ストレージ**: Vercel Blob
+- **ストレージ**: Vercel Blob + Vercel KV
+- **監視**: Prometheus + Grafana
 
 ## 機能
 
@@ -40,6 +41,12 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 - **可視化**: グラフ・チャートによる読書データの視覚化
 - **年間ベスト本**: 年間読書ランキング機能
 
+### 🔧 その他の機能
+
+- **Software Design誌対応**: 技術評論社の表紙画像を自動取得
+- **アプリケーション監視**: Prometheus + Grafanaによるメトリクス収集・可視化
+- **バーコードスキャン連携**: モバイルアプリからのスキャン結果をリアルタイム反映
+
 ### 🔍 検索・発見
 
 - **高速検索**: MeiliSearchによる本の高速全文検索
@@ -56,32 +63,38 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 
 ### フロントエンド
 
-- **Next.js** (v14) - React フレームワーク
-- **TypeScript** - 型安全性
-- **Tailwind CSS** - スタイリング
+- **Next.js** (v14.1.0) - React フレームワーク (Pages Router)
+- **React** (v18.2.0) - UIライブラリ
+- **TypeScript** (v4.5.4) - 型安全性
+- **Tailwind CSS** (v3.2.2) - スタイリング
 - **Framer Motion** - アニメーション
-- **Jotai** - 状態管理
-- **Apollo Client** - GraphQLクライアント
+- **Jotai** (v2.6.5) - 状態管理
+- **Apollo Client** (v3.13.8) - GraphQLクライアント
+- **NextAuth.js** (v4.23.1) - 認証
+- **Prisma** (v5.2.0) - ORM
 - **React Email** - メールテンプレート
 
 ### バックエンド
 
-- **NestJS** - Node.jsフレームワーク
-- **GraphQL** - API仕様
-- **Drizzle ORM** - データベースORM
-- **MySQL/TiDB** - データベース
-- **JWT** - 認証トークン
+- **NestJS** (v11.0.1) - Node.jsフレームワーク
+- **GraphQL** - API仕様（Apollo Server v4.12.0）
+- **TypeScript** (v5.7.3) - 型安全性
+- **Drizzle ORM** (v0.43.1) - データベースORM
+- **MySQL** - データベース
+- **JWT** - 認証トークン（@nestjs/jwt v11.0.0）
 
 ### インフラ・外部サービス
 
-- **MeiliSearch** - 検索エンジン
-- **OpenAI GPT** - AI分析
-- **Cohere** - AI言語モデル
-- **Pusher** - リアルタイム通信
-- **Resend** - メール配信
-- **Stripe** - 決済処理
+- **MeiliSearch** (v0.35.0) - 検索エンジン
+- **OpenAI GPT** (v4.23.0) - AI分析
+- **Cohere** (v7.9.5) - AI言語モデル
+- **Pusher** (v5.2.0) - リアルタイム通信
+- **Resend** (v1.1.0) - メール配信
+- **Stripe** (v14.5.0) - 決済処理
 - **Vercel Blob** - ファイルストレージ
 - **Docker** - コンテナ化
+- **Prometheus** - メトリクス収集
+- **Grafana** - メトリクス可視化
 
 ## プロジェクト構成
 
@@ -90,56 +103,103 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 ```
 kidoku/
 ├── apps/
-│   ├── web/          # Next.jsフロントエンドアプリケーション
-│   └── api/          # NestJS GraphQLバックエンドAPI
-├── docker/           # Docker設定ファイル
-│   ├── meilisearch/  # MeiliSearch設定
-│   └── mysql/        # MySQL設定
+│   ├── web/                    # Next.jsフロントエンドアプリケーション
+│   │   ├── src/
+│   │   │   ├── pages/         # Pages Router
+│   │   │   ├── components/    # Reactコンポーネント
+│   │   │   ├── features/      # 機能別モジュール
+│   │   │   ├── graphql/       # GraphQLクエリ・ミューテーション
+│   │   │   ├── hooks/         # カスタムフック
+│   │   │   ├── lib/           # ユーティリティ
+│   │   │   └── stores/        # Jotaiストア
+│   │   └── prisma/            # Prismaスキーマ
+│   │
+│   └── api/                    # NestJS GraphQLバックエンドAPI
+│       ├── src/
+│       │   ├── modules/        # 機能モジュール
+│       │   │   ├── sheets/     # シート管理
+│       │   │   ├── comments/   # コメント機能
+│       │   │   ├── software-design/ # Software Design誌機能
+│       │   │   └── metrics/    # メトリクス
+│       │   └── common/         # 共通機能
+│       └── drizzle/            # Drizzleスキーマ
+│
+├── docker/                     # Docker設定ファイル
+│   ├── meilisearch/           # MeiliSearch設定
+│   ├── mysql/                 # MySQL設定
+│   ├── prometheus/            # Prometheus設定
+│   └── grafana/               # Grafanaダッシュボード
+│
+├── .github/
+│   └── workflows/             # GitHub Actions
+│       └── deploy-api.yml     # APIデプロイ
+│
 ├── docker-compose.yml
-├── turbo.json        # Turbo設定
-└── package.json      # ルートpackage.json
+├── turbo.json                 # Turbo設定
+└── package.json               # ルートpackage.json
 ```
 
 ### apps/web (フロントエンド)
 
-- **フレームワーク**: Next.js 14
-- **言語**: TypeScript
+- **フレームワーク**: Next.js 14 (Pages Router)
+- **言語**: TypeScript 4.5.4
 - **UI**: Tailwind CSS + Framer Motion
 - **状態管理**: Jotai
 - **データ取得**: Apollo Client (GraphQL)
 - **認証**: NextAuth.js
 - **ORM**: Prisma
+- **メトリクス**: `/api/metrics`エンドポイント
 
 ### apps/api (バックエンド)
 
 - **フレームワーク**: NestJS
 - **API**: GraphQL (Apollo Server)
-- **言語**: TypeScript
+- **言語**: TypeScript 5.7.3
 - **ORM**: Drizzle ORM
 - **データベース**: MySQL
 - **認証**: JWT + Passport
+- **メトリクス**: `/metrics`エンドポイント
 
 ### 主要なスクリプト
 
 ```bash
-# 全アプリケーションの開発開始
-pnpm dev
+# 開発
+pnpm dev                    # 全サービスの起動
+pnpm --filter web dev      # フロントエンドのみ
+pnpm --filter api dev      # APIのみ
 
-# 全アプリケーションのビルド
-pnpm build
+# ビルド
+pnpm build                 # 全体のビルド
+pnpm --filter web build    # フロントエンドのビルド
+pnpm --filter api build    # APIのビルド
 
-# リンター実行
-pnpm lint
+# テスト
+pnpm --filter web test     # フロントエンドのテスト
+pnpm --filter api test     # APIのテスト
+pnpm --filter api test:e2e # APIのE2Eテスト
 
-# 型チェック
-pnpm check-types
+# リント・フォーマット
+pnpm lint                  # 全体のリント
+pnpm lint:fix             # リントエラーの自動修正
+pnpm format               # コードフォーマット
+pnpm check-types          # 型チェック
+
+# データベース操作
+pnpm --filter web prisma:generate  # Prismaクライアント生成
+pnpm --filter web prisma:push      # Prismaスキーマの反映
+pnpm --filter api db:push          # Drizzleスキーマの反映
+
+# その他
+pnpm --filter web analyze      # バンドルサイズ分析
+pnpm --filter web lighthouse   # Lighthouse実行
+pnpm --filter web email        # メールテンプレート開発
 ```
 
 ## 環境構築
 
 ### 前提条件
 
-- Node.js 23以上
+- Node.js 22以上（推奨: v22、.nvmrc参照）
 - pnpm 10.5.2以上
 - Docker & Docker Compose
 
@@ -161,21 +221,54 @@ pnpm install
 
 ```bash
 # Webアプリケーション用の環境変数
-cp apps/web/.env.example apps/web/.env
+cp apps/web/.env.example apps/web/.env.local
 
-# APIアプリケーション用の環境変数
+# APIアプリケーション用の環境変数（.env.exampleを作成する必要があります）
 cp apps/api/.env.example apps/api/.env
 ```
 
-必要な環境変数を設定してください：
+#### 必須の環境変数（apps/web/.env.local）
 
-- データベース接続情報
-- NextAuth設定（Google OAuth）
-- MeiliSearch設定
-- AI API キー（OpenAI、Cohere）
-- Pusher設定
-- Stripe設定
-- Resend設定
+```env
+# 基本設定
+NEXT_PUBLIC_HOST=http://localhost:3000
+NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
+NEXTAUTH_SECRET= # openssl rand -base64 32で生成
+
+# Google OAuth（必須）
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# データベース（必須）
+DATABASE_URL=mysql://root:password@localhost:3306/kidoku
+
+# MeiliSearch（必須）
+MEILI_HOST=http://localhost:7700
+MEILI_HTTP_ADDR=0.0.0.0:7700
+MEILI_MASTER_KEY=YourMasterKey
+
+# その他のサービス
+RESEND_API_KEY=           # メール送信
+STRIPE_SECRET_KEY=        # 決済
+STRIPE_PUBLISHABLE_KEY=   # 決済（公開鍵）
+OPENAI_API_KEY=          # AI分析
+COHERE_API_KEY=          # AI分析
+PUSHER_APP_ID=           # リアルタイム通信
+PUSHER_KEY=              # リアルタイム通信
+PUSHER_SECRET=           # リアルタイム通信
+PUSHER_CLUSTER=          # リアルタイム通信
+ADMIN_AUTH_TOKEN=        # 管理者認証トークン
+```
+
+#### APIの環境変数（apps/api/.env）
+
+```env
+DB_USER=root
+DB_PASS=password
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=kidoku
+```
 
 ### 4. インフラストラクチャの起動
 
@@ -188,13 +281,11 @@ docker-compose up -d
 
 ```bash
 # Prismaマイグレーション（Webアプリ）
-cd apps/web
-pnpm prisma db push
-pnpm prisma generate
+pnpm --filter web prisma:push
+pnpm --filter web prisma:generate
 
 # Drizzleマイグレーション（API）
-cd ../api
-pnpm db:push
+pnpm --filter api db:push
 ```
 
 ### 6. MeiliSearchの初期設定
@@ -218,27 +309,62 @@ pnpm dev
 以下のURLでアクセス可能です：
 
 - **Webアプリ**: http://localhost:3000
-- **GraphQL API**: http://localhost:3001/graphql
+- **GraphQL API**: http://localhost:4000/graphql
 - **MeiliSearch Dashboard**: http://localhost:7700
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:13000 (初期認証: admin/admin)
 
-### 開発用コマンド
+## 監視システム（Prometheus + Grafana）
 
-```bash
-# 個別にアプリを起動
-pnpm --filter web dev          # Webアプリのみ
-pnpm --filter api dev          # APIのみ
+アプリケーションとインフラの監視が設定済みです。
 
-# テスト実行
-pnpm --filter web test         # Webアプリのテスト
-pnpm --filter api test         # APIのテスト
+### アクセスURL
 
-# リンター・フォーマッター
-pnpm lint                      # 全プロジェクトのリント
-pnpm format                    # コードフォーマット
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:13000 (初期認証: admin/admin)
 
-# ビルド
-pnpm build                     # 全プロジェクトのビルド
+### メトリクスエンドポイント
+
+- **フロントエンド**: http://localhost:3000/api/metrics
+- **バックエンド**: http://localhost:4000/metrics
+
+### カスタムメトリクス
+
 ```
+- http_requests_total: HTTPリクエスト数
+- http_request_duration_seconds: リクエスト処理時間
+- kidoku_active_users: アクティブユーザー数
+- kidoku_books_registered_total: 登録された本の総数
+- kidoku_ai_analysis_requests_total: AI分析リクエスト数
+```
+
+### Grafanaダッシュボード
+
+Grafanaにログイン後、プリセットされた`kidoku-dashboard.json`を使用してアプリケーションメトリクスを視覚化できます。
+
+## CI/CD
+
+### GitHub Actions
+
+APIの自動デプロイが設定されています：
+
+- **トリガー**: master/mainブランチへのプッシュ、またはapi配下の変更
+- **デプロイ先**: Google Cloud Run
+- **設定**: メモリ256Mi、CPU 1、インスタンス0-2
+
+## 特殊機能
+
+### Software Design誌対応
+
+技術評論社の「Software Design」誌を自動判別し、表紙画像を取得します：
+
+- ISBNが`9784297`で始まる場合
+- タイトルに"Software Design"を含む場合
+- 最新号情報の自動取得
+
+### バーコードスキャン連携
+
+モバイルアプリからのバーコードスキャン結果がPusher経由でリアルタイムに反映されます。
 
 ## トラブルシューティング
 
@@ -281,8 +407,23 @@ docker-compose logs mysql
 # APIサーバーのログ確認
 pnpm --filter api dev
 
-# ポート3001が使用中の場合、プロセスを終了
-lsof -ti:3001 | xargs kill -9
+# ポート4000が使用中の場合、プロセスを終了
+lsof -ti:4000 | xargs kill -9
+```
+
+#### TypeScriptバージョンの不一致
+
+フロントエンド（TypeScript 4.5.4）とバックエンド（TypeScript 5.7.3）でバージョンが異なるため、共通コードを書く際は注意が必要です。
+
+#### 監視システムが起動しない場合
+
+```bash
+# Dockerコンテナのログ確認
+docker-compose logs prometheus
+docker-compose logs grafana
+
+# コンテナの再起動
+docker-compose restart prometheus grafana
 ```
 
 ## 貢献
@@ -301,6 +442,12 @@ lsof -ti:3001 | xargs kill -9
 - **ESLint**: プロジェクトのESLint設定に従う
 - **Prettier**: コードフォーマットは自動で適用
 - **コミットメッセージ**: Conventional Commitsに従う
+
+### 注意事項
+
+- フロントエンドはPages Routerを使用（App Routerではありません）
+- データベースアクセスはフロントエンドがPrisma、バックエンドがDrizzle ORMを使用
+- TypeScriptバージョンがフロントエンドとバックエンドで異なる
 
 ### テスト
 
@@ -321,3 +468,7 @@ pnpm --filter api test:cov
 ### 環境変数の管理
 
 機密情報を含む環境変数は絶対にコミットしないでください。`.env.example`ファイルに必要な環境変数のテンプレートを記載してください。
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
