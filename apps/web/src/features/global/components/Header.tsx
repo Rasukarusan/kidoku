@@ -24,16 +24,18 @@ export const Header = () => {
     <>
       <div
         className={twMerge(
-          'sticky top-0 z-40 h-16 w-full border-b border-gray-200 bg-main text-white',
+          'sticky top-0 z-40 h-14 w-full border-b border-gray-200 bg-main text-white',
           session && 'lg:left-60'
         )}
       >
-        <Container className="flex max-h-16 items-center p-2">
-          <Link href="/" className="mr-2 no-underline sm:mr-4">
-            <Logo className="h-8 min-h-8 w-8 min-w-8" />
-          </Link>
-          <div className="mr-2 flex-grow sm:mr-4 sm:flex-grow-0 lg:ml-12">
-            <SearchBox />
+        <Container className="flex max-h-16 items-center justify-between p-2">
+          <div className="flex items-center">
+            <Link href="/" className="mr-2 no-underline sm:mr-4">
+              <Logo className="h-8 min-h-8 w-8 min-w-8" />
+            </Link>
+            <div className="mr-2 flex-grow sm:mr-4 sm:flex-grow-0 lg:ml-12">
+              <SearchBox />
+            </div>
           </div>
           {session && (
             <button
