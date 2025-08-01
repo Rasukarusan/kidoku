@@ -9,6 +9,7 @@ import { Reorder } from 'framer-motion'
 import { useMutation } from '@apollo/client'
 import { UPDATE_SHEET_ORDERS } from '@/libs/apollo/queries'
 import { useSession } from 'next-auth/react'
+import { useMediaQuery } from 'react-responsive'
 
 interface Props {
   sheets: Array<{ id: string; name: string; order: number }>
@@ -29,6 +30,8 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
     null
   )
   const isMine = session && session.user.id === userId
+  const isMobile = useMediaQuery({ maxWidth: 768 })
+  const canDrag = isMine && !isMobile
 
   const { data } = useSWR<UserImageResponse>(
     `/api/user/image?username=${username}`,
@@ -123,7 +126,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
           as="div"
           axis="x"
           values={orderedSheets}
-          onReorder={isMine ? handleReorder : () => {}}
+          onReorder={canDrag ? handleReorder : () => {}}
           className="flex items-center"
           style={{ listStyle: 'none' }}
           layoutScroll
@@ -135,7 +138,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
               className="relative"
               style={{ listStyle: 'none' }}
               whileDrag={
-                isMine
+                canDrag
                   ? {
                       scale: 1.05,
                       zIndex: 1,
@@ -143,15 +146,15 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
                     }
                   : {}
               }
-              onDragStart={isMine ? () => handleDragStart(item) : undefined}
-              onDragEnd={isMine ? handleDragEnd : undefined}
+              onDragStart={canDrag ? () => handleDragStart(item) : undefined}
+              onDragEnd={canDrag ? handleDragEnd : undefined}
               layoutId={item}
               transition={{
                 type: 'spring',
                 stiffness: 600,
                 damping: 30,
               }}
-              drag={isMine ? 'x' : false}
+              drag={canDrag ? 'x' : false}
             >
               <button
                 className={twMerge(
@@ -165,7 +168,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
                 )}
                 onClick={() => onClick(item)}
                 onPointerDown={
-                  isMine
+                  canDrag
                     ? (e) => {
                         const target = e.currentTarget
                         const timer = setTimeout(() => {
@@ -178,7 +181,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
                     : undefined
                 }
                 onPointerUp={
-                  isMine
+                  canDrag
                     ? () => {
                         if (longPressTimer) {
                           clearTimeout(longPressTimer)
@@ -188,7 +191,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
                     : undefined
                 }
                 onPointerLeave={
-                  isMine
+                  canDrag
                     ? () => {
                         if (longPressTimer) {
                           clearTimeout(longPressTimer)
