@@ -24,10 +24,10 @@ export default async function handler(
       where: { userId },
       include: {
         books: {
-          orderBy: { finished: 'desc' }
-        }
+          orderBy: { finished: 'desc' },
+        },
       },
-      orderBy: { order: 'asc' }
+      orderBy: { order: 'asc' },
     })
 
     // CSVヘッダー
@@ -40,14 +40,14 @@ export default async function handler(
       'メモ',
       '読了日',
       '登録日',
-      '更新日'
+      '更新日',
     ]
 
     // CSVデータの生成
     const csvRows: string[] = [csvHeaders.join(',')]
 
-    sheets.forEach(sheet => {
-      sheet.books.forEach(book => {
+    sheets.forEach((sheet) => {
+      sheet.books.forEach((book) => {
         const row = [
           escapeCSV(sheet.name),
           escapeCSV(book.title),
@@ -57,7 +57,7 @@ export default async function handler(
           escapeCSV(book.memo),
           book.finished ? formatDate(book.finished) : '',
           formatDate(book.created),
-          formatDate(book.updated)
+          formatDate(book.updated),
         ]
         csvRows.push(row.join(','))
       })
@@ -70,7 +70,10 @@ export default async function handler(
     const csvBuffer = Buffer.concat([bom, Buffer.from(csv, 'utf-8')])
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8')
-    res.setHeader('Content-Disposition', `attachment; filename="kidoku_export_${new Date().toISOString().split('T')[0]}.csv"`)
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="kidoku_export_${new Date().toISOString().split('T')[0]}.csv"`
+    )
     res.send(csvBuffer)
   } catch (error) {
     console.error('CSV export error:', error)
@@ -81,15 +84,20 @@ export default async function handler(
 // CSV用のエスケープ処理
 function escapeCSV(str: string): string {
   if (!str) return ''
-  
+
   // ダブルクォートをエスケープ
   const escaped = str.replace(/"/g, '""')
-  
+
   // カンマ、改行、ダブルクォートが含まれている場合はダブルクォートで囲む
-  if (escaped.includes(',') || escaped.includes('\n') || escaped.includes('\r') || escaped.includes('"')) {
+  if (
+    escaped.includes(',') ||
+    escaped.includes('\n') ||
+    escaped.includes('\r') ||
+    escaped.includes('"')
+  ) {
     return `"${escaped}"`
   }
-  
+
   return escaped
 }
 
