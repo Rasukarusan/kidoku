@@ -47,6 +47,10 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
     }
   }
 
+  const onClickExportCSV = () => {
+    window.open('/api/export/csv', '_blank')
+  }
+
   return (
     <Container className="p-10">
       <NextSeo title="アカウント設定 | kidoku" />
@@ -66,6 +70,20 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
             onChange={onChange}
           />
           <div className="mb-4 text-xs text-red-700">{error}</div>
+          <div className="mb-4">
+            <div className="mb-4 text-sm font-bold text-gray-700">
+              データエクスポート
+            </div>
+            <button
+              className="mb-2 rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white hover:bg-green-600"
+              onClick={onClickExportCSV}
+            >
+              読書記録をCSVでダウンロード
+            </button>
+            <div className="mb-6 text-xs text-gray-600">
+              ※すべての読書記録をCSV形式でダウンロードできます。
+            </div>
+          </div>
           <div className="mb-4">
             <div className="mb-4 text-sm font-bold text-gray-700">
               アカウント削除
