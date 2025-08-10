@@ -15,33 +15,42 @@ export const config = {
 }
 
 async function updateMeiliSearchDocuments() {
-  const books = await prisma.books.findMany({
-    select: {
-      id: true,
-      title: true,
-      author: true,
-      image: true,
-      is_public_memo: true,
-      memo: true,
-      user: { select: { name: true, image: true } },
-      sheet: { select: { name: true } },
-    },
-  })
-  const documents = books.map((book) => {
-    const { id, title, author, image, memo, is_public_memo, user, sheet } = book
-    return {
-      id,
-      title,
-      author,
-      image,
-      memo: is_public_memo ? memo : '',
-      username: user.name,
-      userImage: user.image,
-      sheet: sheet.name,
-    }
-  })
-  const result = await addDocuments('books', documents)
-  return result
+  try {
+    const books = await prisma.books.findMany({
+      select: {
+        id: true,
+        title: true,
+        author: true,
+        image: true,
+        is_public_memo: true,
+        memo: true,
+        user: { select: { name: true, image: true } },
+        sheet: { select: { name: true } },
+      },
+    })
+    const documents = books
+      .filter((book) => book.sheet !== null) // sheetがnullのレコードを除外
+      .map((book) => {
+        const { id, title, author, image, memo, is_public_memo, user, sheet } =
+          book
+        return {
+          id,
+          title,
+          author,
+          image,
+          memo: is_public_memo ? memo : '',
+          username: user.name,
+          userImage: user.image,
+          sheet: sheet.name,
+        }
+      })
+    const result = await addDocuments('books', documents)
+    return result
+  } catch (error) {
+    console.error('updateMeiliSearchDocuments error:', error)
+    // エラーが発生してもAPIレスポンスは継続
+    return null
+  }
 }
 
 export default async (req, res) => {

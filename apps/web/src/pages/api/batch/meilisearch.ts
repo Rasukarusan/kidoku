@@ -23,20 +23,22 @@ export default async function handler(
         sheet: { select: { name: true } },
       },
     })
-    const documents = books.map((book) => {
-      const { id, title, author, image, memo, is_public_memo, user, sheet } =
-        book
-      return {
-        id,
-        title,
-        author,
-        image,
-        memo: is_public_memo ? memo : '',
-        username: user.name,
-        userImage: user.image,
-        sheet: sheet.name,
-      }
-    })
+    const documents = books
+      .filter((book) => book.sheet !== null) // sheetがnullのレコードを除外
+      .map((book) => {
+        const { id, title, author, image, memo, is_public_memo, user, sheet } =
+          book
+        return {
+          id,
+          title,
+          author,
+          image,
+          memo: is_public_memo ? memo : '',
+          username: user.name,
+          userImage: user.image,
+          sheet: sheet.name,
+        }
+      })
     const result = await addDocuments('books', documents)
     console.log(result)
     return response.status(200).json({ result: true })
