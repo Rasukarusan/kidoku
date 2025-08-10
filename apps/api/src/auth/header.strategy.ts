@@ -14,15 +14,15 @@ export class HeaderStrategy extends PassportStrategy(Strategy, 'header') {
     super();
     // NEXTAUTH_SECRETを署名検証にも使用
     const secret = this.configService.get<string>('NEXTAUTH_SECRET');
-    
+
     if (!secret) {
       throw new Error('NEXTAUTH_SECRET is not configured');
     }
-    
+
     this.secretKey = secret;
   }
 
-  async validate(req: Request): Promise<any> {
+  validate(req: Request): any {
     // Next.jsのプロキシから送信されるヘッダーを取得
     const userId = req.headers['x-user-id'] as string;
     const isAdmin = req.headers['x-user-admin'] as string;
@@ -37,9 +37,14 @@ export class HeaderStrategy extends PassportStrategy(Strategy, 'header') {
     // タイムスタンプの検証（リプレイ攻撃防止）
     const requestTime = parseInt(timestamp, 10);
     const currentTime = Date.now();
-    
-    if (isNaN(requestTime) || Math.abs(currentTime - requestTime) > this.maxTimestampAge) {
-      throw new UnauthorizedException('Request timestamp is invalid or expired');
+
+    if (
+      isNaN(requestTime) ||
+      Math.abs(currentTime - requestTime) > this.maxTimestampAge
+    ) {
+      throw new UnauthorizedException(
+        'Request timestamp is invalid or expired',
+      );
     }
 
     // 署名の検証
