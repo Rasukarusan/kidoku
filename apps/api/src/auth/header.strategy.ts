@@ -13,11 +13,13 @@ export class HeaderStrategy extends PassportStrategy(Strategy, 'header') {
   constructor(private configService: ConfigService) {
     super();
     // NEXTAUTH_SECRETを署名検証にも使用
-    this.secretKey = this.configService.get<string>('NEXTAUTH_SECRET');
+    const secret = this.configService.get<string>('NEXTAUTH_SECRET');
     
-    if (!this.secretKey) {
+    if (!secret) {
       throw new Error('NEXTAUTH_SECRET is not configured');
     }
+    
+    this.secretKey = secret;
   }
 
   async validate(req: Request): Promise<any> {
