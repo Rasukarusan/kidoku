@@ -24,7 +24,7 @@ import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         req,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        user: req.user, // JwtStrategy → req.user
+        user: req.user, // HeaderStrategy → req.user
       }),
       playground: true,
     }),

@@ -40,7 +40,6 @@
     "dayjs": "^1.11.3",
     "framer-motion": "^11.2.6",
     "graphql": "^16.11.0",
-    "jose": "^6.0.10",
     "jotai": "^2.6.5",
     "linkify-react": "^4.1.3",
     "linkifyjs": "^4.1.3",
