@@ -6,21 +6,52 @@ import {
   concat,
 } from '@apollo/client'
 
-const httpLink = new HttpLink({ uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT })
+// GraphQLエンドポイントの決定
+// サーバーサイドでは絶対URLが必要、クライアントサイドでは相対URLで良い
+const getGraphQLEndpoint = () => {
+  if (typeof window === 'undefined') {
+    // サーバーサイド
+    const host = process.env.NEXT_PUBLIC_HOST || 'http://localhost:3000'
+    return `${host}/api/graphql`
+  } else {
+    // クライアントサイド
+    return '/api/graphql'
+  }
+}
 
+// HttpLinkの作成
+const httpLink = new HttpLink({
+  uri: getGraphQLEndpoint(),
+  credentials: 'same-origin', // 同一オリジンでクッキーを送信
+})
+
+// 認証ミドルウェア
+// NextAuthのセッションはクッキーで管理されており、
+// /api/graphqlプロキシ側でセッション情報を取得して認証ヘッダーを付与するため、
+// ここでは特別な認証処理は不要
 const authMiddleware = new ApolloLink((operation, forward) => {
-  const token = localStorage.getItem('accessToken') // ここでトークンを取得
-  operation.setContext({
-    headers: {
-      authorization: token ? `Bearer ${token}` : '',
-    },
-  })
+  // 必要に応じて他のヘッダーを設定できる
   return forward(operation)
 })
 
-const client = new ApolloClient({
-  link: concat(authMiddleware, httpLink),
-  cache: new InMemoryCache(),
-})
+// Apollo Clientの作成
+const createApolloClient = () => {
+  return new ApolloClient({
+    link: concat(authMiddleware, httpLink),
+    cache: new InMemoryCache(),
+    ssrMode: typeof window === 'undefined', // SSRモードの自動検出
+  })
+}
 
-export default client
+// シングルトンパターンでクライアントを管理
+let apolloClient: ApolloClient<any> | null = null
+
+const getApolloClient = () => {
+  if (!apolloClient) {
+    apolloClient = createApolloClient()
+  }
+  return apolloClient
+}
+
+export default getApolloClient()
+export { createApolloClient, getApolloClient }
