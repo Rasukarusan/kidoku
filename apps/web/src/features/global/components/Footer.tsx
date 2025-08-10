@@ -116,7 +116,7 @@ export const Footer: React.FC = () => {
                   },
                   {
                     title: 'Vercel',
-                    href: 'https://vercel.com/rasukarusan/kidoku',
+                    href: 'https://vercel.com/naototanakas-projects/kidoku',
                     target: '_blank',
                   },
                 ]}
