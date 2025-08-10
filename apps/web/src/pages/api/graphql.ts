@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from './auth/[...nextauth]'
+import crypto from 'crypto'
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,21 +18,41 @@ export default async function handler(
     // NestJS GraphQLエンドポイント
     const graphqlEndpoint = process.env.NESTJS_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql'
     
+    // NEXTAUTH_SECRETを内部API通信の署名にも使用
+    const secretKey = process.env.NEXTAUTH_SECRET
+    if (!secretKey) {
+      console.error('NEXTAUTH_SECRET is not configured')
+      return res.status(500).json({ error: 'Internal server configuration error' })
+    }
+    
     // リクエストヘッダーの準備
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     }
     
     // NextAuthのセッション情報を基に認証ヘッダーを設定
-    // NestJS側では、このユーザーIDを使って認証を行う
     if (session?.user?.id) {
-      // セッション情報をJSON形式でヘッダーに含める
-      // NestJS側でこの情報を解析して認証処理を行う
-      headers['X-User-Id'] = session.user.id
-      headers['X-User-Admin'] = String(session.user.admin || false)
+      // ユーザー情報
+      const userId = session.user.id
+      const isAdmin = String(session.user.admin || false)
       
-      // 必要に応じてJWTトークンを生成することも可能
-      // ただし、現在のシステムではセッションベースの認証を使用
+      // タイムスタンプ（リプレイ攻撃防止）
+      const timestamp = Date.now().toString()
+      
+      // 署名対象のデータ
+      const signaturePayload = `${userId}:${isAdmin}:${timestamp}`
+      
+      // HMAC-SHA256で署名を生成
+      const signature = crypto
+        .createHmac('sha256', secretKey)
+        .update(signaturePayload)
+        .digest('hex')
+      
+      // ヘッダーに設定
+      headers['X-User-Id'] = userId
+      headers['X-User-Admin'] = isAdmin
+      headers['X-Timestamp'] = timestamp
+      headers['X-Signature'] = signature
     }
     
     // NestJSのGraphQLエンドポイントにプロキシ
