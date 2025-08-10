@@ -3,11 +3,11 @@ import {
   Post,
   Get,
   Param,
-  // UseGuards,
+  UseGuards,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-// import { JwtAuthGuard } from '../../auth/jwt-auth.guard'; // JWT認証は削除済み
+import { HttpHeaderAuthGuard } from '../../auth/http-header-auth.guard';
 import { SoftwareDesignService } from './software-design.service';
 import { SoftwareDesignRepository } from './software-design.repository';
 
@@ -63,7 +63,7 @@ export class SoftwareDesignController {
   }
 
   @Post('batch/add-latest')
-  // @UseGuards(JwtAuthGuard) // JWT認証は削除済み
+  @UseGuards(HttpHeaderAuthGuard) // ヘッダー認証で保護
   async addLatestAsTemplate() {
     // 最新のSoftware Designを取得
     const latestSD = this.softwareDesignService.getLatest();
