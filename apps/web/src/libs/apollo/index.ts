@@ -44,6 +44,7 @@ const createApolloClient = () => {
 }
 
 // シングルトンパターンでクライアントを管理
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let apolloClient: ApolloClient<any> | null = null
 
 const getApolloClient = () => {
