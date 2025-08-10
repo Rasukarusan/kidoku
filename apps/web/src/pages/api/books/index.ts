@@ -31,7 +31,8 @@ async function updateMeiliSearchDocuments() {
     const documents = books
       .filter((book) => book.sheet !== null) // sheetがnullのレコードを除外
       .map((book) => {
-        const { id, title, author, image, memo, is_public_memo, user, sheet } = book
+        const { id, title, author, image, memo, is_public_memo, user, sheet } =
+          book
         return {
           id,
           title,
