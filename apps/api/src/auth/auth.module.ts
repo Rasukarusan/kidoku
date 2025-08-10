@@ -4,10 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { HeaderStrategy } from './header.strategy';
 
 @Module({
-  imports: [
-    ConfigModule,
-    PassportModule,
-  ],
+  imports: [ConfigModule, PassportModule],
   providers: [HeaderStrategy],
   exports: [PassportModule],
 })
