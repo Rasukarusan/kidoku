@@ -37,6 +37,28 @@ export const BookDetailSidebar: React.FC<Props> = ({
     setCurrentBook(book)
   }, [book])
 
+  // サイドバーが開いている時に背景のスクロールを防ぐ
+  useEffect(() => {
+    if (open) {
+      // 現在のスクロール位置を保存
+      const scrollY = window.scrollY
+      // bodyのスタイルを設定してスクロールを防ぐ
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+
+      return () => {
+        // コンポーネントが閉じられたらスタイルをリセット
+        const scrollY = document.body.style.top
+        document.body.style.position = ''
+        document.body.style.top = ''
+        document.body.style.width = ''
+        // 元のスクロール位置に戻す
+        window.scrollTo(0, parseInt(scrollY || '0') * -1)
+      }
+    }
+  }, [open])
+
   const onClickEdit = async () => {
     const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])
     if (isDiff) {
