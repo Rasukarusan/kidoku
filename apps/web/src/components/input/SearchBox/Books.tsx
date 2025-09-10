@@ -18,7 +18,7 @@ export const Books: React.FC<Props> = ({ input }) => {
   const [selectItem, setSelectItem] = useAtom(addBookAtom)
   const [books, setBooks] = useState<SearchResult[]>([])
   // const [books, setBooks] = useState<SearchResult[]>(items)
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   // デバウンス。入力から一定時間経った後に検索を実行する。
   // 300ms以内に入力があった場合はタイマーがクリアされ、新しいタイマーが設定され、デバウンスが実現される。
@@ -57,16 +57,25 @@ export const Books: React.FC<Props> = ({ input }) => {
                 {selectItem?.id === item.id && (
                   <div className="absolute bottom-0 left-1/2 w-full -translate-x-2/4 text-center opacity-80 hover:opacity-100">
                     <button
-                      className="w-full rounded-md bg-blue-600 py-2 text-xs font-bold text-white hover:bg-blue-700"
+                      className="w-full rounded-md bg-blue-600 py-2 text-xs font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
                       onClick={() => {
-                        if (!session) {
+                        // セッションローディング中は何もしない
+                        if (status === 'loading') {
+                          return
+                        }
+
+                        // 未認証の場合はログインモーダルを表示
+                        if (status === 'unauthenticated') {
                           setOpenLoginModal(true)
                           return
                         }
+
+                        // 認証済みの場合のみ本追加モーダルを表示
                         setOpenAddModal(true)
                       }}
+                      disabled={status === 'loading'}
                     >
-                      本を登録する
+                      {status === 'loading' ? '読み込み中...' : '本を登録する'}
                     </button>
                   </div>
                 )}
