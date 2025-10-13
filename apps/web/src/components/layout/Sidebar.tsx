@@ -16,6 +16,7 @@ import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
 import { useQuery } from '@apollo/client'
 import { GET_SHEETS } from '@/libs/apollo/queries'
+import { Logo } from '@/components/icon/Logo'
 
 export const Sidebar: React.FC = () => {
   const router = useRouter()
@@ -178,7 +179,10 @@ export const Sidebar: React.FC = () => {
         <div className="flex min-h-0 flex-1 flex-col border-r border-gray-100 bg-main shadow-sm">
           <div className="flex flex-1 flex-col overflow-y-auto pb-4 pt-6">
             <div className="flex flex-shrink-0 items-center px-6">
-              <h1 className="text-xl font-bold text-gray-800">Kidoku</h1>
+              <Link href="/" className="flex items-center gap-3 no-underline">
+                <Logo className="h-8 w-8" />
+                <h1 className="text-xl font-bold text-gray-800">Kidoku</h1>
+              </Link>
             </div>
 
             {isAuthenticated && (
@@ -217,7 +221,7 @@ export const Sidebar: React.FC = () => {
           </div>
 
           {/* User section at bottom */}
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <div
               className="flex flex-shrink-0 border-t border-gray-100 p-4"
               role="region"
@@ -258,6 +262,20 @@ export const Sidebar: React.FC = () => {
                 </button>
               </div>
             </div>
+          ) : (
+            <div
+              className="flex flex-shrink-0 border-t border-gray-100 p-4"
+              role="region"
+              aria-label="ログイン"
+            >
+              <button
+                onClick={() => setOpenLoginModal(true)}
+                className="flex w-full items-center justify-center px-4 py-2.5 text-sm font-bold text-gray-700 transition-all duration-200 hover:text-gray-900 focus:outline-none"
+                aria-label="アカウントにログイン"
+              >
+                ログイン
+              </button>
+            </div>
           )}
         </div>
       </aside>
@@ -292,12 +310,15 @@ export const Sidebar: React.FC = () => {
               <div className="flex h-full flex-col">
                 {/* Header with close button */}
                 <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-                  <h1
-                    id="sidebar-title"
-                    className="text-xl font-bold text-gray-800"
-                  >
-                    Kidoku
-                  </h1>
+                  <Link href="/" className="flex items-center gap-3 no-underline" onClick={closeSidebar}>
+                    <Logo className="h-8 w-8" />
+                    <h1
+                      id="sidebar-title"
+                      className="text-xl font-bold text-gray-800"
+                    >
+                      Kidoku
+                    </h1>
+                  </Link>
                   <button
                     ref={closeButtonRef}
                     onClick={closeSidebar}
