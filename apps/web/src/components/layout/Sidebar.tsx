@@ -3,13 +3,14 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAtom } from 'jotai'
-import { openNavSidebarAtom } from '@/store/modal/atom'
+import { useAtom, useSetAtom } from 'jotai'
+import { openNavSidebarAtom, openLoginModalAtom } from '@/store/modal/atom'
 import {
   AiOutlineHome,
   AiOutlineBook,
   AiOutlineSetting,
   AiOutlineClose,
+  AiOutlineLogin,
 } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
@@ -18,8 +19,9 @@ import { GET_SHEETS } from '@/libs/apollo/queries'
 
 export const Sidebar: React.FC = () => {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [isOpen, setIsOpen] = useAtom(openNavSidebarAtom)
+  const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const { data } = useQuery(GET_SHEETS)
   const sidebarRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -131,10 +133,9 @@ export const Sidebar: React.FC = () => {
     ]
   }, [data, session, router.pathname])
 
-  // ログインしていない場合はモバイルメニューボタンのみ表示しない
-  if (!session) {
-    return null
-  }
+  // 認証状態を判定
+  const isAuthenticated = status === 'authenticated' && session
+  const isLoading = status === 'loading'
 
   const sidebarVariants = {
     open: {
@@ -166,11 +167,6 @@ export const Sidebar: React.FC = () => {
     },
   }
 
-  // 未ログイン時はサイドバーを表示しない
-  if (!session) {
-    return null
-  }
-
   return (
     <>
       {/* Desktop Sidebar */}
@@ -185,86 +181,90 @@ export const Sidebar: React.FC = () => {
               <h1 className="text-xl font-bold text-gray-800">Kidoku</h1>
             </div>
 
-            <nav
-              className="mt-8 flex-1 space-y-1 px-3"
-              role="navigation"
-              aria-label="メインメニュー"
-            >
-              {navigationItems.map((item) => {
-                const Icon = item.icon
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main ${
-                      item.isActive
-                        ? 'border border-gray-100 bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
-                    }`}
-                    aria-current={item.isActive ? 'page' : undefined}
-                  >
-                    <Icon
-                      className={`mr-3 h-5 w-5 flex-shrink-0 ${
+            {isAuthenticated && (
+              <nav
+                className="mt-8 flex-1 space-y-1 px-3"
+                role="navigation"
+                aria-label="メインメニュー"
+              >
+                {navigationItems.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main ${
                         item.isActive
-                          ? 'text-gray-700'
-                          : 'text-gray-400 group-hover:text-gray-600'
+                          ? 'border border-gray-100 bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
                       }`}
-                      aria-hidden="true"
-                    />
-                    {item.name}
-                  </Link>
-                )
-              })}
-            </nav>
+                      aria-current={item.isActive ? 'page' : undefined}
+                    >
+                      <Icon
+                        className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                          item.isActive
+                            ? 'text-gray-700'
+                            : 'text-gray-400 group-hover:text-gray-600'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              </nav>
+            )}
           </div>
 
           {/* User section at bottom */}
-          <div
-            className="flex flex-shrink-0 border-t border-gray-100 p-4"
-            role="region"
-            aria-label="ユーザーアカウント"
-          >
-            <div className="w-full space-y-2">
-              <Link
-                href="/settings/profile"
-                className="flex items-center rounded-lg p-2 transition-colors duration-150 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
-                aria-label="アカウント設定に移動"
-              >
-                <div className="mr-3">
-                  <img
-                    className="h-9 w-9 rounded-full ring-2 ring-white"
-                    src={session.user.image || ''}
-                    alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
+          {isAuthenticated && (
+            <div
+              className="flex flex-shrink-0 border-t border-gray-100 p-4"
+              role="region"
+              aria-label="ユーザーアカウント"
+            >
+              <div className="w-full space-y-2">
+                <Link
+                  href="/settings/profile"
+                  className="flex items-center rounded-lg p-2 transition-colors duration-150 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
+                  aria-label="アカウント設定に移動"
+                >
+                  <div className="mr-3">
+                    <img
+                      className="h-9 w-9 rounded-full ring-2 ring-white"
+                      src={session.user.image || ''}
+                      alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-800">
+                      {session.user.name}
+                    </p>
+                    <p className="truncate text-xs text-gray-500">
+                      {session.user.email}
+                    </p>
+                  </div>
+                </Link>
+                <button
+                  onClick={() => signOut()}
+                  className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-white/50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
+                  aria-label="アカウントからログアウト"
+                >
+                  <BiExit
+                    className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
+                    aria-hidden="true"
                   />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-gray-800">
-                    {session.user.name}
-                  </p>
-                  <p className="truncate text-xs text-gray-500">
-                    {session.user.email}
-                  </p>
-                </div>
-              </Link>
-              <button
-                onClick={() => signOut()}
-                className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-white/50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
-                aria-label="アカウントからログアウト"
-              >
-                <BiExit
-                  className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
-                  aria-hidden="true"
-                />
-                ログアウト
-              </button>
+                  ログアウト
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </aside>
 
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && isAuthenticated && (
           <>
             <motion.div
               initial="closed"
