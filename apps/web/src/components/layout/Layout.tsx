@@ -12,16 +12,13 @@ interface Props {
 
 export const Layout: React.FC<Props> = ({ children }) => {
   usePusher()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   return (
     <div className="flex">
       <Sidebar />
       <div
-        className={twMerge(
-          'flex min-h-screen flex-1 flex-col',
-          session && 'lg:ml-60'
-        )}
+        className="flex min-h-screen flex-1 flex-col lg:ml-60"
       >
         <SearchModal />
         <AddModal />
