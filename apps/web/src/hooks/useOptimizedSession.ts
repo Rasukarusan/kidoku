@@ -1,8 +1,9 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import type { Session } from 'next-auth'
 
 interface OptimizedSession {
-  data: any
+  data: Session | null
   status: 'loading' | 'authenticated' | 'unauthenticated'
   isInitialLoading: boolean
   isRevalidating: boolean
@@ -41,21 +42,21 @@ export const useOptimizedSession = (): OptimizedSession => {
     }
   }, [session.status, isInitialLoading])
 
-  // 優先順位: 
+  // 優先順位:
   // 1. 実際のセッション状態（loading以外）
   // 2. キャッシュされた状態（再検証中の場合）
   // 3. loading状態
-  const optimizedStatus = 
-    session.status !== 'loading' 
-      ? session.status 
-      : (isRevalidating && cachedStatus) 
-        ? cachedStatus as any
+  const optimizedStatus =
+    session.status !== 'loading'
+      ? session.status
+      : isRevalidating && cachedStatus
+        ? (cachedStatus as 'loading' | 'authenticated' | 'unauthenticated')
         : 'loading'
 
   return {
     data: session.data,
     status: optimizedStatus,
     isInitialLoading: session.status === 'loading' && isInitialLoading,
-    isRevalidating
+    isRevalidating,
   }
 }

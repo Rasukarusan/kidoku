@@ -13,7 +13,7 @@ export const useAuthPrewarm = () => {
         // セッションエンドポイントに軽量リクエストを送信
         await fetch('/api/auth/session', {
           method: 'HEAD', // HEADリクエストで軽量化
-          credentials: 'include'
+          credentials: 'include',
         })
       } catch {
         // エラーは無視（プリウォームは補助的な機能）
