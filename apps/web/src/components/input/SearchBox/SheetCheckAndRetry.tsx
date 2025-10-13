@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react'
 import { AiOutlineFileAdd } from 'react-icons/ai'
 import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 
+interface Sheet {
+  id: number
+  name: string
+}
+
 interface SheetCheckAndRetryProps {
-  sheets: any[]
-  refetchSheets: () => Promise<any>
-  status: string
+  sheets: Sheet[]
+  refetchSheets: () => Promise<unknown>
+  status: 'loading' | 'authenticated' | 'unauthenticated'
   isRevalidating?: boolean
 }
 
@@ -17,7 +22,7 @@ export const SheetCheckAndRetry: React.FC<SheetCheckAndRetryProps> = ({
   sheets,
   refetchSheets,
   status,
-  isRevalidating = false
+  isRevalidating = false,
 }) => {
   const [openAdd, setOpenAdd] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
@@ -28,13 +33,15 @@ export const SheetCheckAndRetry: React.FC<SheetCheckAndRetryProps> = ({
     const checkSheets = async () => {
       if (status === 'authenticated' && sheets.length === 0 && retryCount < 3) {
         setIsRetrying(true)
-        
+
         // 少し待ってからリトライ（バックエンドの起動を待つ）
-        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)))
-        
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 * (retryCount + 1))
+        )
+
         try {
           await refetchSheets()
-          setRetryCount(prev => prev + 1)
+          setRetryCount((prev) => prev + 1)
         } catch (error) {
           console.error('Sheet refetch failed:', error)
         } finally {
@@ -55,7 +62,7 @@ export const SheetCheckAndRetry: React.FC<SheetCheckAndRetryProps> = ({
   if (isRetrying || isRevalidating) {
     return (
       <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-        <div className="animate-spin h-4 w-4 border-2 border-gray-400 rounded-full border-t-transparent"></div>
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"></div>
         <span>シート情報を取得中...</span>
       </div>
     )
@@ -66,8 +73,7 @@ export const SheetCheckAndRetry: React.FC<SheetCheckAndRetryProps> = ({
     <>
       <SheetAddModal
         open={openAdd}
-        setOpen={setOpenAdd}
-        callback={() => {
+        onClose={() => {
           setOpenAdd(false)
           refetchSheets()
           setRetryCount(0) // リトライカウントをリセット
