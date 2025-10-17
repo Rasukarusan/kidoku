@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
@@ -14,6 +14,12 @@ import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { useReward } from 'react-rewards'
 import { CategoriesResponse } from '@/types/api'
+import {
+  getBookDraft,
+  saveBookDraft,
+  removeBookDraft,
+  cleanupOldDrafts,
+} from '@/utils/localStorage'
 
 interface Props {
   book: Book
@@ -28,10 +34,64 @@ export const BookDetailEditPage: React.FC<Props> = ({
 }) => {
   const [book, setBook] = useState<Book>(initialBook)
   const [loading, setLoading] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
   const { reward } = useReward('saveRewardId', 'balloons', {
     lifetime: 200,
     spread: 100,
   })
+
+  // 初回マウント時に古い下書きをクリーンアップ
+  useEffect(() => {
+    cleanupOldDrafts()
+  }, [])
+
+  // ローカルストレージから下書きを復元
+  useEffect(() => {
+    if (!initialBook.id) return
+
+    const draft = getBookDraft(String(initialBook.id))
+    if (draft) {
+      setBook((prev) => ({
+        ...prev,
+        memo: draft.memo ?? prev.memo,
+        impression: draft.impression ?? prev.impression,
+        category: draft.category ?? prev.category,
+        finished: draft.finished ?? prev.finished,
+        title: draft.title ?? prev.title,
+        author: draft.author ?? prev.author,
+        is_public_memo: draft.is_public_memo ?? prev.is_public_memo,
+      }))
+      setHasDraft(true)
+    }
+  }, [initialBook.id])
+
+  // 書籍データが変更されたらローカルストレージに自動保存
+  useEffect(() => {
+    if (!book.id) return
+
+    const timeoutId = setTimeout(() => {
+      saveBookDraft(String(book.id), {
+        memo: book.memo,
+        impression: book.impression,
+        category: book.category,
+        finished: book.finished,
+        title: book.title,
+        author: book.author,
+        is_public_memo: book.is_public_memo,
+      })
+    }, 500) // 500msのデバウンス
+
+    return () => clearTimeout(timeoutId)
+  }, [
+    book.id,
+    book.memo,
+    book.impression,
+    book.category,
+    book.finished,
+    book.title,
+    book.author,
+    book.is_public_memo,
+  ])
 
   // カテゴリ一覧
   const { data } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
@@ -54,6 +114,10 @@ export const BookDetailEditPage: React.FC<Props> = ({
       })
 
       if (response.ok) {
+        // 保存成功時にローカルストレージの下書きを削除
+        if (book.id) {
+          removeBookDraft(String(book.id))
+        }
         reward() // 保存成功時にアニメーション
         setTimeout(() => {
           onCancel() // 編集モードを終了して読み取りモードに戻る
@@ -79,6 +143,10 @@ export const BookDetailEditPage: React.FC<Props> = ({
       })
 
       if (response.ok) {
+        // 削除成功時にローカルストレージの下書きも削除
+        if (book.id) {
+          removeBookDraft(String(book.id))
+        }
         onClose()
       }
     } catch (error) {
@@ -90,6 +158,11 @@ export const BookDetailEditPage: React.FC<Props> = ({
   return (
     <div className="flex h-full min-w-full flex-col justify-between rounded-md">
       <div className="flex-1">
+        {hasDraft && (
+          <div className="mx-4 mt-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800">
+            💾 下書きが復元されました
+          </div>
+        )}
         <div className="flex justify-end p-4">
           <div className="flex items-center space-x-2">
             <button
