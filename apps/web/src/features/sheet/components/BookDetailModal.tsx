@@ -6,6 +6,12 @@ import { BookDetailEditModal } from './BookDetailEditModal'
 import { useReward } from 'react-rewards'
 import { useSWRConfig } from 'swr'
 import { useRouter } from 'next/router'
+import {
+  getBookDraft,
+  saveBookDraft,
+  removeBookDraft,
+  cleanupOldDrafts,
+} from '@/utils/localStorage'
 
 interface Props {
   book?: Book
@@ -25,10 +31,63 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
     spread: 100,
   })
 
+  // 初回マウント時に古い下書きをクリーンアップ
+  useEffect(() => {
+    cleanupOldDrafts()
+  }, [])
+
   useEffect(() => {
     setNewBook(book)
     setCurrentBook(book)
   }, [book])
+
+  // 編集モード時にローカルストレージから下書きを復元
+  useEffect(() => {
+    if (!edit || !book?.id) return
+
+    const draft = getBookDraft(String(book.id))
+    if (draft) {
+      setNewBook((prev) => ({
+        ...prev,
+        memo: draft.memo ?? prev.memo,
+        impression: draft.impression ?? prev.impression,
+        category: draft.category ?? prev.category,
+        finished: draft.finished ?? prev.finished,
+        title: draft.title ?? prev.title,
+        author: draft.author ?? prev.author,
+        is_public_memo: draft.is_public_memo ?? prev.is_public_memo,
+      }))
+    }
+  }, [edit, book?.id])
+
+  // 書籍データが変更されたらローカルストレージに自動保存（編集モード時のみ）
+  useEffect(() => {
+    if (!edit || !newBook?.id) return
+
+    const timeoutId = setTimeout(() => {
+      saveBookDraft(String(newBook.id), {
+        memo: newBook.memo,
+        impression: newBook.impression,
+        category: newBook.category,
+        finished: newBook.finished,
+        title: newBook.title,
+        author: newBook.author,
+        is_public_memo: newBook.is_public_memo,
+      })
+    }, 500) // 500msのデバウンス
+
+    return () => clearTimeout(timeoutId)
+  }, [
+    edit,
+    newBook?.id,
+    newBook?.memo,
+    newBook?.impression,
+    newBook?.category,
+    newBook?.finished,
+    newBook?.title,
+    newBook?.author,
+    newBook?.is_public_memo,
+  ])
 
   const onClickEdit = async () => {
     // 編集する際はマスキングされていないメモを表示したいので、改めてデータを取得し直す。
@@ -63,6 +122,12 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
       },
     }).then((res) => res.json())
     setCurrentBook({ ...newBook, image: res.data?.image })
+
+    // 保存成功時にローカルストレージの下書きを削除
+    if (newBook?.id) {
+      removeBookDraft(String(newBook.id))
+    }
+
     reward()
     setLoading(false)
     setEdit(false)
@@ -82,6 +147,10 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
       },
     }).then((res) => res.json())
     if (res.result) {
+      // 削除成功時にローカルストレージの下書きも削除
+      if (currentBook?.id) {
+        removeBookDraft(String(currentBook.id))
+      }
       onClose()
     }
   }
