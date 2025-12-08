@@ -26,7 +26,6 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 ### 外部サービス
 - MeiliSearch（検索エンジン）
 - OpenAI GPT / Cohere（AI分析）
-- Pusher（リアルタイム通信）
 - Stripe（決済）
 - Vercel Blob（ストレージ）
 
