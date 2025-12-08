@@ -13,11 +13,8 @@ import { AppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
 import apolloClient from '@/libs/apollo'
 import { StoreAccessToken } from '@/features/global/components/StoreAccessToken'
-import { useAuthPrewarm } from '@/hooks/useAuthPrewarm'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  // 認証APIをプリウォームしてコールドスタートを防ぐ
-  useAuthPrewarm()
   return (
     <>
       <Head>

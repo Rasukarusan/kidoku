@@ -17,7 +17,7 @@ import { useRouter } from 'next/router'
 import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 import { AiOutlineFileAdd } from 'react-icons/ai'
-import { useOptimizedSession } from '@/hooks/useOptimizedSession'
+import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAtom, useAtomValue } from 'jotai'
 import { openAddModalAtom } from '@/store/modal/atom'
@@ -39,14 +39,7 @@ export const AddModal: React.FC = () => {
   const router = useRouter()
   const [open, setOpen] = useAtom(openAddModalAtom)
   const item = useAtomValue(addBookAtom)
-  // useOptimizedSessionで認証状態を最適化して取得
-  // コールドスタート時でもキャッシュから前回の状態を参照可能
-  const {
-    data: session,
-    status,
-    isInitialLoading,
-    isRevalidating,
-  } = useOptimizedSession()
+  const { data: session, status } = useSession()
   const { data: sheetsData, refetch: refetchSheets } = useQuery(GET_SHEETS)
   const sheets = sheetsData?.sheets || []
   const { mutate } = useSWR(
@@ -275,19 +268,15 @@ export const AddModal: React.FC = () => {
                         setOpenAdd(true)
                       }}
                       disabled={
-                        // 初回ロード時のみ無効化、再検証中は有効
-                        (status === 'loading' && isInitialLoading) ||
-                        status === 'unauthenticated'
+                        status === 'loading' || status === 'unauthenticated'
                       }
                     >
                       <AiOutlineFileAdd className="mr-1 h-[24px] w-[24px] text-white" />
-                      {isInitialLoading
+                      {status === 'loading'
                         ? '読み込み中...'
-                        : isRevalidating
-                          ? 'シートを追加' // 再検証中は前回の状態を信頼
-                          : status === 'authenticated'
-                            ? 'シートを追加'
-                            : 'ログインしてください'}
+                        : status === 'authenticated'
+                          ? 'シートを追加'
+                          : 'ログインしてください'}
                     </button>
                   ) : (
                     <select
@@ -354,22 +343,19 @@ export const AddModal: React.FC = () => {
                     tabIndex={6}
                     disabled={
                       isAnimating ||
-                      // 初回ロード時のみ無効化、再検証中は有効
-                      (status === 'loading' && isInitialLoading) ||
+                      status === 'loading' ||
                       status === 'unauthenticated'
                     }
                   >
-                    {(loading || isInitialLoading) && (
+                    {(loading || status === 'loading') && (
                       <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
                     )}
                     <span id="rewardId">
-                      {isInitialLoading
+                      {status === 'loading'
                         ? 'セッション確認中...'
-                        : isRevalidating
-                          ? '本を登録する' // 再検証中は前回の状態を信頼
-                          : status === 'authenticated'
-                            ? '本を登録する'
-                            : 'ログインしてください'}
+                        : status === 'authenticated'
+                          ? '本を登録する'
+                          : 'ログインしてください'}
                     </span>
                   </button>
                 )}
