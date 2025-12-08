@@ -1,6 +1,12 @@
 {
   "name": "kidoku",
   "private": true,
+  "pnpm": {
+    "overrides": {
+      "@types/react": "18.2.79",
+      "@types/react-dom": "18.2.25"
+    }
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
