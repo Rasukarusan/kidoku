@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const BarcodeScan: React.FC<Props> = () => {
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const setOpen = useSetAtom(openAddModalAtom)
   const setBook = useSetAtom(addBookAtom)
@@ -52,25 +52,12 @@ export const BarcodeScan: React.FC<Props> = () => {
         )}
         <EnhancedBarcodeScanner
           onDetect={(result) => {
-            // セッションの状態を最初に確認
-            if (status === 'loading') {
-              // セッション読み込み中は何もしない
-              setScanError(
-                'セッション情報を読み込み中です。もう一度お試しください。'
-              )
-              setTimeout(() => setScanError(''), 3000)
-              return
-            }
-
-            if (status === 'unauthenticated') {
-              // 未ログインの場合はログインモーダルのみ表示
+            setBook(result)
+            setOpen(true)
+            if (!session) {
               setOpenLoginModal(true)
               return
             }
-
-            // ログイン済みの場合のみ本を追加
-            setBook(result)
-            setOpen(true)
             sendMessage(result)
           }}
           onError={(error) => {

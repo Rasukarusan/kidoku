@@ -39,7 +39,7 @@ export const AddModal: React.FC = () => {
   const router = useRouter()
   const [open, setOpen] = useAtom(openAddModalAtom)
   const item = useAtomValue(addBookAtom)
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const { data: sheetsData, refetch: refetchSheets } = useQuery(GET_SHEETS)
   const sheets = sheetsData?.sheets || []
   const { mutate } = useSWR(
@@ -267,16 +267,10 @@ export const AddModal: React.FC = () => {
                       onClick={() => {
                         setOpenAdd(true)
                       }}
-                      disabled={
-                        status === 'loading' || status === 'unauthenticated'
-                      }
+                      disabled={!session}
                     >
                       <AiOutlineFileAdd className="mr-1 h-[24px] w-[24px] text-white" />
-                      {status === 'loading'
-                        ? '読み込み中...'
-                        : status === 'authenticated'
-                          ? 'シートを追加'
-                          : 'ログインしてください'}
+                      {session ? 'シートを追加' : 'ログインしてください'}
                     </button>
                   ) : (
                     <select
@@ -341,21 +335,13 @@ export const AddModal: React.FC = () => {
                     className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
                     onClick={onClickAdd}
                     tabIndex={6}
-                    disabled={
-                      isAnimating ||
-                      status === 'loading' ||
-                      status === 'unauthenticated'
-                    }
+                    disabled={isAnimating || !session}
                   >
-                    {(loading || status === 'loading') && (
+                    {loading && (
                       <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
                     )}
                     <span id="rewardId">
-                      {status === 'loading'
-                        ? 'セッション確認中...'
-                        : status === 'authenticated'
-                          ? '本を登録する'
-                          : 'ログインしてください'}
+                      {session ? '本を登録する' : 'ログインしてください'}
                     </span>
                   </button>
                 )}
