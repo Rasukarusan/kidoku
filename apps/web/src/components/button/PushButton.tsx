@@ -18,7 +18,7 @@ export const PushButton: React.FC<Props> = ({ open, book, onClick }) => {
       y: '0',
       opacity: 1,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 260,
         damping: 20,
       },
@@ -28,7 +28,7 @@ export const PushButton: React.FC<Props> = ({ open, book, onClick }) => {
       opacity: 0,
       transition: {
         duration: 0.2,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const,
       },
     },
   }
