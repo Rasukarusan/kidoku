@@ -10,6 +10,7 @@ import {
   AiOutlineBook,
   AiOutlineSetting,
   AiOutlineClose,
+  AiOutlineLogin,
 } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
@@ -309,11 +310,7 @@ export const Sidebar: React.FC = () => {
               <div className="flex h-full flex-col">
                 {/* Header with close button */}
                 <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-                  <Link
-                    href="/"
-                    className="flex items-center gap-3 no-underline"
-                    onClick={closeSidebar}
-                  >
+                  <Link href="/" className="flex items-center gap-3 no-underline" onClick={closeSidebar}>
                     <Logo className="h-8 w-8" />
                     <h1
                       id="sidebar-title"
