@@ -140,7 +140,7 @@ export const Sidebar: React.FC = () => {
     open: {
       x: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 30,
       },
@@ -148,7 +148,7 @@ export const Sidebar: React.FC = () => {
     closed: {
       x: '100%',
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 30,
       },

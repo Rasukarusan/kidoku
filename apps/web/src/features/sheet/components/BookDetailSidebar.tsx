@@ -148,7 +148,11 @@ export const BookDetailSidebar: React.FC<Props> = ({
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            transition={{
+              type: 'spring' as const,
+              damping: 25,
+              stiffness: 200,
+            }}
           >
             <div className="flex h-full w-full flex-col">
               {/* ヘッダー */}

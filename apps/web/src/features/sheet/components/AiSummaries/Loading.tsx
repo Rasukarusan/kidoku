@@ -72,7 +72,7 @@ export const Loading: React.FC = () => {
                     repeat: Infinity,
                     repeatType: 'reverse',
                     repeatDelay: 0,
-                    type: 'spring',
+                    type: 'spring' as const,
                     duration: 2,
                     delay,
                   },

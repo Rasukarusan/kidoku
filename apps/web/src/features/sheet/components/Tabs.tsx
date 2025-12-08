@@ -150,7 +150,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
               onDragEnd={canDrag ? handleDragEnd : undefined}
               layoutId={item}
               transition={{
-                type: 'spring',
+                type: 'spring' as const,
                 stiffness: 600,
                 damping: 30,
               }}

@@ -97,7 +97,7 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
       y: '0',
       opacity: 1,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 260,
         damping: 20,
       },
@@ -107,7 +107,7 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
       opacity: 0,
       transition: {
         duration: 0.2,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as const,
       },
     },
   }
