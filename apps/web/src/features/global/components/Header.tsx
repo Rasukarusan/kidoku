@@ -10,7 +10,7 @@ import { twMerge } from 'tailwind-merge'
 // レスポンシブヘッダー
 export const Header = () => {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const setOpenSidebar = useSetAtom(openNavSidebarAtom)
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
 
