@@ -34,12 +34,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   )
 }
 
-export const TreemapGraph: React.FC<Props> = ({
+export function TreemapGraph({
   sheet,
   records,
   setShowData,
   setFilter,
-}) => {
+}: Props) {
   const data = useMemo(() => {
     const categories = {}
     records.forEach((record) => {
