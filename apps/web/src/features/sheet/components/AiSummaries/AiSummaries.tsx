@@ -28,6 +28,7 @@ export const AiSummaries: React.FC<Props> = ({
     generateSummary,
     loading,
     json,
+    setJson,
     error,
     open,
     setOpen,
@@ -50,6 +51,7 @@ export const AiSummaries: React.FC<Props> = ({
               setOpen(false)
               await generateSummary(sheet, settings.months, settings.categories)
             }}
+            onManualSet={(json) => setJson(json)}
             courseId={CourseId.Free}
             sheetName={sheet}
             books={books}
