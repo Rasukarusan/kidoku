@@ -14,7 +14,10 @@ function isPortAvailable(port: number): Promise<boolean> {
   });
 }
 
-async function findAvailablePort(startPort: number, maxAttempts = 10): Promise<number> {
+async function findAvailablePort(
+  startPort: number,
+  maxAttempts = 10,
+): Promise<number> {
   for (let i = 0; i < maxAttempts; i++) {
     const port = startPort + i;
     if (await isPortAvailable(port)) {

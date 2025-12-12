@@ -44,12 +44,11 @@ export const Confirm: React.FC<Props> = ({
 
   const buildPrompt = () => {
     const targetBooks = books
-      .filter((book) => book.is_public_memo && book.finished)
+      .filter((book) => book.finished)
       .filter((book) => {
         const month = dayjs(book.finished).month() + 1
         return months.includes(month) && categories.includes(book.category)
       })
-      .slice(0, 10)
       .map((book) => ({
         category: book.category,
         memo: book.memo.replace(/\*.*\*/g, '***'),

@@ -31,7 +31,6 @@ export default async (req) => {
     const books = await prisma.books.findMany({
       where: {
         userId,
-        is_public_memo: true,
         sheet: { id: sheet.id },
         NOT: { finished: null },
       },
@@ -40,7 +39,6 @@ export default async (req) => {
         memo: true,
         finished: true,
       },
-      take: 10,
     })
     const targetBooks = books.filter((book) => {
       const month = dayjs(book.finished).month() + 1
