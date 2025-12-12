@@ -9,6 +9,8 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { AiSummaryUsageResponse } from '@/types/api'
+import { aiSummaryPrompt } from '@/libs/ai/prompt'
+import { FaRegCopy, FaCheck } from 'react-icons/fa'
 
 export type DetailSettings = {
   months: string[]
@@ -38,6 +40,30 @@ export const Confirm: React.FC<Props> = ({
   const initialCategories = uniq(books.map((book) => book.category))
   const [months, setMonths] = useState(initialMonths)
   const [categories, setCategories] = useState(initialCategories)
+  const [copied, setCopied] = useState(false)
+
+  const buildPrompt = () => {
+    const targetBooks = books
+      .filter((book) => book.is_public_memo && book.finished)
+      .filter((book) => {
+        const month = dayjs(book.finished).month() + 1
+        return months.includes(month) && categories.includes(book.category)
+      })
+      .slice(0, 10)
+      .map((book) => ({
+        category: book.category,
+        memo: book.memo.replace(/\*.*\*/g, '***'),
+        finished: book.finished,
+      }))
+    return `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`
+  }
+
+  const handleCopyPrompt = async () => {
+    const prompt = buildPrompt()
+    await navigator.clipboard.writeText(prompt)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const { data } = useSWR<AiSummaryUsageResponse>(
     `/api/ai-summary/usage?sheetName=${sheetName}&months=${months.join(',')}&categories=${categories.join(',')}`,
@@ -81,6 +107,24 @@ export const Confirm: React.FC<Props> = ({
         </div>
         <Accordion title="詳細設定" className="text-sm">
           <div className="p-2 text-left">
+            <div className="mb-3 flex justify-end">
+              <button
+                onClick={handleCopyPrompt}
+                className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+              >
+                {copied ? (
+                  <>
+                    <FaCheck className="text-green-500" />
+                    コピーしました
+                  </>
+                ) : (
+                  <>
+                    <FaRegCopy />
+                    プロンプトをコピー
+                  </>
+                )}
+              </button>
+            </div>
             <div className="mb-2 flex justify-start">
               <div className="w-20 text-nowrap font-bold">読了日</div>
               <div className="grid grid-cols-3 sm:grid-cols-3">
