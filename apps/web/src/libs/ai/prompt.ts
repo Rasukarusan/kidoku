@@ -6,7 +6,7 @@
  * [ルール]
  * ・フィードバックは「読書傾向分析」「感情分析」「「もしも」シナリオ」「総評」の4項目
  * ・各分析の本文は「ユーザーは」や「あなたは」などは出力せず、本題から入ること
- * ・valueるだけ抽象的な表現は避け、極論を言う事
+ * ・できるだけ抽象的な表現は避け、極論を言う事
  * ・valueはそれぞれ最大200文字までとする
  * ・出力はjsonでキー名はそれぞれreading_trend_analysis, sentiment_analysis, what_if_scenario,overall_feedbackで、valueは日本語で出力
  * ・分析に必要なデータが十分ではない場合、各valueは「分析に必要なデータが足りません」とする
@@ -45,7 +45,7 @@ export const aiSummaryPrompt = `
 [ルール]
 ・フィードバックは「読書傾向分析」「感情分析」「「もしも」シナリオ」「総評」の4項目
 ・各分析の本文は「ユーザーは」や「あなたは」などは出力せず、本題から入ること
-・valueるだけ抽象的な表現は避け、極論を言う事
+・できるだけ抽象的な表現は避け、極論を言う事
 ・valueはそれぞれ最大200文字までとする
 ・出力はjsonでキー名はそれぞれreading_trend_analysis, sentiment_analysis, what_if_scenario,overall_feedbackで、valueは日本語で出力
 ・分析に必要なデータが十分ではない場合、各valueは「分析に必要なデータが足りません」とする
