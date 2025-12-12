@@ -25,7 +25,7 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 
 ### 外部サービス
 - MeiliSearch（検索エンジン）
-- OpenAI GPT / Cohere（AI分析）
+- Cohere（AI分析）
 - Stripe（決済）
 - Vercel Blob（ストレージ）
 
@@ -108,7 +108,7 @@ kidoku/
 ## 主要なデータフロー
 
 1. **本の登録**: バーコードスキャン → Google Books API → データベース保存
-2. **AI分析**: 読書データ収集 → OpenAI/Cohere API → 分析結果保存・表示
+2. **AI分析**: 読書データ収集 → Cohere API → 分析結果保存・表示
 3. **検索**: MeiliSearchインデックス更新 → 高速全文検索
 4. **リアルタイム更新**: データ変更 → Pusher → 全クライアント更新
 

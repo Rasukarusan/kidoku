@@ -18,7 +18,7 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 - **データベース**: MySQL + Prisma (フロントエンド) / Drizzle ORM (バックエンド)
 - **認証**: NextAuth.js + JWT
 - **検索エンジン**: MeiliSearch
-- **AI機能**: OpenAI GPT + Cohere
+- **AI機能**: Cohere
 - **メール送信**: Resend
 - **決済**: Stripe
 - **ストレージ**: Vercel Blob + Vercel KV
@@ -35,7 +35,7 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 
 ### 📊 分析機能
 
-- **AIによる読書傾向分析**: OpenAI/Cohereを活用した読書パターン分析
+- **AIによる読書傾向分析**: Cohereを活用した読書パターン分析
 - **統計データ**: 月別読書数、カテゴリ別内訳、年間統計
 - **可視化**: グラフ・チャートによる読書データの視覚化
 - **年間ベスト本**: 年間読書ランキング機能
@@ -83,8 +83,7 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 ### インフラ・外部サービス
 
 - **MeiliSearch** (v0.35.0) - 検索エンジン
-- **OpenAI GPT** (v4.23.0) - AI分析
-- **Cohere** (v7.9.5) - AI言語モデル
+- **Cohere** (v7.9.5) - AI分析
 - **Resend** (v1.1.0) - メール配信
 - **Stripe** (v14.5.0) - 決済処理
 - **Vercel Blob** - ファイルストレージ
@@ -247,7 +246,6 @@ MEILI_MASTER_KEY=YourMasterKey
 RESEND_API_KEY=           # メール送信
 STRIPE_SECRET_KEY=        # 決済
 STRIPE_PUBLISHABLE_KEY=   # 決済（公開鍵）
-OPENAI_API_KEY=          # AI分析
 COHERE_API_KEY=          # AI分析
 PUSHER_APP_ID=           # リアルタイム通信
 PUSHER_KEY=              # リアルタイム通信
