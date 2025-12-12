@@ -21,6 +21,7 @@ interface Props {
   open: boolean
   onCancel: () => void
   onConfirm: (settings: DetailSettings) => void
+  onManualSet: (json: Record<string, string>) => void
   courseId: CourseId
   sheetName: string
   books: Book[]
@@ -30,6 +31,7 @@ export const Confirm: React.FC<Props> = ({
   open,
   onCancel,
   onConfirm,
+  onManualSet,
   sheetName,
   books,
 }) => {
@@ -41,6 +43,19 @@ export const Confirm: React.FC<Props> = ({
   const [months, setMonths] = useState(initialMonths)
   const [categories, setCategories] = useState(initialCategories)
   const [copied, setCopied] = useState(false)
+  const [manualJson, setManualJson] = useState('')
+  const [jsonError, setJsonError] = useState('')
+
+  const handleManualSet = () => {
+    try {
+      const parsed = JSON.parse(manualJson)
+      setJsonError('')
+      onManualSet(parsed)
+      onCancel()
+    } catch {
+      setJsonError('JSONの形式が正しくありません')
+    }
+  }
 
   const buildPrompt = () => {
     const targetBooks = books
@@ -182,6 +197,26 @@ export const Confirm: React.FC<Props> = ({
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="mt-4 border-t pt-4">
+              <div className="mb-2 font-bold">手動で結果をセット</div>
+              <textarea
+                className="w-full rounded border border-gray-300 p-2 text-xs"
+                rows={5}
+                placeholder="LLMの出力JSONをペースト..."
+                value={manualJson}
+                onChange={(e) => setManualJson(e.target.value)}
+              />
+              {jsonError && (
+                <div className="mb-2 text-xs text-red-500">{jsonError}</div>
+              )}
+              <button
+                onClick={handleManualSet}
+                disabled={!manualJson}
+                className="mt-2 w-full rounded border border-ai py-2 text-xs text-ai hover:brightness-125 disabled:opacity-50"
+              >
+                結果をセット
+              </button>
             </div>
           </div>
         </Accordion>
