@@ -46,14 +46,33 @@ export const Confirm: React.FC<Props> = ({
   const [manualJson, setManualJson] = useState('')
   const [jsonError, setJsonError] = useState('')
 
-  const handleManualSet = () => {
+  const [saving, setSaving] = useState(false)
+
+  const handleManualSet = async () => {
     try {
       const parsed = JSON.parse(manualJson)
       setJsonError('')
+      setSaving(true)
+
+      // DBに保存
+      const response = await fetch('/api/ai-summary/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheetName, analysis: parsed }),
+      })
+
+      if (!response.ok) {
+        setJsonError('保存に失敗しました')
+        setSaving(false)
+        return
+      }
+
       onManualSet(parsed)
       onCancel()
     } catch {
       setJsonError('JSONの形式が正しくありません')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -212,10 +231,10 @@ export const Confirm: React.FC<Props> = ({
               )}
               <button
                 onClick={handleManualSet}
-                disabled={!manualJson}
+                disabled={!manualJson || saving}
                 className="mt-2 w-full rounded border border-ai py-2 text-xs text-ai hover:brightness-125 disabled:opacity-50"
               >
-                結果をセット
+                {saving ? '保存中...' : '結果をセット'}
               </button>
             </div>
           </div>
