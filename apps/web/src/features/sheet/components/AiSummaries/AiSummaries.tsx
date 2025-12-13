@@ -8,7 +8,7 @@ import { Confirm } from './Confirm'
 import { StepIndicator } from './StepIndicator'
 import { CourseId } from '@/types/user'
 import { Book } from '@/types/book'
-import { FaCircleNotch } from 'react-icons/fa'
+import { FaCircleNotch, FaTrash } from 'react-icons/fa'
 
 interface Props {
   username: string
@@ -26,7 +26,9 @@ export const AiSummaries: React.FC<Props> = ({
 }) => {
   const {
     generateSummary,
+    deleteSummary,
     loading,
+    deleting,
     json,
     setJson,
     error,
@@ -105,8 +107,27 @@ export const AiSummaries: React.FC<Props> = ({
               }}
             />
           )}
-          <div className="w-full text-left text-xs text-gray-400 sm:text-right">
-            ※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。
+          <div className="flex w-full items-center justify-between text-xs text-gray-400">
+            <span>※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。</span>
+            {isMine && (
+              <button
+                onClick={() => {
+                  if (window.confirm('AI分析結果を削除しますか？')) {
+                    deleteSummary(sheet)
+                  }
+                }}
+                disabled={deleting}
+                className="flex items-center gap-1 text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50"
+                title="AI分析結果を削除"
+              >
+                {deleting ? (
+                  <FaCircleNotch size={14} className="animate-spin" />
+                ) : (
+                  <FaTrash size={14} />
+                )}
+                <span>削除</span>
+              </button>
+            )}
           </div>
         </div>
       )}
