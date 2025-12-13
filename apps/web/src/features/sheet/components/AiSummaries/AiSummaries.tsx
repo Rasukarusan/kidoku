@@ -108,7 +108,9 @@ export const AiSummaries: React.FC<Props> = ({
             />
           )}
           <div className="flex w-full items-center justify-between text-xs text-gray-400">
-            <span>※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。</span>
+            <span>
+              ※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。
+            </span>
             {isMine && (
               <button
                 onClick={() => {
