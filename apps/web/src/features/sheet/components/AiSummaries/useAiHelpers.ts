@@ -27,7 +27,7 @@ const useAiHelpers = (sheet, aiSummaries) => {
     try {
       const userId = session.user.id
 
-      const response = await fetch(`/api/ai-summary/exec`, {
+      const response = await fetch(`/api/ai-summary`, {
         method: 'POST',
         body: JSON.stringify({ sheetName, months, categories, userId }),
       })
