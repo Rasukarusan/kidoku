@@ -34,9 +34,7 @@ export default async (req, res) => {
       select: { id: true },
     })
     if (!sheet) {
-      return res
-        .status(404)
-        .json({ result: false, error: 'Sheet not found' })
+      return res.status(404).json({ result: false, error: 'Sheet not found' })
     }
 
     const {
