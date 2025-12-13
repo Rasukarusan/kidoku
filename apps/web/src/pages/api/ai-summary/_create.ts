@@ -5,9 +5,7 @@ import cohere from '@/libs/ai/cohere'
 import { RequestCookies } from '@edge-runtime/cookies'
 import { metricsHelpers } from '@/lib/metrics'
 
-export const runtime = 'edge'
-
-export default async (req) => {
+export const handleCreate = async (req: Request) => {
   try {
     const cookies = new RequestCookies(req.headers)
     const sessionToken = cookies.get('next-auth.session-token')?.value
