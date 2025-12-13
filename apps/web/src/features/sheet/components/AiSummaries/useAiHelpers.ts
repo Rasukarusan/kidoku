@@ -65,7 +65,7 @@ const useAiHelpers = (sheet, aiSummaries) => {
     setError(null)
     try {
       const userId = session.user.id
-      const response = await fetch(`/api/ai-summary/delete`, {
+      const response = await fetch(`/api/ai-summary`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
