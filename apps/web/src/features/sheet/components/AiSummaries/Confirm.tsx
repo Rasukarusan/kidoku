@@ -119,26 +119,26 @@ export const Confirm: React.FC<Props> = ({
             </button>
           )}
         </div>
+        <div className="mb-2 flex justify-center">
+          <button
+            onClick={handleCopyPrompt}
+            className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+          >
+            {copied ? (
+              <>
+                <FaCheck className="text-green-500" />
+                コピーしました
+              </>
+            ) : (
+              <>
+                <FaRegCopy />
+                プロンプトをコピー
+              </>
+            )}
+          </button>
+        </div>
         <Accordion title="詳細設定" className="text-sm">
           <div className="p-2 text-left">
-            <div className="mb-3 flex justify-end">
-              <button
-                onClick={handleCopyPrompt}
-                className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
-              >
-                {copied ? (
-                  <>
-                    <FaCheck className="text-green-500" />
-                    コピーしました
-                  </>
-                ) : (
-                  <>
-                    <FaRegCopy />
-                    プロンプトをコピー
-                  </>
-                )}
-              </button>
-            </div>
             <div className="mb-2 flex justify-start">
               <div className="w-20 text-nowrap font-bold">読了日</div>
               <div className="grid grid-cols-3 sm:grid-cols-3">
