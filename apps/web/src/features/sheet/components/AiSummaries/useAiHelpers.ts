@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 const useAiHelpers = (sheet, aiSummaries) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [json, setJson] = useState(null)
   const [error, setError] = useState(null)
   const [summaryIndex, setSummaryIndex] = useState(0)
@@ -58,9 +59,38 @@ const useAiHelpers = (sheet, aiSummaries) => {
     }
   }
 
+  const deleteSummary = async (sheetName: string) => {
+    if (deleting || !session) return
+    setDeleting(true)
+    setError(null)
+    try {
+      const userId = session.user.id
+      const response = await fetch(`/api/ai-summary/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sheetName, userId }),
+      })
+      const data = await response.json()
+      if (data.result) {
+        setJson(null)
+        setSummaryIndex(0)
+      } else {
+        setError('削除に失敗しました')
+      }
+    } catch (error) {
+      setError('通信中にエラーが発生しました')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return {
     generateSummary,
+    deleteSummary,
     loading,
+    deleting,
     setLoading,
     error,
     json,
