@@ -24,7 +24,9 @@ export default async (req, res) => {
     ]
     const hasAllKeys = requiredKeys.every((key) => key in analysis)
     if (!hasAllKeys) {
-      return res.status(400).json({ result: false, error: 'Invalid analysis format' })
+      return res
+        .status(400)
+        .json({ result: false, error: 'Invalid analysis format' })
     }
 
     const sheet = await prisma.sheets.findFirst({
@@ -32,7 +34,9 @@ export default async (req, res) => {
       select: { id: true },
     })
     if (!sheet) {
-      return res.status(404).json({ result: false, error: 'Sheet not found' })
+      return res
+        .status(404)
+        .json({ result: false, error: 'Sheet not found' })
     }
 
     const {
