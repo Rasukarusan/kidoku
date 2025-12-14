@@ -138,22 +138,42 @@ export const Confirm: React.FC<Props> = ({
             </button>
           )}
         </div>
-        <div className="mb-2 flex justify-center">
+        <div className="my-4 border-t pt-4">
+          <div className="mb-2 font-bold">手動で結果をセット</div>
+          <div className="mb-2 flex justify-center">
+            <button
+              onClick={handleCopyPrompt}
+              className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+            >
+              {copied ? (
+                <>
+                  <FaCheck className="text-green-500" />
+                  コピーしました
+                </>
+              ) : (
+                <>
+                  <FaRegCopy />
+                  プロンプトをコピー
+                </>
+              )}
+            </button>
+          </div>
+          <textarea
+            className="w-full rounded border border-gray-300 p-2 text-xs"
+            rows={5}
+            placeholder="LLMの出力JSONをペースト..."
+            value={manualJson}
+            onChange={(e) => setManualJson(e.target.value)}
+          />
+          {jsonError && (
+            <div className="mb-2 text-xs text-red-500">{jsonError}</div>
+          )}
           <button
-            onClick={handleCopyPrompt}
-            className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+            onClick={handleManualSet}
+            disabled={!manualJson || saving}
+            className="mt-2 w-full rounded border border-ai py-2 text-xs text-ai hover:brightness-125 disabled:opacity-50"
           >
-            {copied ? (
-              <>
-                <FaCheck className="text-green-500" />
-                コピーしました
-              </>
-            ) : (
-              <>
-                <FaRegCopy />
-                プロンプトをコピー
-              </>
-            )}
+            {saving ? '保存中...' : '結果をセット'}
           </button>
         </div>
         <Accordion title="詳細設定" className="text-sm">
@@ -216,26 +236,6 @@ export const Confirm: React.FC<Props> = ({
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="mt-4 border-t pt-4">
-              <div className="mb-2 font-bold">手動で結果をセット</div>
-              <textarea
-                className="w-full rounded border border-gray-300 p-2 text-xs"
-                rows={5}
-                placeholder="LLMの出力JSONをペースト..."
-                value={manualJson}
-                onChange={(e) => setManualJson(e.target.value)}
-              />
-              {jsonError && (
-                <div className="mb-2 text-xs text-red-500">{jsonError}</div>
-              )}
-              <button
-                onClick={handleManualSet}
-                disabled={!manualJson || saving}
-                className="mt-2 w-full rounded border border-ai py-2 text-xs text-ai hover:brightness-125 disabled:opacity-50"
-              >
-                {saving ? '保存中...' : '結果をセット'}
-              </button>
             </div>
           </div>
         </Accordion>
