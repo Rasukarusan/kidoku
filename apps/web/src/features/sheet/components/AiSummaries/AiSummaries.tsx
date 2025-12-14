@@ -84,13 +84,15 @@ export const AiSummaries: React.FC<Props> = ({
       {json && (
         <div className="relative mx-auto w-full text-center sm:w-3/4">
           <div className="mb-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {Object.keys(json).map((key) => {
-              return (
-                <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
-                  <AiSummary key={key} jsonKey={key} text={json[key]} />
-                </div>
-              )
-            })}
+            {Object.keys(json)
+              .filter((key) => key !== 'id')
+              .map((key) => {
+                return (
+                  <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
+                    <AiSummary key={key} jsonKey={key} text={json[key]} />
+                  </div>
+                )
+              })}
           </div>
           {aiSummaries.length > 1 && (
             <StepIndicator
@@ -115,7 +117,7 @@ export const AiSummaries: React.FC<Props> = ({
               <button
                 onClick={() => {
                   if (window.confirm('AI分析結果を削除しますか？')) {
-                    deleteSummary(sheet)
+                    deleteSummary(json.id)
                   }
                 }}
                 disabled={deleting}

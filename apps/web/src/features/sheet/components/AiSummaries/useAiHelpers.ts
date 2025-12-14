@@ -59,20 +59,27 @@ const useAiHelpers = (sheet, aiSummaries) => {
     }
   }
 
-  const deleteSummary = async (sheetName: string) => {
+  const deleteSummary = async (id: number) => {
     if (deleting || !session) return
     setDeleting(true)
     setError(null)
     try {
       const userId = session.user.id
-      const params = new URLSearchParams({ sheetName, userId })
+      const params = new URLSearchParams({ id: id.toString(), userId })
       const response = await fetch(`/api/ai-summary?${params}`, {
         method: 'DELETE',
       })
       const data = await response.json()
       if (data.result) {
-        setJson(null)
-        setSummaryIndex(0)
+        // 削除したアイテムをリストから除外
+        const newSummaries = aiSummaries.filter((s) => s.id !== id)
+        if (newSummaries.length === 0) {
+          setJson(null)
+        } else {
+          const newIndex = Math.min(summaryIndex, newSummaries.length - 1)
+          setSummaryIndex(newIndex)
+          setJson(newSummaries[newIndex])
+        }
       } else {
         setError('削除に失敗しました')
       }
