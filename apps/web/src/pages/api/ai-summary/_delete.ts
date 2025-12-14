@@ -5,8 +5,9 @@ export const handleDelete = async (req: Request) => {
   try {
     const cookies = new RequestCookies(req.headers)
     const sessionToken = cookies.get('next-auth.session-token')?.value
-    const body = await req.json()
-    const { sheetName, userId } = body
+    const url = new URL(req.url)
+    const sheetName = url.searchParams.get('sheetName')
+    const userId = url.searchParams.get('userId')
 
     const session = await prisma.session.findFirst({
       where: { sessionToken },
