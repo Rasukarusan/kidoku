@@ -4,19 +4,6 @@ import { aiSummaryPrompt } from '@/libs/ai/prompt'
 import cohere from '@/libs/ai/cohere'
 import { RequestCookies } from '@edge-runtime/cookies'
 
-const revalidatePath = async (username: string, sheetName: string) => {
-  const path = `/${username}/sheets/${sheetName}`
-  try {
-    await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/revalidate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path, secret: process.env.REVALIDATE_SECRET }),
-    })
-  } catch (e) {
-    console.error('Revalidate error:', e)
-  }
-}
-
 export const handleCreate = async (req: Request) => {
   try {
     const cookies = new RequestCookies(req.headers)
@@ -24,18 +11,10 @@ export const handleCreate = async (req: Request) => {
     const body = await req.json()
     console.log(body)
     const { sheetName, months, categories, userId } = body
-    const session = await prisma.session.findFirst({
+    const user = await prisma.session.findFirst({
       where: { sessionToken },
     })
-    if (!session || session?.userId !== userId) {
-      return new Response(JSON.stringify({ result: false }))
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { name: true },
-    })
-    if (!user) {
+    if (!user || user?.userId !== userId) {
       return new Response(JSON.stringify({ result: false }))
     }
 
@@ -110,7 +89,6 @@ export const handleCreate = async (req: Request) => {
                 token,
               },
             })
-            await revalidatePath(user.name, sheetName)
           }
         }
         controller.enqueue(encoder.encode('COMPLETE'))
