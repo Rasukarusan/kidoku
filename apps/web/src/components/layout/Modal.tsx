@@ -31,7 +31,7 @@ export const Modal: React.FC<Props> = ({
           onClick={onClose}
         >
           <div
-            className={`m-2 flex flex-col rounded-md bg-white text-gray-700 sm:m-0 ${className}`}
+            className={`m-2 flex w-full max-w-lg flex-col items-center rounded-md bg-white text-gray-700 sm:m-0 ${className}`}
             onClick={(e) => e.stopPropagation()}
           >
             {children}
