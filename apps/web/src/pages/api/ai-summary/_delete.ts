@@ -1,6 +1,19 @@
 import prisma from '@/libs/prisma/edge'
 import { RequestCookies } from '@edge-runtime/cookies'
 
+const revalidatePath = async (username: string, sheetName: string) => {
+  const path = `/${username}/sheets/${sheetName}`
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/revalidate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, secret: process.env.REVALIDATE_SECRET }),
+    })
+  } catch (e) {
+    console.error('Revalidate error:', e)
+  }
+}
+
 export const handleDelete = async (req: Request) => {
   try {
     const cookies = new RequestCookies(req.headers)
@@ -16,6 +29,17 @@ export const handleDelete = async (req: Request) => {
       return new Response(
         JSON.stringify({ result: false, error: 'Unauthorized' }),
         { status: 401 }
+      )
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true },
+    })
+    if (!user) {
+      return new Response(
+        JSON.stringify({ result: false, error: 'User not found' }),
+        { status: 404 }
       )
     }
 
@@ -36,6 +60,8 @@ export const handleDelete = async (req: Request) => {
         sheet_id: sheet.id,
       },
     })
+
+    await revalidatePath(user.name, sheetName)
 
     return new Response(
       JSON.stringify({ result: true, deletedCount: deleted.count }),
