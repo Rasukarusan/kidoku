@@ -68,7 +68,7 @@ export async function getStaticProps(context) {
 
   const aiSummaries = await prisma.aiSummaries.findMany({
     where: { userId, sheet_id: sheet.id },
-    select: { analysis: true },
+    select: { id: true, analysis: true },
     orderBy: { created: 'desc' },
   })
   return {
@@ -83,7 +83,10 @@ export async function getStaticProps(context) {
       username,
       userId,
       yearlyTopBooks,
-      aiSummaries: aiSummaries.map((v) => v.analysis),
+      aiSummaries: aiSummaries.map((v) => ({
+        id: v.id,
+        ...(v.analysis as object),
+      })),
     },
     revalidate: 5,
   }
