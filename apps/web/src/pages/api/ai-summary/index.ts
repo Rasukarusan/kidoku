@@ -1,7 +1,9 @@
 import { handleCreate } from './_create'
 import { handleDelete } from './_delete'
 
-export const runtime = 'edge'
+export const config = {
+  runtime: 'edge',
+}
 
 export default async (req: Request) => {
   switch (req.method) {
