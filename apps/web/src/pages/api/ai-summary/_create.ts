@@ -3,7 +3,6 @@ import dayjs from 'dayjs'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
 import cohere from '@/libs/ai/cohere'
 import { RequestCookies } from '@edge-runtime/cookies'
-import { metricsHelpers } from '@/lib/metrics'
 
 export const handleCreate = async (req: Request) => {
   try {
@@ -46,15 +45,10 @@ export const handleCreate = async (req: Request) => {
       }
     })
 
-    const response = await cohere
-      .chatStream({
-        model: 'command-r-plus',
-        message: `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`,
-      })
-      .catch((error) => {
-        metricsHelpers.incrementAIAnalysisRequests('cohere', 'failure')
-        throw error
-      })
+    const response = await cohere.chatStream({
+      model: 'command-r-plus',
+      message: `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`,
+    })
 
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
@@ -95,7 +89,6 @@ export const handleCreate = async (req: Request) => {
                 token,
               },
             })
-            metricsHelpers.incrementAIAnalysisRequests('cohere', 'success')
           }
         }
         controller.enqueue(encoder.encode('COMPLETE'))
