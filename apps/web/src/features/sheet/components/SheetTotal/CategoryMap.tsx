@@ -1,57 +1,70 @@
-import { useMemo, useState } from 'react'
-import { Tooltip, ResponsiveContainer, Treemap } from 'recharts'
+import { useMemo } from 'react'
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Category } from '../../types'
-import { TreemapItem } from '../TreemapItem'
 
 interface Props {
   categories: Category[]
 }
 
+const COLORS = [
+  '#8884d8',
+  '#82ca9d',
+  '#ffc658',
+  '#ff7300',
+  '#00C49F',
+  '#FFBB28',
+  '#FF8042',
+  '#0088FE',
+  '#a4de6c',
+  '#d0ed57',
+  '#ffc0cb',
+  '#dda0dd',
+]
+
 // eslint-disable-next-line
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
   if (!(active && payload && payload.length)) return null
   const data = payload[0].payload
   return (
-    <div className="custom-tooltip">
-      <p className="label" style={{ color: 'white', fontWeight: 400 }}>
-        {`${data.value}冊 (${Math.floor(data.percent)}%)`}
-      </p>
-      <p className="intro">{label}</p>
-      <p className="desc" style={{ color: 'white' }}></p>
+    <div className="rounded bg-gray-800 px-3 py-2 text-white shadow">
+      <p className="font-medium">{data.name}</p>
+      <p>{`${data.count}冊 (${Math.floor(data.percent)}%)`}</p>
     </div>
   )
 }
 
 export const CategoryMap: React.FC<Props> = ({ categories }) => {
-  // 各タイルのホバー状態
-  const initialHovers = useMemo(() => {
-    const hovers: boolean[] = new Array(categories.length).fill(false)
-    return hovers
+  const data = useMemo(() => {
+    return [...categories].sort((a, b) => b.count - a.count)
   }, [categories])
 
-  const [hovers, setHovers] = useState<boolean[]>(initialHovers)
-  const onMouseEnter = (node) => {
-    const newHovers = [...initialHovers]
-    newHovers[node.index] = true
-    setHovers(newHovers)
-  }
-
-  const onMouseLeave = () => {
-    setHovers([...initialHovers])
-  }
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <Treemap
-        data={categories}
-        dataKey="count"
-        stroke="#fff"
-        animationDuration={1000}
-        content={<TreemapItem hovers={hovers} activeIndex={null} />}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-      >
+      <PieChart>
+        <Pie
+          data={data}
+          dataKey="count"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={80}
+          animationDuration={1000}
+          label={({ name, percent }) =>
+            percent > 5 ? `${name} ${Math.floor(percent)}%` : ''
+          }
+          labelLine={false}
+        >
+          {data.map((_, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={COLORS[index % COLORS.length]}
+              stroke="#fff"
+              strokeWidth={1}
+            />
+          ))}
+        </Pie>
         <Tooltip content={<CustomTooltip />} />
-      </Treemap>
+      </PieChart>
     </ResponsiveContainer>
   )
 }
