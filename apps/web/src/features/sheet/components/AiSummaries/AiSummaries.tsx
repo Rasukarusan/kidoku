@@ -83,6 +83,25 @@ export const AiSummaries: React.FC<Props> = ({
       )}
       {json && (
         <div className="relative mx-auto w-full text-center sm:w-3/4">
+          {isMine && (
+            <button
+              onClick={() => {
+                if (window.confirm('AI分析結果を削除しますか？')) {
+                  deleteSummary(json.id)
+                }
+              }}
+              disabled={deleting}
+              className="absolute -top-6 right-0 flex items-center gap-1 text-xs text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50"
+              title="AI分析結果を削除"
+            >
+              {deleting ? (
+                <FaCircleNotch size={14} className="animate-spin" />
+              ) : (
+                <FaTrash size={14} />
+              )}
+              <span>削除</span>
+            </button>
+          )}
           <div className="mb-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Object.keys(json)
               .filter((key) => key !== 'id')
@@ -94,43 +113,24 @@ export const AiSummaries: React.FC<Props> = ({
                 )
               })}
           </div>
-          {aiSummaries.length > 1 && (
-            <StepIndicator
-              step={summaryIndex}
-              maxStep={aiSummaries.length}
-              onBack={() => {
-                if (summaryIndex === 0) return
-                setSummaryIndex(summaryIndex - 1)
-              }}
-              onNext={() => {
-                const newSummaryIndex = summaryIndex + 1
-                if (newSummaryIndex === aiSummaries.length) return
-                setSummaryIndex(newSummaryIndex)
-              }}
-            />
-          )}
-          <div className="flex w-full items-center justify-between text-xs text-gray-400">
-            <span>
+          <div className="flex items-baseline justify-between gap-4 text-xs text-gray-400">
+            <span className="shrink text-left">
               ※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。
             </span>
-            {isMine && (
-              <button
-                onClick={() => {
-                  if (window.confirm('AI分析結果を削除しますか？')) {
-                    deleteSummary(json.id)
-                  }
+            {aiSummaries.length > 1 && (
+              <StepIndicator
+                step={summaryIndex}
+                maxStep={aiSummaries.length}
+                onBack={() => {
+                  if (summaryIndex === 0) return
+                  setSummaryIndex(summaryIndex - 1)
                 }}
-                disabled={deleting}
-                className="flex items-center gap-1 text-gray-400 transition-colors hover:text-red-500 disabled:opacity-50"
-                title="AI分析結果を削除"
-              >
-                {deleting ? (
-                  <FaCircleNotch size={14} className="animate-spin" />
-                ) : (
-                  <FaTrash size={14} />
-                )}
-                <span>削除</span>
-              </button>
+                onNext={() => {
+                  const newSummaryIndex = summaryIndex + 1
+                  if (newSummaryIndex === aiSummaries.length) return
+                  setSummaryIndex(newSummaryIndex)
+                }}
+              />
             )}
           </div>
         </div>

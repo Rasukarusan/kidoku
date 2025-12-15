@@ -12,7 +12,7 @@ export const StepIndicator: React.FC<Props> = ({
   onNext,
 }) => {
   return (
-    <div className="text-right text-sm text-gray-700">
+    <div className="whitespace-nowrap text-right text-sm text-gray-700">
       <button
         className="disabled:text-gray-400"
         onClick={onBack}
