@@ -149,7 +149,6 @@ export const BookDetailSidebar: React.FC<Props> = ({
     if (!touchStart || !touchEnd) return
 
     const distance = touchEnd - touchStart
-    const isLeftSwipe = distance < -minSwipeDistance
     const isRightSwipe = distance > minSwipeDistance
 
     // 左から右へのスワイプ（正の値）で閉じる
