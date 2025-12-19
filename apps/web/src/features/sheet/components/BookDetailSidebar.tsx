@@ -1,5 +1,5 @@
 import { Book } from '@/types/book'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { BookDetailReadModal } from './BookDetailReadModal'
 import { BookDetailEditModal } from './BookDetailEditModal'
 import { useReward } from 'react-rewards'
@@ -31,6 +31,14 @@ export const BookDetailSidebar: React.FC<Props> = ({
     lifetime: 200,
     spread: 100,
   })
+
+  // スワイプ検出用のstate
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const sidebarRef = useRef<HTMLDivElement>(null)
+
+  // スワイプの最小距離（ピクセル）
+  const minSwipeDistance = 50
 
   useEffect(() => {
     setNewBook(book)
@@ -127,6 +135,29 @@ export const BookDetailSidebar: React.FC<Props> = ({
     }
   }
 
+  // スワイプイベントハンドラー
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchEnd - touchStart
+    const isLeftSwipe = distance < -minSwipeDistance
+    const isRightSwipe = distance > minSwipeDistance
+
+    // 左から右へのスワイプ（正の値）で閉じる
+    if (isRightSwipe) {
+      handleClose()
+    }
+  }
+
   if (!newBook) return null
 
   return (
@@ -144,6 +175,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
 
           {/* サイドバー */}
           <motion.div
+            ref={sidebarRef}
             className="fixed right-0 top-0 z-[1000] flex h-full w-full bg-white shadow-2xl md:w-[480px] lg:w-[540px]"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -153,6 +185,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
               damping: 25,
               stiffness: 200,
             }}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
             <div className="flex h-full w-full flex-col">
               {/* ヘッダー */}
