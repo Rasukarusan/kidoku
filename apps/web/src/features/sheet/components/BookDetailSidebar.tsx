@@ -32,6 +32,13 @@ export const BookDetailSidebar: React.FC<Props> = ({
     spread: 100,
   })
 
+  // スワイプ検出用のstate
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  // スワイプの最小距離（ピクセル）
+  const minSwipeDistance = 100
+
   useEffect(() => {
     setNewBook(book)
     setCurrentBook(book)
@@ -127,6 +134,28 @@ export const BookDetailSidebar: React.FC<Props> = ({
     }
   }
 
+  // タッチイベントハンドラー
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchEnd - touchStart
+    const isRightSwipe = distance > minSwipeDistance
+
+    // 左から右へのスワイプ（正の値）で閉じる
+    if (isRightSwipe) {
+      handleClose()
+    }
+  }
+
   if (!newBook) return null
 
   return (
@@ -153,6 +182,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
               damping: 25,
               stiffness: 200,
             }}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
             <div className="flex h-full w-full flex-col">
               {/* ヘッダー */}
