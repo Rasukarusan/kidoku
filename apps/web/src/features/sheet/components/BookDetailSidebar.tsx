@@ -165,8 +165,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
               stiffness: 200,
             }}
             drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={{ left: 0, right: 0.5 }}
+            dragConstraints={{ left: -50, right: 300 }}
+            dragElastic={0.2}
+            dragDirectionLock
             onDragEnd={handleDragEnd}
             dragMomentum={false}
           >
