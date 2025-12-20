@@ -46,6 +46,15 @@ export const BookDetailSidebar: React.FC<Props> = ({
     setCurrentBook(book)
   }, [book])
 
+  // サイドバーが開いた時にdragOffsetをリセット
+  useEffect(() => {
+    if (open) {
+      setDragOffset(0)
+      setTouchStart(null)
+      setTouchEnd(null)
+    }
+  }, [open])
+
   // サイドバーが開いている時に背景のスクロールを防ぐ
   useEffect(() => {
     if (open) {
