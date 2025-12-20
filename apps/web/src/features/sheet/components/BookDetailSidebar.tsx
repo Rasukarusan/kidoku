@@ -6,7 +6,7 @@ import { useReward } from 'react-rewards'
 import { useSWRConfig } from 'swr'
 import { useRouter } from 'next/router'
 import { IoMdClose, IoMdExpand } from 'react-icons/io'
-import { motion, AnimatePresence, PanInfo } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Props {
   book?: Book
@@ -31,6 +31,13 @@ export const BookDetailSidebar: React.FC<Props> = ({
     lifetime: 200,
     spread: 100,
   })
+
+  // スワイプ検出用のstate
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  // スワイプの最小距離（ピクセル）
+  const minSwipeDistance = 100
 
   useEffect(() => {
     setNewBook(book)
@@ -127,13 +134,24 @@ export const BookDetailSidebar: React.FC<Props> = ({
     }
   }
 
-  // ドラッグ終了時のハンドラー
-  const handleDragEnd = (
-    _event: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
-  ) => {
-    // 右方向に100px以上ドラッグされたら閉じる
-    if (info.offset.x > 100) {
+  // タッチイベントハンドラー
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchEnd - touchStart
+    const isRightSwipe = distance > minSwipeDistance
+
+    // 左から右へのスワイプ（正の値）で閉じる
+    if (isRightSwipe) {
       handleClose()
     }
   }
@@ -164,12 +182,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
               damping: 25,
               stiffness: 200,
             }}
-            drag="x"
-            dragConstraints={{ left: -50, right: 300 }}
-            dragElastic={0.2}
-            dragDirectionLock
-            onDragEnd={handleDragEnd}
-            dragMomentum={false}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
             <div className="flex h-full w-full flex-col">
               {/* ヘッダー */}
