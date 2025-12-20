@@ -35,6 +35,8 @@ export const BookDetailSidebar: React.FC<Props> = ({
   // スワイプ検出用のstate
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const [dragOffset, setDragOffset] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
 
   // スワイプの最小距離（ピクセル）
   const minSwipeDistance = 100
@@ -138,14 +140,30 @@ export const BookDetailSidebar: React.FC<Props> = ({
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null)
     setTouchStart(e.targetTouches[0].clientX)
+    setIsDragging(true)
   }
 
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
+    if (!touchStart) return
+
+    const currentTouch = e.targetTouches[0].clientX
+    setTouchEnd(currentTouch)
+
+    const distance = currentTouch - touchStart
+
+    // 右方向（正の値）のスワイプのみ追従
+    if (distance > 0) {
+      setDragOffset(distance)
+    }
   }
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
+    setIsDragging(false)
+
+    if (!touchStart || !touchEnd) {
+      setDragOffset(0)
+      return
+    }
 
     const distance = touchEnd - touchStart
     const isRightSwipe = distance > minSwipeDistance
@@ -153,6 +171,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
     // 左から右へのスワイプ（正の値）で閉じる
     if (isRightSwipe) {
       handleClose()
+    } else {
+      // 距離が不十分な場合は元の位置に戻す
+      setDragOffset(0)
     }
   }
 
@@ -175,13 +196,17 @@ export const BookDetailSidebar: React.FC<Props> = ({
           <motion.div
             className="fixed right-0 top-0 z-[1000] flex h-full w-full bg-white shadow-2xl md:w-[480px] lg:w-[540px]"
             initial={{ x: '100%' }}
-            animate={{ x: 0 }}
+            animate={{ x: dragOffset }}
             exit={{ x: '100%' }}
-            transition={{
-              type: 'spring' as const,
-              damping: 25,
-              stiffness: 200,
-            }}
+            transition={
+              isDragging
+                ? { type: 'tween', duration: 0 }
+                : {
+                    type: 'spring' as const,
+                    damping: 25,
+                    stiffness: 200,
+                  }
+            }
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
