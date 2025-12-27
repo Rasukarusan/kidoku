@@ -105,7 +105,11 @@ export const Confirm: React.FC<Props> = ({
 
   const isLimited = data?.count >= MONTHLY_LIMIT
   return (
-    <Modal open={open} onClose={onCancel}>
+    <Modal
+      open={open}
+      onClose={onCancel}
+      className="max-w-md flex-col items-center"
+    >
       <div className="w-full rounded-md p-6 sm:w-[450px] sm:p-10">
         <div className="mb-2 text-center text-sm font-bold leading-5">
           今月の残り：
