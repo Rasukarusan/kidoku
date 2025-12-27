@@ -22,20 +22,20 @@ export const MaskButton: React.FC<Props> = ({
     // テキストが選択されていない場合は何もしない
     if (!selectedText) return
 
-    // 選択されたテキストを[[MASK: text]]で囲む
-    const beforeText = textarea.value.substring(0, start)
-    const afterText = textarea.value.substring(end)
-    const newText = `${beforeText}[[MASK: ${selectedText}]]${afterText}`
+    // フォーカスを確保
+    textarea.focus()
 
-    // テキストを更新
-    onTextChange(newText)
+    // 選択範囲を再設定
+    textarea.setSelectionRange(start, end)
+
+    // document.execCommandを使ってundo履歴に記録
+    // 選択されたテキストを[[MASK: text]]で囲んだものに置き換え
+    const maskedText = `[[MASK: ${selectedText}]]`
+    document.execCommand('insertText', false, maskedText)
 
     // カーソル位置を調整（マスク記法の終了位置に移動）
-    setTimeout(() => {
-      const newCursorPos = start + `[[MASK: ${selectedText}]]`.length
-      textarea.setSelectionRange(newCursorPos, newCursorPos)
-      textarea.focus()
-    }, 0)
+    const newCursorPos = start + maskedText.length
+    textarea.setSelectionRange(newCursorPos, newCursorPos)
   }
 
   return (
