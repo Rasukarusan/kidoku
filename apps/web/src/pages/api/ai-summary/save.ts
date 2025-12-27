@@ -42,6 +42,7 @@ export default async (req, res) => {
       sentiment_analysis,
       what_if_scenario,
       overall_feedback,
+      character_summary,
     } = analysis
 
     await prisma.aiSummaries.create({
@@ -53,6 +54,7 @@ export default async (req, res) => {
           sentiment_analysis,
           what_if_scenario,
           overall_feedback,
+          character_summary,
         },
         token: 0, // 手動セットの場合はトークン使用なし
       },
