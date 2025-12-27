@@ -1,5 +1,7 @@
+import { RefObject } from 'react'
+
 interface Props {
-  textareaRef: React.RefObject<HTMLTextAreaElement>
+  textareaRef: RefObject<HTMLTextAreaElement>
   onTextChange: (newText: string) => void
   className?: string
 }
