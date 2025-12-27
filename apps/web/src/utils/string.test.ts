@@ -46,22 +46,10 @@ describe('mask()', () => {
     const expected = 'ここが*****ところです'
     expect(result).toEqual(expected)
   })
-  it('**で囲まれた文字列がマスキングされて返ること（後方互換性）', () => {
-    const text = 'ここが**マスクされる**ところです'
-    const result = mask(text)
-    const expected = 'ここが*****ところです'
-    expect(result).toEqual(expected)
-  })
-  it('新旧両方の形式が混在していてもマスキングされること', () => {
-    const text = 'ここが[[MASK: 新形式]]で、ここは**旧形式**です'
-    const result = mask(text)
-    const expected = 'ここが*****で、ここは*****です'
-    expect(result).toEqual(expected)
-  })
   it('マスク形式で囲まれていない場合はマスキングされないこと', () => {
-    const text = 'ここはマスクされま**せん'
+    const text = 'ここはマスクされません'
     const result = mask(text)
-    const expected = 'ここはマスクされま**せん'
+    const expected = 'ここはマスクされません'
     expect(result).toEqual(expected)
   })
 })

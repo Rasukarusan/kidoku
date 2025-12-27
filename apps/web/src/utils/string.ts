@@ -15,21 +15,11 @@ export const truncate = (str: string, len: number, line?: number) => {
 
 /**
  * 指定文字で囲まれた文字列をマスキングする
- * 新形式: [[MASK: text]] -> *****
- * 旧形式: **text** -> ***** (後方互換性のため)
+ * [[MASK: text]] -> *****
  */
 export const mask = (text: string) => {
-  // 新形式 [[MASK: text]] をマスキング
-  const newPattern = /\[\[MASK:\s*(.*?)\]\]/g
-  let result = text.replace(newPattern, '*****')
-
-  // 旧形式 **text** もマスキング（後方互換性のため）
-  const oldSymbol = '**'
-  const masking = oldSymbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  const oldPattern = new RegExp(`${masking}(.*?)${masking}`, 'g')
-  result = result.replace(oldPattern, '*****')
-
-  return result
+  const pattern = /\[\[MASK:\s*(.*?)\]\]/g
+  return text.replace(pattern, '*****')
 }
 
 /**
