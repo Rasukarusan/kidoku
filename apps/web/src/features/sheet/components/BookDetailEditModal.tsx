@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
@@ -14,6 +14,7 @@ import { Tooltip } from 'react-tooltip'
 import { Label } from '@/components/input/Label'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
+import { MaskButton } from '@/components/button/MaskButton'
 import { CategoriesResponse } from '@/types/api'
 
 interface Props {
@@ -33,6 +34,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
   setBook,
   loading,
 }) => {
+  const memoTextareaRef = useRef<HTMLTextAreaElement>(null)
   const [diff, setDiff] = useState({
     title: false,
     author: false,
@@ -128,7 +130,14 @@ export const BookDetailEditModal: React.FC<Props> = ({
             {book?.memo?.length || 0} 文字
           </div>
         </div>
+        <div className="mb-2">
+          <MaskButton
+            textareaRef={memoTextareaRef}
+            onTextChange={(newText) => setBook({ ...book, memo: newText })}
+          />
+        </div>
         <BookInputField
+          ref={memoTextareaRef}
           rows={8}
           value={book?.memo}
           onChange={(e) => setBook({ ...book, memo: e.target.value })}
