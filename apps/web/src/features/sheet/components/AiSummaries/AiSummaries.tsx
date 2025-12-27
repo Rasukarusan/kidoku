@@ -102,9 +102,19 @@ export const AiSummaries: React.FC<Props> = ({
               <span>削除</span>
             </button>
           )}
+          {json.character_summary && (
+            <div className="mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5 shadow-sm">
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                一言でいうとこんな人
+              </h3>
+              <p className="text-xl font-bold leading-relaxed text-gray-800">
+                {json.character_summary}
+              </p>
+            </div>
+          )}
           <div className="mb-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {Object.keys(json)
-              .filter((key) => key !== 'id')
+              .filter((key) => key !== 'id' && key !== 'character_summary')
               .map((key) => {
                 return (
                   <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
