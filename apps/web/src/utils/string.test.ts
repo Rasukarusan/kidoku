@@ -34,16 +34,22 @@ describe('truncate()', () => {
 })
 
 describe('mask()', () => {
-  it('**で囲まれた文字列がマスキングされて返ること', () => {
-    const text = 'ここが**マスクされる**ところです'
+  it('[[MASK: text]]形式の文字列がマスキングされて返ること', () => {
+    const text = 'ここが[[MASK: マスクされる]]ところです'
     const result = mask(text)
     const expected = 'ここが*****ところです'
     expect(result).toEqual(expected)
   })
-  it('**で囲まれていない場合はマスキングされないこと', () => {
-    const text = 'ここはマスクされま**せん'
+  it('[[MASK:text]]形式（スペースなし）の文字列がマスキングされて返ること', () => {
+    const text = 'ここが[[MASK:マスクされる]]ところです'
     const result = mask(text)
-    const expected = 'ここはマスクされま**せん'
+    const expected = 'ここが*****ところです'
+    expect(result).toEqual(expected)
+  })
+  it('マスク形式で囲まれていない場合はマスキングされないこと', () => {
+    const text = 'ここはマスクされません'
+    const result = mask(text)
+    const expected = 'ここはマスクされません'
     expect(result).toEqual(expected)
   })
 })

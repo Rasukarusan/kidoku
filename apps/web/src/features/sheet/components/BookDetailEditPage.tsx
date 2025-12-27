@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
@@ -12,6 +12,7 @@ import { BookCreatableSelectBox } from '@/components/input/BookCreatableSelectBo
 import { Tooltip } from 'react-tooltip'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
+import { MaskButton } from '@/components/button/MaskButton'
 import { useReward } from 'react-rewards'
 import { CategoriesResponse } from '@/types/api'
 import {
@@ -32,6 +33,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
   onClose,
   onCancel,
 }) => {
+  const memoTextareaRef = useRef<HTMLTextAreaElement>(null)
   const [book, setBook] = useState<Book>(initialBook)
   const [loading, setLoading] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
@@ -307,8 +309,16 @@ export const BookDetailEditPage: React.FC<Props> = ({
               </div>
             </div>
 
+            <div className="mb-2">
+              <MaskButton
+                textareaRef={memoTextareaRef}
+                onTextChange={(newText) => setBook({ ...book, memo: newText })}
+              />
+            </div>
+
             <div className="rounded-lg bg-gray-50 p-4">
               <textarea
+                ref={memoTextareaRef}
                 value={book?.memo || ''}
                 onChange={(e) => {
                   setBook({ ...book, memo: e.target.value })

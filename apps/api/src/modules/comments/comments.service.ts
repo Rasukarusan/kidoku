@@ -72,9 +72,9 @@ export class CommentsService {
   }
 
   private maskMemo(memo: string): string {
-    // **で囲まれた部分をマスキング
-    return memo.replace(/\*\*(.*?)\*\*/g, (match, content: string) => {
-      return '**' + '*'.repeat(content.length) + '**';
+    // [[MASK: text]] をマスキング
+    return memo.replace(/\[\[MASK:\s*(.*?)\]\]/g, () => {
+      return '*****';
     });
   }
 }
