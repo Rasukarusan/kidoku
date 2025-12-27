@@ -43,7 +43,7 @@ export const SheetTotalPage: React.FC<Props> = ({
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={total} unit="冊" />
 
-        <div className="m-auto mb-4 h-[200px] w-full sm:h-[300px] sm:w-3/4">
+        <div className="m-auto mb-4 h-[300px] w-full sm:h-[400px] sm:w-3/4">
           <CategoryMap categories={categories} />
         </div>
 
