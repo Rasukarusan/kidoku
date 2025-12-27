@@ -18,10 +18,7 @@ export const MaskButton: React.FC<Props> = ({
     const selectedText = textarea.value.substring(start, end)
 
     // テキストが選択されていない場合は何もしない
-    if (!selectedText) {
-      alert('マスクしたいテキストを選択してください')
-      return
-    }
+    if (!selectedText) return
 
     // 選択されたテキストを[[MASK: text]]で囲む
     const beforeText = textarea.value.substring(0, start)
