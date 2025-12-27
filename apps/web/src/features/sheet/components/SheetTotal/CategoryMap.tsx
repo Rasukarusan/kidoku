@@ -47,7 +47,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
           nameKey="name"
           cx="50%"
           cy="50%"
-          outerRadius={80}
+          outerRadius={120}
           animationDuration={1000}
           label={({ name, percent }) =>
             percent > 5 ? `${name} ${Math.floor(percent)}%` : ''
