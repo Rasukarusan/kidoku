@@ -27,7 +27,7 @@ export const BarcodeScan: React.FC<Props> = () => {
       id: '',
       title: '',
       author: '',
-      image: '',
+      image: '/no-image.png',
       category: '-',
       memo: '',
     })

@@ -44,7 +44,7 @@ export const Books: React.FC<Props> = ({ input }) => {
       id: '',
       title: '',
       author: '',
-      image: '',
+      image: '/no-image.png',
       category: '-',
       memo: '',
     })
