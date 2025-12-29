@@ -6,7 +6,7 @@ import { fetcher } from '@/libs/swr'
 import { Book } from '@/types/book'
 import { uniq } from '@/utils/array'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { AiSummaryUsageResponse } from '@/types/api'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
@@ -76,7 +76,7 @@ export const Confirm: React.FC<Props> = ({
     }
   }
 
-  const buildPrompt = () => {
+  const prompt = useMemo(() => {
     const targetBooks = books
       .filter((book) => book.finished)
       .filter((book) => {
@@ -88,14 +88,21 @@ export const Confirm: React.FC<Props> = ({
         memo: book.memo.replace(/\*.*\*/g, '***'),
         finished: book.finished,
       }))
-    return `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`
-  }
+    return `${aiSummaryPrompt}\n${JSON.stringify(targetBooks, null, 2)}`
+  }, [books, months, categories])
 
   const handleCopyPrompt = async () => {
-    const prompt = buildPrompt()
-    await navigator.clipboard.writeText(prompt)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      console.log('プロンプトの長さ:', prompt.length, '文字')
+      console.log('プロンプトの最初の100文字:', prompt.substring(0, 100))
+      console.log('プロンプトの最後の100文字:', prompt.substring(prompt.length - 100))
+      await navigator.clipboard.writeText(prompt)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error('クリップボードへのコピーに失敗しました:', error)
+      alert('コピーに失敗しました。コンソールを確認してください。')
+    }
   }
 
   const { data } = useSWR<AiSummaryUsageResponse>(
@@ -144,6 +151,9 @@ export const Confirm: React.FC<Props> = ({
         </div>
         <div className="my-4 border-t pt-4">
           <div className="mb-2 font-bold">手動で結果をセット</div>
+          <div className="mb-1 text-center text-xs text-gray-500">
+            プロンプト長: {prompt.length.toLocaleString()} 文字
+          </div>
           <div className="mb-2 flex justify-center">
             <button
               onClick={handleCopyPrompt}
