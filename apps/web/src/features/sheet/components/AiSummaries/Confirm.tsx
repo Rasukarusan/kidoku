@@ -168,33 +168,45 @@ export const Confirm: React.FC<Props> = ({
         </div>
         <div className="my-4 border-t pt-4">
           <div className="mb-2 font-bold">手動で結果をセット</div>
-          <div className="mb-1 text-center text-xs text-gray-500">
-            プロンプト長: {prompt.length.toLocaleString()} 文字
+
+          {/* プロンプトプレビュー */}
+          <div className="relative mb-4">
+            <div className="mb-1 text-xs text-gray-500">
+              プロンプトプレビュー ({prompt.length.toLocaleString()} 文字)
+            </div>
+            <div className="relative">
+              <textarea
+                readOnly
+                value={prompt}
+                className="w-full rounded border border-gray-300 bg-gray-50 p-2 pr-20 text-xs font-mono"
+                rows={8}
+              />
+              <div className="absolute right-2 top-2 flex gap-1">
+                <button
+                  onClick={handleCopyPrompt}
+                  className="rounded bg-white p-2 shadow-sm hover:bg-gray-100"
+                  title={copied ? 'コピーしました' : 'コピー'}
+                >
+                  {copied ? (
+                    <FaCheck className="text-green-500" size={14} />
+                  ) : (
+                    <FaRegCopy className="text-gray-600" size={14} />
+                  )}
+                </button>
+                <button
+                  onClick={handleDownloadPrompt}
+                  className="rounded bg-white p-2 shadow-sm hover:bg-gray-100"
+                  title="ダウンロード"
+                >
+                  <FaDownload className="text-gray-600" size={14} />
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="mb-2 flex justify-center gap-2">
-            <button
-              onClick={handleCopyPrompt}
-              className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
-            >
-              {copied ? (
-                <>
-                  <FaCheck className="text-green-500" />
-                  コピーしました
-                </>
-              ) : (
-                <>
-                  <FaRegCopy />
-                  コピー
-                </>
-              )}
-            </button>
-            <button
-              onClick={handleDownloadPrompt}
-              className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
-            >
-              <FaDownload />
-              ダウンロード
-            </button>
+
+          {/* LLM出力ペースト用テキストエリア */}
+          <div className="mb-1 text-xs text-gray-500">
+            LLMの出力をペースト
           </div>
           <textarea
             className="w-full rounded border border-gray-300 p-2 text-xs"
