@@ -10,7 +10,7 @@ import { useState, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { AiSummaryUsageResponse } from '@/types/api'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
-import { FaRegCopy, FaCheck } from 'react-icons/fa'
+import { FaRegCopy, FaCheck, FaDownload } from 'react-icons/fa'
 
 export type DetailSettings = {
   months: string[]
@@ -105,6 +105,23 @@ export const Confirm: React.FC<Props> = ({
     }
   }
 
+  const handleDownloadPrompt = () => {
+    try {
+      const blob = new Blob([prompt], { type: 'text/plain;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `ai-summary-prompt-${sheetName}-${dayjs().format('YYYY-MM-DD')}.txt`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('ダウンロードに失敗しました:', error)
+      alert('ダウンロードに失敗しました。')
+    }
+  }
+
   const { data } = useSWR<AiSummaryUsageResponse>(
     `/api/ai-summary/usage?sheetName=${sheetName}&months=${months.join(',')}&categories=${categories.join(',')}`,
     fetcher
@@ -154,7 +171,7 @@ export const Confirm: React.FC<Props> = ({
           <div className="mb-1 text-center text-xs text-gray-500">
             プロンプト長: {prompt.length.toLocaleString()} 文字
           </div>
-          <div className="mb-2 flex justify-center">
+          <div className="mb-2 flex justify-center gap-2">
             <button
               onClick={handleCopyPrompt}
               className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
@@ -167,9 +184,16 @@ export const Confirm: React.FC<Props> = ({
               ) : (
                 <>
                   <FaRegCopy />
-                  プロンプトをコピー
+                  コピー
                 </>
               )}
+            </button>
+            <button
+              onClick={handleDownloadPrompt}
+              className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
+            >
+              <FaDownload />
+              ダウンロード
             </button>
           </div>
           <textarea
