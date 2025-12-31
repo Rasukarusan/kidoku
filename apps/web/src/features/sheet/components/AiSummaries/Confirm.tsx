@@ -6,11 +6,11 @@ import { fetcher } from '@/libs/swr'
 import { Book } from '@/types/book'
 import { uniq } from '@/utils/array'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { AiSummaryUsageResponse } from '@/types/api'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
-import { FaRegCopy, FaCheck } from 'react-icons/fa'
+import { FaRegCopy, FaCheck, FaDownload } from 'react-icons/fa'
 
 export type DetailSettings = {
   months: string[]
@@ -76,7 +76,7 @@ export const Confirm: React.FC<Props> = ({
     }
   }
 
-  const buildPrompt = () => {
+  const prompt = useMemo(() => {
     const targetBooks = books
       .filter((book) => book.finished)
       .filter((book) => {
@@ -88,14 +88,41 @@ export const Confirm: React.FC<Props> = ({
         memo: book.memo.replace(/\*.*\*/g, '***'),
         finished: book.finished,
       }))
-    return `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`
-  }
+    return `${aiSummaryPrompt}\n${JSON.stringify(targetBooks, null, 2)}`
+  }, [books, months, categories])
 
   const handleCopyPrompt = async () => {
-    const prompt = buildPrompt()
-    await navigator.clipboard.writeText(prompt)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      console.log('プロンプトの長さ:', prompt.length, '文字')
+      console.log('プロンプトの最初の100文字:', prompt.substring(0, 100))
+      console.log(
+        'プロンプトの最後の100文字:',
+        prompt.substring(prompt.length - 100)
+      )
+      await navigator.clipboard.writeText(prompt)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error('クリップボードへのコピーに失敗しました:', error)
+      alert('コピーに失敗しました。コンソールを確認してください。')
+    }
+  }
+
+  const handleDownloadPrompt = () => {
+    try {
+      const blob = new Blob([prompt], { type: 'text/plain;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `ai-summary-prompt-${sheetName}-${dayjs().format('YYYY-MM-DD')}.txt`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('ダウンロードに失敗しました:', error)
+      alert('ダウンロードに失敗しました。')
+    }
   }
 
   const { data } = useSWR<AiSummaryUsageResponse>(
@@ -144,24 +171,44 @@ export const Confirm: React.FC<Props> = ({
         </div>
         <div className="my-4 border-t pt-4">
           <div className="mb-2 font-bold">手動で結果をセット</div>
-          <div className="mb-2 flex justify-center">
-            <button
-              onClick={handleCopyPrompt}
-              className="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 hover:bg-gray-100"
-            >
-              {copied ? (
-                <>
-                  <FaCheck className="text-green-500" />
-                  コピーしました
-                </>
-              ) : (
-                <>
-                  <FaRegCopy />
-                  プロンプトをコピー
-                </>
-              )}
-            </button>
+
+          {/* プロンプトプレビュー */}
+          <div className="relative mb-4">
+            <div className="mb-1 text-xs text-gray-500">
+              プロンプトプレビュー ({prompt.length.toLocaleString()} 文字)
+            </div>
+            <div className="relative">
+              <textarea
+                readOnly
+                value={prompt}
+                className="w-full rounded border border-gray-300 bg-gray-50 p-2 pr-20 font-mono text-xs"
+                rows={8}
+              />
+              <div className="absolute right-2 top-2 flex gap-1">
+                <button
+                  onClick={handleCopyPrompt}
+                  className="rounded bg-white p-2 shadow-sm hover:bg-gray-100"
+                  title={copied ? 'コピーしました' : 'コピー'}
+                >
+                  {copied ? (
+                    <FaCheck className="text-green-500" size={14} />
+                  ) : (
+                    <FaRegCopy className="text-gray-600" size={14} />
+                  )}
+                </button>
+                <button
+                  onClick={handleDownloadPrompt}
+                  className="rounded bg-white p-2 shadow-sm hover:bg-gray-100"
+                  title="ダウンロード"
+                >
+                  <FaDownload className="text-gray-600" size={14} />
+                </button>
+              </div>
+            </div>
           </div>
+
+          {/* LLM出力ペースト用テキストエリア */}
+          <div className="mb-1 text-xs text-gray-500">LLMの出力をペースト</div>
           <textarea
             className="w-full rounded border border-gray-300 p-2 text-xs"
             rows={5}
