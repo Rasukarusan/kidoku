@@ -95,7 +95,10 @@ export const Confirm: React.FC<Props> = ({
     try {
       console.log('プロンプトの長さ:', prompt.length, '文字')
       console.log('プロンプトの最初の100文字:', prompt.substring(0, 100))
-      console.log('プロンプトの最後の100文字:', prompt.substring(prompt.length - 100))
+      console.log(
+        'プロンプトの最後の100文字:',
+        prompt.substring(prompt.length - 100)
+      )
       await navigator.clipboard.writeText(prompt)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -178,7 +181,7 @@ export const Confirm: React.FC<Props> = ({
               <textarea
                 readOnly
                 value={prompt}
-                className="w-full rounded border border-gray-300 bg-gray-50 p-2 pr-20 text-xs font-mono"
+                className="w-full rounded border border-gray-300 bg-gray-50 p-2 pr-20 font-mono text-xs"
                 rows={8}
               />
               <div className="absolute right-2 top-2 flex gap-1">
@@ -205,9 +208,7 @@ export const Confirm: React.FC<Props> = ({
           </div>
 
           {/* LLM出力ペースト用テキストエリア */}
-          <div className="mb-1 text-xs text-gray-500">
-            LLMの出力をペースト
-          </div>
+          <div className="mb-1 text-xs text-gray-500">LLMの出力をペースト</div>
           <textarea
             className="w-full rounded border border-gray-300 p-2 text-xs"
             rows={5}
