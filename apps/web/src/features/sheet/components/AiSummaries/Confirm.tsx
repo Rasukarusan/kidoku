@@ -173,38 +173,38 @@ export const Confirm: React.FC<Props> = ({
           <div className="mb-2 font-bold">手動で結果をセット</div>
 
           {/* プロンプトプレビュー */}
-          <div className="relative mb-4">
-            <div className="mb-1 text-xs text-gray-500">
-              プロンプトプレビュー ({prompt.length.toLocaleString()} 文字)
-            </div>
-            <div className="relative">
-              <textarea
-                readOnly
-                value={prompt}
-                className="w-full rounded border border-gray-300 bg-gray-50 p-2 pr-20 font-mono text-xs"
-                rows={8}
-              />
-              <div className="absolute right-2 top-2 flex gap-1">
+          <div className="mb-4">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs text-gray-500">
+                プロンプトプレビュー ({prompt.length.toLocaleString()} 文字)
+              </span>
+              <div className="flex gap-1">
                 <button
                   onClick={handleCopyPrompt}
-                  className="rounded bg-white p-2 shadow-sm hover:bg-gray-100"
+                  className="rounded bg-white/80 p-1.5 shadow-sm hover:bg-white"
                   title={copied ? 'コピーしました' : 'コピー'}
                 >
                   {copied ? (
-                    <FaCheck className="text-green-500" size={14} />
+                    <FaCheck className="text-green-500" size={12} />
                   ) : (
-                    <FaRegCopy className="text-gray-600" size={14} />
+                    <FaRegCopy className="text-gray-600" size={12} />
                   )}
                 </button>
                 <button
                   onClick={handleDownloadPrompt}
-                  className="rounded bg-white p-2 shadow-sm hover:bg-gray-100"
+                  className="rounded bg-white/80 p-1.5 shadow-sm hover:bg-white"
                   title="ダウンロード"
                 >
-                  <FaDownload className="text-gray-600" size={14} />
+                  <FaDownload className="text-gray-600" size={12} />
                 </button>
               </div>
             </div>
+            <textarea
+              readOnly
+              value={prompt}
+              className="w-full rounded border border-gray-300 bg-gray-50 p-2 font-mono text-xs"
+              rows={8}
+            />
           </div>
 
           {/* LLM出力ペースト用テキストエリア */}
