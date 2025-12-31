@@ -13,13 +13,14 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 
 ### アーキテクチャ
 
-- **フロントエンド**: Next.js 14 (Pages Router) + React 18 (TypeScript 4.5.4)
+- **モノレポ管理**: Turborepo + pnpm workspaces
+- **フロントエンド**: Next.js 14 (App Router & API Routes) + React 18 (TypeScript 4.5.4)
 - **バックエンド**: NestJS 11 + GraphQL (TypeScript 5.7.3)
 - **データベース**: MySQL + Prisma (フロントエンド) / Drizzle ORM (バックエンド)
-- **認証**: NextAuth.js + JWT
-- **検索エンジン**: MeiliSearch
+- **認証**: NextAuth.js (Google OAuth) + JWT署名検証
+- **検索エンジン**: MeiliSearch (日本語対応版)
 - **AI機能**: Cohere
-- **メール送信**: Resend
+- **メール送信**: Resend + React Email
 - **決済**: Stripe
 - **ストレージ**: Vercel Blob + Vercel KV
 - **監視**: Prometheus + Grafana
@@ -100,13 +101,23 @@ kidoku/
 ├── apps/
 │   ├── web/                    # Next.jsフロントエンドアプリケーション
 │   │   ├── src/
-│   │   │   ├── pages/         # Pages Router
-│   │   │   ├── components/    # Reactコンポーネント
+│   │   │   ├── app/           # App Router
+│   │   │   ├── components/    # 共通UIコンポーネント
 │   │   │   ├── features/      # 機能別モジュール
-│   │   │   ├── graphql/       # GraphQLクエリ・ミューテーション
+│   │   │   │   ├── auth/     # 認証機能
+│   │   │   │   ├── sheet/    # 読書シート
+│   │   │   │   ├── search/   # 検索機能
+│   │   │   │   └── settings/ # 設定画面
+│   │   │   ├── libs/          # 外部ライブラリ統合
+│   │   │   │   ├── apollo/   # GraphQLクライアント
+│   │   │   │   ├── auth/     # NextAuth設定
+│   │   │   │   ├── meilisearch/ # 検索エンジン
+│   │   │   │   ├── prisma/   # ORM
+│   │   │   │   └── stripe/   # 決済
+│   │   │   ├── pages/         # Pages Router (API Routes)
 │   │   │   ├── hooks/         # カスタムフック
-│   │   │   ├── lib/           # ユーティリティ
-│   │   │   └── stores/        # Jotaiストア
+│   │   │   ├── store/         # Jotaiストア
+│   │   │   └── utils/         # ユーティリティ関数
 │   │   └── prisma/            # Prismaスキーマ
 │   │
 │   └── api/                    # NestJS GraphQLバックエンドAPI
@@ -115,9 +126,12 @@ kidoku/
 │       │   │   ├── sheets/     # シート管理
 │       │   │   ├── comments/   # コメント機能
 │       │   │   ├── software-design/ # Software Design誌機能
-│       │   │   └── metrics/    # メトリクス
-│       │   └── common/         # 共通機能
-│       └── drizzle/            # Drizzleスキーマ
+│       │   │   └── hello/      # ヘルスチェック
+│       │   ├── database/       # データベース設定
+│       │   │   └── schema/     # Drizzleスキーマ
+│       │   ├── auth/           # 認証機能
+│       │   └── infrastructure/ # インフラ層
+│       └── drizzle/            # Drizzle設定
 │
 ├── docker/                     # Docker設定ファイル
 │   ├── meilisearch/           # MeiliSearch設定
@@ -136,23 +150,24 @@ kidoku/
 
 ### apps/web (フロントエンド)
 
-- **フレームワーク**: Next.js 14 (Pages Router)
+- **フレームワーク**: Next.js 14 (App Router)
 - **言語**: TypeScript 4.5.4
-- **UI**: Tailwind CSS + Framer Motion
+- **UI**: Tailwind CSS + Framer Motion + Radix UI
 - **状態管理**: Jotai
 - **データ取得**: Apollo Client (GraphQL)
-- **認証**: NextAuth.js
+- **認証**: NextAuth.js (Google OAuth)
 - **ORM**: Prisma
+- **画像処理**: Sharp
 - **メトリクス**: `/api/metrics`エンドポイント
 
 ### apps/api (バックエンド)
 
-- **フレームワーク**: NestJS
-- **API**: GraphQL (Apollo Server)
+- **フレームワーク**: NestJS 11
+- **API**: GraphQL (Apollo Server + Code-First)
 - **言語**: TypeScript 5.7.3
 - **ORM**: Drizzle ORM
 - **データベース**: MySQL
-- **認証**: JWT + Passport
+- **認証**: JWT署名検証（NextAuthセッション）
 - **メトリクス**: `/metrics`エンドポイント
 
 ### 主要なスクリプト
@@ -180,9 +195,13 @@ pnpm format               # コードフォーマット
 pnpm check-types          # 型チェック
 
 # データベース操作
-pnpm --filter web prisma:generate  # Prismaクライアント生成
-pnpm --filter web prisma:push      # Prismaスキーマの反映
+pnpm --filter web prisma generate  # Prismaクライアント生成
+pnpm --filter web db:push          # Prismaスキーマの反映
+pnpm --filter web db:studio        # Prisma Studio起動
 pnpm --filter api db:push          # Drizzleスキーマの反映
+
+# GraphQL
+pnpm --filter web codegen          # GraphQLコード生成
 
 # その他
 pnpm --filter web analyze      # バンドルサイズ分析
@@ -197,6 +216,7 @@ pnpm --filter web email        # メールテンプレート開発
 - Node.js 22以上（推奨: v22、.nvmrc参照）
 - pnpm 10.5.2以上
 - Docker & Docker Compose
+- Google Cloud Platform アカウント（OAuth認証用）
 
 ### 1. リポジトリのクローン
 
@@ -262,6 +282,8 @@ DB_PASS=password
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=kidoku
+NEXTAUTH_SECRET= # フロントエンドと同じ値を設定
+PORT=4000
 ```
 
 ### 4. インフラストラクチャの起動
@@ -275,8 +297,8 @@ docker-compose up -d
 
 ```bash
 # Prismaマイグレーション（Webアプリ）
-pnpm --filter web prisma:push
-pnpm --filter web prisma:generate
+pnpm --filter web db:push
+pnpm --filter web prisma generate
 
 # Drizzleマイグレーション（API）
 pnpm --filter api db:push
@@ -439,9 +461,11 @@ docker-compose restart prometheus grafana
 
 ### 注意事項
 
-- フロントエンドはPages Routerを使用（App Routerではありません）
+- フロントエンドはApp RouterとPages Router（API Routes用）を併用
 - データベースアクセスはフロントエンドがPrisma、バックエンドがDrizzle ORMを使用
 - TypeScriptバージョンがフロントエンドとバックエンドで異なる
+- GraphQLはプロキシ経由（`/api/graphql`）でNextAuthセッション情報を付与
+- 認証はフロントエンドのNextAuth.jsで処理、バックエンドは署名検証のみ
 
 ### テスト
 
