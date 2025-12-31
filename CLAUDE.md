@@ -4,155 +4,184 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-Kidoku（きどく）は、読書記録・分析アプリケーションです。バーコードスキャンによる本の登録、AIによる読書傾向分析、年別シート管理などの機能を提供します。
+Kidoku（きどく）は、読書記録・分析アプリケーションです。モノレポ構成（Turborepo + pnpm）で、Next.jsフロントエンドとNestJS GraphQL APIを統合しています。
 
-## 技術スタック
+## アーキテクチャ概要
 
-### フロントエンド (apps/web)
-- Next.js 14 (App Router) + React 18 + TypeScript
-- Tailwind CSS（スタイリング）
-- Jotai（状態管理）
-- Apollo Client（GraphQL）
-- NextAuth.js（認証）
-- Prisma（ORM）
+### 認証フロー
+1. **フロントエンド**: NextAuth.js（Google OAuth）でセッション管理
+2. **プロキシ層**: `/api/graphql`でセッション情報をHMAC-SHA256署名付きヘッダーに変換
+3. **バックエンド**: NestJSでヘッダー署名を検証し、ユーザー情報を復元
 
-### バックエンド (apps/api)
-- NestJS + TypeScript
-- GraphQL (Apollo Server)
-- Drizzle ORM
-- MySQL
-- JWT認証
+### データベースアクセス
+- **フロントエンド**: Prisma ORM → MySQL
+- **バックエンド**: Drizzle ORM → 同一MySQL（スキーマ同期が必要）
 
-### 外部サービス
-- MeiliSearch（検索エンジン）
-- Cohere（AI分析）
-- Stripe（決済）
-- Vercel Blob（ストレージ）
+### 検索エンジン
+- **MeiliSearch日本語版**（`getmeili/meilisearch:prototype-japanese-6`）を使用
+- Dockerfileで専用イメージをビルド
 
-## 開発環境セットアップ
+## 開発コマンド
 
+### 基本操作
 ```bash
-# 依存関係のインストール
-pnpm install
-
-# 環境変数の設定
-cp apps/web/.env.example apps/web/.env.local
-cp apps/api/.env.example apps/api/.env
-
-# Dockerサービスの起動
-docker-compose up -d
-
-# 開発サーバーの起動
+# 開発環境起動（全サービス）
 pnpm dev
-```
 
-## 主要な開発コマンド
-
-```bash
-# 開発
-pnpm dev                    # 全サービスの起動
-pnpm --filter web dev      # フロントエンドのみ
-pnpm --filter api dev      # APIのみ
+# 個別サービス起動
+pnpm --filter web dev      # フロントエンド (http://localhost:3000)
+pnpm --filter api dev      # API (http://localhost:4000/graphql)
 
 # ビルド
-pnpm build                 # 全体のビルド
-pnpm --filter web build    # フロントエンドのビルド
-pnpm --filter api build    # APIのビルド
+pnpm build                 # 全体
+pnpm --filter web build
+pnpm --filter api build
+```
 
-# テスト
-pnpm --filter web test     # フロントエンドのテスト
-pnpm --filter api test     # APIのテスト
-pnpm --filter api test:e2e # APIのE2Eテスト
+### データベース操作
+```bash
+# Prisma (フロントエンド)
+pnpm --filter web prisma generate    # クライアント生成
+pnpm --filter web db:push            # スキーマ反映
+pnpm --filter web db:studio          # Prisma Studio起動
 
-# リント・フォーマット
-pnpm lint                  # 全体のリント
-pnpm format               # コードフォーマット
+# Drizzle (バックエンド)  
+pnpm --filter api db:push            # スキーマ反映
+pnpm --filter api db:generate        # マイグレーション生成
+```
 
-# データベース操作
-pnpm --filter web db:push  # Prismaスキーマの反映
-pnpm --filter web db:studio # Prisma Studioの起動
+### テスト
+```bash
+# フロントエンド
+pnpm --filter web test              # 単体テスト実行
+pnpm --filter web test:w            # ウォッチモード
+pnpm --filter web test:c            # カバレッジ
+
+# バックエンド
+pnpm --filter api test              # 単体テスト
+pnpm --filter api test:watch        # ウォッチモード
+pnpm --filter api test:cov          # カバレッジ
+pnpm --filter api test:e2e          # E2Eテスト
+```
+
+### リント・フォーマット
+```bash
+pnpm lint                           # 全体のリント
+pnpm lint:fix                       # 自動修正
+pnpm format                         # Prettierフォーマット
+pnpm check-types                    # 型チェック
+```
+
+### その他の開発コマンド
+```bash
+# GraphQLコード生成（型定義）
+pnpm --filter web codegen
+
+# バンドルサイズ分析
+pnpm --filter web analyze
+
+# メールテンプレート開発
+pnpm --filter web email
+
+# Lighthouse実行
+pnpm --filter web lighthouse
+```
+
+## 重要ファイル・ディレクトリ
+
+### 認証関連
+- `apps/web/src/pages/api/graphql.ts` - GraphQLプロキシ（署名生成）
+- `apps/web/src/pages/api/auth/[...nextauth].ts` - NextAuth設定
+- `apps/web/src/libs/auth/` - 認証ユーティリティ
+- `apps/api/src/auth/` - NestJS認証モジュール（署名検証）
+
+### GraphQL
+- `apps/web/src/libs/apollo/` - Apollo Client設定
+- `apps/api/src/schema.gql` - GraphQLスキーマ（自動生成）
+- `apps/api/src/modules/*/` - GraphQLリゾルバー
+
+### データベース
+- `apps/web/prisma/schema.prisma` - Prismaスキーマ定義
+- `apps/api/src/database/schema/` - Drizzleスキーマ定義
+
+### 検索
+- `apps/web/src/libs/meilisearch/` - MeiliSearch統合
+- `docker/meilisearch/` - 日本語対応MeiliSearch設定
+
+## 環境変数
+
+### 必須環境変数（apps/web/.env.local）
+```env
+# 認証
+NEXTAUTH_SECRET=              # openssl rand -base64 32で生成
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# データベース
+DATABASE_URL=mysql://root:password@localhost:3306/kidoku
+
+# MeiliSearch  
+MEILI_HOST=http://localhost:7700
+MEILI_MASTER_KEY=
 
 # GraphQL
-pnpm --filter web codegen  # GraphQLコード生成
+NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
 ```
 
-## プロジェクト構成
-
+### APIの環境変数（apps/api/.env）
+```env
+NEXTAUTH_SECRET=              # フロントエンドと同じ値（署名検証用）
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASS=password
+DB_NAME=kidoku
+PORT=4000
 ```
-kidoku/
-├── apps/
-│   ├── web/                    # Next.jsフロントエンド
-│   │   ├── src/
-│   │   │   ├── app/           # App Router
-│   │   │   ├── components/    # Reactコンポーネント
-│   │   │   ├── graphql/       # GraphQLクエリ・ミューテーション
-│   │   │   ├── hooks/         # カスタムフック
-│   │   │   ├── lib/          # ユーティリティ
-│   │   │   └── stores/       # Jotaiストア
-│   │   └── prisma/           # Prismaスキーマ
-│   │
-│   └── api/                   # NestJS API
-│       ├── src/
-│       │   ├── modules/      # 機能モジュール
-│       │   ├── common/       # 共通機能
-│       │   └── schema/       # GraphQLスキーマ
-│       └── drizzle/          # Drizzleスキーマ
-│
-├── docker/                    # Docker設定
-│   ├── meilisearch/          # 検索エンジン
-│   └── mysql/                # データベース
-│
-└── turbo.json                # Turborepo設定
-```
-
-## 主要なデータフロー
-
-1. **本の登録**: バーコードスキャン → Google Books API → データベース保存
-2. **AI分析**: 読書データ収集 → Cohere API → 分析結果保存・表示
-3. **検索**: MeiliSearchインデックス更新 → 高速全文検索
-4. **リアルタイム更新**: データ変更 → Pusher → 全クライアント更新
 
 ## 開発時の注意事項
 
 ### GraphQL開発
-- スキーマ変更後は必ず `pnpm --filter web codegen` を実行
-- Resolverは対応するモジュールディレクトリに配置
+1. NestJSでリゾルバー変更後、スキーマが自動生成される
+2. フロントエンドで`pnpm --filter web codegen`実行で型を生成
+3. プロキシ経由（`/api/graphql`）でのみAPIアクセス可能
 
-### データベース
-- フロントエンド: Prismaを使用（`apps/web/prisma/schema.prisma`）
-- バックエンド: Drizzle ORMを使用（`apps/api/drizzle`）
-- スキーマ変更時は両方の更新が必要
+### データベーススキーマ変更
+1. Prismaスキーマを編集
+2. `pnpm --filter web db:push`でDBに反映
+3. Drizzleスキーマも手動で同期（重要）
+4. `pnpm --filter api db:push`でバックエンドも更新
 
-### 環境変数
-- 必須の環境変数はREADMEに記載
-- APIキーは絶対にコミットしない
-- ローカル開発では`.env.local`を使用
+### MeiliSearch
+- 日本語プロトタイプビルド使用のため、通常版との互換性なし
+- インデックスリセット時は`docker-compose restart meilisearch`
 
-### テスト
-- 新機能追加時は必ずテストを書く
-- フロントエンド: Jest + React Testing Library
-- バックエンド: Jest（単体テスト）+ Supertest（E2E）
+### デプロイ（GitHub Actions）
+- masterブランチプッシュで自動デプロイ（Google Cloud Run）
+- `apps/api`配下の変更でAPIデプロイトリガー
+- 環境変数はGitHub Secretsで管理
 
 ## トラブルシューティング
-
-### MeiliSearchエラー
-```bash
-# インデックスのリセット
-docker-compose restart meilisearch
-```
-
-### データベース接続エラー
-```bash
-# MySQLコンテナの再起動
-docker-compose restart mysql
-# Prismaクライアントの再生成
-pnpm --filter web prisma generate
-```
 
 ### 型エラー
 ```bash
 # GraphQL型の再生成
 pnpm --filter web codegen
-# TypeScriptの型チェック
-pnpm --filter web type-check
+
+# Prismaクライアント再生成
+pnpm --filter web prisma generate
+```
+
+### 認証エラー
+- NEXTAUTH_SECRETがフロントエンド・バックエンド間で一致しているか確認
+- タイムスタンプのずれ（30秒以上）でも認証失敗
+
+### Docker関連
+```bash
+# 全コンテナ再起動
+docker-compose down && docker-compose up -d
+
+# MeiliSearchデータリセット
+rm -rf docker/meilisearch/data/meilisearch
+docker-compose up -d meilisearch
 ```
