@@ -9,9 +9,15 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 ## アーキテクチャ概要
 
 ### 認証フロー
-1. **フロントエンド**: NextAuth.js（Google OAuth）でセッション管理
+1. **フロントエンド**: NextAuth.js（Google OAuth + 裏口ログイン）でセッション管理
 2. **プロキシ層**: `/api/graphql`でセッション情報をHMAC-SHA256署名付きヘッダーに変換
 3. **バックエンド**: NestJSでヘッダー署名を検証し、ユーザー情報を復元
+
+#### 裏口ログイン（プレビュー環境用）
+- **用途**: Vercelプレビュー環境での検証用
+- **有効化**: 環境変数`ENABLE_BACKDOOR_LOGIN=true`で有効化
+- **認証方式**: CredentialsProvider（JWT戦略）
+- **本番環境**: 必ず無効化すること（`ENABLE_BACKDOOR_LOGIN=false`）
 
 ### データベースアクセス
 - **フロントエンド**: Prisma ORM → MySQL
@@ -117,10 +123,15 @@ NEXTAUTH_SECRET=              # openssl rand -base64 32で生成
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
+# 裏口ログイン（プレビュー環境用）
+ENABLE_BACKDOOR_LOGIN=false   # プレビュー環境でtrueに設定
+BACKDOOR_USER_EMAIL=          # 裏口ログイン用のメールアドレス
+BACKDOOR_USER_PASSWORD=       # 裏口ログイン用のパスワード
+
 # データベース
 DATABASE_URL=mysql://root:password@localhost:3306/kidoku
 
-# MeiliSearch  
+# MeiliSearch
 MEILI_HOST=http://localhost:7700
 MEILI_MASTER_KEY=
 
@@ -175,6 +186,8 @@ pnpm --filter web prisma generate
 ### 認証エラー
 - NEXTAUTH_SECRETがフロントエンド・バックエンド間で一致しているか確認
 - タイムスタンプのずれ（30秒以上）でも認証失敗
+- 裏口ログイン使用時：`ENABLE_BACKDOOR_LOGIN=true`、`BACKDOOR_USER_EMAIL`、`BACKDOOR_USER_PASSWORD`が正しく設定されているか確認
+- 裏口ログイン有効時はJWT戦略に切り替わる（sessionテーブルは使用されない）
 
 ### Docker関連
 ```bash
