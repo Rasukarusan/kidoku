@@ -3,8 +3,18 @@ export default IndexPage
 
 import prisma, { parse } from '@/libs/prisma'
 import { mask } from '@/utils/string'
+import { isSSGEnabled } from '@/libs/env'
+import { GetServerSideProps } from 'next'
 
-export const getStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+  // 本番環境のみキャッシュを有効化（ISR相当の動作）
+  if (isSSGEnabled) {
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=5, stale-while-revalidate=59'
+    )
+  }
+
   const books = await prisma.books.findMany({
     include: {
       user: { select: { name: true, image: true } },
@@ -29,8 +39,5 @@ export const getStaticProps = async () => {
       sheet: book.sheet.name,
     })
   })
-  return {
-    props: { comments },
-    revalidate: 5,
-  }
+  return { props: { comments } }
 }

@@ -2,10 +2,22 @@ import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { mask } from '@/utils/string'
+import { isSSGEnabled } from '@/libs/env'
+import { GetServerSideProps } from 'next'
+
 export default SheetPage
 
-export async function getStaticProps(context) {
-  const { user: username, year } = context.params
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
+  // 本番環境のみキャッシュを有効化（ISR相当の動作）
+  if (isSSGEnabled) {
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=5, stale-while-revalidate=59'
+    )
+  }
+
+  const username = params?.user as string
+  const year = params?.year as string
   const user = await prisma.user.findUnique({
     where: { name: username },
   })
@@ -88,22 +100,5 @@ export async function getStaticProps(context) {
         ...(v.analysis as object),
       })),
     },
-    revalidate: 5,
-  }
-}
-export async function getStaticPaths() {
-  const users = await prisma.user.findMany({
-    select: { name: true, sheets: { select: { name: true } } },
-  })
-  const paths = users
-    .map((user) => {
-      return user.sheets.map((sheet) => {
-        return { params: { user: user.name, year: sheet.name } }
-      })
-    })
-    .flat()
-  return {
-    paths,
-    fallback: 'blocking', // キャッシュが存在しない場合はSSR
   }
 }
