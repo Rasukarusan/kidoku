@@ -86,7 +86,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               <td className={`px-6 py-2 ${pc}`}>{book.impression}</td>
               {(isMine || book.is_public_memo) && (
                 <td className={`whitespace-normal px-6 py-2 ${pc}`}>
-                  <span>{truncate(book.memo, 40)}</span>
+                  <span className="line-clamp-2">{book.memo}</span>
                 </td>
               )}
             </tr>
