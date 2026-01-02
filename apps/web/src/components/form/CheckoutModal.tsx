@@ -25,13 +25,14 @@ export const CheckoutModal: React.FC<Props> = ({
 }) => {
   const [clientSecret, setClientSecret] = useState('')
   useEffect(() => {
+    if (!open) return
     fetch('/api/stripe/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
     })
       .then((res) => res.json())
       .then((data) => setClientSecret(data.clientSecret))
-  }, [])
+  }, [open])
 
   const appearance: Appearance = {
     theme: 'stripe',
