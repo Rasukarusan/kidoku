@@ -74,7 +74,7 @@ export const AiSummaries: React.FC<Props> = ({
         </div>
       )}
       {loading && (
-        <div className="mx-auto mb-4 flex w-full items-center justify-center rounded-lg bg-ai-summary bg-gradient-to-b p-4 text-center text-gray-700 sm:w-3/4">
+        <div className="mx-auto mb-4 flex w-full items-center justify-center rounded-lg bg-ai-summary bg-gradient-to-b p-4 text-center text-gray-700 md:w-3/4">
           <div className="flex items-center rounded-md px-2 py-1 hover:font-bold">
             <FaCircleNotch size={25} className="mr-2 animate-spin text-ai" />
             <span className="animate-pulse">AI分析中...</span>
@@ -82,7 +82,7 @@ export const AiSummaries: React.FC<Props> = ({
         </div>
       )}
       {json && (
-        <div className="relative mx-auto w-full text-center sm:w-3/4">
+        <div className="relative mx-auto w-full text-center md:w-3/4">
           {isMine && (
             <button
               onClick={() => {
@@ -112,7 +112,7 @@ export const AiSummaries: React.FC<Props> = ({
               </p>
             </div>
           )}
-          <div className="mb-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mb-1 grid grid-cols-2 gap-4">
             {Object.keys(json)
               .filter((key) => key !== 'id' && key !== 'character_summary')
               .map((key) => {
