@@ -36,7 +36,7 @@ export const SheetEditModal: React.FC<Props> = ({
         setInput(sheet)
         onClose()
       }}
-      className="h-[200px] w-[500px]"
+      className="h-auto min-h-[200px] max-w-[500px]"
     >
       <div className="p-4 text-center sm:p-10">
         <div className="mb-4 text-2xl font-bold">シート名を編集</div>
