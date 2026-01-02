@@ -68,7 +68,7 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               <td className="p-2 text-center">{i + 1}</td>
               <th
                 scope="row"
-                className="px-4 py-4 font-medium text-gray-900 sm:px-6"
+                className="px-4 py-2 font-medium text-gray-900 sm:px-6"
               >
                 <div className="flex items-center">
                   <img
@@ -96,13 +96,13 @@ export const BookRows: React.FC<Props> = ({ books }) => {
                   </div>
                 </div>
               </th>
-              <td className={`px-6 py-4 ${pc}`}>{book.author}</td>
-              <td className={`px-6 py-4 ${pc} whitespace-nowrap`}>
+              <td className={`px-6 py-2 ${pc}`}>{book.author}</td>
+              <td className={`px-6 py-2 ${pc} whitespace-nowrap`}>
                 {book.category}
               </td>
-              <td className={`px-6 py-4 ${pc}`}>{book.impression}</td>
+              <td className={`px-6 py-2 ${pc}`}>{book.impression}</td>
               {(isMine || book.is_public_memo) && (
-                <td className={`whitespace-normal px-6 py-4 ${pc}`}>
+                <td className={`whitespace-normal px-6 py-2 ${pc}`}>
                   {expands[i] ? (
                     <Memo memo={book.memo} />
                   ) : (
