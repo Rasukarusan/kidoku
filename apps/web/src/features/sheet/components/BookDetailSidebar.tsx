@@ -93,7 +93,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
 
   const onClickSave = async () => {
     setLoading(true)
-    const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])
+    // sheet_idなど新しく追加されたキーも比較対象にする
+    const allKeys = new Set([...Object.keys(book), ...Object.keys(newBook)])
+    const isDiff = [...allKeys].some((key) => book[key] !== newBook[key])
     if (!isDiff) {
       setLoading(false)
       setEdit(false)
@@ -135,7 +137,8 @@ export const BookDetailSidebar: React.FC<Props> = ({
       onClose()
       return
     }
-    const isDiff = Object.keys(book).some((key) => book[key] !== newBook[key])
+    const allKeys = new Set([...Object.keys(book), ...Object.keys(newBook)])
+    const isDiff = [...allKeys].some((key) => book[key] !== newBook[key])
     if (!isDiff) {
       setEdit(false)
       return

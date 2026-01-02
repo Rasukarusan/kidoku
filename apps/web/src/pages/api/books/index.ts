@@ -123,7 +123,7 @@ export default async (req, res) => {
       if (!book) {
         return res.status(401).json({ result: false })
       }
-      const data = {
+      const data: Record<string, unknown> = {
         title: body.title,
         author: body.author,
         category: body.category,
@@ -133,6 +133,9 @@ export default async (req, res) => {
         is_public_memo: body.is_public_memo,
         finished: body.finished ? new Date(body.finished) : null,
         updated: new Date(),
+      }
+      if (body.sheet_id !== undefined) {
+        data.sheet_id = Number(body.sheet_id)
       }
       const { image } = body
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新

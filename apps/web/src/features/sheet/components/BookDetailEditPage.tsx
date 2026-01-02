@@ -21,6 +21,7 @@ import {
   removeBookDraft,
   cleanupOldDrafts,
 } from '@/utils/localStorage'
+import { SheetSelectBox } from '@/components/input/SheetSelectBox'
 
 interface Props {
   book: Book
@@ -276,6 +277,23 @@ export const BookDetailEditPage: React.FC<Props> = ({
                     setBook({ ...book, finished: e.target.value })
                   }
                   tabIndex={5}
+                />
+              </div>
+              <div className="text-center">
+                <label className="mb-1 block text-xs font-semibold text-gray-500">
+                  シート
+                </label>
+                <SheetSelectBox
+                  value={book?.sheet_id}
+                  onChange={(sheet) => {
+                    setBook({
+                      ...book,
+                      sheet_id: sheet.id,
+                      sheet: sheet.name,
+                    })
+                  }}
+                  label=""
+                  tabIndex={6}
                 />
               </div>
             </div>
