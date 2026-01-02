@@ -65,7 +65,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-6">
+      <div className="grid grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-4 lg:grid-cols-6">
         {books.map((book, i) => {
           return (
             <div key={book.title + i} className="">

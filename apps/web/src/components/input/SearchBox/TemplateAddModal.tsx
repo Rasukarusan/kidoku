@@ -116,7 +116,7 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
     <Modal
       open={open}
       onClose={onClose}
-      className="!z-[1200] h-3/4 w-full sm:w-1/2"
+      className="!z-[1200] h-3/4 w-full sm:w-3/4 lg:w-1/2"
     >
       <motion.div
         initial="hidden"

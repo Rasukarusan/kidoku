@@ -21,7 +21,7 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
   const containerClass =
     variant === 'simple'
       ? 'mb-8 flex items-center border-b border-gray-200'
-      : 'sticky top-[3.5rem] z-30 -mx-4 flex items-center bg-white px-4 sm:-mx-6 sm:px-6 max-w-[400px] sm:max-w-full'
+      : 'sticky top-[3.5rem] z-30 -mx-4 flex items-center bg-white px-4 sm:-mx-6 sm:px-6'
 
   return (
     <div className={containerClass}>

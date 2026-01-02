@@ -147,7 +147,7 @@ export const AddModal: React.FC = () => {
       onClose={() => {
         setOpen(false)
       }}
-      className="!z-[1200] h-3/4 w-full sm:w-1/2"
+      className="!z-[1200] h-3/4 w-full sm:w-3/4 lg:w-1/2"
     >
       <AnimatePresence>
         {open && (

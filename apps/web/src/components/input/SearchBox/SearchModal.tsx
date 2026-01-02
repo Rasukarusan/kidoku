@@ -38,7 +38,7 @@ export const SearchModal: React.FC = () => {
     <Modal
       open={open}
       onClose={onClose}
-      className="h-3/4 w-full overflow-auto sm:w-1/2"
+      className="h-3/4 w-full overflow-auto sm:w-3/4 lg:w-1/2"
     >
       <div className="flex shrink-0 items-center border-b border-b-[#f1f5f9] px-2 pt-2">
         <div className="relative w-full text-gray-600">
