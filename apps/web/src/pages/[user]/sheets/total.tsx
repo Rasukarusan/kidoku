@@ -1,11 +1,21 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import prisma from '@/libs/prisma'
+import { isSSGEnabled } from '@/libs/env'
+import { GetServerSideProps } from 'next'
 
 export default SheetTotalPage
 
-export const getStaticProps = async (ctx) => {
-  const { user: username } = ctx.params
+export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
+  // 本番環境のみキャッシュを有効化（ISR相当の動作）
+  if (isSSGEnabled) {
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=5, stale-while-revalidate=59'
+    )
+  }
+
+  const username = params?.user as string
   const user = await prisma.user.findUnique({
     where: { name: username },
   })
@@ -82,21 +92,5 @@ export const getStaticProps = async (ctx) => {
       userId,
       yearlyTopBooks,
     },
-    revalidate: 5,
-  }
-}
-
-export async function getStaticPaths() {
-  const users = await prisma.user.findMany({
-    select: { name: true },
-  })
-  const paths = users
-    .map((user) => {
-      return { params: { user: user.name } }
-    })
-    .flat()
-  return {
-    paths,
-    fallback: 'blocking', // キャッシュが存在しない場合はSSR
   }
 }
