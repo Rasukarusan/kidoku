@@ -18,7 +18,8 @@ const prisma = isEdge
     require('@/libs/prisma').default
 
 // 裏口ログインが有効かどうか
-const isBackdoorEnabled = process.env.ENABLE_BACKDOOR_LOGIN === 'true'
+const isBackdoorEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN === 'true'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -51,48 +52,29 @@ export const authOptions: NextAuthOptions = {
           CredentialsProvider({
             id: 'backdoor',
             name: 'Backdoor Login',
-            credentials: {
-              email: { label: 'Email', type: 'email' },
-              password: { label: 'Password', type: 'password' },
-            },
-            async authorize(credentials) {
-              if (!credentials?.email || !credentials?.password) {
+            credentials: {},
+            async authorize() {
+              const backdoorEmail = process.env.BACKDOOR_USER_EMAIL
+              if (!backdoorEmail) {
                 return null
               }
 
-              // 環境変数で設定されたメールアドレスとパスワードをチェック
-              if (
-                credentials.email === process.env.BACKDOOR_USER_EMAIL &&
-                credentials.password === process.env.BACKDOOR_USER_PASSWORD
-              ) {
-                // メールアドレスで既存ユーザーを検索
-                let user = await prisma.user.findUnique({
-                  where: { email: credentials.email },
-                })
+              // 環境変数で設定されたメールアドレスでユーザーを検索
+              const user = await prisma.user.findUnique({
+                where: { email: backdoorEmail },
+              })
 
-                // ユーザーが存在しない場合、新規作成
-                if (!user) {
-                  user = await prisma.user.create({
-                    data: {
-                      email: credentials.email,
-                      name: 'Test User',
-                      admin: false,
-                    },
-                  })
-                  // 初期データを作成
-                  await initUser({ id: user.id } as any)
-                }
-
-                return {
-                  id: user.id,
-                  email: user.email,
-                  name: user.name,
-                  image: user.image,
-                  admin: user.admin,
-                }
+              if (!user) {
+                return null
               }
 
-              return null
+              return {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                image: user.image,
+                admin: user.admin,
+              }
             },
           }),
         ]

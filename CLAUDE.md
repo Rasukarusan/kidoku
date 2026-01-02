@@ -124,9 +124,8 @@ GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
 # 裏口ログイン（プレビュー環境用）
-ENABLE_BACKDOOR_LOGIN=false   # プレビュー環境でtrueに設定
-BACKDOOR_USER_EMAIL=          # 裏口ログイン用のメールアドレス
-BACKDOOR_USER_PASSWORD=       # 裏口ログイン用のパスワード
+NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN=false  # プレビュー環境でtrueに設定
+BACKDOOR_USER_EMAIL=                     # ログインするユーザーのメールアドレス
 
 # データベース
 DATABASE_URL=mysql://root:password@localhost:3306/kidoku
@@ -186,7 +185,7 @@ pnpm --filter web prisma generate
 ### 認証エラー
 - NEXTAUTH_SECRETがフロントエンド・バックエンド間で一致しているか確認
 - タイムスタンプのずれ（30秒以上）でも認証失敗
-- 裏口ログイン使用時：`ENABLE_BACKDOOR_LOGIN=true`、`BACKDOOR_USER_EMAIL`、`BACKDOOR_USER_PASSWORD`が正しく設定されているか確認
+- 裏口ログイン使用時：`NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN=true`、`BACKDOOR_USER_EMAIL`が正しく設定されているか確認
 - 裏口ログイン有効時はJWT戦略に切り替わる（sessionテーブルは使用されない）
 
 ### Docker関連
