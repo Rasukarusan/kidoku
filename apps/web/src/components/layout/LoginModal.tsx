@@ -13,21 +13,24 @@ const isBackdoorEnabled =
 
 export const LoginModal: React.FC = () => {
   const [open, setOpen] = useAtom(openLoginModalAtom)
+  const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleBackdoorLogin = async () => {
+  const handleBackdoorLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
     setError('')
     setLoading(true)
 
     const result = await signIn('backdoor', {
+      email,
       redirect: false,
     })
 
     setLoading(false)
 
     if (result?.error) {
-      setError('ログインに失敗しました')
+      setError('メールアドレスが正しくありません')
     } else {
       setOpen(false)
       window.location.reload()
@@ -58,15 +61,24 @@ export const LoginModal: React.FC = () => {
         {isBackdoorEnabled && (
           <div className="mt-4 border-t pt-4">
             <div className="mb-3 text-sm text-gray-500">または</div>
-            {error && <div className="mb-2 text-sm text-red-500">{error}</div>}
-            <button
-              type="button"
-              onClick={handleBackdoorLogin}
-              disabled={loading}
-              className="w-full rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
-            >
-              {loading ? 'ログイン中...' : 'テストユーザーでログイン'}
-            </button>
+            <form onSubmit={handleBackdoorLogin} className="space-y-3">
+              <input
+                type="email"
+                placeholder="メールアドレス"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded border px-3 py-2 text-sm"
+                required
+              />
+              {error && <div className="text-sm text-red-500">{error}</div>}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700 disabled:opacity-50"
+              >
+                {loading ? 'ログイン中...' : 'ログイン'}
+              </button>
+            </form>
           </div>
         )}
         <div className="mt-4 text-sm text-gray-400">
