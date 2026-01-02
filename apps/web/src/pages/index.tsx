@@ -3,8 +3,9 @@ export default IndexPage
 
 import prisma, { parse } from '@/libs/prisma'
 import { mask } from '@/utils/string'
+import { isSSGEnabled } from '@/libs/env'
 
-export const getStaticProps = async () => {
+const fetchIndexData = async () => {
   const books = await prisma.books.findMany({
     include: {
       user: { select: { name: true, image: true } },
@@ -29,8 +30,15 @@ export const getStaticProps = async () => {
       sheet: book.sheet.name,
     })
   })
-  return {
-    props: { comments },
-    revalidate: 5,
-  }
+  return { props: { comments } }
 }
+
+// 本番環境: SSG (ISR)
+export const getStaticProps = isSSGEnabled
+  ? async () => ({ ...(await fetchIndexData()), revalidate: 5 })
+  : undefined
+
+// 開発・プレビュー環境: SSR
+export const getServerSideProps = !isSSGEnabled
+  ? async () => await fetchIndexData()
+  : undefined

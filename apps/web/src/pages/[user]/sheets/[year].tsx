@@ -2,9 +2,11 @@ import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { mask } from '@/utils/string'
+import { isSSGEnabled } from '@/libs/env'
+
 export default SheetPage
 
-export async function getStaticProps(context) {
+const fetchYearData = async (context) => {
   const { user: username, year } = context.params
   const user = await prisma.user.findUnique({
     where: { name: username },
@@ -88,22 +90,34 @@ export async function getStaticProps(context) {
         ...(v.analysis as object),
       })),
     },
-    revalidate: 5,
   }
 }
-export async function getStaticPaths() {
-  const users = await prisma.user.findMany({
-    select: { name: true, sheets: { select: { name: true } } },
-  })
-  const paths = users
-    .map((user) => {
-      return user.sheets.map((sheet) => {
-        return { params: { user: user.name, year: sheet.name } }
+
+// 本番環境: SSG (ISR)
+export const getStaticProps = isSSGEnabled
+  ? async (context) => ({ ...(await fetchYearData(context)), revalidate: 5 })
+  : undefined
+
+export const getStaticPaths = isSSGEnabled
+  ? async () => {
+      const users = await prisma.user.findMany({
+        select: { name: true, sheets: { select: { name: true } } },
       })
-    })
-    .flat()
-  return {
-    paths,
-    fallback: 'blocking', // キャッシュが存在しない場合はSSR
-  }
-}
+      const paths = users
+        .map((user) => {
+          return user.sheets.map((sheet) => {
+            return { params: { user: user.name, year: sheet.name } }
+          })
+        })
+        .flat()
+      return {
+        paths,
+        fallback: 'blocking',
+      }
+    }
+  : undefined
+
+// 開発・プレビュー環境: SSR
+export const getServerSideProps = !isSSGEnabled
+  ? async (context) => await fetchYearData(context)
+  : undefined

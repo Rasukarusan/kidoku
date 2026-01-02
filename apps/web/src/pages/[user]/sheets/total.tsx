@@ -1,10 +1,11 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import prisma from '@/libs/prisma'
+import { isSSGEnabled } from '@/libs/env'
 
 export default SheetTotalPage
 
-export const getStaticProps = async (ctx) => {
+const fetchTotalData = async (ctx) => {
   const { user: username } = ctx.params
   const user = await prisma.user.findUnique({
     where: { name: username },
@@ -82,21 +83,32 @@ export const getStaticProps = async (ctx) => {
       userId,
       yearlyTopBooks,
     },
-    revalidate: 5,
   }
 }
 
-export async function getStaticPaths() {
-  const users = await prisma.user.findMany({
-    select: { name: true },
-  })
-  const paths = users
-    .map((user) => {
-      return { params: { user: user.name } }
-    })
-    .flat()
-  return {
-    paths,
-    fallback: 'blocking', // キャッシュが存在しない場合はSSR
-  }
-}
+// 本番環境: SSG (ISR)
+export const getStaticProps = isSSGEnabled
+  ? async (ctx) => ({ ...(await fetchTotalData(ctx)), revalidate: 5 })
+  : undefined
+
+export const getStaticPaths = isSSGEnabled
+  ? async () => {
+      const users = await prisma.user.findMany({
+        select: { name: true },
+      })
+      const paths = users
+        .map((user) => {
+          return { params: { user: user.name } }
+        })
+        .flat()
+      return {
+        paths,
+        fallback: 'blocking',
+      }
+    }
+  : undefined
+
+// 開発・プレビュー環境: SSR
+export const getServerSideProps = !isSSGEnabled
+  ? async (ctx) => await fetchTotalData(ctx)
+  : undefined
