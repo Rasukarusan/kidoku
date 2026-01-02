@@ -52,14 +52,21 @@ export const authOptions: NextAuthOptions = {
           CredentialsProvider({
             id: 'backdoor',
             name: 'Backdoor Login',
-            credentials: {},
-            async authorize() {
+            credentials: {
+              email: { label: 'Email', type: 'email' },
+            },
+            async authorize(credentials) {
               const backdoorEmail = process.env.BACKDOOR_USER_EMAIL
-              if (!backdoorEmail) {
+              if (!backdoorEmail || !credentials?.email) {
                 return null
               }
 
-              // 環境変数で設定されたメールアドレスでユーザーを検索
+              // 入力されたメールアドレスが環境変数と一致するかチェック
+              if (credentials.email !== backdoorEmail) {
+                return null
+              }
+
+              // メールアドレスでユーザーを検索
               const user = await prisma.user.findUnique({
                 where: { email: backdoorEmail },
               })
