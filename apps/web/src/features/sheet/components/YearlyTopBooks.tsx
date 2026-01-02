@@ -53,7 +53,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
         <div className="mb-4">
           <TitleWithLine text={`${year}年トップ３`} />
         </div>
-        <div className="flex justify-center gap-4 sm:gap-8">
+        <div className="flex justify-between">
           {[1, 2, 3].map((v) => {
             const yearlyTopBook = latestYearlyBooks?.yearlyTopBooks
               ?.filter((book) => book.order === v)
