@@ -96,6 +96,12 @@ export const getServerSideProps: GetServerSideProps = async ({
             image: true,
           },
         },
+        sheet: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     })
 
@@ -125,7 +131,12 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     return {
       props: {
-        book: parse({ ...sanitizedBook, month }),
+        book: parse({
+          ...sanitizedBook,
+          month,
+          sheet_id: book.sheet_id,
+          sheet: book.sheet?.name ?? null,
+        }),
       },
     }
   } catch (error) {

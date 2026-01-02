@@ -16,6 +16,7 @@ import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { MaskButton } from '@/components/button/MaskButton'
 import { CategoriesResponse } from '@/types/api'
+import { SheetSelectBox } from '@/components/input/SheetSelectBox'
 
 interface Props {
   currentBook: Book // 変更前の本
@@ -120,6 +121,18 @@ export const BookDetailEditModal: React.FC<Props> = ({
           isChanged={diff.finished}
         />
       </div>
+      <SheetSelectBox
+        value={book?.sheet_id}
+        onChange={(sheet) => {
+          setBook({
+            ...book,
+            sheet_id: sheet.id,
+            sheet: sheet.name,
+          })
+        }}
+        className="mb-4"
+        tabIndex={6}
+      />
       <div className="mb-4">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center">

@@ -27,6 +27,8 @@ export default async (req, res) => {
         memo,
         finished,
         is_public_memo,
+        sheet_id,
+        sheet,
       } = book
       return {
         id,
@@ -40,6 +42,8 @@ export default async (req, res) => {
         memo,
         finished,
         is_public_memo,
+        sheet_id,
+        sheet: sheet?.name,
       }
     })
     return res.status(200).json({
