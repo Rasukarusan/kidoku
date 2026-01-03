@@ -5,9 +5,9 @@ import { users } from '../../infrastructure/database/schema/users.schema';
 import { DrizzleDb } from '../database/types';
 import { INJECTION_TOKENS } from '../../shared/constants/injection-tokens';
 import { Comment } from '../../domain/models/comment';
-import { ICommentRepository } from 'src/domain/repositories/comment';
+import { ICommentRepository } from '../../domain/repositories/comment';
 import { books } from '../database/schema';
-import { PaginatedResult } from 'src/domain/types/paginated-result';
+import { PaginatedResult } from '../../domain/types/paginated-result';
 
 @Injectable()
 export class CommentRepository implements ICommentRepository {

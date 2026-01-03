@@ -4,7 +4,7 @@ import { GetSheetsUseCase } from '../../application/usecases/sheets/get-sheets';
 import { SheetRepository } from '../../infrastructure/repositories/sheet';
 import { AuthModule } from '../../infrastructure/auth/auth.module';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
-import { ISheetRepository } from 'src/domain/repositories/sheet';
+import { ISheetRepository } from '../../domain/repositories/sheet';
 
 @Module({
   imports: [AuthModule, DatabaseModule],

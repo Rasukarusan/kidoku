@@ -1,4 +1,4 @@
-import { Comment } from 'src/domain/models/comment';
+import { Comment } from '../models/comment';
 import { PaginatedResult } from '../types/paginated-result';
 
 export abstract class ICommentRepository {
