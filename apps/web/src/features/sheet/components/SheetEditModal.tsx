@@ -5,19 +5,21 @@ import { useMutation } from '@apollo/client'
 import { UPDATE_SHEET } from '@/libs/apollo/queries'
 
 interface Props {
-  sheet: string
+  sheetName: string
+  sheetId?: string
   open: boolean
   onClose: () => void
   username: string
 }
 
 export const SheetEditModal: React.FC<Props> = ({
-  sheet,
+  sheetName,
+  sheetId,
   open,
   onClose,
   username,
 }) => {
-  const [input, setInput] = useState(sheet)
+  const [input, setInput] = useState(sheetName)
   const ref = useRef<HTMLInputElement>(null)
   const [updateSheet, { loading }] = useMutation(UPDATE_SHEET)
 
@@ -26,14 +28,14 @@ export const SheetEditModal: React.FC<Props> = ({
   }, [open])
 
   useEffect(() => {
-    setInput(sheet)
-  }, [sheet])
+    setInput(sheetName)
+  }, [sheetName])
 
   return (
     <Modal
       open={open}
       onClose={() => {
-        setInput(sheet)
+        setInput(sheetName)
         onClose()
       }}
       className="h-auto min-h-[200px] max-w-[500px]"
@@ -51,19 +53,20 @@ export const SheetEditModal: React.FC<Props> = ({
         />
         <button
           className="mx-auto flex items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white disabled:bg-gray-300"
-          disabled={input === sheet || loading}
+          disabled={input === sheetName || loading || !sheetId}
           onClick={async () => {
+            if (!sheetId) return
             try {
               await updateSheet({
                 variables: {
                   input: {
-                    oldName: sheet,
-                    newName: input,
+                    id: sheetId,
+                    name: input,
                   },
                 },
               })
               alert('更新しました')
-              location.href = `/${username}/sheets`
+              location.href = `/${username}/sheets/${input}`
             } catch (error) {
               alert('シート名の更新に失敗しました')
             }

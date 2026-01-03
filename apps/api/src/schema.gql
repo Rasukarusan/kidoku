@@ -2,11 +2,24 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type HelloResponseDto {
-  message: String!
+type SoftwareDesignResponse {
+  yearMonth: String!
+  title: String!
+  coverImageUrl: String!
+  publishDate: String!
+  isbn: String
+  author: String!
+  category: String!
+  image: String
+  memo: String
 }
 
-type SheetObject {
+type SoftwareDesignListResponse {
+  items: [SoftwareDesignResponse!]!
+  total: Float!
+}
+
+type SheetResponse {
   id: ID!
   name: String!
   userId: ID!
@@ -20,7 +33,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type CommentObject {
+type CommentItem {
   id: ID!
   title: String!
   memo: String!
@@ -31,42 +44,24 @@ type CommentObject {
   sheet: String!
 }
 
-type CommentsResponseDto {
-  comments: [CommentObject!]!
+type CommentResponse {
+  total: Float!
   hasMore: Boolean!
-  total: Float!
-}
-
-type SoftwareDesignObject {
-  yearMonth: String!
-  title: String!
-  coverImageUrl: String!
-  publishDate: String!
-  isbn: String
-  author: String!
-  category: String!
-  image: String
-  memo: String
-}
-
-type SoftwareDesignListResponseDto {
-  items: [SoftwareDesignObject!]!
-  total: Float!
+  comments: [CommentItem!]!
 }
 
 type Query {
-  hello: HelloResponseDto!
-  sheets: [SheetObject!]!
-  comments(input: GetCommentsInput!): CommentsResponseDto!
-  latestSoftwareDesign: SoftwareDesignObject!
-  softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignObject!
-  softwareDesignByYear(input: GetSoftwareDesignInput!): SoftwareDesignListResponseDto!
-  searchSoftwareDesignByISBN(isbn: String!, year: Int, month: Int, title: String): SoftwareDesignObject
+  sheets: [SheetResponse!]!
+  comments(input: GetCommentsInput!): CommentResponse!
+  latestSoftwareDesign: SoftwareDesignResponse!
+  softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignResponse!
+  softwareDesignByYear(input: GetSoftwareDesignInput!): SoftwareDesignListResponse!
+  searchSoftwareDesignByISBN(isbn: String!, year: Int, month: Int, title: String): SoftwareDesignResponse
 }
 
 input GetCommentsInput {
-  limit: Int! = 20
-  offset: Int! = 0
+  limit: Int!
+  offset: Int!
 }
 
 input GetSoftwareDesignInput {
@@ -75,8 +70,8 @@ input GetSoftwareDesignInput {
 }
 
 type Mutation {
-  createSheet(input: CreateSheetInput!): SheetObject!
-  updateSheet(input: UpdateSheetInput!): SheetObject!
+  createSheet(input: CreateSheetInput!): SheetResponse!
+  updateSheet(input: UpdateSheetInput!): SheetResponse!
   deleteSheet(input: DeleteSheetInput!): Boolean!
   updateSheetOrders(input: UpdateSheetOrdersInput!): Boolean!
 }
@@ -86,12 +81,12 @@ input CreateSheetInput {
 }
 
 input UpdateSheetInput {
-  oldName: String!
-  newName: String!
+  id: ID!
+  name: String!
 }
 
 input DeleteSheetInput {
-  name: String!
+  id: ID!
 }
 
 input UpdateSheetOrdersInput {
@@ -99,6 +94,6 @@ input UpdateSheetOrdersInput {
 }
 
 input SheetOrderItem {
-  id: String!
-  order: Float!
+  id: ID!
+  order: Int!
 }
