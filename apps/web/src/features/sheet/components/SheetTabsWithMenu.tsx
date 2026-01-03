@@ -23,6 +23,8 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
       ? 'mb-8 flex items-center border-b border-gray-200'
       : 'sticky top-[3.5rem] z-30 -mx-4 flex items-center bg-white px-4 sm:-mx-6 sm:px-6 max-w-[400px] sm:max-w-full'
 
+  const currentSheetId = sheets.find((s) => s.name === currentSheet)?.id
+
   return (
     <div className={containerClass}>
       <Tabs
@@ -33,6 +35,7 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
       />
       <Menu
         currentSheet={currentSheet}
+        currentSheetId={currentSheetId}
         username={username}
         userId={userId}
         activate={menuActivate}

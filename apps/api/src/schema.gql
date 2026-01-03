@@ -68,3 +68,32 @@ input GetSoftwareDesignInput {
   year: Int!
   month: Int
 }
+
+type Mutation {
+  createSheet(input: CreateSheetInput!): SheetResponse!
+  updateSheet(input: UpdateSheetInput!): SheetResponse!
+  deleteSheet(input: DeleteSheetInput!): Boolean!
+  updateSheetOrders(input: UpdateSheetOrdersInput!): Boolean!
+}
+
+input CreateSheetInput {
+  name: String!
+}
+
+input UpdateSheetInput {
+  id: ID!
+  name: String!
+}
+
+input DeleteSheetInput {
+  id: ID!
+}
+
+input UpdateSheetOrdersInput {
+  sheets: [SheetOrderItem!]!
+}
+
+input SheetOrderItem {
+  id: ID!
+  order: Int!
+}
