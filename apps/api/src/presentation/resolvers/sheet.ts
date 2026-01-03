@@ -3,7 +3,7 @@ import { Query, Resolver } from '@nestjs/graphql';
 import { GetSheetsUseCase } from '../../application/usecases/sheets/get-sheets';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
 import { GqlAuthGuard } from '../../infrastructure/auth/gql-auth.guard';
-import { SheetResponse } from '../dto/sheet.response';
+import { SheetResponse } from '../dto/sheet';
 
 @Resolver()
 @UseGuards(GqlAuthGuard)

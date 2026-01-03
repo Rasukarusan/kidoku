@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Query, Resolver } from '@nestjs/graphql';
-import { CommentResponse, CommentItem } from '../dto/comment.response';
+import { Query, Resolver, Args } from '@nestjs/graphql';
+import {
+  CommentResponse,
+  CommentItem,
+  GetCommentsInput,
+} from '../dto/comment';
 import { GetPublicCommentsUseCase } from '../../application/usecases/comments/get-public-comments';
 import { Comment } from '../../domain/models/comment';
 
@@ -11,8 +15,13 @@ export class CommentResolver {
   ) {}
 
   @Query(() => CommentResponse)
-  async comments(): Promise<CommentResponse> {
-    const result = await this.getPublicCommentsUseCase.execute();
+  async comments(
+    @Args('input') input: GetCommentsInput,
+  ): Promise<CommentResponse> {
+    const result = await this.getPublicCommentsUseCase.execute(
+      input.limit,
+      input.offset,
+    );
     return {
       comments: result.items.map((item) => this.toCommentItem(item)),
       total: result.total,
