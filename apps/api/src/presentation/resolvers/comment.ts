@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Query, Resolver } from '@nestjs/graphql';
 import { CommentResponse, CommentItem } from '../dto/comment.response';
 import { GetPublicCommentsUseCase } from '../../application/usecases/comments/get-public-comments';
