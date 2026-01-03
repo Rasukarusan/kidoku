@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Sheet } from 'src/domain/models/sheet';
-import { ISheetRepository } from 'src/domain/repositories/sheet';
+import { Sheet } from '../../../domain/models/sheet';
+import { ISheetRepository } from '../../../domain/repositories/sheet';
 
 @Injectable()
 export class GetSheetsUseCase {

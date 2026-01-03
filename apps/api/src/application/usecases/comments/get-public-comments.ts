@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Comment } from 'src/domain/models/comment';
-import { ICommentRepository } from 'src/domain/repositories/comment';
-import { PaginatedResult } from 'src/domain/types/paginated-result';
+import { Comment } from '../../../domain/models/comment';
+import { ICommentRepository } from '../../../domain/repositories/comment';
+import { PaginatedResult } from '../../../domain/types/paginated-result';
 
 @Injectable()
 export class GetPublicCommentsUseCase {

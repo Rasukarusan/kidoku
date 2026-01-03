@@ -1,4 +1,4 @@
-import { Sheet } from 'src/domain/models/sheet';
+import { Sheet } from '../models/sheet';
 
 export abstract class ISheetRepository {
   abstract findByUserId(userId: string): Promise<Sheet[]>;
