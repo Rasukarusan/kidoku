@@ -7,7 +7,7 @@ import { PaginatedResult } from '../../../domain/types/paginated-result';
 export class GetPublicCommentsUseCase {
   constructor(private readonly commentRepository: ICommentRepository) {}
 
-  async execute(): Promise<PaginatedResult<Comment>> {
-    return await this.commentRepository.findPublicComments();
+  async execute(limit: number, offset: number): Promise<PaginatedResult<Comment>> {
+    return await this.commentRepository.findPublicComments(limit, offset);
   }
 }

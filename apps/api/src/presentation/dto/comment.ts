@@ -1,5 +1,21 @@
-import { Field, ObjectType, ID, GraphQLISODateTime } from '@nestjs/graphql';
-import { PaginatedResponse } from './paginated.response';
+import {
+  Field,
+  ObjectType,
+  InputType,
+  ID,
+  Int,
+  GraphQLISODateTime,
+} from '@nestjs/graphql';
+import { PaginatedResponse } from './paginated';
+
+@InputType()
+export class GetCommentsInput {
+  @Field(() => Int)
+  limit: number;
+
+  @Field(() => Int)
+  offset: number;
+}
 
 @ObjectType()
 export class CommentItem {

@@ -57,11 +57,16 @@ type CommentResponse {
 type Query {
   hello: HelloResponseDto!
   sheets: [SheetResponse!]!
-  comments: CommentResponse!
+  comments(input: GetCommentsInput!): CommentResponse!
   latestSoftwareDesign: SoftwareDesignObject!
   softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignObject!
   softwareDesignByYear(input: GetSoftwareDesignInput!): SoftwareDesignListResponseDto!
   searchSoftwareDesignByISBN(isbn: String!, year: Int, month: Int, title: String): SoftwareDesignObject
+}
+
+input GetCommentsInput {
+  limit: Int!
+  offset: Int!
 }
 
 input GetSoftwareDesignInput {
