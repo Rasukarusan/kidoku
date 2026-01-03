@@ -23,6 +23,35 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 - **フロントエンド**: Prisma ORM → MySQL
 - **バックエンド**: Drizzle ORM → 同一MySQL（スキーマ同期が必要）
 
+### API アーキテクチャ（DDD）
+バックエンドAPIはDDD（ドメイン駆動設計）のレイヤードアーキテクチャを採用：
+
+```
+apps/api/src/
+├── domain/           # ドメイン層（ビジネスロジックの中核）
+│   ├── models/       # エンティティ（private constructor + factory methods）
+│   ├── repositories/ # リポジトリインターフェース（abstract class）
+│   └── types/        # ドメイン型定義
+├── application/      # アプリケーション層（ユースケース）
+│   └── usecases/     # 各機能のユースケース
+├── infrastructure/   # インフラ層（外部システムとの接続）
+│   ├── auth/         # 認証（Guards, Strategies, Decorators）
+│   ├── database/     # Drizzle設定・スキーマ
+│   └── repositories/ # リポジトリ実装
+├── presentation/     # プレゼンテーション層（GraphQL API）
+│   ├── resolvers/    # GraphQLリゾルバー
+│   ├── dto/          # Input/Response型（@InputType, @ObjectType）
+│   └── modules/      # NestJSモジュール
+└── shared/           # 横断的関心事
+    └── constants/    # 定数（DIトークンなど）
+```
+
+**レイヤー間の依存ルール:**
+- domain → 他層に依存しない
+- application → domain のみ依存
+- infrastructure → domain に依存（リポジトリ実装）
+- presentation → application, domain に依存
+
 ### 検索エンジン
 - **MeiliSearch日本語版**（`getmeili/meilisearch:prototype-japanese-6`）を使用
 - Dockerfileで専用イメージをビルド
@@ -99,16 +128,16 @@ pnpm --filter web lighthouse
 - `apps/web/src/pages/api/graphql.ts` - GraphQLプロキシ（署名生成）
 - `apps/web/src/pages/api/auth/[...nextauth].ts` - NextAuth設定
 - `apps/web/src/libs/auth/` - 認証ユーティリティ
-- `apps/api/src/auth/` - NestJS認証モジュール（署名検証）
+- `apps/api/src/infrastructure/auth/` - NestJS認証モジュール（署名検証）
 
 ### GraphQL
 - `apps/web/src/libs/apollo/` - Apollo Client設定
 - `apps/api/src/schema.gql` - GraphQLスキーマ（自動生成）
-- `apps/api/src/modules/*/` - GraphQLリゾルバー
+- `apps/api/src/presentation/resolvers/` - GraphQLリゾルバー
 
 ### データベース
 - `apps/web/prisma/schema.prisma` - Prismaスキーマ定義
-- `apps/api/src/database/schema/` - Drizzleスキーマ定義
+- `apps/api/src/infrastructure/database/schema/` - Drizzleスキーマ定義
 
 ### 検索
 - `apps/web/src/libs/meilisearch/` - MeiliSearch統合
