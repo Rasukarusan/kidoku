@@ -2,10 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type HelloResponseDto {
-  message: String!
-}
-
 type SoftwareDesignResponse {
   yearMonth: String!
   title: String!
@@ -55,7 +51,6 @@ type CommentResponse {
 }
 
 type Query {
-  hello: HelloResponseDto!
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
   latestSoftwareDesign: SoftwareDesignResponse!
