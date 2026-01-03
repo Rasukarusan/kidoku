@@ -27,6 +27,19 @@ export class Sheet {
     return this._updated;
   }
 
+  rename(newName: string): void {
+    if (!newName || newName.trim().length === 0) {
+      throw new Error('シート名は必須です');
+    }
+    this._name = newName.trim();
+    this._updated = new Date();
+  }
+
+  updateOrder(newOrder: number): void {
+    this._order = newOrder;
+    this._updated = new Date();
+  }
+
   static create(userId: string, name: string, order: number): Sheet {
     if (!name || name.trim().length === 0) {
       throw new Error('シート名は必須です');

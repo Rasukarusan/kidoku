@@ -1,58 +1,16 @@
-// async createSheet(userId: string, name: string): Promise<SheetObject> {
-//   const lastSheet = await this.sheetsRepository.findLastByUserId(userId);
-//   const order = lastSheet ? (lastSheet.order ?? 0) + 1 : 1;
+import { Injectable } from '@nestjs/common';
+import { Sheet } from '../../../domain/models/sheet';
+import { ISheetRepository } from '../../../domain/repositories/sheet';
 
-//   const created = await this.sheetsRepository.create({
-//     userId,
-//     name,
-//     order,
-//   });
+@Injectable()
+export class CreateSheetUseCase {
+  constructor(private readonly sheetRepository: ISheetRepository) {}
 
-//   return {
-//     id: created.id.toString(),
-//     name: created.name,
-//     userId: created.userId,
-//     created: created.created ?? undefined,
-//     updated: created.updated ?? undefined,
-//     order: created.order ?? undefined,
-//   };
-// }
+  async execute(userId: string, name: string): Promise<Sheet> {
+    const lastSheet = await this.sheetRepository.findLastByUserId(userId);
+    const order = lastSheet ? lastSheet.order + 1 : 1;
 
-// async updateSheet(
-//   userId: string,
-//   oldName: string,
-//   newName: string,
-// ): Promise<SheetObject> {
-//   const updated = await this.sheetsRepository.update(
-//     userId,
-//     oldName,
-//     newName,
-//   );
-
-//   return {
-//     id: updated.id.toString(),
-//     name: updated.name,
-//     userId: updated.userId,
-//     created: updated.created ?? undefined,
-//     updated: updated.updated ?? undefined,
-//     order: updated.order ?? undefined,
-//   };
-// }
-
-// async deleteSheet(userId: string, name: string): Promise<void> {
-//   await this.sheetsRepository.delete(userId, name);
-// }
-
-// async updateSheetOrders(
-//   userId: string,
-//   input: UpdateSheetOrdersInput,
-// ): Promise<boolean> {
-//   const sheetUpdates = input.sheets.map((sheet) => ({
-//     id: sheet.id,
-//     order: sheet.order,
-//   }));
-
-//   await this.sheetsRepository.updateOrders(sheetUpdates);
-//   return true;
-// }
-// }
+    const sheet = Sheet.create(userId, name, order);
+    return await this.sheetRepository.save(sheet);
+  }
+}
