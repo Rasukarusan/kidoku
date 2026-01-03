@@ -45,7 +45,7 @@ type SoftwareDesignListResponseDto {
   total: Float!
 }
 
-type SheetObject {
+type SheetResponse {
   id: ID!
   name: String!
   userId: ID!
@@ -56,7 +56,7 @@ type SheetObject {
 
 type Query {
   hello: HelloResponseDto!
-  sheets: [SheetObject!]!
+  sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentsResponseDto!
   latestSoftwareDesign: SoftwareDesignObject!
   softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignObject!
