@@ -19,55 +19,55 @@ export class SheetsResolver {
     private readonly getSheetsUseCase: GetSheetsUseCase,
   ) {}
 
-  @Query(() => [SheetObject])
-  async sheets(
-    @CurrentUser() user: { id: string; admin: boolean },
-  ): Promise<SheetObject[]> {
-    const sheets = await this.getSheetsUseCase.execute(user.id);
-    return sheets.map((sheet) => ({
-      id: sheet.id.toString(),
-      name: sheet.name,
-      userId: sheet.userId,
-      created: sheet.created ?? undefined,
-      updated: sheet.updated ?? undefined,
-      order: sheet.order ?? undefined,
-    }));
-  }
+  // @Query(() => [SheetObject])
+  // async sheets(
+  //   @CurrentUser() user: { id: string; admin: boolean },
+  // ): Promise<SheetObject[]> {
+  //   const sheets = await this.getSheetsUseCase.execute(user.id);
+  //   return sheets.map((sheet) => ({
+  //     id: sheet.id.toString(),
+  //     name: sheet.name,
+  //     userId: sheet.userId,
+  //     created: sheet.created ?? undefined,
+  //     updated: sheet.updated ?? undefined,
+  //     order: sheet.order ?? undefined,
+  //   }));
+  // }
 
-  @Mutation(() => SheetObject)
-  async createSheet(
-    @CurrentUser() user: { id: string; admin: boolean },
-    @Args('input') input: CreateSheetInput,
-  ): Promise<SheetObject> {
-    return await this.sheetsService.createSheet(user.id, input.name);
-  }
+  // @Mutation(() => SheetObject)
+  // async createSheet(
+  //   @CurrentUser() user: { id: string; admin: boolean },
+  //   @Args('input') input: CreateSheetInput,
+  // ): Promise<SheetObject> {
+  //   return await this.sheetsService.createSheet(user.id, input.name);
+  // }
 
-  @Mutation(() => SheetObject)
-  async updateSheet(
-    @CurrentUser() user: { id: string; admin: boolean },
-    @Args('input') input: UpdateSheetInput,
-  ): Promise<SheetObject> {
-    return await this.sheetsService.updateSheet(
-      user.id,
-      input.oldName,
-      input.newName,
-    );
-  }
+  // @Mutation(() => SheetObject)
+  // async updateSheet(
+  //   @CurrentUser() user: { id: string; admin: boolean },
+  //   @Args('input') input: UpdateSheetInput,
+  // ): Promise<SheetObject> {
+  //   return await this.sheetsService.updateSheet(
+  //     user.id,
+  //     input.oldName,
+  //     input.newName,
+  //   );
+  // }
 
-  @Mutation(() => Boolean)
-  async deleteSheet(
-    @CurrentUser() user: { id: string; admin: boolean },
-    @Args('input') input: DeleteSheetInput,
-  ): Promise<boolean> {
-    await this.sheetsService.deleteSheet(user.id, input.name);
-    return true;
-  }
+  // @Mutation(() => Boolean)
+  // async deleteSheet(
+  //   @CurrentUser() user: { id: string; admin: boolean },
+  //   @Args('input') input: DeleteSheetInput,
+  // ): Promise<boolean> {
+  //   await this.sheetsService.deleteSheet(user.id, input.name);
+  //   return true;
+  // }
 
-  @Mutation(() => Boolean)
-  async updateSheetOrders(
-    @CurrentUser() user: { id: string; admin: boolean },
-    @Args('input') input: UpdateSheetOrdersInput,
-  ): Promise<boolean> {
-    return await this.sheetsService.updateSheetOrders(user.id, input);
-  }
+  // @Mutation(() => Boolean)
+  // async updateSheetOrders(
+  //   @CurrentUser() user: { id: string; admin: boolean },
+  //   @Args('input') input: UpdateSheetOrdersInput,
+  // ): Promise<boolean> {
+  //   return await this.sheetsService.updateSheetOrders(user.id, input);
+  // }
 }

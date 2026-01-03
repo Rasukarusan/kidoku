@@ -4,10 +4,9 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { HelloModule } from './modules/hello/hello.module';
-import { SheetsModule } from './modules/sheets/sheets.module';
 import { CommentsModule } from './modules/comments/comments.module';
-import { HealthModule } from './health/health.module';
 import { SoftwareDesignModule } from './modules/software-design/software-design.module';
+import { SheetModule } from './presentation/modules/sheet';
 
 @Module({
   imports: [
@@ -26,9 +25,8 @@ import { SoftwareDesignModule } from './modules/software-design/software-design.
       playground: true,
     }),
     HelloModule,
-    SheetsModule,
+    SheetModule,
     CommentsModule,
-    HealthModule,
     SoftwareDesignModule,
   ],
 })
