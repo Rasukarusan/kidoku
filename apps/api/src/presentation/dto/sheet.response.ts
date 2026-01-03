@@ -7,7 +7,7 @@ import {
 } from '@nestjs/graphql';
 
 @ObjectType()
-export class SheetObject {
+export class SheetResponse {
   /** 主キー ─ 数値なら Int でも OK。一般的には ID 推奨 */
   @Field(() => ID)
   id: string;
