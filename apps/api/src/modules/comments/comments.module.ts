@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from '../../database/database.module';
+import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { CommentsService } from './comments.service';
 import { CommentsResolver } from './comments.resolver';
 

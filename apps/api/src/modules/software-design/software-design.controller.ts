@@ -7,7 +7,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { HttpHeaderAuthGuard } from '../../auth/http-header-auth.guard';
+import { HttpHeaderAuthGuard } from '../../infrastructure/auth/http-header-auth.guard';
 import { SoftwareDesignService } from './software-design.service';
 import { SoftwareDesignRepository } from './software-design.repository';
 

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, desc, count } from 'drizzle-orm';
-import { INJECTION_TOKENS } from '../../constants/injection-tokens';
-import { books } from '../../database/schema/books.schema';
-import { users } from '../../database/schema/users.schema';
-import { sheets } from '../../database/schema/sheets.schema';
+import { INJECTION_TOKENS } from '../../shared/constants/injection-tokens';
+import { books } from '../../infrastructure/database/schema/books.schema';
+import { users } from '../../infrastructure/database/schema/users.schema';
+import { sheets } from '../../infrastructure/database/schema/sheets.schema';
 import { GetCommentsInput } from './dto/get-comments.input';
 import { CommentObject } from './dto/comment.object';
 import { CommentsResponseDto } from './dto/comments-response.dto';
