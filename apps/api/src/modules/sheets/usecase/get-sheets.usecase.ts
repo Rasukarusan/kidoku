@@ -6,8 +6,8 @@ import { Sheet } from '../models/sheet.model';
 export class GetSheetsUseCase {
   constructor(private readonly sheetsRepository: SheetsRepository) {}
 
-  async execute(userId: string): Promise<Sheet[]> {
-    const sheets = await this.sheetsRepository.findByUserId(userId);
-    return sheets;
-  }
+  // async execute(userId: string): Promise<Sheet[]> {
+  //   const sheets = await this.sheetsRepository.findByUserId(userId);
+  //   return sheets;
+  // }
 }
