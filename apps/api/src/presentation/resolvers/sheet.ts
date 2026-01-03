@@ -1,8 +1,8 @@
 import { UseGuards } from '@nestjs/common';
 import { Query, Resolver } from '@nestjs/graphql';
 import { GetSheetsUseCase } from 'src/application/usecases/sheets/get-sheets';
-import { CurrentUser } from 'src/auth/current-user.decorator';
-import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { CurrentUser } from 'src/infrastructure/auth/current-user.decorator';
+import { GqlAuthGuard } from 'src/infrastructure/auth/gql-auth.guard';
 import { SheetResponse } from '../dto/sheet.response';
 
 @Resolver()

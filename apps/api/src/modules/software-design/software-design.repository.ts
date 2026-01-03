@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { DATABASE_CONNECTION } from '../../constants/injection-tokens';
+import { DATABASE_CONNECTION } from '../../shared/constants/injection-tokens';
 import type { MySql2Database } from 'drizzle-orm/mysql2';
-import * as schema from '../../database/schema';
+import * as schema from '../../infrastructure/database/schema';
 import { eq } from 'drizzle-orm';
 
 @Injectable()

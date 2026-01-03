@@ -5,7 +5,7 @@ import * as schema from './schema';
 import {
   INJECTION_TOKENS,
   DATABASE_CONNECTION,
-} from '../constants/injection-tokens';
+} from '../../shared/constants/injection-tokens';
 
 const createDatabaseConnection = (configService: ConfigService) => {
   const dbHost = configService.get<string>('DB_HOST');

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq, desc, and } from 'drizzle-orm';
-import { sheets } from '../../database/schema/sheets.schema';
-import { DrizzleDb } from '../../database/types';
-import { INJECTION_TOKENS } from '../../constants/injection-tokens';
+import { sheets } from '../database/schema/sheets.schema';
+import { DrizzleDb } from '../database/types';
+import { INJECTION_TOKENS } from '../../shared/constants/injection-tokens';
 // import { Sheet } from '../../modules/sheets/models/sheet.model';
 import { Sheet } from '../../domain/models/sheet';
 import { ISheetRepository } from 'src/domain/repositories/sheet';
