@@ -1,7 +1,57 @@
 import ReactMarkdown from 'react-markdown'
+import { useState } from 'react'
 
 interface MemoProps {
   memo: string | null | undefined
+}
+
+/**
+ * マスクされたテキストを表示するコンポーネント
+ * クリックで内容を表示/非表示を切り替え
+ */
+const MaskedText: React.FC<{ text: string }> = ({ text }) => {
+  const [revealed, setRevealed] = useState(false)
+
+  return (
+    <span
+      className={`cursor-pointer rounded px-1 py-0.5 transition-colors ${
+        revealed
+          ? 'bg-gray-100 text-gray-800'
+          : 'bg-gray-800 text-gray-800 hover:bg-gray-700'
+      }`}
+      onClick={() => setRevealed(!revealed)}
+      title={revealed ? 'クリックで隠す' : 'クリックで表示'}
+    >
+      {revealed ? text : 'ネタバレ'}
+    </span>
+  )
+}
+
+/**
+ * [[MASK: text]] 形式のテキストを処理してマスク表示する
+ */
+const processMaskedText = (content: string): React.ReactNode[] => {
+  const maskPattern = /\[\[MASK:\s*(.*?)\]\]/g
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  let match
+
+  while ((match = maskPattern.exec(content)) !== null) {
+    // マッチ前のテキスト
+    if (match.index > lastIndex) {
+      parts.push(content.substring(lastIndex, match.index))
+    }
+    // マスクされたテキスト
+    parts.push(<MaskedText key={match.index} text={match[1]} />)
+    lastIndex = match.index + match[0].length
+  }
+
+  // 残りのテキスト
+  if (lastIndex < content.length) {
+    parts.push(content.substring(lastIndex))
+  }
+
+  return parts
 }
 
 /**
@@ -97,6 +147,43 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
               {children}
             </a>
           ),
+          p: ({ children }) => {
+            // 子要素を処理してマスクテキストを変換
+            const processChildren = (child: React.ReactNode): React.ReactNode => {
+              if (typeof child === 'string') {
+                const hasMask = /\[\[MASK:\s*(.*?)\]\]/.test(child)
+                if (hasMask) {
+                  return <>{processMaskedText(child)}</>
+                }
+                return child
+              }
+              return child
+            }
+            const processed = Array.isArray(children)
+              ? children.map((child, i) => (
+                  <span key={i}>{processChildren(child)}</span>
+                ))
+              : processChildren(children)
+            return <p>{processed}</p>
+          },
+          li: ({ children }) => {
+            const processChildren = (child: React.ReactNode): React.ReactNode => {
+              if (typeof child === 'string') {
+                const hasMask = /\[\[MASK:\s*(.*?)\]\]/.test(child)
+                if (hasMask) {
+                  return <>{processMaskedText(child)}</>
+                }
+                return child
+              }
+              return child
+            }
+            const processed = Array.isArray(children)
+              ? children.map((child, i) => (
+                  <span key={i}>{processChildren(child)}</span>
+                ))
+              : processChildren(children)
+            return <li>{processed}</li>
+          },
         }}
       >
         {memo}

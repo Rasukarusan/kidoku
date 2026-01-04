@@ -36,6 +36,7 @@ import {
   Minus,
   CheckSquare,
   Text,
+  EyeOff,
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
@@ -409,6 +410,31 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                 title="コード"
               >
                 <Code className="h-4 w-4" />
+              </button>
+            </EditorBubbleItem>
+            <div className="mx-1 h-4 w-px bg-gray-300" />
+            <EditorBubbleItem
+              onSelect={(editor) => {
+                const { from, to } = (editor as any).state.selection
+                const selectedText = (editor as any).state.doc.textBetween(
+                  from,
+                  to
+                )
+                if (selectedText) {
+                  ;(editor as any)
+                    .chain()
+                    .focus()
+                    .insertContent(`[[MASK: ${selectedText}]]`)
+                    .run()
+                }
+              }}
+            >
+              <button
+                type="button"
+                className="rounded p-1.5 hover:bg-gray-100"
+                title="マスク（ネタバレ防止）"
+              >
+                <EyeOff className="h-4 w-4" />
               </button>
             </EditorBubbleItem>
           </EditorBubble>

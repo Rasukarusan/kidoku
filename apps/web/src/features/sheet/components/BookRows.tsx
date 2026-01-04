@@ -3,6 +3,7 @@ import { Book } from '@/types/book'
 import { useState } from 'react'
 import { BookDetailSidebar } from './BookDetailSidebar'
 import { useSession } from 'next-auth/react'
+import { MemoPreview } from './MemoPreview'
 
 interface Props {
   books: Book[]
@@ -86,7 +87,9 @@ export const BookRows: React.FC<Props> = ({ books }) => {
               <td className={`px-6 py-2 ${pc}`}>{book.impression}</td>
               {(isMine || book.is_public_memo) && (
                 <td className={`whitespace-normal px-6 py-2 ${pc}`}>
-                  <span className="line-clamp-2">{book.memo}</span>
+                  <div className="line-clamp-2">
+                    <MemoPreview memo={book.memo} />
+                  </div>
                 </td>
               )}
             </tr>
