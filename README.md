@@ -296,10 +296,6 @@ RESEND_API_KEY=           # メール送信
 STRIPE_SECRET_KEY=        # 決済
 STRIPE_PUBLISHABLE_KEY=   # 決済（公開鍵）
 COHERE_API_KEY=          # AI分析
-PUSHER_APP_ID=           # リアルタイム通信
-PUSHER_KEY=              # リアルタイム通信
-PUSHER_SECRET=           # リアルタイム通信
-PUSHER_CLUSTER=          # リアルタイム通信
 ADMIN_AUTH_TOKEN=        # 管理者認証トークン
 ```
 
@@ -376,10 +372,6 @@ APIの自動デプロイが設定されています：
 - ISBNが`9784297`で始まる場合
 - タイトルに"Software Design"を含む場合
 - 最新号情報の自動取得
-
-### バーコードスキャン連携
-
-モバイルアプリからのバーコードスキャン結果がPusher経由でリアルタイムに反映されます。
 
 ## トラブルシューティング
 
