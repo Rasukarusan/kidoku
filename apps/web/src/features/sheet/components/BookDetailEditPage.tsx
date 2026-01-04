@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
@@ -12,7 +12,6 @@ import { BookCreatableSelectBox } from '@/components/input/BookCreatableSelectBo
 import { Tooltip } from 'react-tooltip'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
-import { MaskButton } from '@/components/button/MaskButton'
 import { useReward } from 'react-rewards'
 import { CategoriesResponse } from '@/types/api'
 import {
@@ -22,6 +21,7 @@ import {
   cleanupOldDrafts,
 } from '@/utils/localStorage'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
+import { MarkdownEditor } from '@/components/input/MarkdownEditor'
 
 interface Props {
   book: Book
@@ -34,7 +34,6 @@ export const BookDetailEditPage: React.FC<Props> = ({
   onClose,
   onCancel,
 }) => {
-  const memoTextareaRef = useRef<HTMLTextAreaElement>(null)
   const [book, setBook] = useState<Book>(initialBook)
   const [loading, setLoading] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
@@ -327,37 +326,11 @@ export const BookDetailEditPage: React.FC<Props> = ({
               </div>
             </div>
 
-            <div className="mb-2">
-              <MaskButton
-                textareaRef={memoTextareaRef}
-                onTextChange={(newText) => setBook({ ...book, memo: newText })}
-              />
-            </div>
-
-            <div className="rounded-lg bg-gray-50 p-4">
-              <textarea
-                ref={memoTextareaRef}
-                value={book?.memo || ''}
-                onChange={(e) => {
-                  setBook({ ...book, memo: e.target.value })
-                  // 自動でテキストエリアの高さを調整
-                  e.target.style.height = 'auto'
-                  e.target.style.height = e.target.scrollHeight + 'px'
-                }}
-                className="w-full resize-none border-none bg-transparent text-sm leading-relaxed focus:outline-none"
-                placeholder="感想やメモを入力してください..."
-                tabIndex={6}
-                style={{
-                  minHeight: '300px',
-                  lineHeight: '1.6',
-                  fontFamily: 'inherit',
-                }}
-                onFocus={(e) => {
-                  e.target.style.height = 'auto'
-                  e.target.style.height = e.target.scrollHeight + 'px'
-                }}
-              />
-            </div>
+            <MarkdownEditor
+              value={book?.memo || ''}
+              onChange={(memo) => setBook({ ...book, memo })}
+              minHeight="300px"
+            />
           </div>
         </div>
 
