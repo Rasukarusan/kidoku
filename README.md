@@ -14,45 +14,43 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 ### アーキテクチャ
 
 - **モノレポ管理**: Turborepo + pnpm workspaces
-- **フロントエンド**: Next.js 14 (App Router & API Routes) + React 18 (TypeScript 4.5.4)
-- **バックエンド**: NestJS 11 + GraphQL (TypeScript 5.7.3)
+- **フロントエンド**: Next.js 14 (Pages Router & App Router) + React 18 (TypeScript 4.5.4)
+- **バックエンド**: NestJS 11 + GraphQL (TypeScript 5.7.3) - DDD（ドメイン駆動設計）
 - **データベース**: MySQL + Prisma (フロントエンド) / Drizzle ORM (バックエンド)
-- **認証**: NextAuth.js (Google OAuth) + JWT署名検証
+- **認証**: NextAuth.js (Google OAuth) + HMAC-SHA256署名検証
 - **検索エンジン**: MeiliSearch (日本語対応版)
 - **AI機能**: Cohere
 - **メール送信**: Resend + React Email
 - **決済**: Stripe
-- **ストレージ**: Vercel Blob + Vercel KV
-- **監視**: Prometheus + Grafana
+- **ストレージ**: Vercel Blob
 
 ## 機能
 
-### 📚 読書記録管理
+### 読書記録管理
 
 - **本の検索と登録**: バーコードスキャン、タイトル検索、ユーザー本棚検索
 - **年別シート管理**: 2022年、2023年など年ごとの読書記録管理
 - **読書メモ**: 本ごとの感想・メモ機能
 - **進捗管理**: 読書状況の管理（読書中、読了、積読など）
 
-### 📊 分析機能
+### 分析機能
 
 - **AIによる読書傾向分析**: Cohereを活用した読書パターン分析
 - **統計データ**: 月別読書数、カテゴリ別内訳、年間統計
 - **可視化**: グラフ・チャートによる読書データの視覚化
 - **年間ベスト本**: 年間読書ランキング機能
 
-### 🔧 その他の機能
+### その他の機能
 
 - **Software Design誌対応**: 技術評論社の表紙画像を自動取得
-- **アプリケーション監視**: Prometheus + Grafanaによるメトリクス収集・可視化
 
-### 🔍 検索・発見
+### 検索・発見
 
 - **高速検索**: MeiliSearchによる本の高速全文検索
 - **カテゴリ検索**: ジャンル・カテゴリ別の本の発見
 - **テンプレート機能**: おすすめ本のテンプレート提供
 
-### 👥 社会的機能
+### 社会的機能
 
 - **ユーザー認証**: Google認証によるセキュアなログイン
 - **プロフィール管理**: ユーザープロフィール・読書設定管理
@@ -61,7 +59,7 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 
 ### フロントエンド
 
-- **Next.js** (v14.1.0) - React フレームワーク (Pages Router)
+- **Next.js** (v14.1.0) - React フレームワーク (Pages Router & App Router)
 - **React** (v18.2.0) - UIライブラリ
 - **TypeScript** (v4.5.4) - 型安全性
 - **Tailwind CSS** (v3.2.2) - スタイリング
@@ -79,7 +77,7 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 - **TypeScript** (v5.7.3) - 型安全性
 - **Drizzle ORM** (v0.43.1) - データベースORM
 - **MySQL** - データベース
-- **JWT** - 認証トークン（@nestjs/jwt v11.0.0）
+- **Passport** - 認証（HMAC-SHA256署名検証）
 
 ### インフラ・外部サービス
 
@@ -89,8 +87,6 @@ Kidokuは読書体験を向上させるためのWebアプリケーションで�
 - **Stripe** (v14.5.0) - 決済処理
 - **Vercel Blob** - ファイルストレージ
 - **Docker** - コンテナ化
-- **Prometheus** - メトリクス収集
-- **Grafana** - メトリクス可視化
 
 ## プロジェクト構成
 
@@ -103,41 +99,66 @@ kidoku/
 │   │   ├── src/
 │   │   │   ├── app/           # App Router
 │   │   │   ├── components/    # 共通UIコンポーネント
+│   │   │   │   ├── button/   # ボタンコンポーネント
+│   │   │   │   ├── form/     # フォームコンポーネント
+│   │   │   │   ├── icon/     # アイコンコンポーネント
+│   │   │   │   ├── input/    # 入力コンポーネント
+│   │   │   │   ├── label/    # ラベルコンポーネント
+│   │   │   │   └── layout/   # レイアウトコンポーネント
 │   │   │   ├── features/      # 機能別モジュール
 │   │   │   │   ├── auth/     # 認証機能
 │   │   │   │   ├── sheet/    # 読書シート
 │   │   │   │   ├── search/   # 検索機能
-│   │   │   │   └── settings/ # 設定画面
+│   │   │   │   ├── settings/ # 設定画面
+│   │   │   │   ├── comments/ # コメント機能
+│   │   │   │   ├── about/    # アバウトページ
+│   │   │   │   ├── index/    # トップページ
+│   │   │   │   ├── global/   # グローバル機能
+│   │   │   │   ├── law/      # 特定商取引法
+│   │   │   │   ├── terms/    # 利用規約
+│   │   │   │   └── privacy/  # プライバシーポリシー
 │   │   │   ├── libs/          # 外部ライブラリ統合
+│   │   │   │   ├── ai/       # AI機能（Cohere）
 │   │   │   │   ├── apollo/   # GraphQLクライアント
 │   │   │   │   ├── auth/     # NextAuth設定
 │   │   │   │   ├── meilisearch/ # 検索エンジン
 │   │   │   │   ├── prisma/   # ORM
+│   │   │   │   ├── resend/   # メール送信
+│   │   │   │   ├── sharp/    # 画像処理
 │   │   │   │   └── stripe/   # 決済
 │   │   │   ├── pages/         # Pages Router (API Routes)
 │   │   │   ├── hooks/         # カスタムフック
 │   │   │   ├── store/         # Jotaiストア
+│   │   │   ├── types/         # 型定義
 │   │   │   └── utils/         # ユーティリティ関数
 │   │   └── prisma/            # Prismaスキーマ
 │   │
-│   └── api/                    # NestJS GraphQLバックエンドAPI
+│   └── api/                    # NestJS GraphQL API（DDD構成）
 │       ├── src/
-│       │   ├── modules/        # 機能モジュール
-│       │   │   ├── sheets/     # シート管理
-│       │   │   ├── comments/   # コメント機能
-│       │   │   ├── software-design/ # Software Design誌機能
-│       │   │   └── hello/      # ヘルスチェック
-│       │   ├── database/       # データベース設定
-│       │   │   └── schema/     # Drizzleスキーマ
-│       │   ├── auth/           # 認証機能
-│       │   └── infrastructure/ # インフラ層
+│       │   ├── domain/         # ドメイン層（ビジネスロジックの中核）
+│       │   │   ├── models/     # エンティティ
+│       │   │   ├── repositories/ # リポジトリインターフェース
+│       │   │   └── types/      # ドメイン型定義
+│       │   ├── application/    # アプリケーション層（ユースケース）
+│       │   │   └── usecases/   # 各機能のユースケース
+│       │   │       ├── sheets/         # シート関連
+│       │   │       ├── comments/       # コメント関連
+│       │   │       └── software-design/ # Software Design関連
+│       │   ├── infrastructure/ # インフラ層（外部システムとの接続）
+│       │   │   ├── auth/       # 認証（Guards, Strategies, Decorators）
+│       │   │   ├── database/   # Drizzle設定・スキーマ
+│       │   │   └── repositories/ # リポジトリ実装
+│       │   ├── presentation/   # プレゼンテーション層（GraphQL API）
+│       │   │   ├── resolvers/  # GraphQLリゾルバー
+│       │   │   ├── dto/        # Input/Response型
+│       │   │   └── modules/    # NestJSモジュール
+│       │   └── shared/         # 横断的関心事
+│       │       └── constants/  # 定数（DIトークンなど）
 │       └── drizzle/            # Drizzle設定
 │
 ├── docker/                     # Docker設定ファイル
-│   ├── meilisearch/           # MeiliSearch設定
-│   ├── mysql/                 # MySQL設定
-│   ├── prometheus/            # Prometheus設定
-│   └── grafana/               # Grafanaダッシュボード
+│   ├── meilisearch/           # MeiliSearch設定（日本語対応）
+│   └── mysql/                 # MySQL設定
 │
 ├── .github/
 │   └── workflows/             # GitHub Actions
@@ -150,25 +171,33 @@ kidoku/
 
 ### apps/web (フロントエンド)
 
-- **フレームワーク**: Next.js 14 (App Router)
+- **フレームワーク**: Next.js 14 (Pages Router & App Router)
 - **言語**: TypeScript 4.5.4
-- **UI**: Tailwind CSS + Framer Motion + Radix UI
+- **UI**: Tailwind CSS + Framer Motion
 - **状態管理**: Jotai
 - **データ取得**: Apollo Client (GraphQL)
 - **認証**: NextAuth.js (Google OAuth)
 - **ORM**: Prisma
 - **画像処理**: Sharp
-- **メトリクス**: `/api/metrics`エンドポイント
 
 ### apps/api (バックエンド)
 
 - **フレームワーク**: NestJS 11
 - **API**: GraphQL (Apollo Server + Code-First)
+- **アーキテクチャ**: DDD（ドメイン駆動設計）レイヤードアーキテクチャ
 - **言語**: TypeScript 5.7.3
 - **ORM**: Drizzle ORM
 - **データベース**: MySQL
-- **認証**: JWT署名検証（NextAuthセッション）
-- **メトリクス**: `/metrics`エンドポイント
+- **認証**: HMAC-SHA256署名検証（NextAuthセッション）
+
+#### DDDレイヤー構成
+
+| レイヤー | 役割 | 依存関係 |
+|---------|------|----------|
+| domain | ビジネスロジックの中核（エンティティ、リポジトリIF） | 他層に依存しない |
+| application | ユースケース（ビジネスフローの実行） | domain のみ |
+| infrastructure | 外部システム接続（DB、認証） | domain に依存 |
+| presentation | GraphQL API（リゾルバー、DTO） | application, domain |
 
 ### 主要なスクリプト
 
@@ -267,10 +296,6 @@ RESEND_API_KEY=           # メール送信
 STRIPE_SECRET_KEY=        # 決済
 STRIPE_PUBLISHABLE_KEY=   # 決済（公開鍵）
 COHERE_API_KEY=          # AI分析
-PUSHER_APP_ID=           # リアルタイム通信
-PUSHER_KEY=              # リアルタイム通信
-PUSHER_SECRET=           # リアルタイム通信
-PUSHER_CLUSTER=          # リアルタイム通信
 ADMIN_AUTH_TOKEN=        # 管理者認証トークン
 ```
 
@@ -327,36 +352,6 @@ pnpm dev
 - **Webアプリ**: http://localhost:3000
 - **GraphQL API**: http://localhost:4000/graphql
 - **MeiliSearch Dashboard**: http://localhost:7700
-- **Prometheus**: http://localhost:9090
-- **Grafana**: http://localhost:13000 (初期認証: admin/admin)
-
-## 監視システム（Prometheus + Grafana）
-
-アプリケーションとインフラの監視が設定済みです。
-
-### アクセスURL
-
-- **Prometheus**: http://localhost:9090
-- **Grafana**: http://localhost:13000 (初期認証: admin/admin)
-
-### メトリクスエンドポイント
-
-- **フロントエンド**: http://localhost:3000/api/metrics
-- **バックエンド**: http://localhost:4000/metrics
-
-### カスタムメトリクス
-
-```
-- http_requests_total: HTTPリクエスト数
-- http_request_duration_seconds: リクエスト処理時間
-- kidoku_active_users: アクティブユーザー数
-- kidoku_books_registered_total: 登録された本の総数
-- kidoku_ai_analysis_requests_total: AI分析リクエスト数
-```
-
-### Grafanaダッシュボード
-
-Grafanaにログイン後、プリセットされた`kidoku-dashboard.json`を使用してアプリケーションメトリクスを視覚化できます。
 
 ## CI/CD
 
@@ -377,10 +372,6 @@ APIの自動デプロイが設定されています：
 - ISBNが`9784297`で始まる場合
 - タイトルに"Software Design"を含む場合
 - 最新号情報の自動取得
-
-### バーコードスキャン連携
-
-モバイルアプリからのバーコードスキャン結果がPusher経由でリアルタイムに反映されます。
 
 ## トラブルシューティング
 
@@ -414,7 +405,7 @@ docker-compose down
 docker-compose up -d
 
 # データベースの状態確認
-docker-compose logs mysql
+docker-compose logs db
 ```
 
 #### GraphQL API接続エラー
@@ -430,17 +421,6 @@ lsof -ti:4000 | xargs kill -9
 #### TypeScriptバージョンの不一致
 
 フロントエンド（TypeScript 4.5.4）とバックエンド（TypeScript 5.7.3）でバージョンが異なるため、共通コードを書く際は注意が必要です。
-
-#### 監視システムが起動しない場合
-
-```bash
-# Dockerコンテナのログ確認
-docker-compose logs prometheus
-docker-compose logs grafana
-
-# コンテナの再起動
-docker-compose restart prometheus grafana
-```
 
 ## 貢献
 
@@ -461,11 +441,12 @@ docker-compose restart prometheus grafana
 
 ### 注意事項
 
-- フロントエンドはApp RouterとPages Router（API Routes用）を併用
+- フロントエンドはPages RouterとApp Routerを併用
 - データベースアクセスはフロントエンドがPrisma、バックエンドがDrizzle ORMを使用
 - TypeScriptバージョンがフロントエンドとバックエンドで異なる
 - GraphQLはプロキシ経由（`/api/graphql`）でNextAuthセッション情報を付与
-- 認証はフロントエンドのNextAuth.jsで処理、バックエンドは署名検証のみ
+- 認証はフロントエンドのNextAuth.jsで処理、バックエンドはHMAC-SHA256署名検証のみ
+- APIはDDD（ドメイン駆動設計）レイヤードアーキテクチャを採用
 
 ### テスト
 
