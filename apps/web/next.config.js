@@ -12,6 +12,8 @@ const nextConfig = {
       'image.gihyo.co.jp',
     ],
   },
+  // Novelとその依存関係をトランスパイル
+  transpilePackages: ['novel', 'katex'],
   webpack(config, options) {
     config.resolve.alias['@'] = path.join(__dirname, 'src')
     return config

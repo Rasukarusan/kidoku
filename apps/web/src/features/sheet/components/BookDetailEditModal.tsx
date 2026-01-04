@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
@@ -16,7 +17,22 @@ import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { CategoriesResponse } from '@/types/api'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
-import { MarkdownEditor } from '@/components/input/MarkdownEditor'
+
+// SSRを無効にしてクライアントサイドのみでロード
+const MarkdownEditor = dynamic(
+  () =>
+    import('@/components/input/MarkdownEditor').then(
+      (mod) => mod.MarkdownEditor
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50">
+        <span className="text-gray-400">エディタを読み込み中...</span>
+      </div>
+    ),
+  }
+)
 
 interface Props {
   currentBook: Book // 変更前の本
