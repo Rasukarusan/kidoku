@@ -9,7 +9,6 @@ import {
   EditorCommandEmpty,
   EditorBubble,
   EditorBubbleItem,
-  type JSONContent,
 } from 'novel'
 import {
   StarterKit,
@@ -21,6 +20,7 @@ import {
   handleCommandNavigation,
   Command,
   createSuggestionItems,
+  MarkdownExtension,
 } from 'novel/extensions'
 import {
   Bold,
@@ -228,30 +228,15 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       Placeholder.configure({
         placeholder: '感想やメモを入力... (「/」でコマンドメニュー)',
       }),
+      MarkdownExtension,
       slashCommand,
     ],
     []
   )
 
-  // 初期コンテンツの生成（プレーンテキスト→JSONContent）
-  const initialContent = useMemo<JSONContent>(() => {
-    if (!value) {
-      return {
-        type: 'doc',
-        content: [{ type: 'paragraph' }],
-      }
-    }
-
-    const paragraphs = value.split('\n').map((line) => ({
-      type: 'paragraph' as const,
-      content: line ? [{ type: 'text' as const, text: line }] : [],
-    }))
-
-    return {
-      type: 'doc',
-      content: paragraphs.length > 0 ? paragraphs : [{ type: 'paragraph' }],
-    }
-  }, [])
+  // 初期コンテンツ（マークダウン文字列をそのまま渡す）
+  // MarkdownExtensionがパースしてくれる
+  const initialContent = useMemo(() => value || '', [])
 
   useEffect(() => {
     setMounted(true)
@@ -321,12 +306,19 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       `}</style>
       <EditorRoot>
         <EditorContent
-          initialContent={initialContent}
           extensions={extensions}
           className="rounded-lg border border-gray-200 bg-white shadow-sm"
+          onCreate={({ editor }) => {
+            // 初期値をマークダウンとしてセット
+            if (initialContent) {
+              editor.commands.setContent(initialContent)
+            }
+          }}
           onUpdate={({ editor }) => {
-            const text = editor.getText()
-            onChange(text)
+            // マークダウン形式で保存
+            const markdown =
+              editor.storage.markdown?.getMarkdown() || editor.getText()
+            onChange(markdown)
           }}
           editorProps={{
             handleDOMEvents: {
