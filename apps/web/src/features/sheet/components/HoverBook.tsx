@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { Book } from '@/types/book'
+import { MemoPreview } from './MemoPreview'
 
 interface Props {
   book: Book
@@ -33,7 +34,9 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
           <div className="text-sm font-bold">{book.title}</div>
           <div className="mb-2 pt-1 text-xs">{book.author}</div>
           {(isMine || book.is_public_memo) && (
-            <div className="line-clamp-5 h-[80px] text-xs">{book.memo}</div>
+            <div className="line-clamp-5 h-[80px] text-xs">
+              <MemoPreview memo={book.memo} />
+            </div>
           )}
           {!isMine && !book.is_public_memo && (
             <div className="relative">
