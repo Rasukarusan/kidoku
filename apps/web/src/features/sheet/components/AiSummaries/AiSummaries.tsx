@@ -44,7 +44,7 @@ export const AiSummaries: React.FC<Props> = ({
 
   return (
     <>
-      {process.env.NEXT_PUBLIC_FLAG_KIDOKU_2 === 'true' && isMine && (
+      {isMine && (
         <div className="text-center">
           <Confirm
             open={open}
