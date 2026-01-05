@@ -44,7 +44,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
               initial={{ x: 0 }}
               animate={{ x: '-50%' }}
               transition={{
-                duration: 8,
+                duration: 4,
                 repeat: Infinity,
                 ease: 'linear',
                 delay: 0.5,
