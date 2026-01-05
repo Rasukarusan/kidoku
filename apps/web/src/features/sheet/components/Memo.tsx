@@ -29,9 +29,11 @@ const MaskedText: React.FC<{ text: string }> = ({ text }) => {
 
 /**
  * [[MASK: text]] 形式のテキストを処理してマスク表示する
+ * エスケープされたバージョン \[\[MASK: text\]\] にも対応
  */
 const processMaskedText = (content: string): React.ReactNode[] => {
-  const maskPattern = /\[\[MASK:\s*(.*?)\]\]/g
+  // エスケープされたバージョンと通常バージョン両方にマッチ
+  const maskPattern = /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/g
   const parts: React.ReactNode[] = []
   let lastIndex = 0
   let match
@@ -153,7 +155,8 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
               child: React.ReactNode
             ): React.ReactNode => {
               if (typeof child === 'string') {
-                const hasMask = /\[\[MASK:\s*(.*?)\]\]/.test(child)
+                const hasMask =
+                  /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/.test(child)
                 if (hasMask) {
                   return <>{processMaskedText(child)}</>
                 }
@@ -173,7 +176,8 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
               child: React.ReactNode
             ): React.ReactNode => {
               if (typeof child === 'string') {
-                const hasMask = /\[\[MASK:\s*(.*?)\]\]/.test(child)
+                const hasMask =
+                  /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/.test(child)
                 if (hasMask) {
                   return <>{processMaskedText(child)}</>
                 }

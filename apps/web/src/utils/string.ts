@@ -16,10 +16,14 @@ export const truncate = (str: string, len: number, line?: number) => {
 /**
  * 指定文字で囲まれた文字列をマスキングする
  * [[MASK: text]] -> *****
+ * \[\[MASK: text\]\] -> ***** (エスケープされたバージョンも対応)
  */
 export const mask = (text: string) => {
+  // エスケープされていないバージョン
   const pattern = /\[\[MASK:\s*(.*?)\]\]/g
-  return text.replace(pattern, '*****')
+  // エスケープされたバージョン（DBに保存時にエスケープされる場合）
+  const escapedPattern = /\\\[\\\[MASK:\s*(.*?)\\\]\\\]/g
+  return text.replace(pattern, '*****').replace(escapedPattern, '*****')
 }
 
 /**
