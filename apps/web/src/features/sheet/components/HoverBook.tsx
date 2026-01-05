@@ -16,8 +16,8 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
   return (
     <motion.div
       className="absolute top-0 z-10 w-[350px] max-w-[350px] overflow-x-hidden rounded border-2 border-[#507C8F] bg-white p-0"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={{ scale: 0.83 }}
+      animate={{ scale: 1 }}
       onMouseLeave={() => onMouseLeave(-1)}
       onClick={(e) => onClick(book, e)}
     >
