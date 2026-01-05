@@ -123,21 +123,21 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
               </div>
             )}
 
-            {!isMine &&
-              !book.is_public_memo &&
-              process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
-              book.is_purchasable && (
+            {!isMine && !book.is_public_memo && (
               <div className="rounded-lg bg-gray-100 p-8 text-center">
                 <AiFillLock className="mx-auto mb-2 text-gray-400" size={24} />
                 <p className="text-gray-600">
                   このメモは非公開に設定されています
                 </p>
-                <button
-                  className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                  onClick={() => setOpen(true)}
-                >
-                  メモを見る（有料）
-                </button>
+                {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
+                  book.is_purchasable && (
+                    <button
+                      className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                      onClick={() => setOpen(true)}
+                    >
+                      メモを見る（有料）
+                    </button>
+                  )}
               </div>
             )}
           </div>
