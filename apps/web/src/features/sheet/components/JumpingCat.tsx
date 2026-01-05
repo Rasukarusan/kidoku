@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
-import { CatIcon } from '@/components/icon/CatIcon'
+import { Canvas } from '@react-three/fiber'
+import { Cat3DModel } from '@/components/3d/Cat3DModel'
+import { Suspense } from 'react'
 
 interface Props {
   position?: 'top-right' | 'top-left'
@@ -7,35 +9,45 @@ interface Props {
 
 export const JumpingCat: React.FC<Props> = ({ position = 'top-right' }) => {
   const positionClasses = {
-    'top-right': 'right-[-8px] top-[-8px]',
-    'top-left': 'left-[-8px] top-[-8px]',
+    'top-right': 'right-[-20px] top-[-20px]',
+    'top-left': 'left-[-20px] top-[-20px]',
   }
 
   return (
     <motion.div
       className={`absolute z-20 ${positionClasses[position]}`}
+      style={{ width: '120px', height: '120px', pointerEvents: 'none' }}
       initial={{
-        y: -80,
-        x: position === 'top-right' ? 20 : -20,
-        rotate: position === 'top-right' ? -25 : 25,
+        y: -100,
+        x: position === 'top-right' ? 30 : -30,
+        rotateZ: position === 'top-right' ? -30 : 30,
         opacity: 0,
-        scale: 0.2,
+        scale: 0.3,
       }}
       animate={{
         y: 0,
         x: 0,
-        rotate: 0,
+        rotateZ: 0,
         opacity: 1,
         scale: 1,
       }}
       transition={{
         type: 'spring',
-        damping: 10,
+        damping: 12,
         stiffness: 180,
-        duration: 0.7,
-        opacity: { duration: 0.15 },
+        duration: 0.8,
+        opacity: { duration: 0.2 },
       }}
     >
+      {/* 3D Canvas */}
+      <Canvas
+        camera={{ position: [0, 2, 5], fov: 50 }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <Suspense fallback={null}>
+          <Cat3DModel />
+        </Suspense>
+      </Canvas>
       {/* 着地時のインパクトリング（複数） */}
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -65,32 +77,16 @@ export const JumpingCat: React.FC<Props> = ({ position = 'top-right' }) => {
 
       {/* 猫の影（着地感を出すため） */}
       <motion.div
-        className="absolute left-1/2 top-[36px] -translate-x-1/2"
+        className="absolute left-1/2 bottom-0 -translate-x-1/2"
         initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.4 }}
+        animate={{ scale: 1, opacity: 0.5 }}
         transition={{
-          delay: 0.3,
-          duration: 0.4,
+          delay: 0.4,
+          duration: 0.5,
           ease: 'easeOut',
         }}
       >
-        <div className="h-1.5 w-8 rounded-full bg-black/50 blur-[2px]" />
-      </motion.div>
-
-      {/* 猫本体 */}
-      <motion.div
-        className="drop-shadow-xl"
-        animate={{
-          y: [0, -3, 0],
-        }}
-        transition={{
-          delay: 0.7,
-          duration: 2.5,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-      >
-        <CatIcon size={36} />
+        <div className="h-2 w-16 rounded-full bg-black/60 blur-md" />
       </motion.div>
 
       {/* キラキラエフェクト（左） */}
