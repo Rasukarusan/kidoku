@@ -1,0 +1,1 @@
+export { WalkingCat } from './WalkingCat'
