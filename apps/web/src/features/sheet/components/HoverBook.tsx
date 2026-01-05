@@ -32,13 +32,13 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2, delay: 0.1 }}
       >
-        <div className="text-xs font-bold leading-tight line-clamp-2">
+        <div className="line-clamp-2 text-xs font-bold leading-tight">
           {book.title}
         </div>
         <div className="mt-1 text-[10px] text-gray-300">{book.author}</div>
 
         {(isMine || book.is_public_memo) && book.memo && (
-          <div className="mt-1 text-[10px] leading-tight text-gray-200 line-clamp-2">
+          <div className="mt-1 line-clamp-2 text-[10px] leading-tight text-gray-200">
             <MemoPreview memo={book.memo} />
           </div>
         )}
