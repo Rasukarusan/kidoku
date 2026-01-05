@@ -15,46 +15,38 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
 
   return (
     <motion.div
-      className="absolute top-0 z-10 w-[350px] max-w-[350px] overflow-x-hidden rounded border-2 border-[#507C8F] bg-white p-0"
-      initial={{ scale: 0.83 }}
-      animate={{ scale: 1 }}
+      className="absolute inset-0 z-10 cursor-pointer overflow-hidden rounded"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
       onMouseLeave={() => onMouseLeave(-1)}
       onClick={(e) => onClick(book, e)}
     >
-      <div className="flex w-full">
-        <div className="min-w-[128px]">
-          <img
-            className="cursor-pointer drop-shadow-lg"
-            src={book.image}
-            width={128}
-            height={186}
-            alt=""
-          />
+      {/* 下部グラデーションオーバーレイ */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+
+      {/* テキストコンテンツ */}
+      <motion.div
+        className="absolute bottom-0 left-0 right-0 p-2 text-white"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: 0.1 }}
+      >
+        <div className="text-xs font-bold leading-tight line-clamp-2">
+          {book.title}
         </div>
-        <div className="p-2">
-          <div className="text-sm font-bold">{book.title}</div>
-          <div className="mb-2 pt-1 text-xs">{book.author}</div>
-          {(isMine || book.is_public_memo) && (
-            <div className="line-clamp-5 h-[80px] text-xs">
-              <MemoPreview memo={book.memo} />
-            </div>
-          )}
-          {!isMine && !book.is_public_memo && (
-            <div className="relative">
-              <div className="absolute h-20 w-[190px] bg-gray-200 blur-sm"></div>
-              <div className="flex h-20 items-center justify-center rounded-md">
-                <div>
-                  <div className="mb-2 flex items-center justify-center blur-none">
-                    <div className="z-10 text-center text-sm font-bold blur-none">
-                      非公開のメモです
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+        <div className="mt-1 text-[10px] text-gray-300">{book.author}</div>
+
+        {(isMine || book.is_public_memo) && book.memo && (
+          <div className="mt-1 text-[10px] leading-tight text-gray-200 line-clamp-2">
+            <MemoPreview memo={book.memo} />
+          </div>
+        )}
+
+        {!isMine && !book.is_public_memo && (
+          <div className="mt-1 text-[10px] text-gray-400">非公開メモ</div>
+        )}
+      </motion.div>
     </motion.div>
   )
 }
