@@ -5,14 +5,16 @@ import { useMutation } from '@apollo/client'
 import { DELETE_SHEET } from '@/libs/apollo/queries'
 
 interface Props {
-  sheet: string
+  sheetName: string
+  sheetId?: string
   open: boolean
   onClose: () => void
   username: string
 }
 
 export const SheetDeleteModal: React.FC<Props> = ({
-  sheet,
+  sheetName,
+  sheetId,
   open,
   onClose,
   username,
@@ -49,18 +51,20 @@ export const SheetDeleteModal: React.FC<Props> = ({
           value={input}
         />
         <div className="mb-2 text-sm text-gray-500">
-          削除するには「<span className="font-bold text-gray-700">{sheet}</span>
+          削除するには「
+          <span className="font-bold text-gray-700">{sheetName}</span>
           」と入力してください
         </div>
         <button
           className="mx-auto flex items-center justify-center rounded-md bg-red-700 px-4 py-1 font-bold text-white disabled:bg-gray-300"
-          disabled={input !== sheet || loading}
+          disabled={input !== sheetName || loading || !sheetId}
           onClick={async () => {
+            if (!sheetId) return
             try {
               await deleteSheet({
                 variables: {
                   input: {
-                    name: input,
+                    id: sheetId,
                   },
                 },
               })

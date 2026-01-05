@@ -13,6 +13,7 @@ import { BsThreeDots } from 'react-icons/bs'
 
 interface Props {
   currentSheet: string
+  currentSheetId?: string
   username: string
   userId: string
   activate?: {
@@ -22,6 +23,7 @@ interface Props {
 }
 export const Menu: React.FC<Props> = ({
   currentSheet,
+  currentSheetId,
   username,
   userId,
   activate = { edit: true, delete: true },
@@ -137,13 +139,15 @@ export const Menu: React.FC<Props> = ({
           </AnimatePresence>
           <SheetAddModal open={openAdd} onClose={() => setOpenAdd(false)} />
           <SheetEditModal
-            sheet={currentSheet}
+            sheetName={currentSheet}
+            sheetId={currentSheetId}
             open={openEdit}
             onClose={() => setOpenEdit(false)}
             username={username}
           />
           <SheetDeleteModal
-            sheet={currentSheet}
+            sheetName={currentSheet}
+            sheetId={currentSheetId}
             open={openDelete}
             onClose={() => setOpenDelete(false)}
             username={username}

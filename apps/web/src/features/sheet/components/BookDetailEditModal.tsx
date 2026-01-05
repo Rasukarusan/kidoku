@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
@@ -14,9 +15,24 @@ import { Tooltip } from 'react-tooltip'
 import { Label } from '@/components/input/Label'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
-import { MaskButton } from '@/components/button/MaskButton'
 import { CategoriesResponse } from '@/types/api'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
+
+// SSRを無効にしてクライアントサイドのみでロード
+const MarkdownEditor = dynamic(
+  () =>
+    import('@/components/input/MarkdownEditor').then(
+      (mod) => mod.MarkdownEditor
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50">
+        <span className="text-gray-400">エディタを読み込み中...</span>
+      </div>
+    ),
+  }
+)
 
 interface Props {
   currentBook: Book // 変更前の本
@@ -35,7 +51,6 @@ export const BookDetailEditModal: React.FC<Props> = ({
   setBook,
   loading,
 }) => {
-  const memoTextareaRef = useRef<HTMLTextAreaElement>(null)
   const [diff, setDiff] = useState({
     title: false,
     author: false,
@@ -143,19 +158,11 @@ export const BookDetailEditModal: React.FC<Props> = ({
             {book?.memo?.length || 0} 文字
           </div>
         </div>
-        <div className="mb-2">
-          <MaskButton
-            textareaRef={memoTextareaRef}
-            onTextChange={(newText) => setBook({ ...book, memo: newText })}
-          />
-        </div>
-        <BookInputField
-          ref={memoTextareaRef}
-          rows={8}
-          value={book?.memo}
-          onChange={(e) => setBook({ ...book, memo: e.target.value })}
-          tabIndex={6}
-          isChanged={diff.memo}
+        <MarkdownEditor
+          value={book?.memo || ''}
+          onChange={(memo) => setBook({ ...book, memo })}
+          minHeight="200px"
+          className={diff.memo ? 'ring-2 ring-yellow-400' : ''}
         />
       </div>
       <div className="mb-4 items-start justify-between sm:flex">
