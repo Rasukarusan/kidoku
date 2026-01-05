@@ -1,59 +1,28 @@
-import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 interface MemoPreviewProps {
   memo: string | null | undefined
   className?: string
+  /** 自分の本かどうか。trueの場合はマスクテキストをそのまま表示 */
+  isMine?: boolean
 }
 
 /**
- * マスクされたテキストを表示するコンポーネント（プレビュー用）
- */
-const MaskedTextPreview: React.FC<{ text: string }> = ({ text }) => {
-  const [revealed, setRevealed] = useState(false)
-
-  return (
-    <span
-      className={`cursor-pointer rounded px-0.5 transition-colors ${
-        revealed
-          ? 'bg-gray-100 text-gray-800'
-          : 'bg-gray-800 text-gray-800 hover:bg-gray-700'
-      }`}
-      onClick={(e) => {
-        e.stopPropagation() // 親要素のクリックを防ぐ
-        setRevealed(!revealed)
-      }}
-      title={revealed ? 'クリックで隠す' : 'クリックで表示'}
-    >
-      {revealed ? text : 'ネタバレ'}
-    </span>
-  )
-}
-
-/**
- * [[MASK: text]] 形式のテキストを処理してマスク表示する
+ * [[MASK: text]] 形式のテキストを処理する
  * エスケープされたバージョン \[\[MASK: text\]\] にも対応
+ * @param content - 処理する文字列
+ * @param isMine - 自分の本の場合はtrueでテキストをそのまま表示、falseの場合は*****で置換
  */
-const processMaskedText = (content: string): React.ReactNode[] => {
+const processMaskedText = (content: string, isMine: boolean): string => {
   // エスケープされたバージョンと通常バージョン両方にマッチ
   const maskPattern = /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/g
-  const parts: React.ReactNode[] = []
-  let lastIndex = 0
-  let match
-
-  while ((match = maskPattern.exec(content)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(content.substring(lastIndex, match.index))
-    }
-    parts.push(<MaskedTextPreview key={match.index} text={match[1]} />)
-    lastIndex = match.index + match[0].length
+  if (isMine) {
+    // 自分の本の場合はマスク記法を外してテキストをそのまま表示
+    return content.replace(maskPattern, '$1')
+  } else {
+    // 他人の本の場合は*****で置換
+    return content.replace(maskPattern, '*****')
   }
-
-  if (lastIndex < content.length) {
-    parts.push(content.substring(lastIndex))
-  }
-
-  return parts
 }
 
 /**
@@ -63,8 +32,12 @@ const processMaskedText = (content: string): React.ReactNode[] => {
 export const MemoPreview: React.FC<MemoPreviewProps> = ({
   memo,
   className = '',
+  isMine = true,
 }) => {
   if (!memo) return null
+
+  // マスクテキストを処理
+  const processedMemo = processMaskedText(memo, isMine)
 
   return (
     <div className={`memo-preview ${className}`}>
@@ -119,51 +92,9 @@ export const MemoPreview: React.FC<MemoPreviewProps> = ({
               {children}
             </a>
           ),
-          p: ({ children }) => {
-            const processChildren = (
-              child: React.ReactNode
-            ): React.ReactNode => {
-              if (typeof child === 'string') {
-                const hasMask =
-                  /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/.test(child)
-                if (hasMask) {
-                  return <>{processMaskedText(child)}</>
-                }
-                return child
-              }
-              return child
-            }
-            const processed = Array.isArray(children)
-              ? children.map((child, i) => (
-                  <span key={i}>{processChildren(child)}</span>
-                ))
-              : processChildren(children)
-            return <span>{processed}</span>
-          },
-          li: ({ children }) => {
-            const processChildren = (
-              child: React.ReactNode
-            ): React.ReactNode => {
-              if (typeof child === 'string') {
-                const hasMask =
-                  /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/.test(child)
-                if (hasMask) {
-                  return <>{processMaskedText(child)}</>
-                }
-                return child
-              }
-              return child
-            }
-            const processed = Array.isArray(children)
-              ? children.map((child, i) => (
-                  <span key={i}>{processChildren(child)}</span>
-                ))
-              : processChildren(children)
-            return <span>{processed}</span>
-          },
         }}
       >
-        {memo}
+        {processedMemo}
       </ReactMarkdown>
     </div>
   )
