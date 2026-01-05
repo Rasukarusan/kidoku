@@ -43,9 +43,19 @@ export const JumpingCat: React.FC<Props> = ({ position = 'top-right' }) => {
       <Canvas
         camera={{ position: [0, 2, 5], fov: 50 }}
         style={{ width: '100%', height: '100%' }}
+        shadows
+        dpr={[1, 2]}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+          toneMapping: 5, // ACESFilmicToneMapping
+          toneMappingExposure: 1.2,
+        }}
       >
         <Suspense fallback={null}>
           <Cat3DModel />
+          <color attach="background" args={['transparent']} />
         </Suspense>
       </Canvas>
       {/* 着地時のインパクトリング（複数） */}
