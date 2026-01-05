@@ -77,7 +77,7 @@ export const JumpingCat: React.FC<Props> = ({ position = 'top-right' }) => {
 
       {/* 猫の影（着地感を出すため） */}
       <motion.div
-        className="absolute left-1/2 bottom-0 -translate-x-1/2"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 0.5 }}
         transition={{

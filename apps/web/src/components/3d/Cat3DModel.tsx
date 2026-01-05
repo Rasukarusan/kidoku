@@ -214,7 +214,11 @@ export const Cat3DModel: React.FC = () => {
 
       {/* しっぽ */}
       <group ref={tailRef} position={[-0.5, 0.7, -0.5]}>
-        <mesh position={[0, 0, 0]} rotation={[Math.PI / 6, 0, Math.PI / 4]} castShadow>
+        <mesh
+          position={[0, 0, 0]}
+          rotation={[Math.PI / 6, 0, Math.PI / 4]}
+          castShadow
+        >
           <cylinderGeometry args={[0.15, 0.1, 1.2, 32]} />
           <primitive object={furMaterial} attach="material" />
         </mesh>
