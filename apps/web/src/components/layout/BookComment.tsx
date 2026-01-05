@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getLastModified, truncate, mask } from '@/utils/string'
+import { getLastModified, truncate } from '@/utils/string'
 
 export interface Comment {
   id: string
@@ -30,7 +30,7 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
           href={`/${username}/sheets/${sheet}?book=${comment.id}`}
           className="mb-2 inline-block text-xs font-bold sm:text-sm"
         >
-          {truncate(mask(memo), 120)}
+          {truncate(memo, 120)}
         </Link>
         <div className="flex items-center text-xs text-gray-500 sm:text-sm ">
           <img className="mr-2 h-8 w-8 rounded-full" src={userImage} alt="" />
