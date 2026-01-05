@@ -40,22 +40,18 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
         {(isMine || book.is_public_memo) && book.memo && (
           <div className="mt-1 overflow-hidden">
             <motion.div
-              className="whitespace-nowrap text-[10px] text-gray-200"
+              className="inline-flex whitespace-nowrap text-[10px] text-gray-200"
               initial={{ x: 0 }}
               animate={{ x: '-50%' }}
               transition={{
-                duration: 2,
+                duration: Math.max(book.memo.length / 10, 3),
                 repeat: Infinity,
                 ease: 'linear',
                 delay: 0.5,
               }}
             >
-              <span className="inline-block pr-8">
-                <MemoPreview memo={book.memo} />
-              </span>
-              <span className="inline-block pr-8">
-                <MemoPreview memo={book.memo} />
-              </span>
+              <span className="pr-8">{book.memo.replace(/\n/g, ' ')}</span>
+              <span className="pr-8">{book.memo.replace(/\n/g, ' ')}</span>
             </motion.div>
           </div>
         )}
