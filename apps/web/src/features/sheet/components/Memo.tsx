@@ -149,7 +149,9 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
           ),
           p: ({ children }) => {
             // 子要素を処理してマスクテキストを変換
-            const processChildren = (child: React.ReactNode): React.ReactNode => {
+            const processChildren = (
+              child: React.ReactNode
+            ): React.ReactNode => {
               if (typeof child === 'string') {
                 const hasMask = /\[\[MASK:\s*(.*?)\]\]/.test(child)
                 if (hasMask) {
@@ -167,7 +169,9 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
             return <p>{processed}</p>
           },
           li: ({ children }) => {
-            const processChildren = (child: React.ReactNode): React.ReactNode => {
+            const processChildren = (
+              child: React.ReactNode
+            ): React.ReactNode => {
               if (typeof child === 'string') {
                 const hasMask = /\[\[MASK:\s*(.*?)\]\]/.test(child)
                 if (hasMask) {
