@@ -7,7 +7,10 @@ import { GetServerSideProps } from 'next'
 
 export default SheetPage
 
-export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  params,
+  res,
+}) => {
   // 本番環境のみキャッシュを有効化（ISR相当の動作）
   if (isSSGEnabled) {
     res.setHeader(
