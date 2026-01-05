@@ -11,18 +11,17 @@ interface MemoPreviewProps {
  * [[MASK: text]] 形式のテキストを処理する
  * エスケープされたバージョン \[\[MASK: text\]\] にも対応
  * @param content - 処理する文字列
- * @param isMine - 自分の本の場合はtrueでテキストをそのまま表示、falseの場合は*****で置換
+ * @param isMine - 自分の本の場合はtrueでそのまま表示、falseの場合は*****で置換
  */
 const processMaskedText = (content: string, isMine: boolean): string => {
+  if (isMine) {
+    // 自分の本の場合はそのまま表示（処理しない）
+    return content
+  }
+  // 他人の本の場合は*****で置換
   // エスケープされたバージョンと通常バージョン両方にマッチ
   const maskPattern = /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/g
-  if (isMine) {
-    // 自分の本の場合はマスク記法を外してテキストをそのまま表示
-    return content.replace(maskPattern, '$1')
-  } else {
-    // 他人の本の場合は*****で置換
-    return content.replace(maskPattern, '*****')
-  }
+  return content.replace(maskPattern, '*****')
 }
 
 /**
