@@ -5,7 +5,8 @@ import * as THREE from 'three'
 export const Cat3DModel: React.FC = () => {
   const groupRef = useRef<THREE.Group>(null)
   const tailRef = useRef<THREE.Group>(null)
-  const earsRef = useRef<THREE.Group>(null)
+  const leftEarRef = useRef<THREE.Mesh>(null)
+  const rightEarRef = useRef<THREE.Mesh>(null)
   const [landingComplete, setLandingComplete] = useState(false)
 
   // 着地アニメーション
@@ -27,243 +28,331 @@ export const Cat3DModel: React.FC = () => {
         groupRef.current.rotation.y = (1 - easeOut) * Math.PI * 2
       } else {
         // 着地後の浮遊アニメーション
-        groupRef.current.position.y = Math.sin(clock.elapsedTime * 2) * 0.1
-        groupRef.current.rotation.y = Math.sin(clock.elapsedTime * 0.5) * 0.1
+        groupRef.current.position.y = Math.sin(clock.elapsedTime * 2) * 0.08
+        groupRef.current.rotation.y = Math.sin(clock.elapsedTime * 0.5) * 0.05
       }
     }
 
     if (tailRef.current && landingComplete) {
-      tailRef.current.rotation.z = Math.sin(clock.elapsedTime * 2) * 0.2
+      // しっぽをゆらゆら
+      tailRef.current.rotation.z = Math.sin(clock.elapsedTime * 1.5) * 0.3
+      tailRef.current.rotation.x = Math.sin(clock.elapsedTime * 1.2) * 0.1
     }
-    if (earsRef.current && landingComplete) {
-      earsRef.current.children.forEach((ear, i) => {
-        ear.rotation.z = Math.sin(clock.elapsedTime * 3 + i * Math.PI) * 0.05
-      })
+
+    // 耳をピクピク
+    if (leftEarRef.current && landingComplete) {
+      leftEarRef.current.rotation.z =
+        Math.sin(clock.elapsedTime * 3) * 0.08 + 0.1
+    }
+    if (rightEarRef.current && landingComplete) {
+      rightEarRef.current.rotation.z =
+        Math.sin(clock.elapsedTime * 3 + Math.PI) * 0.08 - 0.1
     }
   })
 
-  // オレンジ色の毛並みマテリアル
-  const furMaterial = new THREE.MeshStandardMaterial({
-    color: '#ff8844',
-    roughness: 0.8,
-    metalness: 0.1,
+  // 黒猫の毛並みマテリアル（光沢のある黒）
+  const blackFurMaterial = new THREE.MeshStandardMaterial({
+    color: '#1a1a1a',
+    roughness: 0.6,
+    metalness: 0.05,
   })
 
   const darkFurMaterial = new THREE.MeshStandardMaterial({
-    color: '#cc6633',
-    roughness: 0.9,
-    metalness: 0.1,
-  })
-
-  const whiteFurMaterial = new THREE.MeshStandardMaterial({
-    color: '#ffffff',
+    color: '#0a0a0a',
     roughness: 0.7,
+    metalness: 0.05,
+  })
+
+  // 鼻（小さなピンク）
+  const noseMaterial = new THREE.MeshStandardMaterial({
+    color: '#2a2a2a',
+    roughness: 0.4,
     metalness: 0.1,
   })
 
-  const pinkMaterial = new THREE.MeshStandardMaterial({
-    color: '#ff88aa',
-    roughness: 0.3,
-    metalness: 0.2,
+  // 目（金色に光る）
+  const eyeWhiteMaterial = new THREE.MeshStandardMaterial({
+    color: '#ffffff',
+    roughness: 0.2,
+    metalness: 0.1,
   })
 
   const eyeMaterial = new THREE.MeshStandardMaterial({
-    color: '#00ff00',
-    emissive: '#004400',
-    emissiveIntensity: 0.5,
-    metalness: 0.8,
+    color: '#ffcc00',
+    emissive: '#aa8800',
+    emissiveIntensity: 0.8,
+    metalness: 0.9,
     roughness: 0.1,
   })
 
   const pupilMaterial = new THREE.MeshStandardMaterial({
     color: '#000000',
     roughness: 0.1,
+    metalness: 0.8,
+  })
+
+  // 肉球（ピンク）
+  const pawPadMaterial = new THREE.MeshStandardMaterial({
+    color: '#3a3a3a',
+    roughness: 0.5,
+    metalness: 0.1,
+  })
+
+  // 内耳（暗いピンク）
+  const innerEarMaterial = new THREE.MeshStandardMaterial({
+    color: '#2a2a2a',
+    roughness: 0.6,
   })
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      {/* 環境光とライティング */}
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
-      <pointLight position={[-5, 5, 5]} intensity={0.8} color="#ffc088" />
-      <spotLight
-        position={[0, 10, 0]}
-        angle={0.6}
-        penumbra={0.5}
-        intensity={0.5}
+      {/* 環境光とライティング - 黒猫用に調整 */}
+      <ambientLight intensity={0.4} />
+      {/* メインライト */}
+      <directionalLight
+        position={[5, 8, 5]}
+        intensity={1.5}
         castShadow
+        color="#ffffff"
       />
+      {/* リムライト（輪郭を強調） */}
+      <pointLight position={[-5, 3, -3]} intensity={1.2} color="#8899ff" />
+      <pointLight position={[5, 3, -3]} intensity={1.0} color="#ffaa88" />
+      {/* 下からの反射光 */}
+      <pointLight position={[0, -2, 2]} intensity={0.3} color="#6688aa" />
 
-      {/* 体（座った姿勢） */}
-      <mesh position={[0, 0.5, 0]} castShadow>
-        <sphereGeometry args={[0.8, 32, 32]} />
-        <primitive object={furMaterial} attach="material" />
+      {/* 体（楕円形のメイン部分） */}
+      <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
+        <sphereGeometry args={[0.85, 64, 64]} />
+        <primitive object={blackFurMaterial} attach="material" />
       </mesh>
-
-      {/* 胸の白い部分 */}
-      <mesh position={[0, 0.3, 0.5]} castShadow>
-        <sphereGeometry args={[0.4, 32, 32]} />
-        <primitive object={whiteFurMaterial} attach="material" />
-      </mesh>
-
-      {/* 頭 */}
-      <mesh position={[0, 1.3, 0.1]} castShadow>
-        <sphereGeometry args={[0.65, 32, 32]} />
-        <primitive object={furMaterial} attach="material" />
-      </mesh>
-
-      {/* 頬の膨らみ */}
-      <mesh position={[-0.4, 1.2, 0.3]} castShadow>
-        <sphereGeometry args={[0.25, 32, 32]} />
-        <primitive object={furMaterial} attach="material" />
-      </mesh>
-      <mesh position={[0.4, 1.2, 0.3]} castShadow>
-        <sphereGeometry args={[0.25, 32, 32]} />
-        <primitive object={furMaterial} attach="material" />
-      </mesh>
-
-      {/* 耳 */}
-      <group ref={earsRef}>
-        <mesh position={[-0.35, 1.85, 0]} castShadow>
-          <coneGeometry args={[0.25, 0.5, 32]} />
-          <primitive object={furMaterial} attach="material" />
-        </mesh>
-        <mesh position={[-0.35, 1.75, 0.05]} castShadow>
-          <coneGeometry args={[0.15, 0.3, 32]} />
-          <primitive object={pinkMaterial} attach="material" />
-        </mesh>
-
-        <mesh position={[0.35, 1.85, 0]} castShadow>
-          <coneGeometry args={[0.25, 0.5, 32]} />
-          <primitive object={furMaterial} attach="material" />
-        </mesh>
-        <mesh position={[0.35, 1.75, 0.05]} castShadow>
-          <coneGeometry args={[0.15, 0.3, 32]} />
-          <primitive object={pinkMaterial} attach="material" />
-        </mesh>
-      </group>
-
-      {/* 目 */}
-      <mesh position={[-0.25, 1.4, 0.55]} castShadow>
-        <sphereGeometry args={[0.15, 32, 32]} />
-        <primitive object={eyeMaterial} attach="material" />
-      </mesh>
-      <mesh position={[-0.25, 1.4, 0.63]}>
-        <sphereGeometry args={[0.06, 32, 32]} />
-        <primitive object={pupilMaterial} attach="material" />
-      </mesh>
-      {/* ハイライト */}
-      <mesh position={[-0.22, 1.45, 0.68]}>
-        <sphereGeometry args={[0.03, 16, 16]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-
-      <mesh position={[0.25, 1.4, 0.55]} castShadow>
-        <sphereGeometry args={[0.15, 32, 32]} />
-        <primitive object={eyeMaterial} attach="material" />
-      </mesh>
-      <mesh position={[0.25, 1.4, 0.63]}>
-        <sphereGeometry args={[0.06, 32, 32]} />
-        <primitive object={pupilMaterial} attach="material" />
-      </mesh>
-      {/* ハイライト */}
-      <mesh position={[0.28, 1.45, 0.68]}>
-        <sphereGeometry args={[0.03, 16, 16]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-
-      {/* 鼻 */}
-      <mesh position={[0, 1.15, 0.6]} castShadow>
-        <sphereGeometry args={[0.08, 32, 32]} />
-        <primitive object={pinkMaterial} attach="material" />
-      </mesh>
-
-      {/* 口 */}
-      <mesh position={[0, 1.05, 0.58]} rotation={[Math.PI / 6, 0, 0]}>
-        <torusGeometry args={[0.1, 0.02, 16, 32, Math.PI]} />
+      {/* 体の下部（お尻側） */}
+      <mesh position={[0, -0.2, -0.2]} scale={[1, 0.8, 1.1]} castShadow>
+        <sphereGeometry args={[0.7, 64, 64]} />
         <primitive object={darkFurMaterial} attach="material" />
       </mesh>
 
-      {/* ヒゲ（左） */}
-      <mesh position={[-0.4, 1.2, 0.5]} rotation={[0, 0, -0.2]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.6, 8]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-      <mesh position={[-0.4, 1.15, 0.5]} rotation={[0, 0, -0.1]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.6, 8]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-      <mesh position={[-0.4, 1.1, 0.5]} rotation={[0, 0, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.6, 8]} />
-        <meshBasicMaterial color="#ffffff" />
+      {/* 胸部分（少し前に出っ張る） */}
+      <mesh position={[0, 0.2, 0.6]} scale={[0.8, 1, 0.7]} castShadow>
+        <sphereGeometry args={[0.45, 32, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
       </mesh>
 
-      {/* ヒゲ（右） */}
-      <mesh position={[0.4, 1.2, 0.5]} rotation={[0, 0, 0.2]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.6, 8]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-      <mesh position={[0.4, 1.15, 0.5]} rotation={[0, 0, 0.1]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.6, 8]} />
-        <meshBasicMaterial color="#ffffff" />
-      </mesh>
-      <mesh position={[0.4, 1.1, 0.5]} rotation={[0, 0, 0]}>
-        <cylinderGeometry args={[0.01, 0.01, 0.6, 8]} />
-        <meshBasicMaterial color="#ffffff" />
+      {/* 首 */}
+      <mesh position={[0, 0.9, 0.3]} scale={[0.7, 0.6, 0.7]} castShadow>
+        <sphereGeometry args={[0.4, 32, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
       </mesh>
 
-      {/* しっぽ */}
-      <group ref={tailRef} position={[-0.5, 0.7, -0.5]}>
+      {/* 頭（よりリアルな形状） */}
+      <mesh position={[0, 1.35, 0.3]} scale={[1, 1, 1.1]} castShadow>
+        <sphereGeometry args={[0.55, 64, 64]} />
+        <primitive object={blackFurMaterial} attach="material" />
+      </mesh>
+
+      {/* 頬の膨らみ */}
+      <mesh position={[-0.35, 1.25, 0.5]} scale={[1, 0.9, 1]} castShadow>
+        <sphereGeometry args={[0.22, 32, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
+      </mesh>
+      <mesh position={[0.35, 1.25, 0.5]} scale={[1, 0.9, 1]} castShadow>
+        <sphereGeometry args={[0.22, 32, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
+      </mesh>
+
+      {/* マズル（鼻周り） */}
+      <mesh position={[0, 1.15, 0.65]} scale={[0.85, 0.7, 0.8]} castShadow>
+        <sphereGeometry args={[0.25, 32, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
+      </mesh>
+
+      {/* 左耳 */}
+      <mesh
+        ref={leftEarRef}
+        position={[-0.35, 1.8, 0.15]}
+        rotation={[0.3, -0.3, 0.1]}
+        castShadow
+      >
+        <coneGeometry args={[0.22, 0.45, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
+      </mesh>
+      {/* 左耳の内側 */}
+      <mesh position={[-0.35, 1.72, 0.2]} rotation={[0.3, -0.3, 0.1]}>
+        <coneGeometry args={[0.14, 0.3, 32]} />
+        <primitive object={innerEarMaterial} attach="material" />
+      </mesh>
+
+      {/* 右耳 */}
+      <mesh
+        ref={rightEarRef}
+        position={[0.35, 1.8, 0.15]}
+        rotation={[0.3, 0.3, -0.1]}
+        castShadow
+      >
+        <coneGeometry args={[0.22, 0.45, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
+      </mesh>
+      {/* 右耳の内側 */}
+      <mesh position={[0.35, 1.72, 0.2]} rotation={[0.3, 0.3, -0.1]}>
+        <coneGeometry args={[0.14, 0.3, 32]} />
+        <primitive object={innerEarMaterial} attach="material" />
+      </mesh>
+
+      {/* 目（金色に光る） */}
+      {/* 左目 */}
+      <group position={[-0.22, 1.42, 0.7]}>
+        <mesh castShadow>
+          <sphereGeometry args={[0.13, 32, 32]} />
+          <primitive object={eyeWhiteMaterial} attach="material" />
+        </mesh>
+        <mesh position={[0, 0, 0.08]}>
+          <sphereGeometry args={[0.11, 32, 32]} />
+          <primitive object={eyeMaterial} attach="material" />
+        </mesh>
+        <mesh position={[0, 0, 0.15]}>
+          <sphereGeometry args={[0.04, 16, 32]} />
+          <primitive object={pupilMaterial} attach="material" />
+        </mesh>
+        {/* ハイライト */}
+        <mesh position={[-0.03, 0.05, 0.18]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+      </group>
+
+      {/* 右目 */}
+      <group position={[0.22, 1.42, 0.7]}>
+        <mesh castShadow>
+          <sphereGeometry args={[0.13, 32, 32]} />
+          <primitive object={eyeWhiteMaterial} attach="material" />
+        </mesh>
+        <mesh position={[0, 0, 0.08]}>
+          <sphereGeometry args={[0.11, 32, 32]} />
+          <primitive object={eyeMaterial} attach="material" />
+        </mesh>
+        <mesh position={[0, 0, 0.15]}>
+          <sphereGeometry args={[0.04, 16, 32]} />
+          <primitive object={pupilMaterial} attach="material" />
+        </mesh>
+        {/* ハイライト */}
+        <mesh position={[-0.03, 0.05, 0.18]}>
+          <sphereGeometry args={[0.025, 16, 16]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+      </group>
+
+      {/* 鼻 */}
+      <mesh position={[0, 1.2, 0.8]} castShadow>
+        <sphereGeometry args={[0.06, 16, 16]} />
+        <primitive object={noseMaterial} attach="material" />
+      </mesh>
+      {/* 鼻のハイライト */}
+      <mesh position={[-0.02, 1.22, 0.84]}>
+        <sphereGeometry args={[0.02, 8, 8]} />
+        <meshBasicMaterial color="#555555" />
+      </mesh>
+
+      {/* ヒゲ（黒猫なので目立たせる） */}
+      {/* 左のヒゲ */}
+      {[-0.1, 0, 0.1].map((offset, i) => (
         <mesh
-          position={[0, 0, 0]}
-          rotation={[Math.PI / 6, 0, Math.PI / 4]}
+          key={`whisker-left-${i}`}
+          position={[-0.45, 1.25 + offset, 0.6]}
+          rotation={[0, 0, -0.2 - i * 0.05]}
+        >
+          <cylinderGeometry args={[0.008, 0.008, 0.7, 8]} />
+          <meshBasicMaterial color="#cccccc" opacity={0.6} transparent />
+        </mesh>
+      ))}
+      {/* 右のヒゲ */}
+      {[-0.1, 0, 0.1].map((offset, i) => (
+        <mesh
+          key={`whisker-right-${i}`}
+          position={[0.45, 1.25 + offset, 0.6]}
+          rotation={[0, 0, 0.2 + i * 0.05]}
+        >
+          <cylinderGeometry args={[0.008, 0.008, 0.7, 8]} />
+          <meshBasicMaterial color="#cccccc" opacity={0.6} transparent />
+        </mesh>
+      ))}
+
+      {/* しっぽ（より自然な曲線） */}
+      <group ref={tailRef} position={[-0.35, 0.5, -0.6]}>
+        {/* しっぽの付け根 */}
+        <mesh position={[0, 0, 0]} rotation={[0.5, 0, 0.2]} castShadow>
+          <cylinderGeometry args={[0.12, 0.1, 0.4, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
+        </mesh>
+        {/* しっぽの中間 */}
+        <mesh
+          position={[-0.1, 0.15, -0.15]}
+          rotation={[0.7, 0, 0.3]}
           castShadow
         >
-          <cylinderGeometry args={[0.15, 0.1, 1.2, 32]} />
-          <primitive object={furMaterial} attach="material" />
+          <cylinderGeometry args={[0.1, 0.08, 0.4, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
+        </mesh>
+        {/* しっぽの先端 */}
+        <mesh
+          position={[-0.15, 0.35, -0.25]}
+          rotation={[0.9, 0, 0.4]}
+          castShadow
+        >
+          <cylinderGeometry args={[0.08, 0.05, 0.35, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
+        </mesh>
+        <mesh position={[-0.2, 0.52, -0.3]} castShadow>
+          <sphereGeometry args={[0.06, 32, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
         </mesh>
       </group>
 
       {/* 前足（左） */}
-      <mesh position={[-0.3, 0, 0.3]} castShadow>
-        <cylinderGeometry args={[0.12, 0.1, 0.8, 32]} />
-        <primitive object={furMaterial} attach="material" />
-      </mesh>
-      <mesh position={[-0.3, -0.4, 0.3]} castShadow>
-        <sphereGeometry args={[0.12, 32, 32]} />
-        <primitive object={furMaterial} attach="material" />
-      </mesh>
-      {/* 肉球 */}
-      <mesh position={[-0.3, -0.5, 0.35]}>
-        <sphereGeometry args={[0.06, 16, 16]} />
-        <primitive object={pinkMaterial} attach="material" />
-      </mesh>
+      <group position={[-0.28, 0, 0.35]}>
+        <mesh position={[0, -0.05, 0]} castShadow>
+          <cylinderGeometry args={[0.11, 0.09, 0.6, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
+        </mesh>
+        {/* 足先 */}
+        <mesh position={[0, -0.4, 0]} castShadow>
+          <sphereGeometry args={[0.1, 32, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
+        </mesh>
+        {/* 肉球 */}
+        <mesh position={[0, -0.48, 0.08]}>
+          <sphereGeometry args={[0.045, 16, 16]} />
+          <primitive object={pawPadMaterial} attach="material" />
+        </mesh>
+      </group>
 
       {/* 前足（右） */}
-      <mesh position={[0.3, 0, 0.3]} castShadow>
-        <cylinderGeometry args={[0.12, 0.1, 0.8, 32]} />
-        <primitive object={furMaterial} attach="material" />
-      </mesh>
-      <mesh position={[0.3, -0.4, 0.3]} castShadow>
-        <sphereGeometry args={[0.12, 32, 32]} />
-        <primitive object={furMaterial} attach="material" />
-      </mesh>
-      {/* 肉球 */}
-      <mesh position={[0.3, -0.5, 0.35]}>
-        <sphereGeometry args={[0.06, 16, 16]} />
-        <primitive object={pinkMaterial} attach="material" />
-      </mesh>
+      <group position={[0.28, 0, 0.35]}>
+        <mesh position={[0, -0.05, 0]} castShadow>
+          <cylinderGeometry args={[0.11, 0.09, 0.6, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
+        </mesh>
+        {/* 足先 */}
+        <mesh position={[0, -0.4, 0]} castShadow>
+          <sphereGeometry args={[0.1, 32, 32]} />
+          <primitive object={blackFurMaterial} attach="material" />
+        </mesh>
+        {/* 肉球 */}
+        <mesh position={[0, -0.48, 0.08]}>
+          <sphereGeometry args={[0.045, 16, 16]} />
+          <primitive object={pawPadMaterial} attach="material" />
+        </mesh>
+      </group>
 
       {/* 後ろ足（左） */}
-      <mesh position={[-0.5, -0.1, -0.2]} rotation={[0, 0, -0.3]} castShadow>
-        <cylinderGeometry args={[0.2, 0.15, 0.6, 32]} />
-        <primitive object={furMaterial} attach="material" />
+      <mesh position={[-0.5, -0.1, -0.15]} rotation={[0, 0, -0.4]} castShadow>
+        <cylinderGeometry args={[0.18, 0.14, 0.5, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
       </mesh>
 
       {/* 後ろ足（右） */}
-      <mesh position={[0.5, -0.1, -0.2]} rotation={[0, 0, 0.3]} castShadow>
-        <cylinderGeometry args={[0.2, 0.15, 0.6, 32]} />
-        <primitive object={furMaterial} attach="material" />
+      <mesh position={[0.5, -0.1, -0.15]} rotation={[0, 0, 0.4]} castShadow>
+        <cylinderGeometry args={[0.18, 0.14, 0.5, 32]} />
+        <primitive object={blackFurMaterial} attach="material" />
       </mesh>
     </group>
   )
