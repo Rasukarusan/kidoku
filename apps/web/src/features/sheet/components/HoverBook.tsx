@@ -35,7 +35,7 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
           <div className="mb-2 pt-1 text-xs">{book.author}</div>
           {(isMine || book.is_public_memo) && (
             <div className="line-clamp-5 h-[80px] text-xs">
-              <MemoPreview memo={book.memo} isMine={isMine} />
+              <MemoPreview memo={book.memo} />
             </div>
           )}
           {!isMine && !book.is_public_memo && (
