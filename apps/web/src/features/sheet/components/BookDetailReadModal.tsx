@@ -123,7 +123,10 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
               </div>
             )}
 
-            {!isMine && !book.is_public_memo && (
+            {!isMine &&
+              !book.is_public_memo &&
+              process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
+              book.is_purchasable && (
               <div className="rounded-lg bg-gray-100 p-8 text-center">
                 <AiFillLock className="mx-auto mb-2 text-gray-400" size={24} />
                 <p className="text-gray-600">
