@@ -3,6 +3,7 @@ import { fetcher } from '@/libs/swr'
 import { Fragment, useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
+import { JumpingCat } from './JumpingCat'
 import { BookDetailSidebar } from './BookDetailSidebar'
 import { NO_IMAGE } from '@/libs/constants'
 import { AiFillLock } from 'react-icons/ai'
@@ -89,11 +90,14 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                     </p>
                   )}
                   {hovers[i] && (
-                    <HoverBook
-                      book={book}
-                      onMouseLeave={onMouseLeave}
-                      onClick={(book, e) => onClickImage(book, e)}
-                    />
+                    <>
+                      <JumpingCat position="top-right" />
+                      <HoverBook
+                        book={book}
+                        onMouseLeave={onMouseLeave}
+                        onClick={(book, e) => onClickImage(book, e)}
+                      />
+                    </>
                   )}
                 </div>
               </div>
