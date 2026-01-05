@@ -44,14 +44,18 @@ export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
               initial={{ x: 0 }}
               animate={{ x: '-50%' }}
               transition={{
-                duration: Math.max(book.memo.length / 10, 3),
+                duration: Math.max(book.memo.length / 5, 3),
                 repeat: Infinity,
                 ease: 'linear',
                 delay: 0.5,
               }}
             >
-              <span className="pr-8">{book.memo.replace(/\n/g, ' ')}</span>
-              <span className="pr-8">{book.memo.replace(/\n/g, ' ')}</span>
+              <span className="pr-8">
+                <MemoPreview memo={book.memo.replace(/\n/g, ' ')} />
+              </span>
+              <span className="pr-8">
+                <MemoPreview memo={book.memo.replace(/\n/g, ' ')} />
+              </span>
             </motion.div>
           </div>
         )}
