@@ -119,7 +119,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
 
             {(isMine || book.is_public_memo) && (
               <div className="rounded-lg bg-gray-50 p-4">
-                <Memo memo={book.memo} />
+                <Memo memo={book.memo} isMine={isMine} />
               </div>
             )}
 
