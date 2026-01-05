@@ -75,9 +75,9 @@ export class CommentRepository implements ICommentRepository {
   }
 
   private maskMemo(memo: string): string {
-    // [[MASK: text]] をマスキング
-    return memo.replace(/\[\[MASK:\s*(.*?)\]\]/g, () => {
-      return '*****';
-    });
+    // [[MASK: text]] をマスキング（エスケープ版も対応）
+    const pattern = /\[\[MASK:\s*(.*?)\]\]/g;
+    const escapedPattern = /\\\[\\\[MASK:\s*(.*?)\\\]\\\]/g;
+    return memo.replace(pattern, '*****').replace(escapedPattern, '*****');
   }
 }
