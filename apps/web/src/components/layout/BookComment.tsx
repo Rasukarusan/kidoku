@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getLastModified, truncate } from '@/utils/string'
+import { MemoPreview } from '@/features/sheet/components/MemoPreview'
 
 export interface Comment {
   id: string
@@ -28,9 +29,11 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
       <div>
         <Link
           href={`/${username}/sheets/${sheet}?book=${comment.id}`}
-          className="mb-2 inline-block text-xs font-bold sm:text-sm"
+          className="mb-2 block text-xs font-bold sm:text-sm"
         >
-          {truncate(memo, 120)}
+          <div className="line-clamp-3">
+            <MemoPreview memo={truncate(memo, 120)} />
+          </div>
         </Link>
         <div className="flex items-center text-xs text-gray-500 sm:text-sm ">
           <img className="mr-2 h-8 w-8 rounded-full" src={userImage} alt="" />
