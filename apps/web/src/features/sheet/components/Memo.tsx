@@ -2,35 +2,14 @@ import ReactMarkdown from 'react-markdown'
 
 interface MemoProps {
   memo: string | null | undefined
-  /** 自分の本かどうか。trueの場合はマスクテキストをそのまま表示 */
-  isMine?: boolean
-}
-
-/**
- * [[MASK: text]] 形式のテキストを処理する
- * エスケープされたバージョン \[\[MASK: text\]\] にも対応
- * @param content - 処理する文字列
- * @param isMine - 自分の本の場合はtrueでそのまま表示、falseの場合は*****で置換
- */
-const processMaskedText = (content: string, isMine: boolean): string => {
-  if (isMine) {
-    // 自分の本の場合はそのまま表示（処理しない）
-    return content
-  }
-  // 他人の本の場合は*****で置換
-  // エスケープされたバージョンと通常バージョン両方にマッチ
-  const maskPattern = /(?:\\\[\\\[|\[\[)MASK:\s*(.*?)(?:\\\]\\\]|\]\])/g
-  return content.replace(maskPattern, '*****')
 }
 
 /**
  * マークダウンをレンダリングするコンポーネント
+ * 注: マスキング処理はバックエンドで実行済み
  */
-export const Memo: React.FC<MemoProps> = ({ memo, isMine = true }) => {
+export const Memo: React.FC<MemoProps> = ({ memo }) => {
   if (!memo) return null
-
-  // マスクテキストを処理
-  const processedMemo = processMaskedText(memo, isMine)
 
   return (
     <div className="memo-content prose prose-sm max-w-none">
@@ -121,7 +100,7 @@ export const Memo: React.FC<MemoProps> = ({ memo, isMine = true }) => {
           ),
         }}
       >
-        {processedMemo}
+        {memo}
       </ReactMarkdown>
     </div>
   )
