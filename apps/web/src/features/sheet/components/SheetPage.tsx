@@ -59,6 +59,9 @@ export const SheetPage: React.FC<Props> = ({
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
   const [filter, setFilter] = useState('')
+  const [sortBy, setSortBy] = useState<
+    'default' | 'impression_desc' | 'impression_asc' | 'title'
+  >('default')
 
   // サイドバー用の状態管理
   const [openSidebar, setOpenSidebar] = useState(false)
@@ -83,6 +86,41 @@ export const SheetPage: React.FC<Props> = ({
 
   const handleChange = (newMode: 'row' | 'grid') => {
     setMode(newMode)
+  }
+
+  // impressionの値を数値にマッピング
+  const getImpressionValue = (impression: string): number => {
+    const map: { [key: string]: number } = {
+      '◎': 4,
+      '◯': 3,
+      '△': 2,
+      '✗': 1,
+      '-': 0,
+    }
+    return map[impression] ?? 0
+  }
+
+  // ソート処理
+  const sortBooks = (books: Book[]): Book[] => {
+    if (sortBy === 'default') return books
+
+    const sorted = [...books]
+    switch (sortBy) {
+      case 'impression_desc':
+        return sorted.sort(
+          (a, b) =>
+            getImpressionValue(b.impression) - getImpressionValue(a.impression)
+        )
+      case 'impression_asc':
+        return sorted.sort(
+          (a, b) =>
+            getImpressionValue(a.impression) - getImpressionValue(b.impression)
+        )
+      case 'title':
+        return sorted.sort((a, b) => a.title.localeCompare(b.title, 'ja'))
+      default:
+        return sorted
+    }
   }
 
   if (data.length === 0) {
@@ -178,41 +216,71 @@ export const SheetPage: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="mb-8 flex justify-end">
-        {['grid', 'row'].map((v: 'grid' | 'row') => (
-          <button
-            key={v}
-            className={twMerge(
-              'flex items-center justify-center border border-gray-400 bg-gray-50 px-2 py-1 text-xs font-bold',
-              mode === v && 'brightness-95',
-              v === 'grid' ? 'rounded-l-md' : 'rounded-r-md'
-            )}
-            onClick={() => handleChange(v)}
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center">
+          <label
+            htmlFor="sort-select"
+            className="mr-2 text-sm font-bold text-gray-700"
           >
-            {v === 'grid' ? (
-              <>
-                <IoGrid className="mr-1" />
-                Grid
-              </>
-            ) : (
-              <>
-                <FaListUl className="mr-1" />
-                List
-              </>
-            )}
-          </button>
-        ))}
+            並び替え:
+          </label>
+          <select
+            id="sort-select"
+            value={sortBy}
+            onChange={(e) =>
+              setSortBy(
+                e.target.value as
+                  | 'default'
+                  | 'impression_desc'
+                  | 'impression_asc'
+                  | 'title'
+              )
+            }
+            className="rounded-md border border-gray-400 bg-gray-50 px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="default">デフォルト</option>
+            <option value="impression_desc">感想順（高評価）</option>
+            <option value="impression_asc">感想順（低評価）</option>
+            <option value="title">タイトル順</option>
+          </select>
+        </div>
+
+        <div className="flex">
+          {['grid', 'row'].map((v: 'grid' | 'row') => (
+            <button
+              key={v}
+              className={twMerge(
+                'flex items-center justify-center border border-gray-400 bg-gray-50 px-2 py-1 text-xs font-bold',
+                mode === v && 'brightness-95',
+                v === 'grid' ? 'rounded-l-md' : 'rounded-r-md'
+              )}
+              onClick={() => handleChange(v)}
+            >
+              {v === 'grid' ? (
+                <>
+                  <IoGrid className="mr-1" />
+                  Grid
+                </>
+              ) : (
+                <>
+                  <FaListUl className="mr-1" />
+                  List
+                </>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="mb-8">
         {mode === 'grid' ? (
           <Books
-            books={currentData}
+            books={sortBooks(currentData)}
             year={year}
             bookId={(router.query.book as string) || ''}
           />
         ) : (
-          <BookRows books={currentData} />
+          <BookRows books={sortBooks(currentData)} />
         )}
       </div>
 
