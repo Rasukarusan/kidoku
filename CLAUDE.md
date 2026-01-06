@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 重要
+
+pushする前にpnpm lint:fixを行ってください。
+
 ## プロジェクト概要
 
 Kidoku（きどく）は、読書記録・分析アプリケーションです。モノレポ構成（Turborepo + pnpm）で、Next.jsフロントエンドとNestJS GraphQL APIを統合しています。
@@ -9,21 +13,25 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 ## アーキテクチャ概要
 
 ### 認証フロー
+
 1. **フロントエンド**: NextAuth.js（Google OAuth + 裏口ログイン）でセッション管理
 2. **プロキシ層**: `/api/graphql`でセッション情報をHMAC-SHA256署名付きヘッダーに変換
 3. **バックエンド**: NestJSでヘッダー署名を検証し、ユーザー情報を復元
 
 #### 裏口ログイン（プレビュー環境用）
+
 - **用途**: Vercelプレビュー環境での検証用
 - **有効化**: 環境変数`ENABLE_BACKDOOR_LOGIN=true`で有効化
 - **認証方式**: CredentialsProvider（JWT戦略）
 - **本番環境**: 必ず無効化すること（`ENABLE_BACKDOOR_LOGIN=false`）
 
 ### データベースアクセス
+
 - **フロントエンド**: Prisma ORM → MySQL
 - **バックエンド**: Drizzle ORM → 同一MySQL（スキーマ同期が必要）
 
 ### API アーキテクチャ（DDD）
+
 バックエンドAPIはDDD（ドメイン駆動設計）のレイヤードアーキテクチャを採用：
 
 ```
@@ -47,18 +55,21 @@ apps/api/src/
 ```
 
 **レイヤー間の依存ルール:**
+
 - domain → 他層に依存しない
 - application → domain のみ依存
 - infrastructure → domain に依存（リポジトリ実装）
 - presentation → application, domain に依存
 
 ### 検索エンジン
+
 - **MeiliSearch日本語版**（`getmeili/meilisearch:prototype-japanese-6`）を使用
 - Dockerfileで専用イメージをビルド
 
 ## 開発コマンド
 
 ### 基本操作
+
 ```bash
 # 開発環境起動（全サービス）
 pnpm dev
@@ -74,18 +85,20 @@ pnpm --filter api build
 ```
 
 ### データベース操作
+
 ```bash
 # Prisma (フロントエンド)
 pnpm --filter web prisma generate    # クライアント生成
 pnpm --filter web db:push            # スキーマ反映
 pnpm --filter web db:studio          # Prisma Studio起動
 
-# Drizzle (バックエンド)  
+# Drizzle (バックエンド)
 pnpm --filter api db:push            # スキーマ反映
 pnpm --filter api db:generate        # マイグレーション生成
 ```
 
 ### テスト
+
 ```bash
 # フロントエンド
 pnpm --filter web test              # 単体テスト実行
@@ -100,6 +113,7 @@ pnpm --filter api test:e2e          # E2Eテスト
 ```
 
 ### リント・フォーマット
+
 ```bash
 pnpm lint                           # 全体のリント
 pnpm lint:fix                       # 自動修正
@@ -108,6 +122,7 @@ pnpm check-types                    # 型チェック
 ```
 
 ### その他の開発コマンド
+
 ```bash
 # GraphQLコード生成（型定義）
 pnpm --filter web codegen
@@ -125,27 +140,32 @@ pnpm --filter web lighthouse
 ## 重要ファイル・ディレクトリ
 
 ### 認証関連
+
 - `apps/web/src/pages/api/graphql.ts` - GraphQLプロキシ（署名生成）
 - `apps/web/src/pages/api/auth/[...nextauth].ts` - NextAuth設定
 - `apps/web/src/libs/auth/` - 認証ユーティリティ
 - `apps/api/src/infrastructure/auth/` - NestJS認証モジュール（署名検証）
 
 ### GraphQL
+
 - `apps/web/src/libs/apollo/` - Apollo Client設定
 - `apps/api/src/schema.gql` - GraphQLスキーマ（自動生成）
 - `apps/api/src/presentation/resolvers/` - GraphQLリゾルバー
 
 ### データベース
+
 - `apps/web/prisma/schema.prisma` - Prismaスキーマ定義
 - `apps/api/src/infrastructure/database/schema/` - Drizzleスキーマ定義
 
 ### 検索
+
 - `apps/web/src/libs/meilisearch/` - MeiliSearch統合
 - `docker/meilisearch/` - 日本語対応MeiliSearch設定
 
 ## 環境変数
 
 ### 必須環境変数（apps/web/.env.local）
+
 ```env
 # 認証
 NEXTAUTH_SECRET=              # openssl rand -base64 32で生成
@@ -168,6 +188,7 @@ NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
 ```
 
 ### APIの環境変数（apps/api/.env）
+
 ```env
 NEXTAUTH_SECRET=              # フロントエンドと同じ値（署名検証用）
 DB_HOST=localhost
@@ -181,21 +202,25 @@ PORT=4000
 ## 開発時の注意事項
 
 ### GraphQL開発
+
 1. NestJSでリゾルバー変更後、スキーマが自動生成される
 2. フロントエンドで`pnpm --filter web codegen`実行で型を生成
 3. プロキシ経由（`/api/graphql`）でのみAPIアクセス可能
 
 ### データベーススキーマ変更
+
 1. Prismaスキーマを編集
 2. `pnpm --filter web db:push`でDBに反映
 3. Drizzleスキーマも手動で同期（重要）
 4. `pnpm --filter api db:push`でバックエンドも更新
 
 ### MeiliSearch
+
 - 日本語プロトタイプビルド使用のため、通常版との互換性なし
 - インデックスリセット時は`docker-compose restart meilisearch`
 
 ### デプロイ（GitHub Actions）
+
 - masterブランチプッシュで自動デプロイ（Google Cloud Run）
 - `apps/api`配下の変更でAPIデプロイトリガー
 - 環境変数はGitHub Secretsで管理
@@ -203,6 +228,7 @@ PORT=4000
 ## トラブルシューティング
 
 ### 型エラー
+
 ```bash
 # GraphQL型の再生成
 pnpm --filter web codegen
@@ -212,12 +238,14 @@ pnpm --filter web prisma generate
 ```
 
 ### 認証エラー
+
 - NEXTAUTH_SECRETがフロントエンド・バックエンド間で一致しているか確認
 - タイムスタンプのずれ（30秒以上）でも認証失敗
 - 裏口ログイン使用時：`NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN=true`、`BACKDOOR_USER_EMAIL`が正しく設定されているか確認
 - 裏口ログイン有効時はJWT戦略に切り替わる（sessionテーブルは使用されない）
 
 ### Docker関連
+
 ```bash
 # 全コンテナ再起動
 docker-compose down && docker-compose up -d
