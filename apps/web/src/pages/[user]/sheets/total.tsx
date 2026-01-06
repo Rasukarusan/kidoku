@@ -2,21 +2,10 @@ import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTota
 import { Category, Year } from '@/features/sheet/types'
 import prisma from '@/libs/prisma'
 import { GetServerSideProps } from 'next'
-import dayjs from 'dayjs'
 
 export default SheetTotalPage
 
-// 3ヶ月以上前かどうかを判定
-const isOlderThan3Months = (date: Date | null | undefined): boolean => {
-  if (!date) return false
-  const threeMonthsAgo = dayjs().subtract(3, 'month')
-  return dayjs(date).isBefore(threeMonthsAgo)
-}
-
-export const getServerSideProps: GetServerSideProps = async ({
-  params,
-  res,
-}) => {
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const username = params?.user as string
   const user = await prisma.user.findUnique({
     where: { name: username },
@@ -77,15 +66,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     },
     orderBy: { year: 'desc' },
   })
-
-  // 最新シートの更新日が3ヶ月以上前ならキャッシュ（実質SSG）
-  const latestSheetUpdate = sheets[0]?.updated
-  if (isOlderThan3Months(latestSheetUpdate)) {
-    res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=86400, stale-while-revalidate=604800'
-    )
-  }
 
   return {
     props: {
