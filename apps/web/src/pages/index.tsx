@@ -3,9 +3,8 @@ export default IndexPage
 
 import prisma, { parse } from '@/libs/prisma'
 import { mask } from '@/utils/string'
-import { GetServerSideProps } from 'next'
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps = async () => {
   const books = await prisma.books.findMany({
     include: {
       user: { select: { name: true, image: true } },
@@ -30,5 +29,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
       sheet: book.sheet.name,
     })
   })
-  return { props: { comments } }
+  return {
+    props: { comments },
+    revalidate: 5,
+  }
 }
