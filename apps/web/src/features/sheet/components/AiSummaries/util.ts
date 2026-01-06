@@ -20,8 +20,8 @@ export const getTitleAndIcon = (jsonKey: string) => {
       title = '感情分析'
       Icon = MdOutlineSentimentSatisfied
       break
-    case 'what_if_scenario':
-      title = '「もしも」シナリオ'
+    case 'hidden_theme_discovery':
+      title = '無意識に追いかけているもの'
       Icon = FaRegLightbulb
       break
     case 'overall_feedback':

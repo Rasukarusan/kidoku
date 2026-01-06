@@ -3,6 +3,6 @@ export type AiSummariesJson = {
   character_summary: string
   reading_trend_analysis: string
   sentiment_analysis: string
-  what_if_scenario: string
+  hidden_theme_discovery: string
   overall_feedback: string
 }
