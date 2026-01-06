@@ -6,7 +6,17 @@ import { GetServerSideProps } from 'next'
 
 export default SheetPage
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+// 3ヶ月以上前かどうかを判定
+const isOlderThan3Months = (date: Date | null | undefined): boolean => {
+  if (!date) return false
+  const threeMonthsAgo = dayjs().subtract(3, 'month')
+  return dayjs(date).isBefore(threeMonthsAgo)
+}
+
+export const getServerSideProps: GetServerSideProps = async ({
+  params,
+  res,
+}) => {
   const username = params?.user as string
   const year = params?.year as string
   const user = await prisma.user.findUnique({
@@ -74,6 +84,15 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     select: { id: true, analysis: true },
     orderBy: { created: 'desc' },
   })
+
+  // 最終更新日が3ヶ月以上前のシートはキャッシュ（実質SSG）
+  if (isOlderThan3Months(sheet.updated)) {
+    res.setHeader(
+      'Cache-Control',
+      'public, s-maxage=86400, stale-while-revalidate=604800'
+    )
+  }
+
   return {
     props: {
       data: parse(data),
