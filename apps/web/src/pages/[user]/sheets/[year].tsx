@@ -105,10 +105,18 @@ export const getServerSideProps: GetServerSideProps = async ({
       username,
       userId,
       yearlyTopBooks,
-      aiSummaries: aiSummaries.map((v) => ({
-        id: v.id,
-        ...(v.analysis as object),
-      })),
+      aiSummaries: aiSummaries.map((v) => {
+        const analysis = v.analysis as any
+        // 後方互換性: 古いキー名を新しいキー名に変換
+        if (analysis.what_if_scenario && !analysis.hidden_theme_discovery) {
+          analysis.hidden_theme_discovery = analysis.what_if_scenario
+          delete analysis.what_if_scenario
+        }
+        return {
+          id: v.id,
+          ...analysis,
+        }
+      }),
     },
   }
 }
