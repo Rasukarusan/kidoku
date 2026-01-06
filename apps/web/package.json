@@ -2,7 +2,7 @@
   "name": "web",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint src/** --ext .ts,.tsx",
     "lint:fix": "eslint --fix src/** --ext .ts,.tsx",
