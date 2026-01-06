@@ -2,23 +2,11 @@ import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { mask } from '@/utils/string'
-import { isSSGEnabled } from '@/libs/env'
 import { GetServerSideProps } from 'next'
 
 export default SheetPage
 
-export const getServerSideProps: GetServerSideProps = async ({
-  params,
-  res,
-}) => {
-  // 本番環境のみキャッシュを有効化（ISR相当の動作）
-  if (isSSGEnabled) {
-    res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=5, stale-while-revalidate=59'
-    )
-  }
-
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const username = params?.user as string
   const year = params?.year as string
   const user = await prisma.user.findUnique({
