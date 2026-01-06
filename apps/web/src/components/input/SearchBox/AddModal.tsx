@@ -6,6 +6,7 @@ import { useReward } from 'react-rewards'
 import useSWR from 'swr'
 import { useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
+import dynamic from 'next/dynamic'
 import { Modal } from '@/components/layout/Modal'
 import { ImagePicker } from '@/components/button/ImagePicker'
 import { DangerAlert } from '@/components/label/DangerAlert'
@@ -27,6 +28,22 @@ import { MaskingHint } from '@/components/label/MaskingHint'
 import { CategoriesResponse } from '@/types/api'
 
 import { GET_SHEETS } from '@/libs/apollo/queries'
+
+// SSRを無効にしてクライアントサイドのみでロード
+const MarkdownEditor = dynamic(
+  () =>
+    import('@/components/input/MarkdownEditor').then(
+      (mod) => mod.MarkdownEditor
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[200px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50">
+        <span className="text-gray-400">エディタを読み込み中...</span>
+      </div>
+    ),
+  }
+)
 
 interface Response {
   result: boolean
@@ -237,11 +254,10 @@ export const AddModal: React.FC = () => {
                     {book?.memo?.length || 0} 文字
                   </div>
                 </div>
-                <BookInputField
-                  rows={8}
-                  value={book?.memo}
-                  onChange={(e) => setBook({ ...book, memo: e.target.value })}
-                  tabIndex={5}
+                <MarkdownEditor
+                  value={book?.memo || ''}
+                  onChange={(memo) => setBook({ ...book, memo })}
+                  minHeight="200px"
                 />
                 <ToggleButton
                   label="メモを公開する"
