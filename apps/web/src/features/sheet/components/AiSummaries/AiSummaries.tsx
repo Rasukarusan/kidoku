@@ -6,6 +6,7 @@ import { AiReGenerateButton } from './AiReGenerateButton'
 import useAiHelpers from './useAiHelpers'
 import { Confirm } from './Confirm'
 import { StepIndicator } from './StepIndicator'
+import { AI_SUMMARY_FIELDS, AiSummaryFieldKey } from './fields'
 import { CourseId } from '@/types/user'
 import { Book } from '@/types/book'
 import { FaCircleNotch, FaTrash } from 'react-icons/fa'
@@ -120,6 +121,13 @@ export const AiSummaries: React.FC<Props> = ({
                   key !== 'character_summary' &&
                   !key.startsWith('_')
               )
+              .sort((a, b) => {
+                const orderA =
+                  AI_SUMMARY_FIELDS[a as AiSummaryFieldKey]?.order ?? 999
+                const orderB =
+                  AI_SUMMARY_FIELDS[b as AiSummaryFieldKey]?.order ?? 999
+                return orderA - orderB
+              })
               .map((key) => {
                 return (
                   <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
