@@ -184,6 +184,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
       <BookDetailSidebar
         open={openSidebar}
         book={sidebarBook}
+        isHoverMode={isHoverMode}
         onClose={() => {
           mutate()
           setOpenSidebar(false)
