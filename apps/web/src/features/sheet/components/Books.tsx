@@ -135,11 +135,6 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   }
 
   const onMouseLeave = (i: number) => {
-    // hoverするとズーム用のコンポーネントが表示され、そちらにMouseEnterするためMouseLeaveしてしまう
-    // そうなるとEnterとLeaveが無限ループしてしまうため、Leaveする際に現在のhover[i]=trueになっているインデックスと、
-    // Leaveする際のインデックスが同じの場合はLeaveしないようにreturnするようにしている。
-    const current = hovers.findIndex((v) => v)
-    if (current === i) return
     const newHovers = [...initialHovers]
     newHovers[i] = false
     setHovers(newHovers)
