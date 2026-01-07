@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import { fetcher } from '@/libs/swr'
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
 import { BookDetailSidebar } from './BookDetailSidebar'
@@ -22,15 +22,31 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   // サイドバー用の状態管理
   const [openSidebar, setOpenSidebar] = useState(false)
   const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
+  // ホバーモードかクリックモードかを管理
+  const [isHoverMode, setIsHoverMode] = useState(false)
+  // サイドバー上にマウスがあるかどうか
+  const [isMouseOnSidebar, setIsMouseOnSidebar] = useState(false)
+  // ホバー用タイマー
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // タイマーのクリーンアップ
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    }
+  }, [])
 
   // URLクエリで指定された本を開く
   useEffect(() => {
     if (bookId) {
       const book = books.filter((book) => book.id === Number(bookId))
       if (!book) return
-      // デフォルトでサイドバー表示
+      // デフォルトでサイドバー表示（クリックモード）
       setSidebarBook(book[0])
       setOpenSidebar(true)
+      setIsHoverMode(false)
     }
   }, [bookId])
 
@@ -39,17 +55,76 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
     if (event && (event.ctrlKey || event.metaKey)) {
       router.push(`/books/${book.id}`)
     } else {
-      // 通常クリックでサイドバー表示
+      // 通常クリックでサイドバー表示（クリックモードに切り替え）
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
       setSidebarBook(book)
       setOpenSidebar(true)
+      setIsHoverMode(false)
     }
     setHovers(initialHovers)
   }
 
-  const onMouseEnter = (i: number) => {
+  // ホバーでサイドバーを開く
+  const openSidebarOnHover = useCallback(
+    (book: Book) => {
+      // クリックモードで開いている場合は何もしない
+      if (openSidebar && !isHoverMode) return
+
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+
+      // 少し遅延してからサイドバーを開く（チラつき防止）
+      hoverTimerRef.current = setTimeout(() => {
+        setSidebarBook(book)
+        setOpenSidebar(true)
+        setIsHoverMode(true)
+      }, 200)
+    },
+    [openSidebar, isHoverMode]
+  )
+
+  // ホバーでサイドバーを閉じる
+  const closeSidebarOnHoverEnd = useCallback(() => {
+    // クリックモードの場合は閉じない
+    if (!isHoverMode) return
+
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+
+    // 少し遅延してから閉じる（サイドバーへの移動を許容）
+    closeTimerRef.current = setTimeout(() => {
+      if (!isMouseOnSidebar) {
+        setOpenSidebar(false)
+        setSidebarBook(null)
+        setIsHoverMode(false)
+      }
+    }, 300)
+  }, [isHoverMode, isMouseOnSidebar])
+
+  // サイドバーにマウスが入った時
+  const handleSidebarMouseEnter = useCallback(() => {
+    setIsMouseOnSidebar(true)
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+  }, [])
+
+  // サイドバーからマウスが離れた時
+  const handleSidebarMouseLeave = useCallback(() => {
+    setIsMouseOnSidebar(false)
+    if (isHoverMode) {
+      closeTimerRef.current = setTimeout(() => {
+        setOpenSidebar(false)
+        setSidebarBook(null)
+        setIsHoverMode(false)
+      }, 300)
+    }
+  }, [isHoverMode])
+
+  const onMouseEnter = (i: number, book: Book) => {
     const newHovers = [...initialHovers]
     newHovers[i] = true
     setHovers(newHovers)
+
+    // ホバーでサイドバーを開く
+    openSidebarOnHover(book)
   }
 
   const onMouseLeave = (i: number) => {
@@ -61,6 +136,9 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
     const newHovers = [...initialHovers]
     newHovers[i] = false
     setHovers(newHovers)
+
+    // ホバーモードの場合、サイドバーを閉じる
+    closeSidebarOnHoverEnd()
   }
 
   return (
@@ -72,7 +150,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
               <div className="bg-white px-2 py-4 sm:px-0 sm:py-2">
                 <div
                   className="relative inline-block"
-                  onMouseEnter={() => onMouseEnter(i)}
+                  onMouseEnter={() => onMouseEnter(i, book)}
                   onMouseLeave={() => onMouseLeave(i)}
                 >
                   <img
@@ -109,13 +187,17 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
           mutate()
           setOpenSidebar(false)
           setSidebarBook(null)
+          setIsHoverMode(false)
         }}
         onExpandToFullPage={() => {
           if (sidebarBook) {
             router.push(`/books/${sidebarBook.id}`)
             setOpenSidebar(false)
+            setIsHoverMode(false)
           }
         }}
+        onMouseEnter={handleSidebarMouseEnter}
+        onMouseLeave={handleSidebarMouseLeave}
       />
     </>
   )

@@ -13,6 +13,8 @@ interface Props {
   open: boolean
   onClose: () => void
   onExpandToFullPage: () => void
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
 }
 
 export const BookDetailSidebar: React.FC<Props> = ({
@@ -20,6 +22,8 @@ export const BookDetailSidebar: React.FC<Props> = ({
   open,
   onClose,
   onExpandToFullPage,
+  onMouseEnter,
+  onMouseLeave,
 }) => {
   const router = useRouter()
   const { mutate } = useSWRConfig()
@@ -222,6 +226,8 @@ export const BookDetailSidebar: React.FC<Props> = ({
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
           >
             <div className="flex h-full w-full flex-col">
               {/* ヘッダー */}
