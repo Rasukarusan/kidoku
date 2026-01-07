@@ -1,12 +1,11 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import prisma from '@/libs/prisma'
-import { GetServerSideProps } from 'next'
 
 export default SheetTotalPage
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const username = params?.user as string
+export const getStaticProps = async (ctx) => {
+  const { user: username } = ctx.params
   const user = await prisma.user.findUnique({
     where: { name: username },
   })
@@ -66,7 +65,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     },
     orderBy: { year: 'desc' },
   })
-
   return {
     props: {
       total: books.length,
@@ -84,5 +82,21 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       userId,
       yearlyTopBooks,
     },
+    revalidate: 5,
+  }
+}
+
+export async function getStaticPaths() {
+  const users = await prisma.user.findMany({
+    select: { name: true },
+  })
+  const paths = users
+    .map((user) => {
+      return { params: { user: user.name } }
+    })
+    .flat()
+  return {
+    paths,
+    fallback: 'blocking', // キャッシュが存在しない場合はSSR
   }
 }

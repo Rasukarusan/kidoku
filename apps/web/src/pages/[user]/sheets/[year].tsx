@@ -2,23 +2,12 @@ import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { mask } from '@/utils/string'
-import { GetServerSideProps } from 'next'
+import { migrateAnalysis } from '@/features/sheet/components/AiSummaries/migrator'
 
 export default SheetPage
 
-// 3ヶ月以上前かどうかを判定
-const isOlderThan3Months = (date: Date | null | undefined): boolean => {
-  if (!date) return false
-  const threeMonthsAgo = dayjs().subtract(3, 'month')
-  return dayjs(date).isBefore(threeMonthsAgo)
-}
-
-export const getServerSideProps: GetServerSideProps = async ({
-  params,
-  res,
-}) => {
-  const username = params?.user as string
-  const year = params?.year as string
+export async function getStaticProps(context) {
+  const { user: username, year } = context.params
   const user = await prisma.user.findUnique({
     where: { name: username },
   })
@@ -84,15 +73,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     select: { id: true, analysis: true },
     orderBy: { created: 'desc' },
   })
-
-  // 最終更新日が3ヶ月以上前のシートはキャッシュ（実質SSG）
-  if (isOlderThan3Months(sheet.updated)) {
-    res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=86400, stale-while-revalidate=604800'
-    )
-  }
-
   return {
     props: {
       data: parse(data),
@@ -105,10 +85,31 @@ export const getServerSideProps: GetServerSideProps = async ({
       username,
       userId,
       yearlyTopBooks,
-      aiSummaries: aiSummaries.map((v) => ({
-        id: v.id,
-        ...(v.analysis as object),
-      })),
+      aiSummaries: aiSummaries.map((v) => {
+        // 汎用マイグレーション関数を使用して最新スキーマに変換
+        const migrated = migrateAnalysis(v.analysis)
+        return {
+          id: v.id,
+          ...migrated,
+        }
+      }),
     },
+    revalidate: 5,
+  }
+}
+export async function getStaticPaths() {
+  const users = await prisma.user.findMany({
+    select: { name: true, sheets: { select: { name: true } } },
+  })
+  const paths = users
+    .map((user) => {
+      return user.sheets.map((sheet) => {
+        return { params: { user: user.name, year: sheet.name } }
+      })
+    })
+    .flat()
+  return {
+    paths,
+    fallback: 'blocking', // キャッシュが存在しない場合はSSR
   }
 }
