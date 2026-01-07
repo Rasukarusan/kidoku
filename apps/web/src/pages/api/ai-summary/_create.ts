@@ -71,9 +71,10 @@ export const handleCreate = async (req: Request) => {
             controller.enqueue(encoder.encode(text))
             const json = JSON.parse(text)
             const {
+              character_summary,
               reading_trend_analysis,
               sentiment_analysis,
-              what_if_scenario,
+              hidden_theme_discovery,
               overall_feedback,
             } = json
             await prisma.aiSummaries.create({
@@ -81,9 +82,11 @@ export const handleCreate = async (req: Request) => {
                 userId,
                 sheet_id: sheet.id,
                 analysis: {
+                  _schemaVersion: 2,
+                  character_summary,
                   reading_trend_analysis,
                   sentiment_analysis,
-                  what_if_scenario,
+                  hidden_theme_discovery,
                   overall_feedback,
                 },
                 token,

@@ -1,36 +1,40 @@
-import { IoSparklesSharp } from 'react-icons/io5'
-import { IoIosAnalytics } from 'react-icons/io'
 import { MdOutlineSentimentSatisfied } from 'react-icons/md'
-import { FaRegLightbulb } from 'react-icons/fa6'
-import { FaUser } from 'react-icons/fa6'
+import { AI_SUMMARY_FIELDS, AiSummaryFieldKey } from './fields'
+import { IconType } from 'react-icons'
 
-export const getTitleAndIcon = (jsonKey: string) => {
-  let Icon = MdOutlineSentimentSatisfied
-  let title = ''
-  switch (jsonKey) {
-    case 'character_summary':
-      title = '一言でいうとこんな人'
-      Icon = FaUser
-      break
-    case 'reading_trend_analysis':
-      title = '読書傾向'
-      Icon = IoIosAnalytics
-      break
-    case 'sentiment_analysis':
-      title = '感情分析'
-      Icon = MdOutlineSentimentSatisfied
-      break
-    case 'what_if_scenario':
-      title = '「もしも」シナリオ'
-      Icon = FaRegLightbulb
-      break
-    case 'overall_feedback':
-      title = 'まとめ'
-      Icon = IoSparklesSharp
-      break
-
-    default:
-      break
+/**
+ * AI分析フィールドのタイトルとアイコンを取得する
+ *
+ * フィールド定義から動的に生成するため、新しいフィールド追加時に
+ * この関数を変更する必要がない
+ *
+ * @param jsonKey - AI分析のフィールドキー
+ * @returns タイトルとアイコンコンポーネント
+ */
+export const getTitleAndIcon = (
+  jsonKey: string
+): { Icon: IconType; title: string } => {
+  // _schemaVersionなどの内部フィールドは無視
+  if (jsonKey.startsWith('_')) {
+    return {
+      Icon: MdOutlineSentimentSatisfied,
+      title: '',
+    }
   }
-  return { Icon, title }
+
+  // フィールド定義から取得
+  const field = AI_SUMMARY_FIELDS[jsonKey as AiSummaryFieldKey]
+
+  if (field) {
+    return {
+      Icon: field.icon,
+      title: field.title,
+    }
+  }
+
+  // 未知のフィールドの場合はデフォルト値を返す
+  return {
+    Icon: MdOutlineSentimentSatisfied,
+    title: '',
+  }
 }
