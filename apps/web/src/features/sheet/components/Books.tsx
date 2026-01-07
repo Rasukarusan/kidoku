@@ -166,13 +166,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                       <AiFillLock size={25} />
                     </p>
                   )}
-                  {hovers[i] && (
-                    <HoverBook
-                      book={book}
-                      onMouseLeave={onMouseLeave}
-                      onClick={(book, e) => onClickImage(book, e)}
-                    />
-                  )}
+                  {hovers[i] && <HoverBook book={book} />}
                 </div>
               </div>
             </div>
