@@ -73,6 +73,13 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
 
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
 
+      // 既にホバーモードで開いている場合は即座に切り替え
+      if (openSidebar && isHoverMode) {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+        setSidebarBook(book)
+        return
+      }
+
       // 少し遅延してからサイドバーを開く（チラつき防止）
       hoverTimerRef.current = setTimeout(() => {
         setSidebarBook(book)
