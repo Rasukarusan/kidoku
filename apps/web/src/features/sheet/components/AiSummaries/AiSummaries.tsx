@@ -114,7 +114,12 @@ export const AiSummaries: React.FC<Props> = ({
           )}
           <div className="mb-1 grid grid-cols-1 gap-4 md:grid-cols-2">
             {Object.keys(json)
-              .filter((key) => key !== 'id' && key !== 'character_summary')
+              .filter(
+                (key) =>
+                  key !== 'id' &&
+                  key !== 'character_summary' &&
+                  !key.startsWith('_')
+              )
               .map((key) => {
                 return (
                   <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
