@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 interface Props {
   book?: Book
   open: boolean
+  isHoverMode?: boolean
   onClose: () => void
   onExpandToFullPage: () => void
   onMouseEnter?: () => void
@@ -20,6 +21,7 @@ interface Props {
 export const BookDetailSidebar: React.FC<Props> = ({
   book,
   open,
+  isHoverMode = false,
   onClose,
   onExpandToFullPage,
   onMouseEnter,
@@ -199,14 +201,16 @@ export const BookDetailSidebar: React.FC<Props> = ({
     <AnimatePresence>
       {open && (
         <>
-          {/* オーバーレイ */}
-          <motion.div
-            className="fixed inset-0 z-[999] bg-black bg-opacity-20"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleClose}
-          />
+          {/* オーバーレイ（ホバーモードでは非表示） */}
+          {!isHoverMode && (
+            <motion.div
+              className="fixed inset-0 z-[999] bg-black bg-opacity-20"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleClose}
+            />
+          )}
 
           {/* サイドバー */}
           <motion.div
