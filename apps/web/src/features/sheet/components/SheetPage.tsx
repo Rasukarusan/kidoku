@@ -218,12 +218,6 @@ export const SheetPage: React.FC<Props> = ({
 
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center">
-          <label
-            htmlFor="sort-select"
-            className="mr-2 text-sm font-bold text-gray-700"
-          >
-            並び替え:
-          </label>
           <select
             id="sort-select"
             value={sortBy}
@@ -238,7 +232,7 @@ export const SheetPage: React.FC<Props> = ({
             }
             className="rounded-md border border-gray-400 bg-gray-50 px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="default">デフォルト</option>
+            <option value="default">登録順</option>
             <option value="impression_desc">感想順（高評価）</option>
             <option value="impression_asc">感想順（低評価）</option>
             <option value="title">タイトル順</option>
