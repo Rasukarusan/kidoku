@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 import { mask } from '@/utils/string'
 import { GetServerSideProps } from 'next'
+import { migrateAnalysis } from '@/features/sheet/components/AiSummaries/migrator'
 
 export default SheetPage
 
@@ -105,10 +106,14 @@ export const getServerSideProps: GetServerSideProps = async ({
       username,
       userId,
       yearlyTopBooks,
-      aiSummaries: aiSummaries.map((v) => ({
-        id: v.id,
-        ...(v.analysis as object),
-      })),
+      aiSummaries: aiSummaries.map((v) => {
+        // 汎用マイグレーション関数を使用して最新スキーマに変換
+        const migrated = migrateAnalysis(v.analysis)
+        return {
+          id: v.id,
+          ...migrated,
+        }
+      }),
     },
   }
 }
