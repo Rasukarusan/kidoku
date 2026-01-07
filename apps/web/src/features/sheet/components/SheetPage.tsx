@@ -60,7 +60,7 @@ export const SheetPage: React.FC<Props> = ({
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
   const [filter, setFilter] = useState('')
   const [sortBy, setSortBy] = useState<
-    'default' | 'impression_desc' | 'impression_asc' | 'title'
+    'default' | 'impression_desc' | 'impression_asc' | 'memo_desc' | 'memo_asc'
   >('default')
 
   // サイドバー用の状態管理
@@ -116,8 +116,10 @@ export const SheetPage: React.FC<Props> = ({
           (a, b) =>
             getImpressionValue(a.impression) - getImpressionValue(b.impression)
         )
-      case 'title':
-        return sorted.sort((a, b) => a.title.localeCompare(b.title, 'ja'))
+      case 'memo_desc':
+        return sorted.sort((a, b) => b.memo.length - a.memo.length)
+      case 'memo_asc':
+        return sorted.sort((a, b) => a.memo.length - b.memo.length)
       default:
         return sorted
     }
@@ -227,7 +229,8 @@ export const SheetPage: React.FC<Props> = ({
                   | 'default'
                   | 'impression_desc'
                   | 'impression_asc'
-                  | 'title'
+                  | 'memo_desc'
+                  | 'memo_asc'
               )
             }
             className="rounded-md border border-gray-400 bg-gray-50 px-3 py-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -235,7 +238,8 @@ export const SheetPage: React.FC<Props> = ({
             <option value="default">登録順</option>
             <option value="impression_desc">感想順（高評価）</option>
             <option value="impression_asc">感想順（低評価）</option>
-            <option value="title">タイトル順</option>
+            <option value="memo_desc">感想が長い順</option>
+            <option value="memo_asc">感想が短い順</option>
           </select>
         </div>
 
