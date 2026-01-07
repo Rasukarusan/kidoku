@@ -15,11 +15,12 @@ export default async (req, res) => {
     const userId = session.user.id
     const { sheetName, analysis } = req.body
 
-    // Validate analysis JSON structure
+    // Validate analysis JSON structure (最新スキーマバージョンに基づく)
     const requiredKeys = [
+      'character_summary',
       'reading_trend_analysis',
       'sentiment_analysis',
-      'what_if_scenario',
+      'hidden_theme_discovery',
       'overall_feedback',
     ]
     const hasAllKeys = requiredKeys.every((key) => key in analysis)
@@ -38,11 +39,11 @@ export default async (req, res) => {
     }
 
     const {
+      character_summary,
       reading_trend_analysis,
       sentiment_analysis,
-      what_if_scenario,
+      hidden_theme_discovery,
       overall_feedback,
-      character_summary,
     } = analysis
 
     await prisma.aiSummaries.create({
@@ -50,11 +51,12 @@ export default async (req, res) => {
         userId,
         sheet_id: sheet.id,
         analysis: {
+          _schemaVersion: 2,
+          character_summary,
           reading_trend_analysis,
           sentiment_analysis,
-          what_if_scenario,
+          hidden_theme_discovery,
           overall_feedback,
-          character_summary,
         },
         token: 0, // 手動セットの場合はトークン使用なし
       },
