@@ -31,7 +31,9 @@ export const AI_SUMMARY_FIELDS = {
   },
   hidden_theme_discovery: {
     title: '無意識に追いかけているもの',
-    legacyTitle: 'もしもシナリオ',
+    titleByVersion: {
+      1: 'もしもシナリオ',
+    } as Record<number, string>,
     icon: FaRegLightbulb as IconType,
     maxLength: 400,
     order: 3,

@@ -28,10 +28,12 @@ export const getTitleAndIcon = (
   const field = AI_SUMMARY_FIELDS[jsonKey as AiSummaryFieldKey]
 
   if (field) {
-    // 元のバージョンが1でlegacyTitleがある場合はレガシータイトルを使用
+    // 元のバージョンに対応するタイトルがあればそれを使用
     const title =
-      originalSchemaVersion === 1 && 'legacyTitle' in field
-        ? field.legacyTitle
+      originalSchemaVersion &&
+      'titleByVersion' in field &&
+      field.titleByVersion[originalSchemaVersion]
+        ? field.titleByVersion[originalSchemaVersion]
         : field.title
 
     return {
