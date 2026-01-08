@@ -82,28 +82,6 @@ export class GraphQLBackendClient {
 
     return result.data
   }
-
-  /**
-   * Mutationを実行（便利メソッド）
-   */
-  async mutation<T = any>(
-    userId: string,
-    mutation: string,
-    variables?: Record<string, any>
-  ): Promise<T> {
-    return this.execute<T>(userId, mutation, variables)
-  }
-
-  /**
-   * Queryを実行（便利メソッド）
-   */
-  async query<T = any>(
-    userId: string,
-    query: string,
-    variables?: Record<string, any>
-  ): Promise<T> {
-    return this.execute<T>(userId, query, variables)
-  }
 }
 
 /**
