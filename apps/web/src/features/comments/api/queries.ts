@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const GET_COMMENTS = gql`
+export const getCommentsQuery = gql`
   query GetComments($input: GetCommentsInput!) {
     comments(input: $input) {
       comments {

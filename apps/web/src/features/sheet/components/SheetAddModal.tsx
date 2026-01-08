@@ -4,7 +4,7 @@ import { useReward } from 'react-rewards'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { DangerAlert } from '@/components/label/DangerAlert'
 import { useMutation } from '@apollo/client'
-import { CREATE_SHEET } from '../api'
+import { createSheetMutation } from '../api'
 
 interface Props {
   open: boolean
@@ -21,7 +21,7 @@ export const SheetAddModal: React.FC<Props> = ({ open, onClose }) => {
     elementCount: 200,
   })
   const [response, setResponse] = useState<Response>(null)
-  const [createSheet] = useMutation(CREATE_SHEET)
+  const [createSheet] = useMutation(createSheetMutation)
 
   useEffect(() => {
     ref.current?.focus()

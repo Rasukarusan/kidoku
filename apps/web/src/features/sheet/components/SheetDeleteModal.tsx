@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Modal } from '@/components/layout/Modal'
 import { Loading } from '@/components/icon/Loading'
 import { useMutation } from '@apollo/client'
-import { DELETE_SHEET } from '../api'
+import { deleteSheetMutation } from '../api'
 
 interface Props {
   sheetName: string
@@ -21,7 +21,7 @@ export const SheetDeleteModal: React.FC<Props> = ({
 }) => {
   const [input, setInput] = useState('')
   const ref = useRef<HTMLInputElement>(null)
-  const [deleteSheet, { loading }] = useMutation(DELETE_SHEET)
+  const [deleteSheet, { loading }] = useMutation(deleteSheetMutation)
 
   useEffect(() => {
     ref.current?.focus()

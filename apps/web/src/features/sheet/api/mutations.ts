@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const CREATE_SHEET = gql`
+export const createSheetMutation = gql`
   mutation CreateSheet($input: CreateSheetInput!) {
     createSheet(input: $input) {
       id
@@ -12,7 +12,7 @@ export const CREATE_SHEET = gql`
   }
 `
 
-export const UPDATE_SHEET = gql`
+export const updateSheetMutation = gql`
   mutation UpdateSheet($input: UpdateSheetInput!) {
     updateSheet(input: $input) {
       id
@@ -24,13 +24,13 @@ export const UPDATE_SHEET = gql`
   }
 `
 
-export const DELETE_SHEET = gql`
+export const deleteSheetMutation = gql`
   mutation DeleteSheet($input: DeleteSheetInput!) {
     deleteSheet(input: $input)
   }
 `
 
-export const UPDATE_SHEET_ORDERS = gql`
+export const updateSheetOrdersMutation = gql`
   mutation UpdateSheetOrders($input: UpdateSheetOrdersInput!) {
     updateSheetOrders(input: $input)
   }
