@@ -8,15 +8,14 @@ import { BookInputField } from '@/components/input/BookInputField'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
 import dayjs from 'dayjs'
-import useSWR from 'swr'
-import { fetcher } from '@/libs/swr'
+import { useQuery } from '@apollo/client'
 import { BookCreatableSelectBox } from '@/components/input/BookCreatableSelectBox'
 import { Tooltip } from 'react-tooltip'
 import { Label } from '@/components/input/Label'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
-import { CategoriesResponse } from '@/types/api'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
+import { getBookCategoriesQuery } from '@/features/books/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -59,14 +58,16 @@ export const BookDetailEditModal: React.FC<Props> = ({
     finished: false,
     memo: false,
   })
-  // カテゴリ一覧
-  const { data } = useSWR<CategoriesResponse>(`/api/books/category`, fetcher)
-  const options =
-    data && data.result
-      ? data.categories.map((category) => {
-          return { value: category, label: category }
-        })
-      : []
+  // カテゴリ一覧（GraphQL）
+  const { data: categoriesData } = useQuery<{ bookCategories: string[] }>(
+    getBookCategoriesQuery
+  )
+  const options = categoriesData
+    ? categoriesData.bookCategories.map((category) => ({
+        value: category,
+        label: category,
+      }))
+    : []
 
   // どこが変更されたかを取得
   useEffect(() => {
