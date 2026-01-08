@@ -7,7 +7,7 @@ import { ImagePicker } from '@/components/button/ImagePicker'
 import { BookSelectBox } from '@/components/input/BookSelectBox'
 import { BookDatePicker } from '@/components/input/BookDatePicker'
 import dayjs from 'dayjs'
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { BookCreatableSelectBox } from '@/components/input/BookCreatableSelectBox'
 import { Tooltip } from 'react-tooltip'
 import { HintIcon } from '@/components/icon/HintIcon'
@@ -20,11 +20,7 @@ import {
   cleanupOldDrafts,
 } from '@/utils/localStorage'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
-import {
-  getBookCategoriesQuery,
-  updateBookMutation,
-  deleteBookMutation,
-} from '@/features/books/api'
+import { getBookCategoriesQuery } from '@/features/books/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -125,40 +121,27 @@ export const BookDetailEditPage: React.FC<Props> = ({
       }))
     : []
 
-  // 書籍更新ミューテーション
-  const [updateBook] = useMutation(updateBookMutation)
-
-  // 書籍削除ミューテーション
-  const [deleteBook] = useMutation(deleteBookMutation)
-
   const handleSave = async () => {
     setLoading(true)
     try {
-      await updateBook({
-        variables: {
-          input: {
-            id: String(book.id),
-            title: book.title,
-            author: book.author,
-            category: book.category,
-            image: book.image,
-            impression: book.impression,
-            memo: book.memo,
-            isPublicMemo: book.is_public_memo,
-            finished: book.finished ? new Date(book.finished) : null,
-            sheetId: book.sheet_id,
-          },
+      const response = await fetch(`/api/books`, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
         },
+        body: JSON.stringify(book),
       })
 
-      // 保存成功時にローカルストレージの下書きを削除
-      if (book.id) {
-        removeBookDraft(String(book.id))
+      if (response.ok) {
+        // 保存成功時にローカルストレージの下書きを削除
+        if (book.id) {
+          removeBookDraft(String(book.id))
+        }
+        reward() // 保存成功時にアニメーション
+        setTimeout(() => {
+          onCancel() // 編集モードを終了して読み取りモードに戻る
+        }, 500) // アニメーションが見えるように少し遅延
       }
-      reward() // 保存成功時にアニメーション
-      setTimeout(() => {
-        onCancel() // 編集モードを終了して読み取りモードに戻る
-      }, 500) // アニメーションが見えるように少し遅延
     } catch (error) {
       console.error('Error saving book:', error)
     }
@@ -170,19 +153,23 @@ export const BookDetailEditPage: React.FC<Props> = ({
 
     setLoading(true)
     try {
-      await deleteBook({
-        variables: {
-          input: {
-            id: String(book.id),
-          },
+      const response = await fetch(`/api/books`, {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
         },
+        body: JSON.stringify({
+          id: book.id,
+        }),
       })
 
-      // 削除成功時にローカルストレージの下書きも削除
-      if (book.id) {
-        removeBookDraft(String(book.id))
+      if (response.ok) {
+        // 削除成功時にローカルストレージの下書きも削除
+        if (book.id) {
+          removeBookDraft(String(book.id))
+        }
+        onClose()
       }
-      onClose()
     } catch (error) {
       console.error('Error deleting book:', error)
     }
