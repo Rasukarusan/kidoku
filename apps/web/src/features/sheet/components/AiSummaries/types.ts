@@ -6,6 +6,8 @@ export type AiSummariesJson = {
   id: number
   /** スキーマバージョン（マイグレーション管理用） */
   _schemaVersion?: number
+  /** 元のスキーマバージョン（レガシー表示用） */
+  _originalSchemaVersion?: number
   /** 一言でいうとこんな人 */
   character_summary: string
   /** 読書傾向分析 */

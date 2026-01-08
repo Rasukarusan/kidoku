@@ -9,10 +9,12 @@ import { IconType } from 'react-icons'
  * この関数を変更する必要がない
  *
  * @param jsonKey - AI分析のフィールドキー
+ * @param originalSchemaVersion - 元のスキーマバージョン（レガシー表示用）
  * @returns タイトルとアイコンコンポーネント
  */
 export const getTitleAndIcon = (
-  jsonKey: string
+  jsonKey: string,
+  originalSchemaVersion?: number
 ): { Icon: IconType; title: string } => {
   // _schemaVersionなどの内部フィールドは無視
   if (jsonKey.startsWith('_')) {
@@ -26,9 +28,15 @@ export const getTitleAndIcon = (
   const field = AI_SUMMARY_FIELDS[jsonKey as AiSummaryFieldKey]
 
   if (field) {
+    // 元のバージョンが1でlegacyTitleがある場合はレガシータイトルを使用
+    const title =
+      originalSchemaVersion === 1 && 'legacyTitle' in field
+        ? field.legacyTitle
+        : field.title
+
     return {
       Icon: field.icon,
-      title: field.title,
+      title,
     }
   }
 
