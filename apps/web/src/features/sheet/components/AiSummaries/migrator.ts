@@ -81,6 +81,9 @@ export function migrateAnalysis(analysis: any): AiSummariesJson {
 
   let migrated = { ...analysis }
 
+  // 元のスキーマバージョンを保持（レガシー表示用）
+  migrated._originalSchemaVersion = currentVersion
+
   // 現在のバージョンから最新バージョンまで順次マイグレーション
   for (
     let version = currentVersion;
