@@ -27,7 +27,7 @@ import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { CategoriesResponse } from '@/types/api'
 
-import { GET_SHEETS } from '@/libs/apollo/queries'
+import { getSheetsQuery } from '@/features/sheet/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -57,7 +57,7 @@ export const AddModal: React.FC = () => {
   const [open, setOpen] = useAtom(openAddModalAtom)
   const item = useAtomValue(addBookAtom)
   const { data: session } = useSession()
-  const { data: sheetsData, refetch: refetchSheets } = useQuery(GET_SHEETS)
+  const { data: sheetsData, refetch: refetchSheets } = useQuery(getSheetsQuery)
   const sheets = sheetsData?.sheets || []
   const { mutate } = useSWR(
     `/api/books/${router.asPath.split('/').pop()}`,

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Modal } from '@/components/layout/Modal'
 import { Loading } from '@/components/icon/Loading'
 import { useMutation } from '@apollo/client'
-import { UPDATE_SHEET } from '@/libs/apollo/queries'
+import { updateSheetMutation } from '../api'
 
 interface Props {
   sheetName: string
@@ -21,7 +21,7 @@ export const SheetEditModal: React.FC<Props> = ({
 }) => {
   const [input, setInput] = useState(sheetName)
   const ref = useRef<HTMLInputElement>(null)
-  const [updateSheet, { loading }] = useMutation(UPDATE_SHEET)
+  const [updateSheet, { loading }] = useMutation(updateSheetMutation)
 
   useEffect(() => {
     ref.current?.focus()
