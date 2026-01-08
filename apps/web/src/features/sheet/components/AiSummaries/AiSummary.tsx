@@ -3,10 +3,15 @@ import { getTitleAndIcon } from './util'
 interface Props {
   jsonKey: string
   text: string
+  originalSchemaVersion?: number
 }
 
-export const AiSummary: React.FC<Props> = ({ jsonKey, text }) => {
-  const { Icon, title } = getTitleAndIcon(jsonKey)
+export const AiSummary: React.FC<Props> = ({
+  jsonKey,
+  text,
+  originalSchemaVersion,
+}) => {
+  const { Icon, title } = getTitleAndIcon(jsonKey, originalSchemaVersion)
   return (
     <>
       <div className="flex items-center justify-center py-2">

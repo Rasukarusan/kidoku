@@ -131,7 +131,12 @@ export const AiSummaries: React.FC<Props> = ({
               .map((key) => {
                 return (
                   <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
-                    <AiSummary key={key} jsonKey={key} text={json[key]} />
+                    <AiSummary
+                      key={key}
+                      jsonKey={key}
+                      text={json[key]}
+                      originalSchemaVersion={json._originalSchemaVersion}
+                    />
                   </div>
                 )
               })}
