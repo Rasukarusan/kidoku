@@ -5,7 +5,7 @@ import { NO_IMAGE } from '@/libs/constants'
 import { put } from '@vercel/blob'
 import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
 import { addDocuments } from '@/libs/meilisearch/addDocuments'
-import crypto from 'crypto'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 // import { setTimeout } from 'timers/promises'
 export const config = {
   api: {
@@ -132,59 +132,31 @@ export default async (req, res) => {
       }
 
       // GraphQL mutation呼び出し
-      const graphqlEndpoint =
-        process.env.NESTJS_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql'
-      const secretKey = process.env.NEXTAUTH_SECRET
-      if (!secretKey) {
-        throw new Error('NEXTAUTH_SECRET is not configured')
-      }
-
-      const timestamp = Date.now().toString()
-      const signature = crypto
-        .createHmac('sha256', secretKey)
-        .update(`${userId}:false:${timestamp}`)
-        .digest('hex')
-
-      const graphqlResponse = await fetch(graphqlEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId,
-          'X-User-Admin': 'false',
-          'X-Timestamp': timestamp,
-          'X-Signature': signature,
-        },
-        body: JSON.stringify({
-          query: `
-            mutation UpdateBook($input: UpdateBookInput!) {
-              updateBook(input: $input) {
-                id
-              }
+      await graphqlClient.mutation(
+        userId,
+        `
+          mutation UpdateBook($input: UpdateBookInput!) {
+            updateBook(input: $input) {
+              id
             }
-          `,
-          variables: {
-            input: {
-              id: String(id),
-              title: body.title,
-              author: body.author,
-              category: body.category,
-              image: imageUrl,
-              impression: body.impression,
-              memo: body.memo,
-              isPublicMemo: body.is_public_memo,
-              isPurchasable: body.is_purchasable,
-              finished: body.finished ? new Date(body.finished) : null,
-              sheetId: body.sheet_id ? Number(body.sheet_id) : undefined,
-            },
+          }
+        `,
+        {
+          input: {
+            id: String(id),
+            title: body.title,
+            author: body.author,
+            category: body.category,
+            image: imageUrl,
+            impression: body.impression,
+            memo: body.memo,
+            isPublicMemo: body.is_public_memo,
+            isPurchasable: body.is_purchasable,
+            finished: body.finished ? new Date(body.finished) : null,
+            sheetId: body.sheet_id ? Number(body.sheet_id) : undefined,
           },
-        }),
-      })
-
-      if (!graphqlResponse.ok) {
-        const errorText = await graphqlResponse.text()
-        console.error('GraphQL update failed:', errorText)
-        throw new Error('GraphQL update failed')
-      }
+        }
+      )
 
       await updateMeiliSearchDocuments()
       return res.status(200).json({ result: true })
@@ -193,47 +165,19 @@ export default async (req, res) => {
       const id = body.id
 
       // GraphQL mutation呼び出し
-      const graphqlEndpoint =
-        process.env.NESTJS_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql'
-      const secretKey = process.env.NEXTAUTH_SECRET
-      if (!secretKey) {
-        throw new Error('NEXTAUTH_SECRET is not configured')
-      }
-
-      const timestamp = Date.now().toString()
-      const signature = crypto
-        .createHmac('sha256', secretKey)
-        .update(`${userId}:false:${timestamp}`)
-        .digest('hex')
-
-      const graphqlResponse = await fetch(graphqlEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': userId,
-          'X-User-Admin': 'false',
-          'X-Timestamp': timestamp,
-          'X-Signature': signature,
-        },
-        body: JSON.stringify({
-          query: `
-            mutation DeleteBook($input: DeleteBookInput!) {
-              deleteBook(input: $input)
-            }
-          `,
-          variables: {
-            input: {
-              id: String(id),
-            },
+      await graphqlClient.mutation(
+        userId,
+        `
+          mutation DeleteBook($input: DeleteBookInput!) {
+            deleteBook(input: $input)
+          }
+        `,
+        {
+          input: {
+            id: String(id),
           },
-        }),
-      })
-
-      if (!graphqlResponse.ok) {
-        const errorText = await graphqlResponse.text()
-        console.error('GraphQL delete failed:', errorText)
-        throw new Error('GraphQL delete failed')
-      }
+        }
+      )
 
       await updateMeiliSearchDocuments()
       return res.status(200).json({ result: true })
