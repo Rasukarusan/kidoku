@@ -31,6 +31,8 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
       // デフォルトでサイドバー表示
       setSidebarBook(book[0])
       setOpenSidebar(true)
+      // 詳細ページをプリフェッチしてレスポンス速度を向上
+      router.prefetch(`/books/${bookId}`)
     }
   }, [bookId])
 
@@ -42,6 +44,8 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
       // 通常クリックでサイドバー表示
       setSidebarBook(book)
       setOpenSidebar(true)
+      // 詳細ページをプリフェッチしてレスポンス速度を向上
+      router.prefetch(`/books/${book.id}`)
     }
     setHovers(initialHovers)
   }
