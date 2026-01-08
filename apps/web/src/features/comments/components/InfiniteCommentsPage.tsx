@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client'
 import { Virtuoso } from 'react-virtuoso'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
-import { GET_COMMENTS } from '../api'
+import { getCommentsQuery } from '../api'
 import { NextSeo } from 'next-seo'
 
 interface CommentsData {
@@ -31,7 +31,7 @@ export const InfiniteCommentsPage: React.FC = () => {
   const { loading, error, fetchMore } = useQuery<
     CommentsData,
     CommentsVariables
-  >(GET_COMMENTS, {
+  >(getCommentsQuery, {
     variables: {
       input: {
         limit: ITEMS_PER_PAGE,

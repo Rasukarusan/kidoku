@@ -7,7 +7,7 @@ import { twMerge } from 'tailwind-merge'
 import { UserImageResponse } from '@/types/api'
 import { Reorder } from 'framer-motion'
 import { useMutation } from '@apollo/client'
-import { UPDATE_SHEET_ORDERS } from '../api'
+import { updateSheetOrdersMutation } from '../api'
 import { useSession } from 'next-auth/react'
 import { useMediaQuery } from 'react-responsive'
 
@@ -25,7 +25,7 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
     sheets.map((sheet) => sheet.name)
   )
   const [draggedItem, setDraggedItem] = useState<string | null>(null)
-  const [updateSheetOrders] = useMutation(UPDATE_SHEET_ORDERS)
+  const [updateSheetOrders] = useMutation(updateSheetOrdersMutation)
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(
     null
   )

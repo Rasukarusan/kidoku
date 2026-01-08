@@ -14,7 +14,7 @@ import {
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
 import { useQuery } from '@apollo/client'
-import { GET_SHEETS } from '@/features/sheet/api'
+import { getSheetsQuery } from '@/features/sheet/api'
 import { Logo } from '@/components/icon/Logo'
 
 export const Sidebar: React.FC = () => {
@@ -22,7 +22,7 @@ export const Sidebar: React.FC = () => {
   const { data: session, status } = useSession()
   const [isOpen, setIsOpen] = useAtom(openNavSidebarAtom)
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
-  const { data } = useQuery(GET_SHEETS)
+  const { data } = useQuery(getSheetsQuery)
   const sidebarRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
