@@ -132,7 +132,7 @@ export default async (req, res) => {
       }
 
       // GraphQL mutation呼び出し
-      await graphqlClient.mutation(
+      await graphqlClient.execute(
         userId,
         `
           mutation UpdateBook($input: UpdateBookInput!) {
@@ -165,7 +165,7 @@ export default async (req, res) => {
       const id = body.id
 
       // GraphQL mutation呼び出し
-      await graphqlClient.mutation(
+      await graphqlClient.execute(
         userId,
         `
           mutation DeleteBook($input: DeleteBookInput!) {
