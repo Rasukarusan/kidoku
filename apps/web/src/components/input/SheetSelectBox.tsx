@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { GET_SHEETS } from '@/libs/apollo/queries'
+import { GET_SHEETS } from '@/features/sheet/api'
 import { Label } from './Label'
 
 interface Sheet {

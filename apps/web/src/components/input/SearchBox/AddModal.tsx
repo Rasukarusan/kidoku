@@ -27,7 +27,7 @@ import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { CategoriesResponse } from '@/types/api'
 
-import { GET_SHEETS } from '@/libs/apollo/queries'
+import { GET_SHEETS } from '@/features/sheet/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(

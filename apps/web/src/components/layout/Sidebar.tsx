@@ -14,7 +14,7 @@ import {
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
 import { useQuery } from '@apollo/client'
-import { GET_SHEETS } from '@/libs/apollo/queries'
+import { GET_SHEETS } from '@/features/sheet/api'
 import { Logo } from '@/components/icon/Logo'
 
 export const Sidebar: React.FC = () => {

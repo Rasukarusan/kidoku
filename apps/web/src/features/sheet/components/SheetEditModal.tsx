@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Modal } from '@/components/layout/Modal'
 import { Loading } from '@/components/icon/Loading'
 import { useMutation } from '@apollo/client'
-import { UPDATE_SHEET } from '@/libs/apollo/queries'
+import { UPDATE_SHEET } from '../api'
 
 interface Props {
   sheetName: string
