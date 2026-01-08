@@ -15,10 +15,15 @@ export class BookRepository implements IBookRepository {
   ) {}
 
   async findById(id: string): Promise<Book | null> {
+    const bookId = parseInt(id, 10);
+    if (isNaN(bookId) || bookId <= 0) {
+      return null;
+    }
+
     const rows = await this.db
       .select()
       .from(books)
-      .where(eq(books.id, parseInt(id)))
+      .where(eq(books.id, bookId))
       .limit(1);
 
     if (rows.length === 0) return null;
@@ -73,9 +78,14 @@ export class BookRepository implements IBookRepository {
         finished: book.finished,
         created: book.created,
         updated: book.updated,
-      })) as any[];
+      })) as unknown as Array<{ insertId: number }>;
 
-      const insertId = result[0].insertId as number;
+      // Drizzle MySQLの戻り値から insertId を取得
+      if (!result?.[0]?.insertId || typeof result[0].insertId !== 'number') {
+        throw new Error('Failed to create book: No insertId returned');
+      }
+
+      const insertId = result[0].insertId;
       return Book.fromDatabase(
         insertId.toString(),
         book.userId,
@@ -94,6 +104,11 @@ export class BookRepository implements IBookRepository {
       );
     } else {
       // 更新
+      const bookId = parseInt(book.id, 10);
+      if (isNaN(bookId) || bookId <= 0) {
+        throw new Error('Invalid book ID');
+      }
+
       await this.db
         .update(books)
         .set({
@@ -109,16 +124,21 @@ export class BookRepository implements IBookRepository {
           finished: book.finished,
           updated: book.updated,
         })
-        .where(eq(books.id, parseInt(book.id)));
+        .where(eq(books.id, bookId));
 
       return book;
     }
   }
 
   async delete(id: string, userId: string): Promise<void> {
+    const bookId = parseInt(id, 10);
+    if (isNaN(bookId) || bookId <= 0) {
+      throw new Error('Invalid book ID');
+    }
+
     await this.db
       .delete(books)
-      .where(and(eq(books.id, parseInt(id)), eq(books.userId, userId)));
+      .where(and(eq(books.id, bookId), eq(books.userId, userId)));
   }
 
   async findAllForSearch(): Promise<

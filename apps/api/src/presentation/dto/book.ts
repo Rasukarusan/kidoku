@@ -84,9 +84,6 @@ export class DeleteBookInput {
 
 @InputType()
 export class GetBooksInput {
-  @Field(() => ID, { nullable: true })
-  userId?: string;
-
   @Field(() => Int, { nullable: true })
   sheetId?: number;
 }

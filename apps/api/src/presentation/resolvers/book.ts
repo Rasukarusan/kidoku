@@ -35,11 +35,10 @@ export class BookResolver {
     @CurrentUser() user: { id: string },
     @Args('input') input: GetBookInput,
   ): Promise<BookResponse | null> {
-    const book = await this.getBookUseCase.execute(input.id);
+    const book = await this.getBookUseCase.execute(user.id, input.id);
     if (!book) return null;
 
-    const isOwner = book.userId === user.id;
-    return this.toResponse(book, isOwner);
+    return this.toResponse(book, true);
   }
 
   @Query(() => [BookResponse])
@@ -48,13 +47,12 @@ export class BookResolver {
     @Args('input', { nullable: true }) input?: GetBooksInput,
   ): Promise<BookResponse[]> {
     const books = await this.getBooksUseCase.execute({
-      userId: input?.userId,
+      userId: user.id,
       sheetId: input?.sheetId,
     });
 
     return books.map((book) => {
-      const isOwner = book.userId === user.id;
-      return this.toResponse(book, isOwner);
+      return this.toResponse(book, true);
     });
   }
 
