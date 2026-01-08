@@ -6,6 +6,7 @@ import { join } from 'path';
 import { SoftwareDesignModule } from './presentation/modules/software-design';
 import { SheetModule } from './presentation/modules/sheet';
 import { CommentModule } from './presentation/modules/comment';
+import { BookModule } from './presentation/modules/book';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CommentModule } from './presentation/modules/comment';
     SheetModule,
     CommentModule,
     SoftwareDesignModule,
+    BookModule,
   ],
 })
 export class AppModule {}
