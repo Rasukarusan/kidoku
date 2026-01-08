@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client'
 import { Virtuoso } from 'react-virtuoso'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
-import { GET_COMMENTS } from '@/libs/apollo/queries'
+import { GET_COMMENTS } from '../api'
 import { NextSeo } from 'next-seo'
 
 interface CommentsData {

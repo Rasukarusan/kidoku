@@ -7,7 +7,7 @@ import { twMerge } from 'tailwind-merge'
 import { UserImageResponse } from '@/types/api'
 import { Reorder } from 'framer-motion'
 import { useMutation } from '@apollo/client'
-import { UPDATE_SHEET_ORDERS } from '@/libs/apollo/queries'
+import { UPDATE_SHEET_ORDERS } from '../api'
 import { useSession } from 'next-auth/react'
 import { useMediaQuery } from 'react-responsive'
 

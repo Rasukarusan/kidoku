@@ -4,7 +4,7 @@ import { useReward } from 'react-rewards'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { DangerAlert } from '@/components/label/DangerAlert'
 import { useMutation } from '@apollo/client'
-import { CREATE_SHEET } from '@/libs/apollo/queries'
+import { CREATE_SHEET } from '../api'
 
 interface Props {
   open: boolean
