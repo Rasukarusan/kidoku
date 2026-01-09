@@ -139,11 +139,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
 
   return (
     <>
-      <div
-        className={`grid grid-cols-3 gap-x-2 gap-y-6 transition-all duration-300 sm:grid-cols-4 lg:grid-cols-6 ${
-          openSidebar ? 'md:mr-[480px] lg:mr-[540px]' : ''
-        }`}
-      >
+      <div className="grid grid-cols-3 gap-x-2 gap-y-6 sm:grid-cols-4 lg:grid-cols-6">
         {books.map((book, i) => {
           return (
             <div key={book.title + i} className="">
