@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client'
-import { GET_SHEETS } from '@/libs/apollo/queries'
+import { getSheetsQuery } from '@/features/sheet/api'
 import { Label } from './Label'
 
 interface Sheet {
@@ -22,7 +22,7 @@ export const SheetSelectBox: React.FC<Props> = ({
   className = '',
   tabIndex,
 }) => {
-  const { data: sheetsData } = useQuery(GET_SHEETS)
+  const { data: sheetsData } = useQuery(getSheetsQuery)
   const sheets: Sheet[] = sheetsData?.sheets || []
 
   if (sheets.length === 0) return null
