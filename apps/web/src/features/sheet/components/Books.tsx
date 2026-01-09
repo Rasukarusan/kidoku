@@ -68,17 +68,10 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   // ホバーでサイドバーを開く
   const openSidebarOnHover = useCallback(
     (book: Book) => {
-      // クリックモードで開いている場合は何もしない
-      if (openSidebar && !isHoverMode) return
+      // 既にサイドバーが開いている場合は何もしない
+      if (openSidebar) return
 
       if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
-
-      // 既にホバーモードで開いている場合は即座に切り替え
-      if (openSidebar && isHoverMode) {
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
-        setSidebarBook(book)
-        return
-      }
 
       // 少し遅延してからサイドバーを開く（チラつき防止）
       hoverTimerRef.current = setTimeout(() => {
@@ -87,7 +80,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
         setIsHoverMode(true)
       }, 200)
     },
-    [openSidebar, isHoverMode]
+    [openSidebar]
   )
 
   // ホバーでサイドバーを閉じる
