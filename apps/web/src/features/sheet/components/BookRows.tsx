@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { BookDetailSidebar } from './BookDetailSidebar'
 import { useSession } from 'next-auth/react'
 import { MemoPreview } from './MemoPreview'
+import { useRouter } from 'next/router'
 
 interface Props {
   books: Book[]
@@ -11,6 +12,7 @@ interface Props {
 
 export const BookRows: React.FC<Props> = ({ books }) => {
   const { data: session } = useSession()
+  const router = useRouter()
   const pc = 'hidden sm:table-cell'
   const [openSidebar, setOpenSidebar] = useState(false)
   const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
@@ -18,6 +20,8 @@ export const BookRows: React.FC<Props> = ({ books }) => {
   const onClickRow = (book: Book) => {
     setSidebarBook(book)
     setOpenSidebar(true)
+    // 詳細ページをプリフェッチしてレスポンス速度を向上
+    router.prefetch(`/books/${book.id}`)
   }
 
   const isMine =
@@ -105,7 +109,10 @@ export const BookRows: React.FC<Props> = ({ books }) => {
           setSidebarBook(null)
         }}
         onExpandToFullPage={() => {
-          setOpenSidebar(false)
+          if (sidebarBook) {
+            router.push(`/books/${sidebarBook.id}`)
+            setOpenSidebar(false)
+          }
         }}
       />
     </div>

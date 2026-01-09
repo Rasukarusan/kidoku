@@ -15,6 +15,7 @@ describe('migrateAnalysis()', () => {
 
       expect(result).toEqual({
         _schemaVersion: 2,
+        _originalSchemaVersion: 1,
         character_summary: 'テスト人物像',
         reading_trend_analysis: 'テスト傾向',
         sentiment_analysis: 'テスト感情',
@@ -22,6 +23,20 @@ describe('migrateAnalysis()', () => {
         overall_feedback: 'テスト総評',
       })
       expect(result).not.toHaveProperty('what_if_scenario')
+    })
+
+    it('_originalSchemaVersionが保持されること', () => {
+      const v1Data = {
+        character_summary: 'テスト人物像',
+        reading_trend_analysis: 'テスト傾向',
+        sentiment_analysis: 'テスト感情',
+        what_if_scenario: 'テストシナリオ',
+        overall_feedback: 'テスト総評',
+      }
+
+      const result = migrateAnalysis(v1Data)
+
+      expect(result._originalSchemaVersion).toBe(1)
     })
 
     it('_schemaVersionが1の場合も正しく変換されること', () => {
@@ -37,6 +52,7 @@ describe('migrateAnalysis()', () => {
       const result = migrateAnalysis(v1Data)
 
       expect(result._schemaVersion).toBe(2)
+      expect(result._originalSchemaVersion).toBe(1)
       expect(result.hidden_theme_discovery).toBe('テストシナリオ')
       expect(result).not.toHaveProperty('what_if_scenario')
     })
@@ -56,6 +72,7 @@ describe('migrateAnalysis()', () => {
       const result = migrateAnalysis(v2Data)
 
       expect(result).toEqual(v2Data)
+      expect(result._originalSchemaVersion).toBeUndefined()
     })
 
     it('すでにhidden_theme_discoveryを持つデータはそのまま返ること', () => {
@@ -117,8 +134,10 @@ describe('migrateAnalyses()', () => {
 
     expect(results).toHaveLength(2)
     expect(results[0].hidden_theme_discovery).toBe('シナリオ1')
+    expect(results[0]._originalSchemaVersion).toBe(1)
     expect(results[0]).not.toHaveProperty('what_if_scenario')
     expect(results[1].hidden_theme_discovery).toBe('テーマ2')
+    expect(results[1]._originalSchemaVersion).toBeUndefined()
   })
 
   it('空の配列でもエラーが発生しないこと', () => {
