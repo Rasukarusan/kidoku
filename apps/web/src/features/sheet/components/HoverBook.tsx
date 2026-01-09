@@ -5,22 +5,18 @@ import { MemoPreview } from './MemoPreview'
 
 interface Props {
   book: Book
-  onClick: (book: Book, event?: React.MouseEvent) => void
-  onMouseLeave: (i: number) => void
 }
 
-export const HoverBook: React.FC<Props> = ({ book, onClick, onMouseLeave }) => {
+export const HoverBook: React.FC<Props> = ({ book }) => {
   const { data: session } = useSession()
   const isMine = session?.user?.id === book.userId
 
   return (
     <motion.div
-      className="absolute inset-0 z-10 cursor-pointer overflow-hidden rounded"
+      className="pointer-events-none absolute inset-0 z-10 overflow-hidden rounded"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
-      onMouseLeave={() => onMouseLeave(-1)}
-      onClick={(e) => onClick(book, e)}
     >
       {/* 下部グラデーションオーバーレイ */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
