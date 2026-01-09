@@ -5,6 +5,8 @@ import React from 'react'
 import { SearchBox } from '@/components/input/SearchBox/SearchBox'
 import { useSetAtom } from 'jotai'
 import { openNavSidebarAtom, openLoginModalAtom } from '@/store/modal/atom'
+import { Logo } from '@/components/icon/Logo'
+import Link from 'next/link'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -21,6 +23,9 @@ export const Header = () => {
     <>
       <div className="sticky top-0 z-40 h-14 w-full bg-main text-white">
         <Container className="flex max-h-16 items-center justify-between gap-2 p-2">
+          <Link href="/" className="flex-shrink-0">
+            <Logo className="h-8 w-8" />
+          </Link>
           <div className="flex-1">
             <SearchBox />
           </div>
