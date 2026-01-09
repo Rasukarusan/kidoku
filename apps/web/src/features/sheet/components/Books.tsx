@@ -24,8 +24,8 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
   const [sidebarBook, setSidebarBook] = useState<Book | null>(null)
   // ホバーモードかクリックモードかを管理
   const [isHoverMode, setIsHoverMode] = useState(false)
-  // サイドバー上にマウスがあるかどうか
-  const [isMouseOnSidebar, setIsMouseOnSidebar] = useState(false)
+  // サイドバー上にマウスがあるかどうか（refで最新値を保持）
+  const isMouseOnSidebarRef = useRef(false)
   // ホバー用タイマー
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null)
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -92,23 +92,24 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
 
     // 少し遅延してから閉じる（サイドバーへの移動を許容）
     closeTimerRef.current = setTimeout(() => {
-      if (!isMouseOnSidebar) {
+      // refから最新の値を取得
+      if (!isMouseOnSidebarRef.current) {
         setOpenSidebar(false)
         setSidebarBook(null)
         setIsHoverMode(false)
       }
     }, 300)
-  }, [isHoverMode, isMouseOnSidebar])
+  }, [isHoverMode])
 
   // サイドバーにマウスが入った時
   const handleSidebarMouseEnter = useCallback(() => {
-    setIsMouseOnSidebar(true)
+    isMouseOnSidebarRef.current = true
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
   }, [])
 
   // サイドバーからマウスが離れた時
   const handleSidebarMouseLeave = useCallback(() => {
-    setIsMouseOnSidebar(false)
+    isMouseOnSidebarRef.current = false
     if (isHoverMode) {
       closeTimerRef.current = setTimeout(() => {
         setOpenSidebar(false)
