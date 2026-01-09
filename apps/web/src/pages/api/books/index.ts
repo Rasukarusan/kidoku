@@ -159,7 +159,7 @@ export default async (req, res) => {
       )
 
       await updateMeiliSearchDocuments()
-      return res.status(200).json({ result: true })
+      return res.status(200).json({ result: true, image: imageUrl })
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
       const id = body.id

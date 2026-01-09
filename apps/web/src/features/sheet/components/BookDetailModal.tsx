@@ -121,7 +121,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
         Accept: 'application/json',
       },
     }).then((res) => res.json())
-    setCurrentBook({ ...newBook, image: res.data?.image })
+    setCurrentBook({ ...newBook, image: res.image || newBook.image })
 
     // 保存成功時にローカルストレージの下書きを削除
     if (newBook?.id) {

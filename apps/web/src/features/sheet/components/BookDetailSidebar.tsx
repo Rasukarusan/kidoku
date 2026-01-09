@@ -108,7 +108,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
         Accept: 'application/json',
       },
     }).then((res) => res.json())
-    setCurrentBook({ ...newBook, image: res.data?.image })
+    setCurrentBook({ ...newBook, image: res.image || newBook.image })
     reward()
     setLoading(false)
     setEdit(false)
