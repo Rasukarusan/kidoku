@@ -11,21 +11,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 interface Props {
   book?: Book
   open: boolean
-  isHoverMode?: boolean
   onClose: () => void
   onExpandToFullPage: () => void
-  onMouseEnter?: () => void
-  onMouseLeave?: () => void
 }
 
 export const BookDetailSidebar: React.FC<Props> = ({
   book,
   open,
-  isHoverMode = false,
   onClose,
   onExpandToFullPage,
-  onMouseEnter,
-  onMouseLeave,
 }) => {
   const router = useRouter()
   const { mutate } = useSWRConfig()
@@ -201,16 +195,14 @@ export const BookDetailSidebar: React.FC<Props> = ({
     <AnimatePresence>
       {open && (
         <>
-          {/* オーバーレイ（ホバーモードでは非表示） */}
-          {!isHoverMode && (
-            <motion.div
-              className="fixed inset-0 z-[999] bg-black bg-opacity-20"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={handleClose}
-            />
-          )}
+          {/* オーバーレイ */}
+          <motion.div
+            className="fixed inset-0 z-[999] bg-black bg-opacity-20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={handleClose}
+          />
 
           {/* サイドバー */}
           <motion.div
@@ -230,8 +222,6 @@ export const BookDetailSidebar: React.FC<Props> = ({
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
           >
             <div className="flex h-full w-full flex-col">
               {/* ヘッダー */}
