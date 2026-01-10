@@ -110,11 +110,6 @@ export const Footer: React.FC = () => {
                 title="Admin"
                 items={[
                   {
-                    title: 'シート',
-                    href: 'https://docs.google.com/spreadsheets/d/1AgAMtzU1xFYfV5OueYkA6MDSNIgjVOHG39CRdKYcVFA/edit#gid=932576471',
-                    target: '_blank',
-                  },
-                  {
                     title: 'Vercel',
                     href: 'https://vercel.com/naototanakas-projects/kidoku',
                     target: '_blank',
