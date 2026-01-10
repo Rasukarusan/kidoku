@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAtom, useSetAtom } from 'jotai'
-import { openNavSidebarAtom, openLoginModalAtom } from '@/store/modal/atom'
+import { useAtom } from 'jotai'
+import { openNavSidebarAtom } from '@/store/modal/atom'
 import {
   AiOutlineHome,
   AiOutlineBook,
@@ -21,7 +21,6 @@ export const Sidebar: React.FC = () => {
   const router = useRouter()
   const { data: session, status } = useSession()
   const [isOpen, setIsOpen] = useAtom(openNavSidebarAtom)
-  const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const { data } = useQuery(getSheetsQuery)
   const sidebarRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -168,117 +167,7 @@ export const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside
-        className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-60 lg:flex-col"
-        role="complementary"
-        aria-label="メインナビゲーション"
-      >
-        <div className="flex min-h-0 flex-1 flex-col border-r border-gray-100 bg-main shadow-sm">
-          <div className="flex flex-1 flex-col overflow-y-auto pb-4 pt-6">
-            <div className="flex flex-shrink-0 items-center px-6">
-              <Link href="/" className="flex items-center gap-3 no-underline">
-                <Logo className="h-8 w-8" />
-                <h1 className="text-xl font-bold text-gray-800">Kidoku</h1>
-              </Link>
-            </div>
-
-            {isAuthenticated && (
-              <nav
-                className="mt-8 flex-1 space-y-1 px-3"
-                role="navigation"
-                aria-label="メインメニュー"
-              >
-                {navigationItems.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main ${
-                        item.isActive
-                          ? 'border border-gray-100 bg-white text-gray-900 shadow-sm'
-                          : 'text-gray-600 hover:bg-white/50 hover:text-gray-900'
-                      }`}
-                      aria-current={item.isActive ? 'page' : undefined}
-                    >
-                      <Icon
-                        className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                          item.isActive
-                            ? 'text-gray-700'
-                            : 'text-gray-400 group-hover:text-gray-600'
-                        }`}
-                        aria-hidden="true"
-                      />
-                      {item.name}
-                    </Link>
-                  )
-                })}
-              </nav>
-            )}
-          </div>
-
-          {/* User section at bottom */}
-          {isAuthenticated ? (
-            <div
-              className="flex flex-shrink-0 border-t border-gray-100 p-4"
-              role="region"
-              aria-label="ユーザーアカウント"
-            >
-              <div className="w-full space-y-2">
-                <Link
-                  href="/settings/profile"
-                  className="flex items-center rounded-lg p-2 transition-colors duration-150 hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
-                  aria-label="アカウント設定に移動"
-                >
-                  <div className="mr-3">
-                    <img
-                      className="h-9 w-9 rounded-full ring-2 ring-white"
-                      src={session.user.image || ''}
-                      alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-800">
-                      {session.user.name}
-                    </p>
-                    <p className="truncate text-xs text-gray-500">
-                      {session.user.email}
-                    </p>
-                  </div>
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="flex w-full items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-all duration-200 hover:bg-white/50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-main"
-                  aria-label="アカウントからログアウト"
-                >
-                  <BiExit
-                    className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
-                    aria-hidden="true"
-                  />
-                  ログアウト
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div
-              className="flex flex-shrink-0 border-t border-gray-100 p-4"
-              role="region"
-              aria-label="ログイン"
-            >
-              <button
-                onClick={() => setOpenLoginModal(true)}
-                className="flex w-full items-center justify-center px-4 py-2.5 text-sm font-bold text-gray-700 transition-all duration-200 hover:text-gray-900 focus:outline-none"
-                aria-label="アカウントにログイン"
-              >
-                ログイン
-              </button>
-            </div>
-          )}
-        </div>
-      </aside>
-
-      {/* Mobile Sidebar Overlay */}
+      {/* Sidebar Overlay (トグル式) */}
       <AnimatePresence>
         {isOpen && isAuthenticated && (
           <>
@@ -287,7 +176,7 @@ export const Sidebar: React.FC = () => {
               animate="open"
               exit="closed"
               variants={overlayVariants}
-              className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+              className="fixed inset-0 z-40 bg-black bg-opacity-50"
               onClick={closeSidebar}
               aria-hidden="true"
             />
@@ -298,7 +187,7 @@ export const Sidebar: React.FC = () => {
               animate="open"
               exit="closed"
               variants={sidebarVariants}
-              className="fixed inset-y-0 right-0 z-50 w-64 bg-main shadow-xl focus:outline-none lg:hidden"
+              className="fixed inset-y-0 right-0 z-50 w-64 bg-main shadow-xl focus:outline-none"
               id="mobile-sidebar"
               role="dialog"
               aria-modal="true"

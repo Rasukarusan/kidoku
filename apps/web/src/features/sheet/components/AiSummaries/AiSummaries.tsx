@@ -83,7 +83,7 @@ export const AiSummaries: React.FC<Props> = ({
         </div>
       )}
       {json && (
-        <div className="relative mx-auto w-full text-center md:w-3/4">
+        <div className="relative mx-auto w-full text-center">
           {isMine && (
             <button
               onClick={() => {
