@@ -1,9 +1,7 @@
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { SearchResult } from '@/types/search'
 import { mask } from '@/utils/string'
-
-const GRAPHQL_ENDPOINT =
-  process.env.NESTJS_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 
 const SEARCH_BOOKS_QUERY = `
   query SearchBooks($input: SearchBooksInput!) {
@@ -35,34 +33,29 @@ export default async function handler(
     const page = Number(req.query.page as string) || 1
     if (!word) return res.status(200).json([])
 
-    const response = await fetch(GRAPHQL_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: SEARCH_BOOKS_QUERY,
-        variables: {
-          input: { query: word, page },
-        },
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`GraphQL request failed: ${response.statusText}`)
-    }
-
-    const { data, errors } = await response.json()
-
-    if (errors) {
-      console.error('GraphQL errors:', errors)
-      throw new Error(`GraphQL errors: ${JSON.stringify(errors)}`)
-    }
+    const data = await graphqlClient.executePublic<{
+      searchBooks: {
+        hits: Array<{
+          id: string
+          title: string
+          author: string
+          image: string
+          memo: string
+          username: string
+          userImage: string | null
+          sheet: string
+        }>
+        totalHits: number
+        hitsPerPage: number
+        page: number
+        hasMore: boolean
+      }
+    }>(SEARCH_BOOKS_QUERY, { input: { query: word, page } })
 
     const searchResult = data.searchBooks
     if (searchResult.hits.length === 0) return res.status(200).json([])
 
-    const result: SearchResult[] = searchResult.hits.map((hit: any) => ({
+    const result: SearchResult[] = searchResult.hits.map((hit) => ({
       id: hit.id,
       title: hit.title,
       author: hit.author,

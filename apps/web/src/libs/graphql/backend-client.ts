@@ -36,7 +36,7 @@ export class GraphQLBackendClient {
   }
 
   /**
-   * GraphQLリクエストを実行
+   * GraphQLリクエストを実行（認証付き）
    */
   async execute<T = any>(
     userId: string,
@@ -75,6 +75,44 @@ export class GraphQLBackendClient {
     const result = await response.json()
 
     // GraphQLエラーチェック
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors)
+      throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`)
+    }
+
+    return result.data
+  }
+
+  /**
+   * GraphQLリクエストを実行（認証なし・公開API用）
+   */
+  async executePublic<T = any>(
+    query: string,
+    variables?: Record<string, any>
+  ): Promise<T> {
+    const response = await fetch(this.endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('GraphQL request failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      })
+      throw new Error(`GraphQL request failed: ${response.statusText}`)
+    }
+
+    const result = await response.json()
+
     if (result.errors) {
       console.error('GraphQL errors:', result.errors)
       throw new Error(`GraphQL errors: ${JSON.stringify(result.errors)}`)
