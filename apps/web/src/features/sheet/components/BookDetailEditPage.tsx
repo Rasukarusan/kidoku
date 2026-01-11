@@ -196,7 +196,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
             <button
               onClick={handleSave}
               className="relative rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:opacity-50"
-              disabled={loading || (book?.title && book.title.length > 100)}
+              disabled={loading}
             >
               {loading ? (
                 <Loading className="h-5 w-5 border-2 border-white" />
@@ -221,36 +221,14 @@ export const BookDetailEditPage: React.FC<Props> = ({
 
           <div className="mb-6 text-center">
             <h1 className="mb-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={book?.title || ''}
-                  onChange={(e) => setBook({ ...book, title: e.target.value })}
-                  placeholder="タイトルを入力"
-                  className={`w-full rounded border-none bg-transparent px-3 py-2 text-center text-2xl font-bold transition-colors hover:bg-gray-50 focus:border focus:border-blue-300 focus:bg-white focus:outline-none ${
-                    book?.title && book.title.length > 100
-                      ? 'border-2 border-red-500'
-                      : ''
-                  }`}
-                  tabIndex={1}
-                />
-                <div className="mt-1 flex items-center justify-between px-3">
-                  <span
-                    className={`text-xs ${
-                      book?.title && book.title.length > 100
-                        ? 'text-red-500'
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    {book?.title?.length || 0}/100
-                  </span>
-                  {book?.title && book.title.length > 100 && (
-                    <span className="text-xs text-red-500">
-                      タイトルは100文字以下で入力してください
-                    </span>
-                  )}
-                </div>
-              </div>
+              <input
+                type="text"
+                value={book?.title || ''}
+                onChange={(e) => setBook({ ...book, title: e.target.value })}
+                placeholder="タイトルを入力"
+                className="w-full rounded border-none bg-transparent px-3 py-2 text-center text-2xl font-bold transition-colors hover:bg-gray-50 focus:border focus:border-blue-300 focus:bg-white focus:outline-none"
+                tabIndex={1}
+              />
             </h1>
 
             <p className="mb-4">
