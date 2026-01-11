@@ -6,6 +6,9 @@ import {
   Int,
   GraphQLISODateTime,
 } from '@nestjs/graphql';
+import { MaxLength, IsNotEmpty, IsOptional } from 'class-validator';
+
+const MAX_TITLE_LENGTH = 100;
 
 @InputType()
 export class CreateBookInput {
@@ -13,6 +16,10 @@ export class CreateBookInput {
   sheetId: number;
 
   @Field()
+  @IsNotEmpty({ message: '書籍タイトルは必須です' })
+  @MaxLength(MAX_TITLE_LENGTH, {
+    message: `タイトルは${MAX_TITLE_LENGTH}文字以下で入力してください`,
+  })
   title: string;
 
   @Field()
@@ -46,6 +53,10 @@ export class UpdateBookInput {
   id: string;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @MaxLength(MAX_TITLE_LENGTH, {
+    message: `タイトルは${MAX_TITLE_LENGTH}文字以下で入力してください`,
+  })
   title?: string;
 
   @Field({ nullable: true })
