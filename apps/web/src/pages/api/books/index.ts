@@ -4,54 +4,14 @@ import { getServerSession } from 'next-auth/next'
 import { NO_IMAGE } from '@/libs/constants'
 import { put } from '@vercel/blob'
 import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
-import { addDocuments } from '@/libs/meilisearch/addDocuments'
 import { graphqlClient } from '@/libs/graphql/backend-client'
-// import { setTimeout } from 'timers/promises'
+
 export const config = {
   api: {
     bodyParser: {
       sizeLimit: '3mb',
     },
   },
-}
-
-async function updateMeiliSearchDocuments() {
-  try {
-    const books = await prisma.books.findMany({
-      select: {
-        id: true,
-        title: true,
-        author: true,
-        image: true,
-        is_public_memo: true,
-        memo: true,
-        user: { select: { name: true, image: true } },
-        sheet: { select: { name: true } },
-      },
-    })
-    const documents = books
-      .filter((book) => book.sheet !== null) // sheetがnullのレコードを除外
-      .map((book) => {
-        const { id, title, author, image, memo, is_public_memo, user, sheet } =
-          book
-        return {
-          id,
-          title,
-          author,
-          image,
-          memo: is_public_memo ? memo : '',
-          username: user.name,
-          userImage: user.image,
-          sheet: sheet.name,
-        }
-      })
-    const result = await addDocuments('books', documents)
-    return result
-  } catch (error) {
-    console.error('updateMeiliSearchDocuments error:', error)
-    // エラーが発生してもAPIレスポンスは継続
-    return null
-  }
 }
 
 export default async (req, res) => {
@@ -108,7 +68,6 @@ export default async (req, res) => {
           },
         })
       }
-      await updateMeiliSearchDocuments()
       return res.status(200).json({
         result: true,
         bookTitle: title,
@@ -158,7 +117,6 @@ export default async (req, res) => {
         }
       )
 
-      await updateMeiliSearchDocuments()
       return res.status(200).json({ result: true, image: imageUrl })
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
@@ -179,7 +137,6 @@ export default async (req, res) => {
         }
       )
 
-      await updateMeiliSearchDocuments()
       return res.status(200).json({ result: true })
     }
   } catch (e) {

@@ -179,10 +179,6 @@ BACKDOOR_USER_EMAIL=                     # ログインするユーザーのメ�
 # データベース
 DATABASE_URL=mysql://root:password@localhost:3306/kidoku
 
-# MeiliSearch
-MEILI_HOST=http://localhost:7700
-MEILI_MASTER_KEY=
-
 # GraphQL
 NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
 ```
@@ -197,6 +193,10 @@ DB_USER=root
 DB_PASS=password
 DB_NAME=kidoku
 PORT=4000
+
+# MeiliSearch
+MEILI_HOST=http://localhost:7700
+MEILI_MASTER_KEY=
 ```
 
 ## 開発時の注意事項
