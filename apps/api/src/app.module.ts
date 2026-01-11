@@ -7,6 +7,7 @@ import { SoftwareDesignModule } from './presentation/modules/software-design';
 import { SheetModule } from './presentation/modules/sheet';
 import { CommentModule } from './presentation/modules/comment';
 import { BookModule } from './presentation/modules/book';
+import { SearchModule } from './presentation/modules/search';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { BookModule } from './presentation/modules/book';
     CommentModule,
     SoftwareDesignModule,
     BookModule,
+    SearchModule,
   ],
 })
 export class AppModule {}

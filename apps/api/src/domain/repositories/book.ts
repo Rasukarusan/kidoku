@@ -23,5 +23,16 @@ export abstract class IBookRepository {
       sheetName: string;
     }>
   >;
+  abstract findForSearchById(id: string): Promise<{
+    id: string;
+    title: string;
+    author: string;
+    image: string;
+    memo: string;
+    isPublicMemo: boolean;
+    userName: string;
+    userImage: string | null;
+    sheetName: string | null;
+  } | null>;
   abstract getCategories(userId: string): Promise<string[]>;
 }

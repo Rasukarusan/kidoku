@@ -184,6 +184,56 @@ export class BookRepository implements IBookRepository {
     }));
   }
 
+  async findForSearchById(id: string): Promise<{
+    id: string;
+    title: string;
+    author: string;
+    image: string;
+    memo: string;
+    isPublicMemo: boolean;
+    userName: string;
+    userImage: string | null;
+    sheetName: string | null;
+  } | null> {
+    const bookId = parseInt(id, 10);
+    if (isNaN(bookId) || bookId <= 0) {
+      return null;
+    }
+
+    const rows = await this.db
+      .select({
+        id: books.id,
+        title: books.title,
+        author: books.author,
+        image: books.image,
+        memo: books.memo,
+        isPublicMemo: books.isPublicMemo,
+        userName: users.name,
+        userImage: users.image,
+        sheetName: sheets.name,
+      })
+      .from(books)
+      .leftJoin(users, eq(books.userId, users.id))
+      .leftJoin(sheets, eq(books.sheetId, sheets.id))
+      .where(eq(books.id, bookId))
+      .limit(1);
+
+    if (rows.length === 0) return null;
+
+    const row = rows[0];
+    return {
+      id: row.id.toString(),
+      title: row.title,
+      author: row.author,
+      image: row.image,
+      memo: row.isPublicMemo ? row.memo : '',
+      isPublicMemo: row.isPublicMemo === 1,
+      userName: row.userName || '',
+      userImage: row.userImage,
+      sheetName: row.sheetName,
+    };
+  }
+
   async getCategories(userId: string): Promise<string[]> {
     const rows = await this.db
       .selectDistinct({ category: books.category })
