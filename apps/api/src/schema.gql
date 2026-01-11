@@ -50,6 +50,23 @@ type CommentResponse {
   comments: [CommentItem!]!
 }
 
+type BookResponse {
+  id: ID!
+  userId: ID!
+  sheetId: Int!
+  title: String!
+  author: String!
+  category: String!
+  image: String!
+  impression: String!
+  memo: String
+  isPublicMemo: Boolean!
+  isPurchasable: Boolean!
+  finished: DateTime
+  created: DateTime!
+  updated: DateTime!
+}
+
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
@@ -57,6 +74,9 @@ type Query {
   softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignResponse!
   softwareDesignByYear(input: GetSoftwareDesignInput!): SoftwareDesignListResponse!
   searchSoftwareDesignByISBN(isbn: String!, year: Int, month: Int, title: String): SoftwareDesignResponse
+  book(input: GetBookInput!): BookResponse
+  books(input: GetBooksInput): [BookResponse!]!
+  bookCategories: [String!]!
 }
 
 input GetCommentsInput {
@@ -69,11 +89,23 @@ input GetSoftwareDesignInput {
   month: Int
 }
 
+input GetBookInput {
+  id: ID!
+}
+
+input GetBooksInput {
+  userId: ID
+  sheetId: Int
+}
+
 type Mutation {
   createSheet(input: CreateSheetInput!): SheetResponse!
   updateSheet(input: UpdateSheetInput!): SheetResponse!
   deleteSheet(input: DeleteSheetInput!): Boolean!
   updateSheetOrders(input: UpdateSheetOrdersInput!): Boolean!
+  createBook(input: CreateBookInput!): BookResponse!
+  updateBook(input: UpdateBookInput!): BookResponse!
+  deleteBook(input: DeleteBookInput!): Boolean!
 }
 
 input CreateSheetInput {
@@ -96,4 +128,35 @@ input UpdateSheetOrdersInput {
 input SheetOrderItem {
   id: ID!
   order: Int!
+}
+
+input CreateBookInput {
+  sheetId: Int!
+  title: String!
+  author: String!
+  category: String!
+  image: String!
+  impression: String!
+  memo: String!
+  isPublicMemo: Boolean!
+  isPurchasable: Boolean
+  finished: DateTime
+}
+
+input UpdateBookInput {
+  id: ID!
+  title: String
+  author: String
+  category: String
+  image: String
+  impression: String
+  memo: String
+  isPublicMemo: Boolean
+  isPurchasable: Boolean
+  finished: DateTime
+  sheetId: Int
+}
+
+input DeleteBookInput {
+  id: ID!
 }

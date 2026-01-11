@@ -25,9 +25,9 @@ import { openAddModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
 import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
-import { CategoriesResponse } from '@/types/api'
 
 import { getSheetsQuery } from '@/features/sheet/api'
+import { getBookCategoriesQuery } from '@/features/books/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -75,17 +75,16 @@ export const AddModal: React.FC = () => {
   })
   const [openAdd, setOpenAdd] = useState(false)
 
-  // カテゴリ一覧
-  const { data: categories } = useSWR<CategoriesResponse>(
-    `/api/books/category`,
-    fetcher
+  // カテゴリ一覧（GraphQL）
+  const { data: categoriesData } = useQuery<{ bookCategories: string[] }>(
+    getBookCategoriesQuery
   )
-  const options =
-    categories && categories.result
-      ? categories.categories.map((category) => {
-          return { value: category, label: category }
-        })
-      : []
+  const options = categoriesData
+    ? categoriesData.bookCategories.map((category) => ({
+        value: category,
+        label: category,
+      }))
+    : []
 
   // シート取得次第、一番上のシートを選択状態にする
   useEffect(() => {

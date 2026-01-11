@@ -5,6 +5,7 @@ import { NO_IMAGE } from '@/libs/constants'
 import { put } from '@vercel/blob'
 import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
 import { addDocuments } from '@/libs/meilisearch/addDocuments'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 // import { setTimeout } from 'timers/promises'
 export const config = {
   api: {
@@ -117,49 +118,68 @@ export default async (req, res) => {
     } else if (req.method === 'PUT') {
       const body = JSON.parse(req.body)
       const id = body.id
-      const book = await prisma.books.findUnique({
-        where: { id, userId },
-      })
-      if (!book) {
-        return res.status(401).json({ result: false })
-      }
-      const data: Record<string, unknown> = {
-        title: body.title,
-        author: body.author,
-        category: body.category,
-        impression: body.impression,
-        memo: body.memo,
-        image: body.image,
-        is_public_memo: body.is_public_memo,
-        finished: body.finished ? new Date(body.finished) : null,
-        updated: new Date(),
-      }
-      if (body.sheet_id !== undefined) {
-        data.sheet_id = Number(body.sheet_id)
-      }
-      const { image } = body
+      let imageUrl = body.image
+
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
-      if (image !== NO_IMAGE && !image.startsWith('http')) {
-        const base64Image = image.split(',')[1]
+      if (imageUrl !== NO_IMAGE && !imageUrl.startsWith('http')) {
+        const base64Image = imageUrl.split(',')[1]
         const imageBuffer = Buffer.from(base64Image, 'base64')
         const buffer = await bufferToWebp(imageBuffer)
-        const { url } = await put(`${book.id}.webp`, buffer, {
+        const { url } = await put(`${id}.webp`, buffer, {
           access: 'public',
         })
-        data['image'] = url
+        imageUrl = url
       }
-      await prisma.books.update({
-        where: { id, userId },
-        data,
-      })
+
+      // GraphQL mutation呼び出し
+      await graphqlClient.execute(
+        userId,
+        `
+          mutation UpdateBook($input: UpdateBookInput!) {
+            updateBook(input: $input) {
+              id
+            }
+          }
+        `,
+        {
+          input: {
+            id: String(id),
+            title: body.title,
+            author: body.author,
+            category: body.category,
+            image: imageUrl,
+            impression: body.impression,
+            memo: body.memo,
+            isPublicMemo: body.is_public_memo,
+            isPurchasable: body.is_purchasable,
+            finished: body.finished ? new Date(body.finished) : null,
+            sheetId: body.sheet_id ? Number(body.sheet_id) : undefined,
+          },
+        }
+      )
+
       await updateMeiliSearchDocuments()
-      return res.status(200).json({ data })
+      return res.status(200).json({ result: true, image: imageUrl })
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
       const id = body.id
-      await prisma.books.delete({
-        where: { id, userId },
-      })
+
+      // GraphQL mutation呼び出し
+      await graphqlClient.execute(
+        userId,
+        `
+          mutation DeleteBook($input: DeleteBookInput!) {
+            deleteBook(input: $input)
+          }
+        `,
+        {
+          input: {
+            id: String(id),
+          },
+        }
+      )
+
+      await updateMeiliSearchDocuments()
       return res.status(200).json({ result: true })
     }
   } catch (e) {

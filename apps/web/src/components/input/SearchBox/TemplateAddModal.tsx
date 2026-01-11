@@ -4,6 +4,7 @@ import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import useSWR from 'swr'
+import { useQuery } from '@apollo/client'
 import { Modal } from '@/components/layout/Modal'
 import { ImagePicker } from '@/components/button/ImagePicker'
 import { DangerAlert } from '@/components/label/DangerAlert'
@@ -13,7 +14,7 @@ import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { NO_IMAGE } from '@/libs/constants'
-import { CategoriesResponse } from '@/types/api'
+import { getBookCategoriesQuery } from '@/features/books/api'
 
 interface Response {
   result: boolean
@@ -34,17 +35,16 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
     elementCount: 200,
   })
 
-  // カテゴリ一覧
-  const { data: categories } = useSWR<CategoriesResponse>(
-    `/api/books/category`,
-    fetcher
+  // カテゴリ一覧（GraphQL）
+  const { data: categoriesData } = useQuery<{ bookCategories: string[] }>(
+    getBookCategoriesQuery
   )
-  const options =
-    categories && categories.result
-      ? categories.categories.map((category) => {
-          return { value: category, label: category }
-        })
-      : []
+  const options = categoriesData
+    ? categoriesData.bookCategories.map((category) => ({
+        value: category,
+        label: category,
+      }))
+    : []
 
   useEffect(() => {
     setResponse(null)
