@@ -190,6 +190,12 @@ export const AddModal: React.FC = () => {
                       }
                       label="タイトル"
                       tabIndex={1}
+                      maxLength={100}
+                      error={
+                        book?.title && book.title.length > 100
+                          ? 'タイトルは100文字以下で入力してください'
+                          : undefined
+                      }
                     />
                     <BookInputField
                       value={book?.author}
@@ -350,7 +356,11 @@ export const AddModal: React.FC = () => {
                     className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
                     onClick={onClickAdd}
                     tabIndex={6}
-                    disabled={isAnimating || !session}
+                    disabled={
+                      isAnimating ||
+                      !session ||
+                      (book?.title && book.title.length > 100)
+                    }
                   >
                     {loading && (
                       <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />

@@ -71,7 +71,17 @@ export class Book {
     finished?: Date | null;
     sheetId?: number;
   }): void {
-    if (params.title !== undefined) this._title = params.title;
+    if (params.title !== undefined) {
+      if (params.title.trim().length === 0) {
+        throw new Error('書籍タイトルは必須です');
+      }
+      if (params.title.trim().length > Book.MAX_TITLE_LENGTH) {
+        throw new Error(
+          `タイトルは${Book.MAX_TITLE_LENGTH}文字以下で入力してください`,
+        );
+      }
+      this._title = params.title;
+    }
     if (params.author !== undefined) this._author = params.author;
     if (params.category !== undefined) this._category = params.category;
     if (params.image !== undefined) this._image = params.image;
@@ -116,6 +126,8 @@ export class Book {
     return text.slice(0, visibleLength) + maskChar.repeat(maskedLength);
   }
 
+  private static readonly MAX_TITLE_LENGTH = 100;
+
   static create(params: {
     userId: string;
     sheetId: number;
@@ -131,6 +143,11 @@ export class Book {
   }): Book {
     if (!params.title || params.title.trim().length === 0) {
       throw new Error('書籍タイトルは必須です');
+    }
+    if (params.title.trim().length > Book.MAX_TITLE_LENGTH) {
+      throw new Error(
+        `タイトルは${Book.MAX_TITLE_LENGTH}文字以下で入力してください`,
+      );
     }
     const now = new Date();
     return new Book(
