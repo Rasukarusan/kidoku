@@ -7,9 +7,12 @@ import { GetBookUseCase } from '../../application/usecases/books/get-book';
 import { GetBooksUseCase } from '../../application/usecases/books/get-books';
 import { GetBookCategoriesUseCase } from '../../application/usecases/books/get-book-categories';
 import { BookRepository } from '../../infrastructure/repositories/book';
+import { SearchRepository } from '../../infrastructure/repositories/search';
+import { MeiliSearchProvider } from '../../infrastructure/search/meilisearch.providers';
 import { AuthModule } from '../../infrastructure/auth/auth.module';
 import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { IBookRepository } from '../../domain/repositories/book';
+import { ISearchRepository } from '../../domain/repositories/search';
 
 @Module({
   imports: [AuthModule, DatabaseModule],
@@ -21,9 +24,14 @@ import { IBookRepository } from '../../domain/repositories/book';
     GetBookUseCase,
     GetBooksUseCase,
     GetBookCategoriesUseCase,
+    MeiliSearchProvider,
     {
       provide: IBookRepository,
       useClass: BookRepository,
+    },
+    {
+      provide: ISearchRepository,
+      useClass: SearchRepository,
     },
   ],
 })

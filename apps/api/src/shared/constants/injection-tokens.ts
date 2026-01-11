@@ -1,6 +1,7 @@
 export const INJECTION_TOKENS = {
   DRIZZLE: 'DRIZZLE',
   DATABASE_CONNECTION: 'DATABASE_CONNECTION',
+  MEILISEARCH: 'MEILISEARCH',
 } as const;
 
 // 後方互換性のため一時的に残す
