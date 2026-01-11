@@ -95,6 +95,12 @@ export const BookDetailEditModal: React.FC<Props> = ({
           label="タイトル"
           tabIndex={1}
           isChanged={diff.title}
+          maxLength={100}
+          error={
+            book?.title && book.title.length > 100
+              ? 'タイトルは100文字以下で入力してください'
+              : undefined
+          }
         />
         <BookInputField
           value={book?.author}
@@ -220,7 +226,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
         className="mx-auto flex h-10 w-full items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-green-800"
         onClick={onClick}
         tabIndex={6}
-        disabled={loading}
+        disabled={loading || (book?.title && book.title.length > 100)}
       >
         {loading && (
           <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
