@@ -6,22 +6,6 @@ import { put } from '@vercel/blob'
 import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
 import { addDocuments } from '@/libs/meilisearch/addDocuments'
 import { graphqlClient } from '@/libs/graphql/backend-client'
-
-const MAX_TITLE_LENGTH = 100
-
-function validateTitle(title: string): { valid: boolean; message?: string } {
-  if (!title || title.trim().length === 0) {
-    return { valid: false, message: '書籍タイトルは必須です' }
-  }
-  if (title.trim().length > MAX_TITLE_LENGTH) {
-    return {
-      valid: false,
-      message: `タイトルは${MAX_TITLE_LENGTH}文字以下で入力してください`,
-    }
-  }
-  return { valid: true }
-}
-
 // import { setTimeout } from 'timers/promises'
 export const config = {
   api: {
@@ -93,16 +77,6 @@ export default async (req, res) => {
         finished,
         sheet,
       } = body
-
-      // タイトルのバリデーション
-      const titleValidation = validateTitle(title)
-      if (!titleValidation.valid) {
-        return res.status(400).json({
-          result: false,
-          message: titleValidation.message,
-        })
-      }
-
       const data = {
         sheet_id: Number(sheet.id),
         userId,
@@ -144,18 +118,6 @@ export default async (req, res) => {
     } else if (req.method === 'PUT') {
       const body = JSON.parse(req.body)
       const id = body.id
-
-      // タイトルのバリデーション（titleが含まれている場合のみ）
-      if (body.title !== undefined) {
-        const titleValidation = validateTitle(body.title)
-        if (!titleValidation.valid) {
-          return res.status(400).json({
-            result: false,
-            message: titleValidation.message,
-          })
-        }
-      }
-
       let imageUrl = body.image
 
       // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
