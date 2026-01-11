@@ -1,7 +1,28 @@
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { SearchResult } from '@/types/search'
-import { searchBooks } from '@/libs/meilisearch/searchBooks'
 import { mask } from '@/utils/string'
+import { graphqlClient } from '@/libs/graphql/backend-client'
+
+const SEARCH_BOOKS_QUERY = `
+  query SearchBooks($input: SearchBooksInput!) {
+    searchBooks(input: $input) {
+      hits {
+        id
+        title
+        author
+        image
+        memo
+        username
+        userImage
+        sheet
+      }
+      totalHits
+      hitsPerPage
+      page
+      hasMore
+    }
+  }
+`
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,26 +32,44 @@ export default async function handler(
     const word = (req.query.q as string) || ''
     const page = Number(req.query.page as string) || 1
     if (!word) return res.status(200).json([])
-    const response = await searchBooks(word, page)
-    if (response.hits.length === 0) return res.status(200).json([])
-    const result: SearchResult[] = []
-    response.hits.map((hit) => {
-      const { id, author, image, username, userImage, sheet, _formatted } = hit
-      result.push({
-        id,
-        title: _formatted.title,
-        author,
-        image,
-        category: '',
-        memo: mask(_formatted.memo),
-        username,
-        userImage,
-        sheet,
-      })
-    })
+
+    const data = await graphqlClient.executePublic<{
+      searchBooks: {
+        hits: Array<{
+          id: string
+          title: string
+          author: string
+          image: string
+          memo: string
+          username: string
+          userImage: string | null
+          sheet: string
+        }>
+        totalHits: number
+        hitsPerPage: number
+        page: number
+        hasMore: boolean
+      }
+    }>(SEARCH_BOOKS_QUERY, { input: { query: word, page } })
+
+    const searchResult = data.searchBooks
+    if (searchResult.hits.length === 0) return res.status(200).json([])
+
+    const result: SearchResult[] = searchResult.hits.map((hit) => ({
+      id: hit.id,
+      title: hit.title,
+      author: hit.author,
+      image: hit.image,
+      category: '',
+      memo: mask(hit.memo),
+      username: hit.username,
+      userImage: hit.userImage,
+      sheet: hit.sheet,
+    }))
+
     return res.status(200).json({
       hits: result,
-      next: response.totalHits / response.hitsPerPage > page,
+      next: searchResult.hasMore,
     })
   } catch (error) {
     console.error(error)
