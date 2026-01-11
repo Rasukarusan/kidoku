@@ -63,6 +63,9 @@ importers:
       graphql:
         specifier: ^16.11.0
         version: 16.11.0
+      meilisearch:
+        specifier: ^0.35.0
+        version: 0.35.1
       mysql2:
         specifier: ^3.14.1
         version: 3.14.1
