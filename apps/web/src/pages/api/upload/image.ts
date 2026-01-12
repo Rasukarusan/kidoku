@@ -19,9 +19,9 @@ export default async function handler(
   // 環境変数チェック
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     console.error('BLOB_READ_WRITE_TOKEN is not set')
-    return res
-      .status(500)
-      .json({ error: 'Server configuration error: BLOB_READ_WRITE_TOKEN is not set' })
+    return res.status(500).json({
+      error: 'Server configuration error: BLOB_READ_WRITE_TOKEN is not set',
+    })
   }
 
   const body = req.body as HandleUploadBody
