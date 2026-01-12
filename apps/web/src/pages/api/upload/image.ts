@@ -16,6 +16,14 @@ export default async function handler(
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
+  // 環境変数チェック
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    console.error('BLOB_READ_WRITE_TOKEN is not set')
+    return res
+      .status(500)
+      .json({ error: 'Server configuration error: BLOB_READ_WRITE_TOKEN is not set' })
+  }
+
   const body = req.body as HandleUploadBody
 
   try {
@@ -45,6 +53,10 @@ export default async function handler(
 
     return res.status(200).json(jsonResponse)
   } catch (error) {
-    return res.status(400).json({ error: (error as Error).message })
+    console.error('Upload error:', error)
+    return res.status(400).json({
+      error: (error as Error).message,
+      details: error instanceof Error ? error.stack : String(error),
+    })
   }
 }

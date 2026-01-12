@@ -18,6 +18,7 @@ export const useImageUpload = () => {
       setUploading(false)
       return blob.url
     } catch (err) {
+      console.error('Upload error:', err)
       const errorMessage = err instanceof Error ? err.message : 'Upload failed'
       setError(errorMessage)
       setUploading(false)
