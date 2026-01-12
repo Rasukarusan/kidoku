@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Modal } from '../layout/Modal'
 import { FaLink } from 'react-icons/fa'
 import { MdEdit } from 'react-icons/md'
+import { useImageUpload } from '@/hooks/useImageUpload'
 
 interface Props {
   img?: string
@@ -10,47 +11,65 @@ interface Props {
 export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   const ref = useRef(null)
   const [image, setImage] = useState(img)
+  const [previewUrl, setPreviewUrl] = useState(img)
   const [open, setOpen] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [urlInput, setUrlInput] = useState('')
+  const { uploadImage, uploading, error } = useImageUpload()
 
   // URLから画像を読み込む
-  const loadImageAsBase64 = (url): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = img.width
-        canvas.height = img.height
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0)
-        const dataURL = canvas.toDataURL()
-        setImage(dataURL)
-      }
-      img.onerror = reject
-      img.crossOrigin = 'Anonymous' // CORSポリシー回避
-      img.src = url
-    })
+  const loadImageFromUrl = (url: string) => {
+    // URLが有効かチェック
+    if (url.startsWith('http')) {
+      setImage(url)
+      setPreviewUrl(url)
+      setUrlInput(url)
+    }
   }
 
   // ファイルから画像選択
   const handleChange = (e) => {
     const file = e.target.files[0]
     if (!file) return
-    const url = URL.createObjectURL(file)
-    setImage(url)
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setImage(e.target.result as string)
-    }
-    reader.readAsDataURL(file)
+
+    // プレビュー用のURL生成
+    const objectUrl = URL.createObjectURL(file)
+    setPreviewUrl(objectUrl)
+    setSelectedFile(file)
   }
 
   const onSubmit = async () => {
-    onImageLoad && onImageLoad(image)
-    setOpen(false)
+    try {
+      let finalUrl = image
+
+      // ファイルが選択されている場合はアップロード
+      if (selectedFile) {
+        const uploadedUrl = await uploadImage(selectedFile)
+        if (uploadedUrl) {
+          finalUrl = uploadedUrl
+        } else {
+          // アップロード失敗
+          return
+        }
+      }
+      // URLが入力されている場合
+      else if (urlInput && urlInput !== image) {
+        finalUrl = urlInput
+      }
+
+      onImageLoad && onImageLoad(finalUrl)
+      setImage(finalUrl)
+      setOpen(false)
+      setSelectedFile(null)
+      setUrlInput('')
+    } catch (err) {
+      console.error('Image upload failed:', err)
+    }
   }
 
   useEffect(() => {
     setImage(img)
+    setPreviewUrl(img)
   }, [img])
 
   return (
@@ -59,10 +78,11 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
         className="relative mr-4 w-1/3 hover:brightness-90"
         onClick={() => setOpen(true)}
       >
-        <img className="mx-auto my-0 drop-shadow-lg" src={image} alt="" />
+        <img className="mx-auto my-0 drop-shadow-lg" src={previewUrl} alt="" />
         <input
           ref={ref}
           type="file"
+          accept="image/*"
           onChange={handleChange}
           className="hidden"
         />
@@ -75,6 +95,9 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
         onClose={() => {
           // 初期画像に戻す
           setImage(img)
+          setPreviewUrl(img)
+          setSelectedFile(null)
+          setUrlInput('')
           setOpen(false)
         }}
         className="w-full sm:w-[500px]"
@@ -84,8 +107,10 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
             <FaLink className="mr-2 text-slate-500" />
             <input
               type="text"
-              onChange={async (e) => {
-                await loadImageAsBase64(e.target.value)
+              value={urlInput}
+              onChange={(e) => {
+                setUrlInput(e.target.value)
+                loadImageFromUrl(e.target.value)
               }}
               placeholder="画像URLをペースト"
               className="w-full placeholder:text-sm focus:outline-none"
@@ -94,22 +119,33 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
           <button
             className="mb-4 hover:brightness-75"
             onClick={() => ref.current.click()}
+            disabled={uploading}
           >
             <img
               className="mx-auto my-0 max-h-52 drop-shadow-lg"
-              src={image}
+              src={previewUrl}
               alt=""
             />
             <input
               ref={ref}
               type="file"
+              accept="image/*"
               onChange={handleChange}
               className="hidden"
             />
           </button>
+          {error && (
+            <p className="mb-2 text-sm text-red-600">
+              アップロードエラー: {error}
+            </p>
+          )}
+          {uploading && (
+            <p className="mb-2 text-sm text-gray-600">アップロード中...</p>
+          )}
           <button
-            className="mx-auto block rounded-md bg-green-700 px-4 py-1 text-sm text-white"
+            className="mx-auto block rounded-md bg-green-700 px-4 py-1 text-sm text-white disabled:opacity-50"
             onClick={onSubmit}
+            disabled={uploading}
           >
             決定
           </button>

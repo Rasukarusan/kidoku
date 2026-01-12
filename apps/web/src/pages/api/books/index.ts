@@ -2,17 +2,7 @@ import prisma from '@/libs/prisma'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 import { NO_IMAGE } from '@/libs/constants'
-import { put } from '@vercel/blob'
-import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
 import { graphqlClient } from '@/libs/graphql/backend-client'
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '3mb',
-    },
-  },
-}
 
 export default async (req, res) => {
   try {
@@ -49,25 +39,10 @@ export default async (req, res) => {
         is_public_memo,
         finished: finished ? new Date(finished) : null,
       }
-      data['image'] = image === NO_IMAGE || image.includes('http') ? image : ''
+      // 画像URLをそのまま保存（フロント側で既にアップロード済み）
+      data['image'] = image || NO_IMAGE
       const book = await prisma.books.create({ data })
 
-      // 画像選択された場合はVercel Blobにアップロードする
-      if (image !== NO_IMAGE && !image.includes('http')) {
-        // 先頭の「data:image/png;base64,」部分を除き、Base64部分のみを取得
-        const base64Image = image.split(',')[1]
-        const imageBuffer = Buffer.from(base64Image, 'base64')
-        const buffer = await bufferToWebp(imageBuffer)
-        const { url } = await put(`${book.id}.webp`, buffer, {
-          access: 'public',
-        })
-        await prisma.books.update({
-          where: { id: book.id },
-          data: {
-            image: url,
-          },
-        })
-      }
       return res.status(200).json({
         result: true,
         bookTitle: title,
@@ -77,18 +52,7 @@ export default async (req, res) => {
     } else if (req.method === 'PUT') {
       const body = JSON.parse(req.body)
       const id = body.id
-      let imageUrl = body.image
-
-      // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
-      if (imageUrl !== NO_IMAGE && !imageUrl.startsWith('http')) {
-        const base64Image = imageUrl.split(',')[1]
-        const imageBuffer = Buffer.from(base64Image, 'base64')
-        const buffer = await bufferToWebp(imageBuffer)
-        const { url } = await put(`${id}.webp`, buffer, {
-          access: 'public',
-        })
-        imageUrl = url
-      }
+      const imageUrl = body.image || NO_IMAGE
 
       // GraphQL mutation呼び出し
       await graphqlClient.execute(
