@@ -18,11 +18,6 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const session = await getServerSession(req, res, authOptions)
-  if (!session?.user?.email) {
-    return res.status(401).json({ error: 'Unauthorized' })
-  }
-
   // 環境変数チェック
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     console.error('BLOB_READ_WRITE_TOKEN is not set')
@@ -35,8 +30,12 @@ export default async function handler(
     const jsonResponse = await handleUpload({
       request: req,
       onBeforeGenerateToken: async (_pathname) => {
-        // ファイル名の検証やカスタマイズが可能
-        // 例: ユーザーIDをプレフィックスにする
+        // 認証チェックをここで実行（リクエストボディを消費する前に）
+        const session = await getServerSession(req, res, authOptions)
+        if (!session?.user?.email) {
+          throw new Error('Unauthorized')
+        }
+
         return {
           allowedContentTypes: [
             'image/jpeg',
