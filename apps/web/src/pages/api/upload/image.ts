@@ -1,7 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/client'
+import { handleUpload } from '@vercel/blob/client'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '../auth/[...nextauth]'
+
+// Vercel Blob client uploadにはbodyParserを無効化する必要がある
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,11 +31,8 @@ export default async function handler(
     })
   }
 
-  const body = req.body as HandleUploadBody
-
   try {
     const jsonResponse = await handleUpload({
-      body,
       request: req,
       onBeforeGenerateToken: async (_pathname) => {
         // ファイル名の検証やカスタマイズが可能
