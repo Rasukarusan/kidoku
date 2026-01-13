@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { upload } from '@vercel/blob/client'
 
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false)
@@ -10,13 +9,22 @@ export const useImageUpload = () => {
     setError(null)
 
     try {
-      const blob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload/image',
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
       })
 
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Upload failed')
+      }
+
+      const data = await response.json()
       setUploading(false)
-      return blob.url
+      return data.url
     } catch (err) {
       console.error('Upload error:', err)
       const errorMessage = err instanceof Error ? err.message : 'Upload failed'
