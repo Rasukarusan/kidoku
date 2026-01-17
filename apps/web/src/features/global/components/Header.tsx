@@ -11,7 +11,7 @@ import Link from 'next/link'
 // レスポンシブヘッダー
 export const Header = () => {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const setOpenSidebar = useSetAtom(openNavSidebarAtom)
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
 
@@ -41,12 +41,14 @@ export const Header = () => {
               />
             </button>
           ) : (
-            <button
-              className="px-4 py-2 text-sm font-bold text-gray-700"
-              onClick={() => setOpenLoginModal(true)}
-            >
-              ログイン
-            </button>
+            status !== 'loading' && (
+              <button
+                className="px-4 py-2 text-sm font-bold text-gray-700"
+                onClick={() => setOpenLoginModal(true)}
+              >
+                ログイン
+              </button>
+            )
           )}
         </Container>
       </div>
