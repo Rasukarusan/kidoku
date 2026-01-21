@@ -38,6 +38,10 @@ pnpm-debug.log*
 .env.production.local
 .env.*.local
 
+# SQLite database (sandbox)
+*.db
+*.db-journal
+
 # analyze
 *.report.html
 
