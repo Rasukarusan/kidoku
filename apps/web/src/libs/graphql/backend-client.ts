@@ -38,10 +38,10 @@ export class GraphQLBackendClient {
   /**
    * GraphQLリクエストを実行（認証付き）
    */
-  async execute<T = any>(
+  async execute<T = unknown>(
     userId: string,
     query: string,
-    variables?: Record<string, any>,
+    variables?: Record<string, unknown>,
     isAdmin = false
   ): Promise<T> {
     const timestamp = Date.now().toString()
@@ -86,9 +86,9 @@ export class GraphQLBackendClient {
   /**
    * GraphQLリクエストを実行（認証なし・公開API用）
    */
-  async executePublic<T = any>(
+  async executePublic<T = unknown>(
     query: string,
-    variables?: Record<string, any>
+    variables?: Record<string, unknown>
   ): Promise<T> {
     const response = await fetch(this.endpoint, {
       method: 'POST',

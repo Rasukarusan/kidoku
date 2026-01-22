@@ -10,6 +10,7 @@ import {
   EditorBubble,
   EditorBubbleItem,
 } from 'novel'
+import { Editor } from '@tiptap/react'
 import {
   StarterKit,
   TiptapLink,
@@ -362,7 +363,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           >
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as any).chain().focus().toggleBold().run()
+                (editor as Editor).chain().focus().toggleBold().run()
               }
             >
               <button
@@ -375,7 +376,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as any).chain().focus().toggleItalic().run()
+                (editor as Editor).chain().focus().toggleItalic().run()
               }
             >
               <button
@@ -388,7 +389,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as any).chain().focus().toggleStrike().run()
+                (editor as Editor).chain().focus().toggleStrike().run()
               }
             >
               <button
@@ -401,7 +402,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as any).chain().focus().toggleCode().run()
+                (editor as Editor).chain().focus().toggleCode().run()
               }
             >
               <button
@@ -415,13 +416,11 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             <div className="mx-1 h-4 w-px bg-gray-300" />
             <EditorBubbleItem
               onSelect={(editor) => {
-                const { from, to } = (editor as any).state.selection
-                const selectedText = (editor as any).state.doc.textBetween(
-                  from,
-                  to
-                )
+                const typedEditor = editor as Editor
+                const { from, to } = typedEditor.state.selection
+                const selectedText = typedEditor.state.doc.textBetween(from, to)
                 if (selectedText) {
-                  ;(editor as any)
+                  typedEditor
                     .chain()
                     .focus()
                     .insertContent(`[[MASK: ${selectedText}]]`)

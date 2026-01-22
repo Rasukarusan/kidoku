@@ -6,9 +6,9 @@ import { AiSummariesJson } from './types'
  * 単一のマイグレーション変換を適用する
  */
 function applyTransformation(
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   transformation: TransformationType
-): Record<string, any> {
+): Record<string, unknown> {
   const result = { ...data }
 
   switch (transformation.type) {
@@ -35,9 +35,9 @@ function applyTransformation(
  * 単一のマイグレーションを適用する
  */
 function applyMigration(
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   migration: Migration
-): Record<string, any> {
+): Record<string, unknown> {
   let result = { ...data }
 
   for (const transformation of migration.transformations) {
@@ -70,7 +70,9 @@ function applyMigration(
  * // }
  * ```
  */
-export function migrateAnalysis(analysis: any): AiSummariesJson {
+export function migrateAnalysis(
+  analysis: Record<string, unknown>
+): AiSummariesJson {
   // _schemaVersionがない場合はバージョン1として扱う
   const currentVersion = analysis._schemaVersion || 1
 
@@ -110,6 +112,8 @@ export function migrateAnalysis(analysis: any): AiSummariesJson {
  * @param analyses - マイグレーション対象のAI分析データの配列
  * @returns 最新スキーマバージョンに変換されたデータの配列
  */
-export function migrateAnalyses(analyses: any[]): AiSummariesJson[] {
+export function migrateAnalyses(
+  analyses: Record<string, unknown>[]
+): AiSummariesJson[] {
   return analyses.map(migrateAnalysis)
 }

@@ -8,7 +8,7 @@ interface Props {
 
 export const MaskButton: React.FC<Props> = ({
   textareaRef,
-  onTextChange,
+  onTextChange: _onTextChange,
   className = '',
 }) => {
   const handleClick = () => {
