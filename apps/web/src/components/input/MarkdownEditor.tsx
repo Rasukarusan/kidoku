@@ -10,7 +10,6 @@ import {
   EditorBubble,
   EditorBubbleItem,
 } from 'novel'
-import { Editor } from '@tiptap/react'
 import {
   StarterKit,
   TiptapLink,
@@ -363,7 +362,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           >
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as Editor).chain().focus().toggleBold().run()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (editor as any).chain().focus().toggleBold().run()
               }
             >
               <button
@@ -376,7 +376,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as Editor).chain().focus().toggleItalic().run()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (editor as any).chain().focus().toggleItalic().run()
               }
             >
               <button
@@ -389,7 +390,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as Editor).chain().focus().toggleStrike().run()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (editor as any).chain().focus().toggleStrike().run()
               }
             >
               <button
@@ -402,7 +404,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </EditorBubbleItem>
             <EditorBubbleItem
               onSelect={(editor) =>
-                (editor as Editor).chain().focus().toggleCode().run()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (editor as any).chain().focus().toggleCode().run()
               }
             >
               <button
@@ -416,7 +419,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             <div className="mx-1 h-4 w-px bg-gray-300" />
             <EditorBubbleItem
               onSelect={(editor) => {
-                const typedEditor = editor as Editor
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const typedEditor = editor as any
                 const { from, to } = typedEditor.state.selection
                 const selectedText = typedEditor.state.doc.textBetween(from, to)
                 if (selectedText) {

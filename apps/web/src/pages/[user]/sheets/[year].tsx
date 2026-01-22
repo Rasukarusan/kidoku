@@ -87,7 +87,10 @@ export async function getStaticProps(context) {
       yearlyTopBooks,
       aiSummaries: aiSummaries.map((v) => {
         // 汎用マイグレーション関数を使用して最新スキーマに変換
-        const migrated = migrateAnalysis(v.analysis)
+        // analysisはJSON文字列として保存されているのでパースが必要
+        const parsedAnalysis =
+          typeof v.analysis === 'string' ? JSON.parse(v.analysis) : v.analysis
+        const migrated = migrateAnalysis(parsedAnalysis)
         return {
           id: v.id,
           ...migrated,
