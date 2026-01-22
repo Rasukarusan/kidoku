@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UseGuards, ForbiddenException } from '@nestjs/common';
-import { GqlAuthGuard } from '../../infrastructure/auth/gql-auth.guard';
+import { AdminApiKeyGuard } from '../../infrastructure/auth/admin-api-key.guard';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
 import { SearchBooksUseCase } from '../../application/usecases/search/search-books';
 import { IndexAllBooksUseCase } from '../../application/usecases/search/index-all-books';
@@ -48,7 +48,7 @@ export class SearchResolver {
   }
 
   @Mutation(() => IndexBooksResponse)
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(AdminApiKeyGuard)
   async indexAllBooks(
     @CurrentUser() user: { id: string; admin: boolean },
   ): Promise<IndexBooksResponse> {
