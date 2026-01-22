@@ -67,6 +67,29 @@ type BookResponse {
   updated: DateTime!
 }
 
+type SearchHitResponse {
+  id: String!
+  title: String!
+  author: String!
+  image: String!
+  memo: String!
+  username: String!
+  userImage: String
+  sheet: String!
+}
+
+type SearchBooksResponse {
+  hits: [SearchHitResponse!]!
+  totalHits: Int!
+  hitsPerPage: Int!
+  page: Int!
+  hasMore: Boolean!
+}
+
+type IndexBooksResponse {
+  count: Int!
+}
+
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
@@ -77,6 +100,7 @@ type Query {
   book(input: GetBookInput!): BookResponse
   books(input: GetBooksInput): [BookResponse!]!
   bookCategories: [String!]!
+  searchBooks(input: SearchBooksInput!): SearchBooksResponse!
 }
 
 input GetCommentsInput {
@@ -94,8 +118,12 @@ input GetBookInput {
 }
 
 input GetBooksInput {
-  userId: ID
   sheetId: Int
+}
+
+input SearchBooksInput {
+  query: String!
+  page: Int = 1
 }
 
 type Mutation {
@@ -106,6 +134,7 @@ type Mutation {
   createBook(input: CreateBookInput!): BookResponse!
   updateBook(input: UpdateBookInput!): BookResponse!
   deleteBook(input: DeleteBookInput!): Boolean!
+  indexAllBooks: IndexBooksResponse!
 }
 
 input CreateSheetInput {
