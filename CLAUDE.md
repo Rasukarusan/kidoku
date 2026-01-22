@@ -162,43 +162,6 @@ pnpm --filter web lighthouse
 - `apps/web/src/libs/meilisearch/` - MeiliSearch統合
 - `docker/meilisearch/` - 日本語対応MeiliSearch設定
 
-## 環境変数
-
-### 必須環境変数（apps/web/.env.local）
-
-```env
-# 認証
-NEXTAUTH_SECRET=              # openssl rand -base64 32で生成
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-
-# 裏口ログイン（プレビュー環境用）
-NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN=false  # プレビュー環境でtrueに設定
-BACKDOOR_USER_EMAIL=                     # ログインするユーザーのメールアドレス
-
-# データベース
-DATABASE_URL=mysql://root:password@localhost:3306/kidoku
-
-# GraphQL
-NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
-```
-
-### APIの環境変数（apps/api/.env）
-
-```env
-NEXTAUTH_SECRET=              # フロントエンドと同じ値（署名検証用）
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASS=password
-DB_NAME=kidoku
-PORT=4000
-
-# MeiliSearch
-MEILI_HOST=http://localhost:7700
-MEILI_MASTER_KEY=
-```
-
 ## 開発時の注意事項
 
 ### GraphQL開発

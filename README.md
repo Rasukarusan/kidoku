@@ -58,7 +58,7 @@ kidoku/
 pnpm install
 
 # 環境変数の設定
-cp apps/web/.env.example apps/web/.env.local
+cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
 
 # Dockerサービスの起動
