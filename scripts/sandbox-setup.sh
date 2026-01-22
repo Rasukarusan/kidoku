@@ -53,5 +53,9 @@ node scripts/sandbox-seed.js || echo "Seed script not found or failed, skipping.
 # Restore original schema (keep backup)
 mv apps/web/prisma/schema.prisma.bak apps/web/prisma/schema.prisma
 
+# Install Playwright browser for MCP
+echo "Installing Playwright Chromium browser..."
+npx playwright install chromium || echo "Playwright browser installation skipped"
+
 echo "=== Sandbox setup complete ==="
 echo "Run 'pnpm --filter web dev' to start the development server"
