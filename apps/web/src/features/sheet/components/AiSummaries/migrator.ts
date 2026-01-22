@@ -74,7 +74,8 @@ export function migrateAnalysis(
   analysis: Record<string, unknown>
 ): AiSummariesJson {
   // _schemaVersionがない場合はバージョン1として扱う
-  const currentVersion = analysis._schemaVersion || 1
+  const currentVersion =
+    typeof analysis._schemaVersion === 'number' ? analysis._schemaVersion : 1
 
   // すでに最新バージョンの場合はそのまま返す
   if (currentVersion === AI_SUMMARY_SCHEMA_VERSION) {
