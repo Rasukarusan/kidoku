@@ -99,3 +99,7 @@ fi
 
 echo "=== Sandbox setup complete ==="
 echo "Run 'pnpm --filter web dev' to start the development server"
+echo ""
+echo "Note: When using Playwright in sandbox, use these Chromium flags:"
+echo "  --no-sandbox --disable-setuid-sandbox --disable-gpu"
+echo "  --disable-dev-shm-usage --single-process --no-zygote"
