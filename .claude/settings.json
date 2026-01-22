@@ -1,4 +1,15 @@
 {
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:binaries.prisma.sh)",
+      "WebFetch(domain:fonts.googleapis.com)",
+      "WebFetch(domain:fonts.gstatic.com)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "Bash(curl:https://binaries.prisma.sh/*)",
+      "Bash(curl:https://fonts.googleapis.com/*)",
+      "Bash(curl:https://fonts.gstatic.com/*)"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
