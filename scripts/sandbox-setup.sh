@@ -16,9 +16,42 @@ cd "$(dirname "$0")/.."
 
 # Copy .env.example to .env if not exists
 if [ ! -f apps/web/.env ]; then
-  echo "Copying .env.example to .env..."
+  echo "Copying apps/web/.env.example to apps/web/.env..."
   cp apps/web/.env.example apps/web/.env
 fi
+
+if [ ! -f apps/api/.env ]; then
+  echo "Copying apps/api/.env.example to apps/api/.env..."
+  cp apps/api/.env.example apps/api/.env
+fi
+
+# Override with environment variables if set
+echo "Updating .env files with environment variables..."
+
+update_env() {
+  local file=$1
+  local key=$2
+  local value=$3
+  if [ -n "$value" ]; then
+    if grep -q "^${key}=" "$file"; then
+      sed -i "s|^${key}=.*|${key}=${value}|" "$file"
+    else
+      echo "${key}=${value}" >> "$file"
+    fi
+  fi
+}
+
+# Web (.env)
+update_env "apps/web/.env" "DATABASE_URL" "$DATABASE_URL"
+
+# API (.env)
+update_env "apps/api/.env" "DB_HOST" "$DB_HOST"
+update_env "apps/api/.env" "DB_PORT" "$DB_PORT"
+update_env "apps/api/.env" "DB_USER" "$DB_USER"
+update_env "apps/api/.env" "DB_PASS" "$DB_PASS"
+update_env "apps/api/.env" "DB_NAME" "$DB_NAME"
+update_env "apps/api/.env" "MEILI_HOST" "$MEILI_HOST"
+update_env "apps/api/.env" "MEILI_MASTER_KEY" "$MEILI_MASTER_KEY"
 
 # Install dependencies
 echo "Installing dependencies..."
