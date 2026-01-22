@@ -1,22 +1,20 @@
-// SQLite schema for Claude Code Web sandbox environment
-// This is a mock schema for local development without MySQL
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model sheets {
-  id      Int       @id @default(autoincrement())
+  id      Int       @id @default(autoincrement()) @db.UnsignedInt
   userId  String    @map("user_id")
-  name    String
+  name    String    @db.VarChar(120)
   order   Int?      @default(1)
-  created DateTime? @default(now())
-  updated DateTime? @default(now())
+  created DateTime? @default(now()) @db.DateTime(0)
+  updated DateTime? @default(now()) @db.DateTime(0)
   user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   books   books[]
 
@@ -24,20 +22,20 @@ model sheets {
 }
 
 model books {
-  id               Int             @id @default(autoincrement())
+  id               Int             @id @default(autoincrement()) @db.UnsignedInt
   userId           String          @map("user_id")
   sheet_id         Int
-  title            String
-  author           String
-  category         String
-  image            String
-  impression       String
-  memo             String
+  title            String          @db.VarChar(120)
+  author           String          @db.VarChar(120)
+  category         String          @db.VarChar(120)
+  image            String          @db.VarChar(255)
+  impression       String          @db.VarChar(5)
+  memo             String          @db.MediumText
   is_public_memo   Boolean         @default(false)
   is_purchasable   Boolean         @default(false)
-  finished         DateTime?
-  created          DateTime        @default(now())
-  updated          DateTime        @default(now())
+  finished         DateTime?       @db.DateTime(0)
+  created          DateTime        @default(now()) @db.DateTime(0)
+  updated          DateTime        @default(now()) @db.DateTime(0)
   sheet            sheets          @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   yearly_top_books YearlyTopBook[]
@@ -49,12 +47,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -100,13 +98,13 @@ model VerificationToken {
 }
 
 model YearlyTopBook {
-  id      Int      @id @default(autoincrement())
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
   userId  String   @map("user_id")
   book_id Int
   order   Int      @default(1)
-  year    String
-  created DateTime @default(now())
-  updated DateTime @default(now())
+  year    String   @db.VarChar(120)
+  created DateTime @default(now()) @db.DateTime(0)
+  updated DateTime @default(now()) @db.DateTime(0)
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   book    books    @relation(fields: [book_id], references: [id], onDelete: Cascade)
 
@@ -115,29 +113,29 @@ model YearlyTopBook {
 }
 
 model AiSummaries {
-  id       Int       @id @default(autoincrement())
+  id       Int       @id @default(autoincrement()) @db.UnsignedInt
   userId   String    @map("user_id")
   sheet_id Int
-  analysis String    // SQLite doesn't have native JSON, store as string
+  analysis Json
   token    Int
-  created  DateTime? @default(now())
-  updated  DateTime? @default(now())
+  created  DateTime? @default(now()) @db.DateTime(0)
+  updated  DateTime? @default(now()) @db.DateTime(0)
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_summaries")
 }
 
 model template_books {
-  id             Int      @id @default(autoincrement())
+  id             Int      @id @default(autoincrement()) @db.UnsignedInt
   userId         String   @map("user_id")
-  name           String
-  title          String
-  author         String
-  category       String
-  image          String
-  memo           String
+  name           String   @db.VarChar(120)
+  title          String   @db.VarChar(120)
+  author         String   @db.VarChar(120)
+  category       String   @db.VarChar(120)
+  image          String   @db.VarChar(255)
+  memo           String   @db.MediumText
   is_public_memo Boolean  @default(false)
-  created        DateTime @default(now())
-  updated        DateTime @default(now())
+  created        DateTime @default(now()) @db.DateTime(0)
+  updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
