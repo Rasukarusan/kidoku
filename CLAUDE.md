@@ -188,6 +188,35 @@ pnpm --filter web lighthouse
 - `apps/api`配下の変更でAPIデプロイトリガー
 - 環境変数はGitHub Secretsで管理
 
+## サンドボックス環境での開発
+
+サンドボックス環境（ネットワーク制限あり）での開発手順は `scripts/sandbox-setup.sh` を参照してください。
+
+### Playwright MCPが使用できない場合のスクリーンショット撮影
+
+```bash
+cat > /tmp/screenshot.mjs << 'EOF'
+import { chromium } from '/root/.npm/_npx/b6ca8615f3c4955e/node_modules/playwright/index.mjs';
+
+const browser = await chromium.launch({
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
+});
+const page = await browser.newPage();
+await page.goto('http://localhost:3000', { waitUntil: 'networkidle', timeout: 60000 });
+await page.screenshot({ path: '/home/user/kidoku/screenshot.png', fullPage: true });
+console.log('Screenshot saved');
+await browser.close();
+EOF
+
+node /tmp/screenshot.mjs
+```
+
+### 注意事項
+
+- **外部サービスへの接続制限**: Google Fonts、Prisma Accelerate等への接続がブロックされる場合があります
+- **ページ表示エラー**: DB接続エラーはサンドボックスのネットワーク制限が原因の場合があり、コード自体の問題ではありません
+- **`pnpm dev`の起動確認**: TypeScriptコンパイルエラー0件、Next.js/NestJSの起動成功メッセージで判断してください
+
 ## トラブルシューティング
 
 ### 型エラー
@@ -197,7 +226,8 @@ pnpm --filter web lighthouse
 pnpm --filter web codegen
 
 # Prismaクライアント再生成
-pnpm --filter web prisma generate
+cd apps/web && npx prisma generate
+# サンドボックス環境では PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 を付与
 ```
 
 ### 認証エラー

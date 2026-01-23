@@ -57,6 +57,13 @@ update_env "apps/api/.env" "MEILI_MASTER_KEY" "$MEILI_MASTER_KEY"
 echo "Installing dependencies..."
 pnpm install
 
+# Generate Prisma client
+# Note: PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING is needed due to network restrictions in sandbox
+echo "Generating Prisma client..."
+cd apps/web
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma generate || echo "WARNING: Prisma client generation failed"
+cd ../..
+
 # Setup Playwright browser for MCP
 # Note: CDN access is restricted in sandbox, so we use pre-installed chromium
 echo "Setting up Playwright browser for MCP..."
