@@ -1,0 +1,14 @@
+{
+  "browser": {
+    "browserName": "chromium",
+    "launchOptions": {
+      "headless": true
+    }
+  },
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "locale": "ja-JP",
+  "timezoneId": "Asia/Tokyo"
+}
