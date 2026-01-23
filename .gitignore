@@ -63,3 +63,6 @@ pnpm-debug.log*
 src/pages/play.tsx
 src/pages/api/play
 src/app/play
+
+# Playwright MCP
+.playwright-mcp/
