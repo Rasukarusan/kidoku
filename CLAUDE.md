@@ -190,8 +190,6 @@ pnpm --filter web lighthouse
 
 ## サンドボックス環境での開発
 
-サンドボックス環境（ネットワーク制限あり）での開発手順は `scripts/sandbox-setup.sh` を参照してください。
-
 ### Playwright MCPが使用できない場合のスクリーンショット撮影
 
 ```bash
