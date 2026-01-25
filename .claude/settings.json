@@ -1,15 +1,2 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash scripts/sandbox-setup.sh"
-          }
-        ]
-      }
-    ]
-  }
 }
