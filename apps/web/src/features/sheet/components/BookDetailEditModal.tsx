@@ -166,7 +166,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
           className={diff.memo ? 'ring-2 ring-yellow-400' : ''}
         />
       </div>
-      <div className="mb-4 items-start justify-between sm:flex">
+      <div className="mb-4">
         <div>
           <ToggleButton
             label="メモを公開する"
@@ -207,14 +207,6 @@ export const BookDetailEditModal: React.FC<Props> = ({
             </div>
           )}
         </div>
-        <div className="flex justify-end">
-          <button
-            className="pr-2 text-right text-xs font-bold text-red-600"
-            onClick={onDelete}
-          >
-            削除する
-          </button>
-        </div>
       </div>
       <button
         className="mx-auto flex h-10 w-full items-center justify-center rounded-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-green-800"
@@ -227,6 +219,14 @@ export const BookDetailEditModal: React.FC<Props> = ({
         )}
         <span>保存する</span>
       </button>
+      <div className="mt-6 border-t border-gray-200 pt-4 text-center">
+        <button
+          className="text-xs text-gray-400 hover:text-red-500"
+          onClick={onDelete}
+        >
+          この書籍を削除する
+        </button>
+      </div>
     </div>
   )
 }
