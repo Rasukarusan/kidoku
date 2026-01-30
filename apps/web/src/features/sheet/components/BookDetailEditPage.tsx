@@ -353,13 +353,13 @@ export const BookDetailEditPage: React.FC<Props> = ({
           </div>
         </div>
 
-        <div className="px-4 pb-4">
+        <div className="mx-4 mt-8 border-t border-gray-200 pb-4 pt-4">
           <button
             onClick={handleDelete}
-            className="rounded-md bg-red-500 px-4 py-2 text-sm text-white hover:bg-red-600 disabled:opacity-50"
+            className="text-xs text-gray-400 hover:text-red-500 disabled:opacity-50"
             disabled={loading}
           >
-            削除
+            この書籍を削除する
           </button>
         </div>
       </div>
