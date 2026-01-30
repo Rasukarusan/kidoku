@@ -353,7 +353,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
           </div>
         </div>
 
-        <div className="mx-4 mt-8 border-t border-gray-200 pb-4 pt-4">
+        <div className="mx-4 mt-8 border-t border-gray-200 pb-4 pt-4 text-center">
           <button
             onClick={handleDelete}
             className="text-xs text-gray-400 hover:text-red-500 disabled:opacity-50"
