@@ -15,7 +15,12 @@ import { signOut } from 'next-auth/react'
 import { useQuery } from '@apollo/client'
 import { getSheetsQuery } from '@/features/sheet/api'
 import { Logo } from '@/components/icon/Logo'
-import { useCachedSession, clearSessionCache } from '@/hooks/useCachedSession'
+import {
+  useCachedSession,
+  clearSessionCache,
+  saveSheetsToCache,
+  loadSheetsFromCache,
+} from '@/hooks/useCachedSession'
 
 export const Sidebar: React.FC = () => {
   const router = useRouter()
@@ -95,9 +100,21 @@ export const Sidebar: React.FC = () => {
     }
   }, [])
 
+  // シートデータが取得できたらキャッシュを更新
+  useEffect(() => {
+    if (data?.sheets && data.sheets.length > 0) {
+      saveSheetsToCache(
+        data.sheets.map((s: { id: number; name: string }) => ({
+          id: s.id,
+          name: s.name,
+        }))
+      )
+    }
+  }, [data])
+
   // ナビゲーションアイテムのメモ化
   const navigationItems = useMemo(() => {
-    const sheets = data?.sheets || []
+    const sheets = data?.sheets || loadSheetsFromCache() || []
     const defaultUrl = !session
       ? '/'
       : sheets.length > 0
