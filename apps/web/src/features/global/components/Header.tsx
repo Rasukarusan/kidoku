@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import { Container } from '@/components/layout/Container'
 import React from 'react'
 import { SearchBox } from '@/components/input/SearchBox/SearchBox'
@@ -7,11 +6,12 @@ import { useSetAtom } from 'jotai'
 import { openNavSidebarAtom, openLoginModalAtom } from '@/store/modal/atom'
 import { Logo } from '@/components/icon/Logo'
 import Link from 'next/link'
+import { useCachedSession } from '@/hooks/useCachedSession'
 
 // レスポンシブヘッダー
 export const Header = () => {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { session, status } = useCachedSession()
   const setOpenSidebar = useSetAtom(openNavSidebarAtom)
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
 
