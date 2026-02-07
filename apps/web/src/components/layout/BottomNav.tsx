@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import { useQuery } from '@apollo/client'
 import { getSheetsQuery } from '@/features/sheet/api'
 import {
@@ -12,14 +11,15 @@ import {
   AiOutlineSetting,
   AiFillSetting,
 } from 'react-icons/ai'
+import { useCachedSession, loadSheetsFromCache } from '@/hooks/useCachedSession'
 
 export const BottomNav: React.FC = () => {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { session, status } = useCachedSession()
   const { data } = useQuery(getSheetsQuery)
 
   const navigationItems = useMemo(() => {
-    const sheets = data?.sheets || []
+    const sheets = data?.sheets || loadSheetsFromCache() || []
     const sheetsUrl = !session
       ? '/'
       : sheets.length > 0
