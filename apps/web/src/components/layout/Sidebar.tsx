@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAtom } from 'jotai'
 import { openNavSidebarAtom } from '@/store/modal/atom'
@@ -16,10 +15,11 @@ import { signOut } from 'next-auth/react'
 import { useQuery } from '@apollo/client'
 import { getSheetsQuery } from '@/features/sheet/api'
 import { Logo } from '@/components/icon/Logo'
+import { useCachedSession, clearSessionCache } from '@/hooks/useCachedSession'
 
 export const Sidebar: React.FC = () => {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { session, status } = useCachedSession()
   const [isOpen, setIsOpen] = useAtom(openNavSidebarAtom)
   const { data } = useQuery(getSheetsQuery)
   const sidebarRef = useRef<HTMLDivElement>(null)
@@ -285,6 +285,7 @@ export const Sidebar: React.FC = () => {
                     </Link>
                     <button
                       onClick={() => {
+                        clearSessionCache()
                         signOut()
                         closeSidebar()
                       }}
