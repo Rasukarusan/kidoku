@@ -116,7 +116,7 @@ export const Confirm: React.FC<Props> = ({
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `ai-summary-prompt-${sheetName}-${dayjs().format('YYYY-MM-DD')}.txt`
+      link.download = `ai-summary-prompt-${sheetName}.txt`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
