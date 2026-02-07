@@ -1,0 +1,93 @@
+import React, { useMemo } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
+import { useQuery } from '@apollo/client'
+import { getSheetsQuery } from '@/features/sheet/api'
+import {
+  AiOutlineHome,
+  AiFillHome,
+  AiOutlineBook,
+  AiFillBook,
+  AiOutlineSetting,
+  AiFillSetting,
+} from 'react-icons/ai'
+
+export const BottomNav: React.FC = () => {
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const { data } = useQuery(getSheetsQuery)
+
+  const navigationItems = useMemo(() => {
+    const sheets = data?.sheets || []
+    const sheetsUrl = !session
+      ? '/'
+      : sheets.length > 0
+        ? `/${session.user.name}/sheets/${sheets[0].name}`
+        : `/${session.user.name}/sheets/total`
+
+    const isHomePage = router.pathname === '/'
+    const isSheetsPage = router.pathname.includes('/sheets')
+    const isSettingsPage = router.pathname.includes('/settings')
+
+    return [
+      {
+        name: 'ホーム',
+        href: '/',
+        icon: AiOutlineHome,
+        activeIcon: AiFillHome,
+        isActive: isHomePage,
+      },
+      {
+        name: '読書記録',
+        href: sheetsUrl,
+        icon: AiOutlineBook,
+        activeIcon: AiFillBook,
+        isActive: isSheetsPage,
+      },
+      {
+        name: '設定',
+        href: '/settings/profile',
+        icon: AiOutlineSetting,
+        activeIcon: AiFillSetting,
+        isActive: isSettingsPage,
+      },
+    ]
+  }, [data, session, router.pathname])
+
+  if (status !== 'authenticated' || !session) {
+    return null
+  }
+
+  if (router.asPath.startsWith('/auth/init')) {
+    return null
+  }
+
+  return (
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white"
+      aria-label="ボトムナビゲーション"
+    >
+      <div className="mx-auto flex h-14 max-w-screen-xl items-center justify-around">
+        {navigationItems.map((item) => {
+          const Icon = item.isActive ? item.activeIcon : item.icon
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-1 text-xs transition-colors ${
+                item.isActive
+                  ? 'font-semibold text-gray-900'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              aria-current={item.isActive ? 'page' : undefined}
+            >
+              <Icon className="h-5 w-5" aria-hidden="true" />
+              <span>{item.name}</span>
+            </Link>
+          )
+        })}
+      </div>
+    </nav>
+  )
+}
