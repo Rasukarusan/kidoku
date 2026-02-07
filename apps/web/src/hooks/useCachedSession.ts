@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import type { Session } from 'next-auth'
 
 const STORAGE_KEY = 'kidoku:session-cache'
+const SHEETS_STORAGE_KEY = 'kidoku:sheets-cache'
 
 type CachedSessionData = {
   user: {
@@ -34,8 +35,34 @@ export function saveSessionToCache(session: Session) {
 export function clearSessionCache() {
   try {
     localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(SHEETS_STORAGE_KEY)
   } catch {
     // localStorage が使えない環境では無視
+  }
+}
+
+// シートキャッシュ
+
+export type CachedSheet = {
+  id: number
+  name: string
+}
+
+export function saveSheetsToCache(sheets: CachedSheet[]) {
+  try {
+    localStorage.setItem(SHEETS_STORAGE_KEY, JSON.stringify(sheets))
+  } catch {
+    // localStorage が使えない環境では無視
+  }
+}
+
+export function loadSheetsFromCache(): CachedSheet[] | null {
+  try {
+    const raw = localStorage.getItem(SHEETS_STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as CachedSheet[]
+  } catch {
+    return null
   }
 }
 
