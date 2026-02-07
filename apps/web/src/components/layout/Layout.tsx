@@ -2,6 +2,7 @@ import { AddModal } from '@/components/input/SearchBox/AddModal'
 import { SearchModal } from '../input/SearchBox/SearchModal'
 import { LoginModal } from './LoginModal'
 import { Sidebar } from './Sidebar'
+import { BottomNav } from './BottomNav'
 
 interface Props {
   children: React.ReactNode
@@ -15,7 +16,8 @@ export const Layout: React.FC<Props> = ({ children }) => {
         <SearchModal />
         <AddModal />
         <LoginModal />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pb-14">{children}</main>
+        <BottomNav />
       </div>
     </div>
   )
