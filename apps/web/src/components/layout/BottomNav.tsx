@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useQuery } from '@apollo/client'
-import { getSheetsQuery } from '@/features/sheet/api'
 import {
   AiOutlineHome,
   AiFillHome,
@@ -11,21 +9,15 @@ import {
   AiOutlineSetting,
   AiFillSetting,
 } from 'react-icons/ai'
-import { useCachedSession, loadSheetsFromCache } from '@/hooks/useCachedSession'
+import { useCachedSession } from '@/hooks/useCachedSession'
+import { useReadingRecordsUrl } from '@/hooks/useReadingRecordsUrl'
 
 export const BottomNav: React.FC = () => {
   const router = useRouter()
   const { session, status } = useCachedSession()
-  const { data } = useQuery(getSheetsQuery)
+  const readingRecordsUrl = useReadingRecordsUrl()
 
   const navigationItems = useMemo(() => {
-    const sheets = data?.sheets || loadSheetsFromCache() || []
-    const sheetsUrl = !session
-      ? '/'
-      : sheets.length > 0
-        ? `/${session.user.name}/sheets/${sheets[0].name}`
-        : `/${session.user.name}/sheets/total`
-
     const isHomePage = router.pathname === '/'
     const isSheetsPage = router.pathname.includes('/sheets')
     const isSettingsPage = router.pathname.includes('/settings')
@@ -40,7 +32,7 @@ export const BottomNav: React.FC = () => {
       },
       {
         name: '読書記録',
-        href: sheetsUrl,
+        href: readingRecordsUrl,
         icon: AiOutlineBook,
         activeIcon: AiFillBook,
         isActive: isSheetsPage,
@@ -53,7 +45,7 @@ export const BottomNav: React.FC = () => {
         isActive: isSettingsPage,
       },
     ]
-  }, [data, session, router.pathname])
+  }, [readingRecordsUrl, router.pathname])
 
   if (status !== 'authenticated' || !session) {
     return null
