@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAtom } from 'jotai'
 import { openNavSidebarAtom } from '@/store/modal/atom'
@@ -13,15 +12,15 @@ import {
 } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
-import { useQuery } from '@apollo/client'
-import { getSheetsQuery } from '@/features/sheet/api'
 import { Logo } from '@/components/icon/Logo'
+import { useCachedSession, clearSessionCache } from '@/hooks/useCachedSession'
+import { useReadingRecordsUrl } from '@/hooks/useReadingRecordsUrl'
 
 export const Sidebar: React.FC = () => {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { session, status } = useCachedSession()
   const [isOpen, setIsOpen] = useAtom(openNavSidebarAtom)
-  const { data } = useQuery(getSheetsQuery)
+  const readingRecordsUrl = useReadingRecordsUrl()
   const sidebarRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -97,13 +96,6 @@ export const Sidebar: React.FC = () => {
 
   // ナビゲーションアイテムのメモ化
   const navigationItems = useMemo(() => {
-    const sheets = data?.sheets || []
-    const defaultUrl = !session
-      ? '/'
-      : sheets.length > 0
-        ? `/${session.user.name}/sheets/${sheets[0].name}`
-        : `/${session.user.name}/sheets/total`
-
     // 現在のパスに基づいてアクティブ状態を判定
     const isHomePage = router.pathname === '/'
     const isSheetsPage =
@@ -119,7 +111,7 @@ export const Sidebar: React.FC = () => {
       },
       {
         name: '読書記録',
-        href: defaultUrl,
+        href: readingRecordsUrl,
         icon: AiOutlineBook,
         isActive: isSheetsPage,
       },
@@ -130,7 +122,7 @@ export const Sidebar: React.FC = () => {
         isActive: isSettingsPage,
       },
     ]
-  }, [data, session, router.pathname])
+  }, [readingRecordsUrl, router.pathname])
 
   // 認証状態を判定
   const isAuthenticated = status === 'authenticated' && session
@@ -285,6 +277,7 @@ export const Sidebar: React.FC = () => {
                     </Link>
                     <button
                       onClick={() => {
+                        clearSessionCache()
                         signOut()
                         closeSidebar()
                       }}
