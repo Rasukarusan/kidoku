@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Loading } from '@/components/icon/Loading'
+import { useRef, useState } from 'react'
 import { Container } from '@/components/layout/Container'
 import { NextSeo } from 'next-seo'
 
@@ -9,12 +8,14 @@ interface Props {
 }
 export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   const [currentName, setCurrentName] = useState(name)
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [saved, setSaved] = useState(false)
+  const savedNameRef = useRef(name)
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
     setCurrentName(newName)
+    setSaved(false)
     const res = await fetch(`/api/check/name`, {
       method: 'POST',
       body: JSON.stringify({ name: newName }),
@@ -24,8 +25,8 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
     }).then((res) => res.json())
     setError(res.result ? '' : 'すでに利用されているため登録できません')
   }
-  const onSubmit = async () => {
-    setLoading(true)
+  const onBlur = async () => {
+    if (error || currentName === savedNameRef.current || !currentName) return
     await fetch(`/api/me`, {
       method: 'PUT',
       body: JSON.stringify({ name: currentName }),
@@ -33,7 +34,8 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         Accept: 'application/json',
       },
     })
-    setLoading(false)
+    savedNameRef.current = currentName
+    setSaved(true)
   }
 
   const onClickDelete = async () => {
@@ -68,8 +70,12 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
             value={currentName}
             className="mb-2 w-full rounded-md border border-slate-200 bg-slate-100 p-2"
             onChange={onChange}
+            onBlur={onBlur}
           />
-          <div className="mb-4 text-xs text-red-700">{error}</div>
+          <div className="mb-4 text-xs">
+            {error && <span className="text-red-700">{error}</span>}
+            {saved && <span className="text-green-600">保存しました</span>}
+          </div>
           <div className="mb-4">
             <div className="mb-4 text-sm font-bold text-gray-700">
               データエクスポート
@@ -100,16 +106,6 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
           </div>
         </div>
       </div>
-      <button
-        className="m-auto block flex items-center rounded-md bg-blue-400 px-4 py-2 font-bold text-white hover:bg-blue-500 disabled:bg-gray-400"
-        onClick={onSubmit}
-        disabled={error !== ''}
-      >
-        {loading && (
-          <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
-        )}
-        <span>更新する</span>
-      </button>
       <div className="mt-60"></div>
     </Container>
   )
