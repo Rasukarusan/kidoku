@@ -77,35 +77,89 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
   }
 
   return (
-    <Modal open={open} onClose={onClose} className="h-3/4 sm:w-2/3">
-      <div className="h-full p-4">
-        <h2 className="mb-4 shrink-0 text-center text-2xl">
+    <Modal open={open} onClose={onClose} className="h-[85vh] sm:w-2/3">
+      <div className="flex min-h-0 flex-1 flex-col p-4">
+        <h2 className="mb-3 shrink-0 text-center text-2xl">
           {year}年ベスト<span className="font-bold">{order}位</span>を設定
         </h2>
-        <div className="flex h-full w-full flex-wrap justify-center overflow-y-auto p-4 pb-12 text-gray-900">
-          {books.map((book) => {
-            return (
-              <div
-                className={`m-2 w-3/4 cursor-pointer rounded-md px-4 py-2 text-center hover:bg-gray-100 sm:w-[200px] ${
-                  selectItem?.id === book.id
-                    ? 'bg-blue-200 hover:bg-blue-300'
-                    : 'bg-white'
-                }`}
-                key={book.id}
-                onClick={() =>
-                  setSelectItem(selectItem?.id === book.id ? null : book)
-                }
-              >
-                <img
-                  className="m-auto mb-1 h-[150px] object-contain"
-                  src={book.image}
-                  alt={book.title}
-                  loading="lazy"
-                />
-                <div className="mb-1 text-sm font-bold">{book.title}</div>
+        {selectItem && (
+          <div className="mb-3 flex shrink-0 items-center gap-3 rounded-lg bg-blue-50 px-3 py-2">
+            <img
+              className="h-[56px] w-[40px] shrink-0 rounded object-cover shadow-sm"
+              src={selectItem.image}
+              alt={selectItem.title}
+            />
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-bold text-gray-800">
+                {selectItem.title}
               </div>
-            )
-          })}
+              <div className="truncate text-xs text-gray-500">
+                {selectItem.author}
+              </div>
+            </div>
+            <button
+              className="shrink-0 rounded-full p-1 text-gray-400 hover:bg-blue-100 hover:text-gray-600"
+              onClick={() => setSelectItem(null)}
+              aria-label="選択解除"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="grid grid-cols-3 gap-2 pb-4 sm:grid-cols-4 sm:gap-3">
+            {books.map((book) => {
+              const isSelected = selectItem?.id === book.id
+              return (
+                <button
+                  className={`relative flex flex-col items-center rounded-lg p-1.5 transition-all sm:p-2 ${
+                    isSelected
+                      ? 'bg-blue-50 ring-2 ring-blue-500'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  key={book.id}
+                  onClick={() => setSelectItem(isSelected ? null : book)}
+                >
+                  {isSelected && (
+                    <div className="absolute right-1 top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 sm:h-6 sm:w-6">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3 text-white sm:h-4 sm:w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                  <img
+                    className="mb-1 h-[100px] w-[70px] rounded object-cover shadow-sm sm:h-[130px] sm:w-[90px]"
+                    src={book.image}
+                    alt={book.title}
+                    loading="lazy"
+                  />
+                  <div className="line-clamp-2 w-full text-center text-xs leading-tight text-gray-700">
+                    {book.title}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
       <div className="flex h-[50px] w-full shrink-0 items-center justify-center text-center">
