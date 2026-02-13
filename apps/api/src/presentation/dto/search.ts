@@ -54,6 +54,30 @@ export class SearchBooksResponse {
   hasMore: boolean;
 }
 
+@InputType()
+export class SearchGoogleBooksInput {
+  @Field()
+  query: string;
+}
+
+@ObjectType()
+export class GoogleBookHitResponse {
+  @Field()
+  id: string;
+
+  @Field()
+  title: string;
+
+  @Field()
+  author: string;
+
+  @Field()
+  category: string;
+
+  @Field()
+  image: string;
+}
+
 @ObjectType()
 export class IndexBooksResponse {
   @Field(() => Int)

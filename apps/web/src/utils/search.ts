@@ -107,18 +107,24 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
     }
   }
 
-  // Google Books APIで検索
+  // バックエンド経由でGoogle Books APIを検索
   await client
-    .get(`https://www.googleapis.com/books/v1/volumes?q=${title}`)
+    .get(`/api/search/google-books?q=${encodeURIComponent(title)}`)
     .then((res) => {
-      res.data.items?.map((item) => {
-        const { title, authors, categories, imageLinks } = item.volumeInfo
+      const items: Array<{
+        id: string
+        title: string
+        author: string
+        category: string
+        image: string
+      }> = res.data
+      items?.map((item) => {
         result.push({
           id: item.id,
-          title: title,
-          author: Array.isArray(authors) ? authors.join(',') : '-',
-          category: categories ? categories.join(',') : '-',
-          image: imageLinks?.thumbnail?.replace('http:', 'https:') || NO_IMAGE,
+          title: item.title,
+          author: item.author,
+          category: item.category,
+          image: item.image,
           memo: '',
         })
       })
