@@ -43,16 +43,17 @@ export const Book: React.FC<Props> = ({ book }) => {
           {title}
         </Link>
         <div className="mb-2 text-xs text-gray-500">{author}</div>
-        {memo &&
-          (is_public_memo ? (
+        {is_public_memo ? (
+          memo && (
             <div className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-gray-700 sm:text-sm">
               {memo}
             </div>
-          ) : (
-            <div className="text-xs text-gray-400 sm:text-sm">
-              感想が非公開です
-            </div>
-          ))}
+          )
+        ) : (
+          <div className="text-xs text-gray-400 sm:text-sm">
+            感想が非公開です
+          </div>
+        )}
       </div>
       <style jsx>{`
         .gold {
