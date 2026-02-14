@@ -1,5 +1,12 @@
 import { useMemo } from 'react'
-import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import {
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Sector,
+} from 'recharts'
 import { Category } from '../../types'
 
 interface Props {
@@ -20,6 +27,24 @@ const COLORS = [
   '#ffc0cb',
   '#dda0dd',
 ]
+
+// eslint-disable-next-line
+const renderActiveShape = (props: any) => {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props
+  return (
+    <Sector
+      cx={cx}
+      cy={cy}
+      innerRadius={innerRadius}
+      outerRadius={outerRadius}
+      startAngle={startAngle}
+      endAngle={endAngle}
+      fill={fill}
+      stroke="#000"
+      strokeWidth={2}
+    />
+  )
+}
 
 // eslint-disable-next-line
 const CustomTooltip = ({ active, payload }: any) => {
@@ -49,6 +74,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
           cy="50%"
           outerRadius={120}
           animationDuration={1000}
+          activeShape={renderActiveShape}
           label={({ name, percent }) =>
             percent > 5 ? `${name} ${Math.floor(percent)}%` : ''
           }
