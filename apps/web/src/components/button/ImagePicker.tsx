@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Modal } from '../layout/Modal'
 import { FaLink } from 'react-icons/fa'
 import { MdEdit } from 'react-icons/md'
@@ -11,6 +11,16 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   const ref = useRef(null)
   const [image, setImage] = useState(img)
   const [open, setOpen] = useState(false)
+  const [pasteMessage, setPasteMessage] = useState('')
+
+  // ファイルをBase64に変換する共通関数
+  const readFileAsBase64 = (file: File) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setImage(e.target.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
 
   // URLから画像を読み込む
   const loadImageAsBase64 = (url): Promise<string> => {
@@ -37,12 +47,36 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
     if (!file) return
     const url = URL.createObjectURL(file)
     setImage(url)
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setImage(e.target.result as string)
-    }
-    reader.readAsDataURL(file)
+    readFileAsBase64(file)
   }
+
+  // クリップボードから画像を貼り付け（キーボード操作用）
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const file = item.getAsFile()
+        if (!file) return
+        readFileAsBase64(file)
+        setPasteMessage('画像を貼り付けました')
+        setTimeout(() => setPasteMessage(''), 2000)
+        return
+      }
+    }
+  }, [])
+
+  // モーダルが開いている間、pasteイベントを監視
+  useEffect(() => {
+    if (open) {
+      document.addEventListener('paste', handlePaste)
+    }
+    return () => {
+      document.removeEventListener('paste', handlePaste)
+    }
+  }, [open, handlePaste])
 
   const onSubmit = async () => {
     onImageLoad && onImageLoad(image)
@@ -76,6 +110,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
           // 初期画像に戻す
           setImage(img)
           setOpen(false)
+          setPasteMessage('')
         }}
         className="w-full sm:w-[500px]"
       >
@@ -87,10 +122,13 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
               onChange={async (e) => {
                 await loadImageAsBase64(e.target.value)
               }}
-              placeholder="画像URLをペースト"
+              placeholder="画像を貼り付け、またはURLを入力"
               className="w-full placeholder:text-sm focus:outline-none"
             />
           </div>
+          {pasteMessage && (
+            <div className="mb-2 text-xs text-green-600">{pasteMessage}</div>
+          )}
           <button
             className="mb-4 hover:brightness-75"
             onClick={() => ref.current.click()}
