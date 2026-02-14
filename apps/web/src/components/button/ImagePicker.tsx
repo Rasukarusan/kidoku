@@ -154,7 +154,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
             onClick={handlePasteFromClipboard}
           >
             <MdContentPaste className="mr-1" />
-            <span>タップ or Ctrl+V で画像を貼り付け</span>
+            <span>クリップボードから貼り付け</span>
           </button>
           {pasteMessage && (
             <div className="mb-2 text-xs text-green-600">{pasteMessage}</div>
