@@ -64,8 +64,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
                 opacity={
                   activeIndex === null || activeIndex === index ? 1 : 0.4
                 }
-                stroke="#fff"
-                strokeWidth={1}
+                stroke="none"
               />
             ))}
           </Pie>
