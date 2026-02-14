@@ -1,8 +1,9 @@
+import { useMemo } from 'react'
 import { Category, Year } from '../../types'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { Rankings } from './Rankings'
-import { CategoryMap } from './CategoryMap'
 import { YearsGraph } from './YearsGraph'
+import { BasePieChart, PieSlice } from '../BasePieChart'
 import { YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
@@ -28,6 +29,13 @@ export const SheetTotalPage: React.FC<Props> = ({
   yearlyTopBooks,
 }) => {
   const average = years.length === 0 ? 0 : Math.ceil(total / years.length)
+  const categoryData: PieSlice[] = useMemo(() => {
+    return categories.map((c) => ({
+      name: c.name,
+      value: c.count,
+      percent: c.percent,
+    }))
+  }, [categories])
 
   return (
     <Container>
@@ -44,7 +52,7 @@ export const SheetTotalPage: React.FC<Props> = ({
         <CoutUpText value={total} unit="冊" />
 
         <div className="m-auto mb-4 h-[300px] w-full sm:h-[400px] sm:w-3/4">
-          <CategoryMap categories={categories} />
+          <BasePieChart data={categoryData} outerRadius={120} stroke="none" />
         </div>
 
         <TitleWithLine text="年間平均読書数" />
