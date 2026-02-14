@@ -51,7 +51,7 @@ export const Book: React.FC<Props> = ({ book }) => {
           )
         ) : (
           <div className="text-xs text-gray-400 sm:text-sm">
-            感想が非公開です
+            非公開の感想です
           </div>
         )}
       </div>
