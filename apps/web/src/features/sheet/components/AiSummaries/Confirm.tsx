@@ -11,8 +11,9 @@ import { twMerge } from 'tailwind-merge'
 import { AiSummaryUsageResponse } from '@/types/api'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
 import { FaRegCopy, FaCheck, FaDownload } from 'react-icons/fa'
+import { MdFilterList } from 'react-icons/md'
 
-export type DetailSettings = {
+export type FilterSettings = {
   months: string[]
   categories: string[]
 }
@@ -20,7 +21,7 @@ export type DetailSettings = {
 interface Props {
   open: boolean
   onCancel: () => void
-  onConfirm: (settings: DetailSettings) => void
+  onConfirm: (settings: FilterSettings) => void
   onManualSet: (json: Record<string, string>) => void
   courseId: CourseId
   sheetName: string
@@ -229,64 +230,69 @@ export const Confirm: React.FC<Props> = ({
             {saving ? '保存中...' : '結果をセット'}
           </button>
         </div>
-        <Accordion title="詳細設定" className="text-sm">
+        <Accordion
+          title={
+            <span className="flex items-center gap-1">
+              <MdFilterList size={16} />
+              絞り込み
+            </span>
+          }
+          className="text-sm"
+        >
           <div className="p-2 text-left">
-            <div className="mb-2 flex justify-start">
-              <div className="w-20 text-nowrap font-bold">読了日</div>
-              <div className="grid grid-cols-3 sm:grid-cols-3">
+            <div className="mb-3">
+              <div className="mb-1.5 text-xs font-bold text-gray-500">
+                読了月
+              </div>
+              <div className="flex flex-wrap gap-1.5">
                 {initialMonths.map((month) => (
-                  <div key={month} className="pb-1 pr-2">
-                    <input
-                      type="checkbox"
-                      name={month}
-                      id={month}
-                      value={month}
-                      className="mr-2 cursor-pointer"
-                      checked={months.includes(month)}
-                      onChange={(e) => {
-                        const month = Number(e.target.value)
-                        if (months.includes(month)) {
-                          setMonths(months.filter((v) => v != month))
-                        } else {
-                          setMonths([...months, month])
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor={month}
-                      className="cursor-pointer select-none"
-                    >
-                      {month}月
-                    </label>
-                  </div>
+                  <button
+                    key={month}
+                    type="button"
+                    className={twMerge(
+                      'rounded-full border px-3 py-1 text-xs transition-colors',
+                      months.includes(month)
+                        ? 'border-ai bg-ai/10 font-bold text-ai'
+                        : 'border-gray-300 bg-gray-100 text-gray-400'
+                    )}
+                    onClick={() => {
+                      if (months.includes(month)) {
+                        setMonths(months.filter((v) => v !== month))
+                      } else {
+                        setMonths([...months, month])
+                      }
+                    }}
+                  >
+                    {month}月
+                  </button>
                 ))}
               </div>
             </div>
-            <div className="mb-2 flex">
-              <div className="w-20 text-nowrap font-bold">カテゴリ</div>
-              <div className="grid grid-cols-2">
+            <div>
+              <div className="mb-1.5 text-xs font-bold text-gray-500">
+                カテゴリ
+              </div>
+              <div className="flex flex-wrap gap-1.5">
                 {initialCategories.map((category) => (
-                  <div key={category} className="pb-1 pr-2">
-                    <input
-                      type="checkbox"
-                      name={category}
-                      id={category}
-                      value={category}
-                      className="mr-2 cursor-pointer"
-                      checked={categories.includes(category)}
-                      onChange={(e) => {
-                        setCategories(
-                          categories.filter((v) => v != e.target.value)
-                        )
-                      }}
-                    />
-                    <label
-                      htmlFor={category}
-                      className="cursor-pointer select-none"
-                    >
-                      {category}
-                    </label>
-                  </div>
+                  <button
+                    key={category}
+                    type="button"
+                    className={twMerge(
+                      'rounded-full border px-3 py-1 text-xs transition-colors',
+                      categories.includes(category)
+                        ? 'border-ai bg-ai/10 font-bold text-ai'
+                        : 'border-gray-300 bg-gray-100 text-gray-400'
+                    )}
+                    onClick={() => {
+                      if (categories.includes(category)) {
+                        setCategories(categories.filter((v) => v !== category))
+                      } else {
+                        setCategories([...categories, category])
+                      }
+                    }}
+                  >
+                    {category}
+                  </button>
                 ))}
               </div>
             </div>
