@@ -80,7 +80,7 @@ export function CategoryPieChart({
 
   return (
     <div
-      className="relative [&_svg]:outline-none"
+      className="relative"
       style={{ width: '100%', height: '300px' }}
       key={sheet}
     >
