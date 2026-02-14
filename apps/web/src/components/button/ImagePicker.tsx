@@ -50,7 +50,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
     readFileAsBase64(file)
   }
 
-  // クリップボードから画像を貼り付け
+  // クリップボードから画像を貼り付け（キーボード操作用）
   const handlePaste = useCallback((e: ClipboardEvent) => {
     const items = e.clipboardData?.items
     if (!items) return
@@ -67,6 +67,29 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
       }
     }
   }, [])
+
+  // クリップボードから画像を読み取る（ボタンタップ用、スマホ対応）
+  const handlePasteFromClipboard = async () => {
+    try {
+      const clipboardItems = await navigator.clipboard.read()
+      for (const item of clipboardItems) {
+        const imageType = item.types.find((type) => type.startsWith('image/'))
+        if (imageType) {
+          const blob = await item.getType(imageType)
+          const file = new File([blob], 'clipboard-image', { type: imageType })
+          readFileAsBase64(file)
+          setPasteMessage('画像を貼り付けました')
+          setTimeout(() => setPasteMessage(''), 2000)
+          return
+        }
+      }
+      setPasteMessage('クリップボードに画像がありません')
+      setTimeout(() => setPasteMessage(''), 2000)
+    } catch {
+      setPasteMessage('クリップボードにアクセスできませんでした')
+      setTimeout(() => setPasteMessage(''), 2000)
+    }
+  }
 
   // モーダルが開いている間、pasteイベントを監視
   useEffect(() => {
@@ -126,10 +149,13 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
               className="w-full placeholder:text-sm focus:outline-none"
             />
           </div>
-          <div className="mb-4 flex items-center justify-center text-xs text-slate-400">
+          <button
+            className="mb-4 flex w-full items-center justify-center rounded-md border-2 border-dashed border-slate-300 px-2 py-3 text-xs text-slate-500 hover:border-slate-400 hover:text-slate-600"
+            onClick={handlePasteFromClipboard}
+          >
             <MdContentPaste className="mr-1" />
-            <span>Ctrl+V / ⌘+V で画像を貼り付けできます</span>
-          </div>
+            <span>タップ or Ctrl+V で画像を貼り付け</span>
+          </button>
           {pasteMessage && (
             <div className="mb-2 text-xs text-green-600">{pasteMessage}</div>
           )}
