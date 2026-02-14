@@ -13,12 +13,17 @@ export interface Props {
 }
 export const Book: React.FC<Props> = ({ book }) => {
   const { id, title, author, order, image, memo, is_public_memo } = book
-  const color = order === 1 ? 'gold' : order === 2 ? 'silver' : 'bronze'
+  const ribbonClass =
+    order === 1
+      ? 'ribbon-gold'
+      : order === 2
+        ? 'ribbon-silver'
+        : 'ribbon-bronze'
   return (
     <div className="mb-6 flex gap-4 text-left sm:gap-6">
-      <div className="flex shrink-0 flex-col items-center">
-        <div className={`mb-2 text-2xl font-bold text-transparent ${color}`}>
-          {order}位
+      <div className="relative shrink-0">
+        <div className={`ribbon ${ribbonClass}`}>
+          <span className="ribbon-text">{order}</span>
         </div>
         <a
           href={encodeURI(`https://www.amazon.co.jp/s?k=${title}`)}
@@ -56,20 +61,54 @@ export const Book: React.FC<Props> = ({ book }) => {
         )}
       </div>
       <style jsx>{`
-        .gold {
-          background:
-            repeating-linear-gradient(0deg, #B67B03 0.1em, #DAAF08 0.2em, #FEE9A0 0.3em, #DAAF08 0.4em, #B67B03 1.2em);
-            -webkit-background-clip: text;
+        .ribbon {
+          position: absolute;
+          top: -4px;
+          left: 6px;
+          width: 26px;
+          height: 40px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          padding-top: 4px;
+          z-index: 10;
+          filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
         }
-        .silver {
-          background:
-            linear-gradient(45deg, #757575 0%, #9E9E9E 45%, #E8E8E8 70%, #9E9E9E 85%, #757575 90% 100%);
-            -webkit-background-clip: text;
+        .ribbon-text {
+          font-size: 13px;
+          font-weight: 800;
+          color: #fff;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          line-height: 1;
         }
-        .bronze {
-          background: #804A00;
-          -webkit-background-clip: text;
-        },
+        .ribbon-gold {
+          background: linear-gradient(
+            180deg,
+            #fce38a 0%,
+            #f7b731 25%,
+            #d4a017 55%,
+            #b8860b 100%
+          );
+        }
+        .ribbon-silver {
+          background: linear-gradient(
+            180deg,
+            #f0f0f0 0%,
+            #d0d0d0 25%,
+            #a8a8a8 55%,
+            #808080 100%
+          );
+        }
+        .ribbon-bronze {
+          background: linear-gradient(
+            180deg,
+            #e8a468 0%,
+            #cd8c3e 25%,
+            #a0622e 55%,
+            #804a00 100%
+          );
+        }
       `}</style>
     </div>
   )
