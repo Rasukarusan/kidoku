@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Modal } from '../layout/Modal'
 import { FaLink } from 'react-icons/fa'
-import { MdContentPaste, MdEdit } from 'react-icons/md'
+import { MdEdit } from 'react-icons/md'
 
 interface Props {
   img?: string
@@ -68,29 +68,6 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
     }
   }, [])
 
-  // クリップボードから画像を読み取る（ボタンタップ用、スマホ対応）
-  const handlePasteFromClipboard = async () => {
-    try {
-      const clipboardItems = await navigator.clipboard.read()
-      for (const item of clipboardItems) {
-        const imageType = item.types.find((type) => type.startsWith('image/'))
-        if (imageType) {
-          const blob = await item.getType(imageType)
-          const file = new File([blob], 'clipboard-image', { type: imageType })
-          readFileAsBase64(file)
-          setPasteMessage('画像を貼り付けました')
-          setTimeout(() => setPasteMessage(''), 2000)
-          return
-        }
-      }
-      setPasteMessage('クリップボードに画像がありません')
-      setTimeout(() => setPasteMessage(''), 2000)
-    } catch {
-      setPasteMessage('クリップボードにアクセスできませんでした')
-      setTimeout(() => setPasteMessage(''), 2000)
-    }
-  }
-
   // モーダルが開いている間、pasteイベントを監視
   useEffect(() => {
     if (open) {
@@ -145,17 +122,10 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
               onChange={async (e) => {
                 await loadImageAsBase64(e.target.value)
               }}
-              placeholder="画像URLをペースト"
+              placeholder="画像を貼り付け、またはURLを入力"
               className="w-full placeholder:text-sm focus:outline-none"
             />
           </div>
-          <button
-            className="mb-4 flex w-full items-center justify-center rounded-md border-2 border-dashed border-slate-300 px-2 py-3 text-xs text-slate-500 hover:border-slate-400 hover:text-slate-600"
-            onClick={handlePasteFromClipboard}
-          >
-            <MdContentPaste className="mr-1" />
-            <span>クリップボードから貼り付け</span>
-          </button>
           {pasteMessage && (
             <div className="mb-2 text-xs text-green-600">{pasteMessage}</div>
           )}
