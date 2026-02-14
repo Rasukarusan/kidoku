@@ -17,6 +17,9 @@ export const truncate = (str: string, len: number, line?: number) => {
  * 指定文字で囲まれた文字列をマスキングする
  * [[MASK: text]] -> *****
  * \[\[MASK: text\]\] -> ***** (エスケープされたバージョンも対応)
+ *
+ * 注意: 必ずサーバーサイド(getStaticProps等)で使用すること。
+ * フロントエンドで使用しても__NEXT_DATA__等に生データが残るため意味がない。
  */
 export const mask = (text: string) => {
   // エスケープされていないバージョン
