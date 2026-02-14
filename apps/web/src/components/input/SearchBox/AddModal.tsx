@@ -339,7 +339,7 @@ export const AddModal: React.FC = () => {
                     onClick={() => {
                       setOpen(false)
                       router.push(
-                        `/${session.user.name}/sheets/${response.sheetName}?book=${response.bookId}`
+                        `/${session.user.name}/sheets/${response.sheetName}`
                       )
                     }}
                   >
