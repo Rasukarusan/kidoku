@@ -71,8 +71,8 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
               key={`cell-${index}`}
               fill={COLORS[index % COLORS.length]}
               opacity={activeIndex === null || activeIndex === index ? 1 : 0.4}
-              stroke={activeIndex === index ? '#000' : '#fff'}
-              strokeWidth={activeIndex === index ? 2 : 1}
+              stroke="#fff"
+              strokeWidth={1}
             />
           ))}
         </Pie>
