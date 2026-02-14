@@ -41,7 +41,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
   const activeData = activeIndex !== null ? data[activeIndex] : null
 
   return (
-    <div className="relative h-full w-full">
+    <div className="relative h-full w-full [&_svg]:outline-none">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
