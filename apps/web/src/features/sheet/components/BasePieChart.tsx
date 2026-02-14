@@ -1,9 +1,18 @@
 import { useRef, useMemo, useState } from 'react'
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
-import { Category } from '../../types'
+
+export interface PieSlice {
+  name: string
+  value: number
+  percent: number
+}
 
 interface Props {
-  categories: Category[]
+  data: PieSlice[]
+  outerRadius?: number
+  stroke?: string
+  onSelect?: (name: string) => void
+  onDeselect?: () => void
 }
 
 const COLORS = [
@@ -21,20 +30,28 @@ const COLORS = [
   '#dda0dd',
 ]
 
-export const CategoryMap: React.FC<Props> = ({ categories }) => {
+export function BasePieChart({
+  data: rawData,
+  outerRadius = 100,
+  stroke,
+  onSelect,
+  onDeselect,
+}: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const hasInteracted = useRef(false)
 
   const data = useMemo(() => {
-    return [...categories].sort((a, b) => b.count - a.count)
-  }, [categories])
+    return [...rawData].sort((a, b) => b.value - a.value)
+  }, [rawData])
 
   const onClick = (_: unknown, index: number) => {
     hasInteracted.current = true
     if (index === activeIndex) {
       setActiveIndex(null)
+      onDeselect?.()
     } else {
       setActiveIndex(index)
+      onSelect?.(data[index].name)
     }
   }
 
@@ -46,11 +63,11 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
         <PieChart>
           <Pie
             data={data}
-            dataKey="count"
+            dataKey="value"
             nameKey="name"
             cx="50%"
             cy="50%"
-            outerRadius={120}
+            outerRadius={outerRadius}
             animationDuration={hasInteracted.current ? 0 : 1000}
             onClick={onClick}
             style={{ cursor: 'pointer' }}
@@ -66,7 +83,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
                 opacity={
                   activeIndex === null || activeIndex === index ? 1 : 0.4
                 }
-                stroke="none"
+                {...(stroke !== undefined ? { stroke } : {})}
               />
             ))}
           </Pie>
@@ -75,7 +92,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
       {activeData && (
         <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded bg-gray-800 px-3 py-2 text-center text-white shadow">
           <p className="font-medium">{activeData.name}</p>
-          <p>{`${activeData.count}冊 (${Math.floor(activeData.percent)}%)`}</p>
+          <p>{`${activeData.value}冊 (${Math.floor(activeData.percent)}%)`}</p>
         </div>
       )}
     </div>
