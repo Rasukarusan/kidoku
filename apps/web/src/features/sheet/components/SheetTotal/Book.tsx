@@ -4,38 +4,45 @@ export interface Props {
     author: string
     order: number
     image: string
+    memo: string
+    is_public_memo: boolean
   }
 }
 export const Book: React.FC<Props> = ({ book }) => {
-  const { title, author, order, image } = book
+  const { title, author, order, image, memo, is_public_memo } = book
   const color = order === 1 ? 'gold' : order === 2 ? 'silver' : 'bronze'
-  const styleOrder =
-    order === 3
-      ? 'order-3 sm:order-none'
-      : order === 2
-        ? 'order-2 sm:order-2'
-        : 'order-1 sm:order-1'
   return (
-    <div className={`mb-5 w-full sm:mb-0 sm:w-1/3 ${styleOrder}`}>
-      <div className={`mb-2 text-3xl font-bold text-transparent ${color}`}>
-        {order}位
+    <div className="mb-6 flex gap-4 text-left sm:gap-6">
+      <div className="flex shrink-0 flex-col items-center">
+        <div className={`mb-2 text-2xl font-bold text-transparent ${color}`}>
+          {order}位
+        </div>
+        <a
+          href={encodeURI(`https://www.amazon.co.jp/s?k=${title}`)}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <img
+            className="shadow-md"
+            src={image}
+            width={100}
+            height={145}
+            alt=""
+            loading="lazy"
+          />
+        </a>
       </div>
-      <a
-        href={encodeURI(`https://www.amazon.co.jp/s?k=${book.title}`)}
-        target="_blank"
-        rel="noreferrer"
-      >
-        <img
-          className="m-auto mb-4 shadow-md"
-          src={image}
-          width={128}
-          height={186}
-          alt=""
-          loading="lazy"
-        />
-      </a>
-      <div className="mb-2">{title}</div>
-      <div className="mb-4 text-xs">{author}</div>
+      <div className="flex min-w-0 flex-1 flex-col justify-center">
+        <div className="mb-1 text-sm font-bold leading-tight sm:text-base">
+          {title}
+        </div>
+        <div className="mb-2 text-xs text-gray-500">{author}</div>
+        {is_public_memo && memo && (
+          <div className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-gray-700 sm:text-sm">
+            {memo}
+          </div>
+        )}
+      </div>
       <style jsx>{`
         .gold {
           background:

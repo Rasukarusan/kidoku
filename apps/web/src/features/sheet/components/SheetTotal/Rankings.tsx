@@ -14,9 +14,9 @@ export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
       const {
         year,
         order,
-        book: { title, author, image },
+        book: { title, author, image, memo, is_public_memo },
       } = book
-      return { year, order, title, author, image }
+      return { year, order, title, author, image, memo, is_public_memo }
     })
     .sort((a, b) => {
       if (a.year === b.year) {
@@ -34,7 +34,7 @@ export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
         return (
           <Fragment key={year}>
             <span className="title">{year}</span>
-            <div className="mt-8 block justify-around sm:flex">
+            <div className="mx-auto mt-8 max-w-2xl">
               {yearBooks.map((book, i) => (
                 <Book key={`${book.title}-${i}`} book={book} />
               ))}
