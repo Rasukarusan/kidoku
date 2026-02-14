@@ -6,9 +6,7 @@ import {
 
 @Injectable()
 export class SearchGoogleBooksUseCase {
-  constructor(
-    private readonly googleBooksRepository: IGoogleBooksRepository,
-  ) {}
+  constructor(private readonly googleBooksRepository: IGoogleBooksRepository) {}
 
   async execute(query: string): Promise<GoogleBookItem[]> {
     return await this.googleBooksRepository.searchByTitle(query);
