@@ -1,10 +1,12 @@
 import { GetServerSideProps } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Book } from '@/types/book'
 import { BookDetailReadModal } from '@/features/sheet/components/BookDetailReadModal'
 import { BookDetailEditPage } from '@/features/sheet/components/BookDetailEditPage'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { MdChevronRight } from 'react-icons/md'
 
 interface BookPageProps {
   book: Book | null
@@ -43,9 +45,33 @@ export default function BookPage({ book }: BookPageProps) {
     setEditMode(!editMode)
   }
 
+  const sheetUrl =
+    book.user && book.sheet ? `/${book.user.name}/sheets/${book.sheet}` : null
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-4xl py-8">
+        {sheetUrl && (
+          <nav
+            aria-label="パンくずリスト"
+            className="mb-4 px-4 text-sm text-gray-500"
+          >
+            <ol className="flex items-center">
+              <li>
+                <Link
+                  href={sheetUrl}
+                  className="hover:text-gray-700 hover:underline"
+                >
+                  {book.sheet}
+                </Link>
+              </li>
+              <li className="flex items-center">
+                <MdChevronRight className="mx-1" size={16} />
+                <span className="truncate text-gray-800">{book.title}</span>
+              </li>
+            </ol>
+          </nav>
+        )}
         {editMode && isOwner ? (
           <BookDetailEditPage
             book={book}
