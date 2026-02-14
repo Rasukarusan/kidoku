@@ -34,8 +34,7 @@ export class GoogleBooksRepository implements IGoogleBooksRepository {
           title: title || '',
           author: Array.isArray(authors) ? authors.join(',') : '-',
           category: categories ? categories.join(',') : '-',
-          image:
-            imageLinks?.thumbnail?.replace('http:', 'https:') || NO_IMAGE,
+          image: imageLinks?.thumbnail?.replace('http:', 'https:') || NO_IMAGE,
         };
       },
     );
