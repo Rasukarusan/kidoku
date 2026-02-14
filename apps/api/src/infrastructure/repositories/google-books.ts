@@ -14,6 +14,7 @@ export class GoogleBooksRepository implements IGoogleBooksRepository {
     const response = await fetch(
       `${this.baseUrl}?q=${encodeURIComponent(query)}`,
     );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const data = await response.json();
 
     if (!data.items) return [];
