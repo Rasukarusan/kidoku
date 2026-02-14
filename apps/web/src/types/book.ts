@@ -16,6 +16,11 @@ export interface Book {
   is_purchasable: boolean
   sheet_id?: number
   sheet?: string
+  user?: {
+    id: string
+    name: string
+    image: string
+  }
 }
 
 export type YearlyTopBook = {
