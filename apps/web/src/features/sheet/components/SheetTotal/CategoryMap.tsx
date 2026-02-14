@@ -1,12 +1,5 @@
-import { useMemo } from 'react'
-import {
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Sector,
-} from 'recharts'
+import { useMemo, useState } from 'react'
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Category } from '../../types'
 
 interface Props {
@@ -29,24 +22,6 @@ const COLORS = [
 ]
 
 // eslint-disable-next-line
-const renderActiveShape = (props: any) => {
-  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props
-  return (
-    <Sector
-      cx={cx}
-      cy={cy}
-      innerRadius={innerRadius}
-      outerRadius={outerRadius}
-      startAngle={startAngle}
-      endAngle={endAngle}
-      fill={fill}
-      stroke="#000"
-      strokeWidth={2}
-    />
-  )
-}
-
-// eslint-disable-next-line
 const CustomTooltip = ({ active, payload }: any) => {
   if (!(active && payload && payload.length)) return null
   const data = payload[0].payload
@@ -59,9 +34,19 @@ const CustomTooltip = ({ active, payload }: any) => {
 }
 
 export const CategoryMap: React.FC<Props> = ({ categories }) => {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
   const data = useMemo(() => {
     return [...categories].sort((a, b) => b.count - a.count)
   }, [categories])
+
+  const onClick = (_: unknown, index: number) => {
+    if (index === activeIndex) {
+      setActiveIndex(null)
+    } else {
+      setActiveIndex(index)
+    }
+  }
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -74,7 +59,8 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
           cy="50%"
           outerRadius={120}
           animationDuration={1000}
-          activeShape={renderActiveShape}
+          onClick={onClick}
+          style={{ cursor: 'pointer' }}
           label={({ name, percent }) =>
             percent > 5 ? `${name} ${Math.floor(percent)}%` : ''
           }
@@ -84,8 +70,9 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
             <Cell
               key={`cell-${index}`}
               fill={COLORS[index % COLORS.length]}
-              stroke="#fff"
-              strokeWidth={1}
+              opacity={activeIndex === null || activeIndex === index ? 1 : 0.4}
+              stroke={activeIndex === index ? '#000' : '#fff'}
+              strokeWidth={activeIndex === index ? 2 : 1}
             />
           ))}
         </Pie>
