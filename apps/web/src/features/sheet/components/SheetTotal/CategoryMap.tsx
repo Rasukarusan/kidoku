@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Category } from '../../types'
 
@@ -34,9 +34,19 @@ const CustomTooltip = ({ active, payload }: any) => {
 }
 
 export const CategoryMap: React.FC<Props> = ({ categories }) => {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+
   const data = useMemo(() => {
     return [...categories].sort((a, b) => b.count - a.count)
   }, [categories])
+
+  const onClick = (_: unknown, index: number) => {
+    if (index === activeIndex) {
+      setActiveIndex(null)
+    } else {
+      setActiveIndex(index)
+    }
+  }
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -49,6 +59,8 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
           cy="50%"
           outerRadius={120}
           animationDuration={1000}
+          onClick={onClick}
+          style={{ cursor: 'pointer' }}
           label={({ name, percent }) =>
             percent > 5 ? `${name} ${Math.floor(percent)}%` : ''
           }
@@ -58,6 +70,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
             <Cell
               key={`cell-${index}`}
               fill={COLORS[index % COLORS.length]}
+              opacity={activeIndex === null || activeIndex === index ? 1 : 0.4}
               stroke="#fff"
               strokeWidth={1}
             />
