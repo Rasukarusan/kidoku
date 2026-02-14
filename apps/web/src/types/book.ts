@@ -26,5 +26,7 @@ export type YearlyTopBook = {
     title: string
     author: string
     image: string
+    memo: string
+    is_public_memo: boolean
   }
 }

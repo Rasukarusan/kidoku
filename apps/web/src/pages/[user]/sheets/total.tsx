@@ -61,7 +61,15 @@ export const getStaticProps = async (ctx) => {
     select: {
       year: true,
       order: true,
-      book: { select: { title: true, author: true, image: true } },
+      book: {
+        select: {
+          title: true,
+          author: true,
+          image: true,
+          memo: true,
+          is_public_memo: true,
+        },
+      },
     },
     orderBy: { year: 'desc' },
   })
