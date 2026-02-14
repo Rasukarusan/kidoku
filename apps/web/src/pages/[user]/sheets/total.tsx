@@ -1,6 +1,7 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import prisma from '@/libs/prisma'
+import { mask } from '@/utils/string'
 
 export default SheetTotalPage
 
@@ -88,7 +89,13 @@ export const getStaticProps = async (ctx) => {
             })),
       username,
       userId,
-      yearlyTopBooks,
+      yearlyTopBooks: yearlyTopBooks.map((entry) => ({
+        ...entry,
+        book: {
+          ...entry.book,
+          memo: entry.book.is_public_memo ? mask(entry.book.memo) : '',
+        },
+      })),
     },
     revalidate: 5,
   }
