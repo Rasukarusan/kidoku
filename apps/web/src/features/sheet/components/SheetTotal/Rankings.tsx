@@ -14,9 +14,9 @@ export const Rankings: React.FC<Props> = ({ yearlyTopBooks }) => {
       const {
         year,
         order,
-        book: { title, author, image, memo, is_public_memo },
+        book: { id, title, author, image, memo, is_public_memo },
       } = book
-      return { year, order, title, author, image, memo, is_public_memo }
+      return { year, order, id, title, author, image, memo, is_public_memo }
     })
     .sort((a, b) => {
       if (a.year === b.year) {

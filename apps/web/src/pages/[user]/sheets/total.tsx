@@ -64,6 +64,7 @@ export const getStaticProps = async (ctx) => {
       order: true,
       book: {
         select: {
+          id: true,
           title: true,
           author: true,
           image: true,

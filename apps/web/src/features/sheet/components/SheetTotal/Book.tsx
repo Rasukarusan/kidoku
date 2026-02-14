@@ -1,5 +1,8 @@
+import Link from 'next/link'
+
 export interface Props {
   book: {
+    id: number
     title: string
     author: string
     order: number
@@ -9,7 +12,7 @@ export interface Props {
   }
 }
 export const Book: React.FC<Props> = ({ book }) => {
-  const { title, author, order, image, memo, is_public_memo } = book
+  const { id, title, author, order, image, memo, is_public_memo } = book
   const color = order === 1 ? 'gold' : order === 2 ? 'silver' : 'bronze'
   return (
     <div className="mb-6 flex gap-4 text-left sm:gap-6">
@@ -33,9 +36,12 @@ export const Book: React.FC<Props> = ({ book }) => {
         </a>
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center">
-        <div className="mb-1 text-sm font-bold leading-tight sm:text-base">
+        <Link
+          href={`/books/${id}`}
+          className="mb-1 text-sm font-bold leading-tight hover:underline sm:text-base"
+        >
           {title}
-        </div>
+        </Link>
         <div className="mb-2 text-xs text-gray-500">{author}</div>
         {is_public_memo && memo && (
           <div className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-gray-700 sm:text-sm">
