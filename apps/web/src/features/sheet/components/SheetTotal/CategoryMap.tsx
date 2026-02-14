@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Category } from '../../types'
 
@@ -23,12 +23,14 @@ const COLORS = [
 
 export const CategoryMap: React.FC<Props> = ({ categories }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const hasInteracted = useRef(false)
 
   const data = useMemo(() => {
     return [...categories].sort((a, b) => b.count - a.count)
   }, [categories])
 
   const onClick = (_: unknown, index: number) => {
+    hasInteracted.current = true
     if (index === activeIndex) {
       setActiveIndex(null)
     } else {
@@ -49,7 +51,7 @@ export const CategoryMap: React.FC<Props> = ({ categories }) => {
             cx="50%"
             cy="50%"
             outerRadius={120}
-            animationDuration={1000}
+            animationDuration={hasInteracted.current ? 0 : 1000}
             onClick={onClick}
             style={{ cursor: 'pointer' }}
             label={({ name, percent }) =>

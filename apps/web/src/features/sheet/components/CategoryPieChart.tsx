@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Book } from '@/types/book'
 
@@ -37,6 +37,7 @@ export function CategoryPieChart({
   setFilter,
 }: Props) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const hasInteracted = useRef(false)
 
   const data = useMemo(() => {
     const categories: Record<string, number> = {}
@@ -59,6 +60,7 @@ export function CategoryPieChart({
   }, [records])
 
   const onClick = (_: unknown, index: number) => {
+    hasInteracted.current = true
     if (index === activeIndex) {
       setActiveIndex(null)
       setShowData(records)
@@ -91,7 +93,7 @@ export function CategoryPieChart({
             cx="50%"
             cy="50%"
             outerRadius={100}
-            animationDuration={1000}
+            animationDuration={hasInteracted.current ? 0 : 1000}
             onClick={onClick}
             style={{ cursor: 'pointer' }}
             label={({ name, percent }) =>
