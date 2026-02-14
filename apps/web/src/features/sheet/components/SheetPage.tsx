@@ -25,8 +25,8 @@ import { IoGrid } from 'react-icons/io5'
 import { twMerge } from 'tailwind-merge'
 import { BooksResponse } from '@/types/api'
 
-const TreemapGraph = dynamic(
-  () => import('./TreemapGraph').then((mod) => mod.TreemapGraph),
+const CategoryPieChart = dynamic(
+  () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
   { ssr: false }
 )
 
@@ -189,7 +189,7 @@ export const SheetPage: React.FC<Props> = ({
         </div>
         <div className="w-full text-center sm:w-1/2">
           <TitleWithLine text="カテゴリ内訳" className="mb-4" />
-          <TreemapGraph
+          <CategoryPieChart
             sheet={year}
             records={data}
             setShowData={setShowData}
