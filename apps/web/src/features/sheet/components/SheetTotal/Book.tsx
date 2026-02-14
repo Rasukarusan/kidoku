@@ -1,3 +1,5 @@
+import { mask } from '@/utils/string'
+
 export interface Props {
   book: {
     title: string
@@ -39,7 +41,7 @@ export const Book: React.FC<Props> = ({ book }) => {
         <div className="mb-2 text-xs text-gray-500">{author}</div>
         {is_public_memo && memo && (
           <div className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-gray-700 sm:text-sm">
-            {memo}
+            {mask(memo)}
           </div>
         )}
       </div>
