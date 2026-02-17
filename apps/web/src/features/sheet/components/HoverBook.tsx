@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
-import { useSession } from 'next-auth/react'
 import { Book } from '@/types/book'
+import { useIsBookOwner } from '@/hooks/useIsBookOwner'
 import { MemoPreview } from './MemoPreview'
 
 interface Props {
@@ -8,8 +8,7 @@ interface Props {
 }
 
 export const HoverBook: React.FC<Props> = ({ book }) => {
-  const { data: session } = useSession()
-  const isMine = session?.user?.id === book.userId
+  const isMine = useIsBookOwner(book)
 
   return (
     <motion.div

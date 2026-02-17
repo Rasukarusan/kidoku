@@ -5,8 +5,8 @@ import { Book } from '@/types/book'
 import { BookDetailReadModal } from '@/features/sheet/components/BookDetailReadModal'
 import { BookDetailEditPage } from '@/features/sheet/components/BookDetailEditPage'
 import { useEffect, useState } from 'react'
-import { useSession } from 'next-auth/react'
 import { MdChevronRight } from 'react-icons/md'
+import { useIsBookOwner } from '@/hooks/useIsBookOwner'
 import apolloClient from '@/libs/apollo'
 import { getBookQuery } from '@/features/books/api/queries'
 
@@ -16,11 +16,9 @@ interface BookPageProps {
 
 export default function BookPage({ book: initialBook }: BookPageProps) {
   const router = useRouter()
-  const { data: session } = useSession()
   const [editMode, setEditMode] = useState(false)
   const [book, setBook] = useState(initialBook)
-
-  const isOwner = session?.user?.id === book?.userId
+  const isOwner = useIsBookOwner(book)
 
   // 所有者の場合、GraphQL経由で完全なメモデータを取得
   useEffect(() => {

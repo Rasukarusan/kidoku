@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 import { Fragment, useState } from 'react'
 import { Book } from '@/types/book'
-import { useSession } from 'next-auth/react'
 import { AiFillLock } from 'react-icons/ai'
+import { useIsBookOwner } from '@/hooks/useIsBookOwner'
 import { CheckoutModal } from '@/components/form/CheckoutModal'
 import { MdEdit } from 'react-icons/md'
 import { Loading } from '@/components/icon/Loading'
@@ -17,8 +17,7 @@ interface Props {
 }
 
 export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
-  const { data: session } = useSession()
-  const isMine = session?.user?.id === book.userId
+  const isMine = useIsBookOwner(book)
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
