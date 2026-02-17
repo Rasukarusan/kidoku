@@ -7,6 +7,8 @@ import { BookDetailEditPage } from '@/features/sheet/components/BookDetailEditPa
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { MdChevronRight } from 'react-icons/md'
+import apolloClient from '@/libs/apollo'
+import { getBookQuery } from '@/features/books/api/queries'
 
 interface BookPageProps {
   book: Book | null
@@ -20,14 +22,17 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
 
   const isOwner = session?.user?.id === book?.userId
 
-  // 所有者の場合、クライアントサイドで完全なメモデータを取得
+  // 所有者の場合、GraphQL経由で完全なメモデータを取得
   useEffect(() => {
     if (!isOwner || !book) return
     const fetchOwnerBook = async () => {
       try {
-        const res = await fetch(`/api/book/${book.id}`)
-        const data = await res.json()
-        if (data.result && data.book) {
+        const { data } = await apolloClient.query({
+          query: getBookQuery,
+          variables: { input: { id: String(book.id) } },
+          fetchPolicy: 'network-only',
+        })
+        if (data?.book?.memo !== undefined) {
           setBook((prev) => ({ ...prev, memo: data.book.memo }))
         }
       } catch {
