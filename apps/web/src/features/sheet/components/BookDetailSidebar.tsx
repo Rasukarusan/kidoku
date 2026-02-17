@@ -7,6 +7,8 @@ import { useSWRConfig } from 'swr'
 import { useRouter } from 'next/router'
 import { IoMdClose, IoMdExpand } from 'react-icons/io'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLazyQuery } from '@apollo/client'
+import { getBookQuery } from '@/features/books/api'
 
 interface Props {
   book?: Book
@@ -27,6 +29,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
   const [currentBook, setCurrentBook] = useState<Book>(book)
   const [newBook, setNewBook] = useState<Book>(book)
   const [loading, setLoading] = useState(false)
+  const [fetchBook] = useLazyQuery(getBookQuery, {
+    fetchPolicy: 'network-only',
+  })
   const { reward } = useReward('sidebarRewardId', 'balloons', {
     lifetime: 200,
     spread: 100,
@@ -83,10 +88,19 @@ export const BookDetailSidebar: React.FC<Props> = ({
       setEdit(true)
       return
     }
-    const res = await fetch(`/api/book/${book?.id}`).then((res) => res.json())
-    if (res.result) {
-      setCurrentBook(res.book)
-      setNewBook(res.book)
+    const { data } = await fetchBook({
+      variables: { input: { id: String(book?.id) } },
+    })
+    if (data?.book) {
+      const fetched = {
+        ...book,
+        ...data.book,
+        is_public_memo: data.book.isPublicMemo,
+        is_purchasable: data.book.isPurchasable,
+        sheet_id: data.book.sheetId,
+      }
+      setCurrentBook(fetched)
+      setNewBook(fetched)
     }
     setEdit(true)
   }
