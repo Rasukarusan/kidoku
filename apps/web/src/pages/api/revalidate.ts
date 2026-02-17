@@ -6,7 +6,7 @@ export default async function handler(
 ) {
   const { path, secret } = req.query
 
-  if (secret !== process.env.REVALIDATE_SECRET) {
+  if (secret !== process.env.ADMIN_AUTH_TOKEN) {
     return res.status(401).json({ message: 'Invalid secret' })
   }
 
