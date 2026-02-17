@@ -68,6 +68,13 @@ export default async (req, res) => {
           },
         })
       }
+      // ISRキャッシュを再検証
+      try {
+        await res.revalidate(`/books/${book.id}`)
+      } catch {
+        // 再検証失敗は無視（次回のISR更新で反映される）
+      }
+
       return res.status(200).json({
         result: true,
         bookTitle: title,
@@ -117,6 +124,13 @@ export default async (req, res) => {
         }
       )
 
+      // ISRキャッシュを再検証
+      try {
+        await res.revalidate(`/books/${id}`)
+      } catch {
+        // 再検証失敗は無視（次回のISR更新で反映される）
+      }
+
       return res.status(200).json({ result: true, image: imageUrl })
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
@@ -136,6 +150,13 @@ export default async (req, res) => {
           },
         }
       )
+
+      // ISRキャッシュを再検証
+      try {
+        await res.revalidate(`/books/${id}`)
+      } catch {
+        // 再検証失敗は無視（次回のISR更新で反映される）
+      }
 
       return res.status(200).json({ result: true })
     }
