@@ -1,21 +1,44 @@
-import { GetServerSideProps } from 'next'
+import { GetStaticPaths, GetStaticProps } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Book } from '@/types/book'
 import { BookDetailReadModal } from '@/features/sheet/components/BookDetailReadModal'
 import { BookDetailEditPage } from '@/features/sheet/components/BookDetailEditPage'
-import { useState } from 'react'
-import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 import { MdChevronRight } from 'react-icons/md'
+import { useIsBookOwner } from '@/hooks/useIsBookOwner'
+import apolloClient from '@/libs/apollo'
+import { getBookQuery } from '@/features/books/api/queries'
 
 interface BookPageProps {
   book: Book | null
 }
 
-export default function BookPage({ book }: BookPageProps) {
+export default function BookPage({ book: initialBook }: BookPageProps) {
   const router = useRouter()
-  const { data: session } = useSession()
   const [editMode, setEditMode] = useState(false)
+  const [book, setBook] = useState(initialBook)
+  const isOwner = useIsBookOwner(book)
+
+  // 所有者の場合、GraphQL経由で完全なメモデータを取得
+  useEffect(() => {
+    if (!isOwner || !book) return
+    const fetchOwnerBook = async () => {
+      try {
+        const { data } = await apolloClient.query({
+          query: getBookQuery,
+          variables: { input: { id: String(book.id) } },
+          fetchPolicy: 'network-only',
+        })
+        if (data?.book?.memo !== undefined) {
+          setBook((prev) => ({ ...prev, memo: data.book.memo }))
+        }
+      } catch {
+        // フォールバック: ISRで生成されたデータをそのまま使用
+      }
+    }
+    fetchOwnerBook()
+  }, [isOwner, book?.id])
 
   if (!book) {
     return (
@@ -34,8 +57,6 @@ export default function BookPage({ book }: BookPageProps) {
       </div>
     )
   }
-
-  const isOwner = session?.user?.id === book.userId
 
   const handleClose = () => {
     router.back()
@@ -90,11 +111,14 @@ export default function BookPage({ book }: BookPageProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({
-  params,
-  req,
-  res,
-}) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  }
+}
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
   const bookId = params?.bookId as string
 
   if (!bookId) {
@@ -104,13 +128,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   }
 
   try {
-    const { getServerSession } = await import('next-auth/next')
-    const { authOptions } = await import('@/pages/api/auth/[...nextauth]')
     const { default: prisma, parse } = await import('@/libs/prisma')
     const { mask } = await import('@/utils/string')
     const dayjs = (await import('dayjs')).default
-
-    const session = await getServerSession(req, res, authOptions)
 
     const book = await prisma.books.findFirst({
       where: { id: Number(bookId) },
@@ -137,14 +157,13 @@ export const getServerSideProps: GetServerSideProps = async ({
       }
     }
 
-    // セキュリティ: 非公開メモは所有者以外に送信しない
-    const isOwner = session?.user?.id === book.userId
+    // ISR: 非所有者向けのページを生成（所有者のメモはクライアントサイドで取得）
     const sanitizedBook = { ...book }
 
-    if (!isOwner && !book.is_public_memo) {
+    if (!book.is_public_memo) {
       // 非公開メモの場合、メモ内容を除外
       sanitizedBook.memo = null
-    } else if (!isOwner && book.is_public_memo) {
+    } else {
       // 公開メモの場合、マスキングを適用
       sanitizedBook.memo = mask(book.memo || '')
     }
@@ -164,6 +183,7 @@ export const getServerSideProps: GetServerSideProps = async ({
           sheet: book.sheet?.name ?? null,
         }),
       },
+      revalidate: 60,
     }
   } catch (error) {
     console.error('Error fetching book:', error)
