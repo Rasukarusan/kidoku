@@ -1,23 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { eq, desc, and } from 'drizzle-orm';
-import { sheets } from '../database/schema/sheets.schema';
-import { DrizzleDb } from '../database/types';
-import { INJECTION_TOKENS } from '../../shared/constants/injection-tokens';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../database/prisma.service';
 import { Sheet } from '../../domain/models/sheet';
 import { ISheetRepository } from '../../domain/repositories/sheet';
 
 @Injectable()
 export class SheetRepository implements ISheetRepository {
-  constructor(
-    @Inject(INJECTION_TOKENS.DRIZZLE) private readonly db: DrizzleDb,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findByUserId(userId: string): Promise<Sheet[]> {
-    const rows = await this.db
-      .select()
-      .from(sheets)
-      .where(eq(sheets.userId, userId))
-      .orderBy(desc(sheets.order));
+    const rows = await this.prisma.sheets.findMany({
+      where: { userId },
+      orderBy: { order: 'desc' },
+    });
     return rows.map((row) =>
       Sheet.fromDatabase(
         row.id.toString(),
@@ -31,37 +25,33 @@ export class SheetRepository implements ISheetRepository {
   }
 
   async findById(id: string): Promise<Sheet | null> {
-    const rows = await this.db
-      .select()
-      .from(sheets)
-      .where(eq(sheets.id, parseInt(id)))
-      .limit(1);
-    if (rows.length === 0) return null;
+    const row = await this.prisma.sheets.findUnique({
+      where: { id: parseInt(id) },
+    });
+    if (!row) return null;
     return Sheet.fromDatabase(
-      rows[0].id.toString(),
-      rows[0].userId,
-      rows[0].name,
-      rows[0].order ?? 0,
-      rows[0].created ?? new Date(),
-      rows[0].updated ?? new Date(),
+      row.id.toString(),
+      row.userId,
+      row.name,
+      row.order ?? 0,
+      row.created ?? new Date(),
+      row.updated ?? new Date(),
     );
   }
 
   async findLastByUserId(userId: string): Promise<Sheet | null> {
-    const rows = await this.db
-      .select()
-      .from(sheets)
-      .where(eq(sheets.userId, userId))
-      .orderBy(desc(sheets.order))
-      .limit(1);
-    if (rows.length === 0) return null;
+    const row = await this.prisma.sheets.findFirst({
+      where: { userId },
+      orderBy: { order: 'desc' },
+    });
+    if (!row) return null;
     return Sheet.fromDatabase(
-      rows[0].id.toString(),
-      rows[0].userId,
-      rows[0].name,
-      rows[0].order ?? 0,
-      rows[0].created ?? new Date(),
-      rows[0].updated ?? new Date(),
+      row.id.toString(),
+      row.userId,
+      row.name,
+      row.order ?? 0,
+      row.created ?? new Date(),
+      row.updated ?? new Date(),
     );
   }
 
@@ -69,35 +59,34 @@ export class SheetRepository implements ISheetRepository {
     userId: string,
     name: string,
   ): Promise<Sheet | null> {
-    const rows = await this.db
-      .select()
-      .from(sheets)
-      .where(and(eq(sheets.userId, userId), eq(sheets.name, name)))
-      .limit(1);
-    if (rows.length === 0) return null;
+    const row = await this.prisma.sheets.findFirst({
+      where: { userId, name },
+    });
+    if (!row) return null;
     return Sheet.fromDatabase(
-      rows[0].id.toString(),
-      rows[0].userId,
-      rows[0].name,
-      rows[0].order ?? 0,
-      rows[0].created ?? new Date(),
-      rows[0].updated ?? new Date(),
+      row.id.toString(),
+      row.userId,
+      row.name,
+      row.order ?? 0,
+      row.created ?? new Date(),
+      row.updated ?? new Date(),
     );
   }
 
   async save(sheet: Sheet): Promise<Sheet> {
     if (sheet.id === null) {
-      const result = (await this.db.insert(sheets).values({
-        userId: sheet.userId,
-        name: sheet.name,
-        order: sheet.order,
-        created: sheet.created,
-        updated: sheet.updated,
-      })) as any[];
+      const created = await this.prisma.sheets.create({
+        data: {
+          userId: sheet.userId,
+          name: sheet.name,
+          order: sheet.order,
+          created: sheet.created,
+          updated: sheet.updated,
+        },
+      });
 
-      const insertId = result[0].insertId as number;
       return Sheet.fromDatabase(
-        insertId.toString(),
+        created.id.toString(),
         sheet.userId,
         sheet.name,
         sheet.order,
@@ -105,21 +94,23 @@ export class SheetRepository implements ISheetRepository {
         sheet.updated,
       );
     } else {
-      await this.db
-        .update(sheets)
-        .set({
+      await this.prisma.sheets.update({
+        where: { id: parseInt(sheet.id) },
+        data: {
           name: sheet.name,
           order: sheet.order,
           updated: sheet.updated,
-        })
-        .where(eq(sheets.id, parseInt(sheet.id)));
+        },
+      });
 
       return sheet;
     }
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.delete(sheets).where(eq(sheets.id, parseInt(id)));
+    await this.prisma.sheets.delete({
+      where: { id: parseInt(id) },
+    });
   }
 
   async saveAll(sheetList: Sheet[]): Promise<void> {

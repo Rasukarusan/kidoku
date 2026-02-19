@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { DatabaseModule } from './infrastructure/database/database.module';
 import { SoftwareDesignModule } from './presentation/modules/software-design';
 import { SheetModule } from './presentation/modules/sheet';
 import { CommentModule } from './presentation/modules/comment';
@@ -25,6 +26,7 @@ import { SearchModule } from './presentation/modules/search';
       }),
       playground: true,
     }),
+    DatabaseModule,
     SheetModule,
     CommentModule,
     SoftwareDesignModule,
