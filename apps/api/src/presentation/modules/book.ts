@@ -10,12 +10,11 @@ import { BookRepository } from '../../infrastructure/repositories/book';
 import { SearchRepository } from '../../infrastructure/repositories/search';
 import { MeiliSearchProvider } from '../../infrastructure/search/meilisearch.providers';
 import { AuthModule } from '../../infrastructure/auth/auth.module';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { IBookRepository } from '../../domain/repositories/book';
 import { ISearchRepository } from '../../domain/repositories/search';
 
 @Module({
-  imports: [AuthModule, DatabaseModule],
+  imports: [AuthModule],
   providers: [
     BookResolver,
     CreateBookUseCase,

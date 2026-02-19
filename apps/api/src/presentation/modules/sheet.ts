@@ -7,11 +7,10 @@ import { DeleteSheetUseCase } from '../../application/usecases/sheets/delete-she
 import { UpdateSheetOrdersUseCase } from '../../application/usecases/sheets/update-sheet-orders';
 import { SheetRepository } from '../../infrastructure/repositories/sheet';
 import { AuthModule } from '../../infrastructure/auth/auth.module';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { ISheetRepository } from '../../domain/repositories/sheet';
 
 @Module({
-  imports: [AuthModule, DatabaseModule],
+  imports: [AuthModule],
   providers: [
     SheetResolver,
     GetSheetsUseCase,

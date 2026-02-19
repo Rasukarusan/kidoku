@@ -28,7 +28,7 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 ### データベースアクセス
 
 - **フロントエンド**: Prisma ORM → MySQL
-- **バックエンド**: Drizzle ORM → 同一MySQL（スキーマ同期が必要）
+- **バックエンド**: Prisma ORM → 同一MySQL
 
 ### API アーキテクチャ（DDD）
 
@@ -44,7 +44,7 @@ apps/api/src/
 │   └── usecases/     # 各機能のユースケース
 ├── infrastructure/   # インフラ層（外部システムとの接続）
 │   ├── auth/         # 認証（Guards, Strategies, Decorators）
-│   ├── database/     # Drizzle設定・スキーマ
+│   ├── database/     # Prisma設定・PrismaService
 │   └── repositories/ # リポジトリ実装
 ├── presentation/     # プレゼンテーション層（GraphQL API）
 │   ├── resolvers/    # GraphQLリゾルバー
@@ -92,9 +92,9 @@ pnpm --filter web prisma generate    # クライアント生成
 pnpm --filter web db:push            # スキーマ反映
 pnpm --filter web db:studio          # Prisma Studio起動
 
-# Drizzle (バックエンド)
+# Prisma (バックエンド)
+pnpm --filter api prisma:generate    # クライアント生成
 pnpm --filter api db:push            # スキーマ反映
-pnpm --filter api db:generate        # マイグレーション生成
 ```
 
 ### テスト
@@ -154,8 +154,8 @@ pnpm --filter web lighthouse
 
 ### データベース
 
-- `apps/web/prisma/schema.prisma` - Prismaスキーマ定義
-- `apps/api/src/infrastructure/database/schema/` - Drizzleスキーマ定義
+- `apps/web/prisma/schema.prisma` - Prismaスキーマ定義（フロントエンド）
+- `apps/api/prisma/schema.prisma` - Prismaスキーマ定義（バックエンド）
 
 ### 検索
 
@@ -172,10 +172,9 @@ pnpm --filter web lighthouse
 
 ### データベーススキーマ変更
 
-1. Prismaスキーマを編集
+1. 両方のPrismaスキーマを編集（`apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma`）
 2. `pnpm --filter web db:push`でDBに反映
-3. Drizzleスキーマも手動で同期（重要）
-4. `pnpm --filter api db:push`でバックエンドも更新
+3. `pnpm --filter api prisma:generate`でバックエンドのクライアントを再生成
 
 ### MeiliSearch
 
@@ -223,8 +222,10 @@ node /tmp/screenshot.mjs
 # GraphQL型の再生成
 pnpm --filter web codegen
 
-# Prismaクライアント再生成
+# Prismaクライアント再生成（フロントエンド）
 cd apps/web && npx prisma generate
+# Prismaクライアント再生成（バックエンド）
+cd apps/api && npx prisma generate
 # サンドボックス環境では PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 を付与
 ```
 
