@@ -25,8 +25,13 @@ export class SheetRepository implements ISheetRepository {
   }
 
   async findById(id: string): Promise<Sheet | null> {
+    const sheetId = parseInt(id, 10);
+    if (isNaN(sheetId) || sheetId <= 0) {
+      return null;
+    }
+
     const row = await this.prisma.sheets.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: sheetId },
     });
     if (!row) return null;
     return Sheet.fromDatabase(
@@ -94,8 +99,13 @@ export class SheetRepository implements ISheetRepository {
         sheet.updated,
       );
     } else {
+      const sheetId = parseInt(sheet.id, 10);
+      if (isNaN(sheetId) || sheetId <= 0) {
+        throw new Error('Invalid sheet ID');
+      }
+
       await this.prisma.sheets.update({
-        where: { id: parseInt(sheet.id) },
+        where: { id: sheetId },
         data: {
           name: sheet.name,
           order: sheet.order,
@@ -108,8 +118,13 @@ export class SheetRepository implements ISheetRepository {
   }
 
   async delete(id: string): Promise<void> {
+    const sheetId = parseInt(id, 10);
+    if (isNaN(sheetId) || sheetId <= 0) {
+      throw new Error('Invalid sheet ID');
+    }
+
     await this.prisma.sheets.delete({
-      where: { id: parseInt(id) },
+      where: { id: sheetId },
     });
   }
 
