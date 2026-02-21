@@ -35,3 +35,11 @@ export const updateSheetOrdersMutation = gql`
     updateSheetOrders(input: $input)
   }
 `
+
+export const deleteAiSummaryMutation = gql`
+  mutation DeleteAiSummary($input: DeleteAiSummaryInput!) {
+    deleteAiSummary(input: $input) {
+      deletedCount
+    }
+  }
+`
