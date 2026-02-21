@@ -1,5 +1,6 @@
 {
   "name": "web",
+  "packageManager": "pnpm@10.5.2",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
