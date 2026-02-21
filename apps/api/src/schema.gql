@@ -86,6 +86,14 @@ type SearchBooksResponse {
   hasMore: Boolean!
 }
 
+type GoogleBookHitResponse {
+  id: String!
+  title: String!
+  author: String!
+  category: String!
+  image: String!
+}
+
 type IndexBooksResponse {
   count: Int!
 }
@@ -101,6 +109,7 @@ type Query {
   books(input: GetBooksInput): [BookResponse!]!
   bookCategories: [String!]!
   searchBooks(input: SearchBooksInput!): SearchBooksResponse!
+  searchGoogleBooks(input: SearchGoogleBooksInput!): [GoogleBookHitResponse!]!
 }
 
 input GetCommentsInput {
@@ -124,6 +133,10 @@ input GetBooksInput {
 input SearchBooksInput {
   query: String!
   page: Int = 1
+}
+
+input SearchGoogleBooksInput {
+  query: String!
 }
 
 type Mutation {

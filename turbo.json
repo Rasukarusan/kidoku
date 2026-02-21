@@ -4,7 +4,27 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "DATABASE_URL",
+        "NEXTAUTH_SECRET",
+        "GOOGLE_CLIENT_ID",
+        "GOOGLE_CLIENT_SECRET",
+        "BLOB_READ_WRITE_TOKEN",
+        "MEILI_HOST",
+        "MEILI_MASTER_KEY",
+        "ADMIN_AUTH_TOKEN",
+        "RESEND_API_KEY",
+        "MAIL_FROM",
+        "OPENAI_API_KEY",
+        "KV_URL",
+        "KV_REST_API_URL",
+        "BACKDOOR_USER_EMAIL",
+        "REVALIDATE_SECRET",
+        "NESTJS_GRAPHQL_ENDPOINT",
+        "COHERE_API_KEY",
+        "TIKTOKEN_URL"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
