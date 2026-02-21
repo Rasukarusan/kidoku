@@ -1,12 +1,11 @@
-import useSWR from 'swr'
-import { fetcher } from '@/libs/swr'
+import { useQuery } from '@apollo/client'
 import { Book } from '@/types/book'
 import { YearlyTopBook } from '@/types/book'
 import { useState } from 'react'
 import { YearlyTopBooksModal } from './YearlyTopBooksModal'
 import { useSession } from 'next-auth/react'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
-import { YearlyTopBooksResponse } from '@/types/api'
+import { getYearlyTopBooksQuery } from '../api'
 
 interface Props {
   books: Book[]
@@ -26,11 +25,11 @@ export const YearlyTopBooks: React.FC<Props> = ({
     session && books.length > 0 && session.user.id === books[0].userId
   // 自分のページの場合、最新の情報を取得
   // 設定した直後は以前設定していたものが表示されてしまうため、取得し直す
-  const { data: latestYearlyBooks } = useSWR<YearlyTopBooksResponse>(
-    isMine ? `/api/yearly?year=${year}` : null,
-    fetcher,
-    { fallbackData: { result: true, yearlyTopBooks } }
-  )
+  const { data } = useQuery(getYearlyTopBooksQuery, {
+    variables: { input: { year } },
+    skip: !isMine,
+  })
+  const latestYearlyTopBooks = data?.yearlyTopBooks || yearlyTopBooks
 
   const onClickAdd = (order: number) => {
     setOpen(true)
@@ -47,7 +46,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
         }}
         year={year}
         order={order}
-        yearlyTopBooks={latestYearlyBooks?.yearlyTopBooks || []}
+        yearlyTopBooks={latestYearlyTopBooks}
       />
       <div className="mb-8 text-center">
         <div className="mb-4">
@@ -55,7 +54,7 @@ export const YearlyTopBooks: React.FC<Props> = ({
         </div>
         <div className="flex justify-between">
           {[1, 2, 3].map((v) => {
-            const yearlyTopBook = latestYearlyBooks?.yearlyTopBooks
+            const yearlyTopBook = latestYearlyTopBooks
               ?.filter((book) => book.order === v)
               .pop()
             return (

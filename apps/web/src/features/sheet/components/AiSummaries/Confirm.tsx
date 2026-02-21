@@ -1,17 +1,16 @@
-import useSWR from 'swr'
 import { Accordion } from '@/components/layout/Accordion'
 import { Modal } from '@/components/layout/Modal'
 import { CourseId } from '@/types/user'
-import { fetcher } from '@/libs/swr'
 import { Book } from '@/types/book'
 import { uniq } from '@/utils/array'
 import dayjs from 'dayjs'
 import { useState, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
-import { AiSummaryUsageResponse } from '@/types/api'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
 import { FaRegCopy, FaCheck, FaDownload } from 'react-icons/fa'
 import { MdFilterList } from 'react-icons/md'
+import { useMutation, useQuery } from '@apollo/client'
+import { aiSummaryUsageQuery, saveAiSummaryMutation } from '../../api'
 
 export type FilterSettings = {
   months: string[]
@@ -48,6 +47,7 @@ export const Confirm: React.FC<Props> = ({
   const [jsonError, setJsonError] = useState('')
 
   const [saving, setSaving] = useState(false)
+  const [saveAiSummary] = useMutation(saveAiSummaryMutation)
 
   const handleManualSet = async () => {
     try {
@@ -56,17 +56,9 @@ export const Confirm: React.FC<Props> = ({
       setSaving(true)
 
       // DBに保存
-      const response = await fetch('/api/ai-summary/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sheetName, analysis: parsed }),
+      await saveAiSummary({
+        variables: { input: { sheetName, analysis: parsed } },
       })
-
-      if (!response.ok) {
-        setJsonError('保存に失敗しました')
-        setSaving(false)
-        return
-      }
 
       onManualSet(parsed)
       onCancel()
@@ -128,12 +120,9 @@ export const Confirm: React.FC<Props> = ({
     }
   }
 
-  const { data } = useSWR<AiSummaryUsageResponse>(
-    `/api/ai-summary/usage?sheetName=${sheetName}&months=${months.join(',')}&categories=${categories.join(',')}`,
-    fetcher
-  )
+  const { data } = useQuery(aiSummaryUsageQuery)
 
-  const isLimited = data?.count >= MONTHLY_LIMIT
+  const isLimited = data?.aiSummaryUsage >= MONTHLY_LIMIT
   return (
     <Modal
       open={open}
@@ -144,7 +133,7 @@ export const Confirm: React.FC<Props> = ({
         <div className="mb-2 text-center text-sm font-bold leading-5">
           今月の残り：
           <span className="fon-bold mx-1">
-            {MONTHLY_LIMIT - data?.count}/{MONTHLY_LIMIT}
+            {MONTHLY_LIMIT - data?.aiSummaryUsage}/{MONTHLY_LIMIT}
           </span>
           回
         </div>
