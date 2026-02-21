@@ -259,6 +259,9 @@ importers:
       novel:
         specifier: ^0.5.0
         version: 0.5.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@tiptap/extension-code-block@2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))(@tiptap/pm@2.27.2))(@types/react@18.2.79)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      prisma:
+        specifier: ^5.2.0
+        version: 5.22.0
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -392,9 +395,6 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.5.6
         version: 0.5.14(prettier@3.8.1)
-      prisma:
-        specifier: ^5.2.0
-        version: 5.22.0
       tailwind-merge:
         specifier: ^2.2.1
         version: 2.6.1
