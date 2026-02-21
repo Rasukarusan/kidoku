@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { toggleNoScrollBody } from '@/utils/element'
 import { useSession } from 'next-auth/react'
+import { useMutation } from '@apollo/client'
+import { deleteAiSummaryMutation } from '../../api'
 
 const useAiHelpers = (sheet, aiSummaries) => {
   const [open, setOpen] = useState(false)
@@ -10,6 +12,7 @@ const useAiHelpers = (sheet, aiSummaries) => {
   const [error, setError] = useState(null)
   const [summaryIndex, setSummaryIndex] = useState(0)
   const { data: session } = useSession()
+  const [deleteAiSummary] = useMutation(deleteAiSummaryMutation)
 
   useEffect(() => {
     setSummaryIndex(0)
@@ -64,12 +67,10 @@ const useAiHelpers = (sheet, aiSummaries) => {
     setDeleting(true)
     setError(null)
     try {
-      const params = new URLSearchParams({ id: id.toString() })
-      const response = await fetch(`/api/ai-summary/delete?${params}`, {
-        method: 'DELETE',
+      const { data } = await deleteAiSummary({
+        variables: { input: { id } },
       })
-      const data = await response.json()
-      if (data.result) {
+      if (data?.deleteAiSummary) {
         // 削除したアイテムをリストから除外
         const newSummaries = aiSummaries.filter((s) => s.id !== id)
         if (newSummaries.length === 0) {
