@@ -1,4 +1,5 @@
-import prisma, { parse } from '@/libs/prisma'
+import prisma from '@/libs/prisma'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 import { NO_IMAGE } from '@/libs/constants'
@@ -24,20 +25,57 @@ export default async (req, res) => {
     const userId = session.user.id
 
     if (req.method === 'GET') {
-      console.log('')
-      const template = await prisma.template_books.findMany({
-        where: {
-          userId,
-        },
-        orderBy: [{ created: 'desc' }],
-      })
+      const data = await graphqlClient.execute<{
+        templateBooks: Array<{
+          id: string
+          name: string
+          title: string
+          author: string
+          category: string
+          image: string
+          memo: string
+          isPublicMemo: boolean
+          created: string
+          updated: string
+        }>
+      }>(
+        userId,
+        `
+        query TemplateBooks {
+          templateBooks {
+            id
+            name
+            title
+            author
+            category
+            image
+            memo
+            isPublicMemo
+            created
+            updated
+          }
+        }
+      `
+      )
+      const templates = data.templateBooks.map((t) => ({
+        id: Number(t.id),
+        name: t.name,
+        title: t.title,
+        author: t.author,
+        category: t.category,
+        image: t.image,
+        memo: t.memo,
+        is_public_memo: t.isPublicMemo,
+        created: t.created,
+        updated: t.updated,
+      }))
       return res.status(200).json({
         result: true,
-        templates: parse(template),
+        templates,
       })
     } else if (req.method === 'POST') {
+      // POST: 画像アップロードを含むため、Prisma直接アクセスを維持
       const body = JSON.parse(req.body)
-      console.log(body)
       const { name, title, author, image, category, is_public_memo, memo } =
         body
       const data = {
@@ -75,9 +113,15 @@ export default async (req, res) => {
     } else if (req.method === 'DELETE') {
       const body = JSON.parse(req.body)
       const id = body.id
-      await prisma.template_books.delete({
-        where: { id, userId },
-      })
+      await graphqlClient.execute(
+        userId,
+        `
+        mutation DeleteTemplateBook($input: DeleteTemplateBookInput!) {
+          deleteTemplateBook(input: $input)
+        }
+      `,
+        { input: { id } }
+      )
       return res.status(200).json({ result: true })
     }
   } catch (e) {

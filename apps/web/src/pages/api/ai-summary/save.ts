@@ -1,4 +1,4 @@
-import prisma from '@/libs/prisma'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]'
 
@@ -15,52 +15,15 @@ export default async (req, res) => {
     const userId = session.user.id
     const { sheetName, analysis } = req.body
 
-    // Validate analysis JSON structure (最新スキーマバージョンに基づく)
-    const requiredKeys = [
-      'character_summary',
-      'reading_trend_analysis',
-      'sentiment_analysis',
-      'hidden_theme_discovery',
-      'overall_feedback',
-    ]
-    const hasAllKeys = requiredKeys.every((key) => key in analysis)
-    if (!hasAllKeys) {
-      return res
-        .status(400)
-        .json({ result: false, error: 'Invalid analysis format' })
-    }
-
-    const sheet = await prisma.sheets.findFirst({
-      where: { userId, name: sheetName },
-      select: { id: true },
-    })
-    if (!sheet) {
-      return res.status(404).json({ result: false, error: 'Sheet not found' })
-    }
-
-    const {
-      character_summary,
-      reading_trend_analysis,
-      sentiment_analysis,
-      hidden_theme_discovery,
-      overall_feedback,
-    } = analysis
-
-    await prisma.aiSummaries.create({
-      data: {
-        userId,
-        sheet_id: sheet.id,
-        analysis: {
-          _schemaVersion: 2,
-          character_summary,
-          reading_trend_analysis,
-          sentiment_analysis,
-          hidden_theme_discovery,
-          overall_feedback,
-        },
-        token: 0, // 手動セットの場合はトークン使用なし
-      },
-    })
+    await graphqlClient.execute(
+      userId,
+      `
+      mutation SaveAiSummary($input: SaveAiSummaryInput!) {
+        saveAiSummary(input: $input)
+      }
+    `,
+      { input: { sheetName, analysis } }
+    )
 
     return res.status(200).json({ result: true })
   } catch (e) {

@@ -49,6 +49,17 @@ export class BookRepository implements IBookRepository {
     return rows.map((row) => this.toEntity(row));
   }
 
+  async findByUserIdAndSheetName(
+    userId: string,
+    sheetName: string,
+  ): Promise<Book[]> {
+    const rows = await this.prisma.books.findMany({
+      where: { userId, sheet: { name: sheetName } },
+    });
+
+    return rows.map((row) => this.toEntity(row));
+  }
+
   async save(book: Book): Promise<Book> {
     if (book.id === null) {
       const created = await this.prisma.books.create({

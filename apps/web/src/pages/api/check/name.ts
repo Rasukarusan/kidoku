@@ -1,4 +1,4 @@
-import prisma from '@/libs/prisma'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 
@@ -13,11 +13,20 @@ export default async (req, res) => {
     }
     const body = JSON.parse(req.body)
     const { name } = body
-    const user = await prisma.user.findFirst({
-      where: { name },
-    })
-    // 指定の名前のユーザーが存在しないなら登録可能
-    res.status(200).json({ result: user === null })
+    const userId = session.user.id
+    const data = await graphqlClient.execute<{
+      isNameAvailable: boolean
+    }>(
+      userId,
+      `
+      query IsNameAvailable($input: CheckNameAvailableInput!) {
+        isNameAvailable(input: $input)
+      }
+    `,
+      { input: { name } }
+    )
+    // 名前が使用可能ならtrue
+    res.status(200).json({ result: data.isNameAvailable })
   } catch (e) {
     console.error(e)
     res.status(400).json({ result: false })
