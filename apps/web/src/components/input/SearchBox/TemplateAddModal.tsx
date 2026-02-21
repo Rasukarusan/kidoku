@@ -1,9 +1,7 @@
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
-import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
-import useSWR from 'swr'
 import { useQuery } from '@apollo/client'
 import { Modal } from '@/components/layout/Modal'
 import { ImagePicker } from '@/components/button/ImagePicker'
@@ -23,11 +21,15 @@ interface Response {
 interface Props {
   open: boolean
   onClose: () => void
+  onCreated?: () => void
 }
 
-export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
+export const TemplateAddModal: React.FC<Props> = ({
+  open,
+  onClose,
+  onCreated,
+}) => {
   const { data: session } = useSession()
-  const { mutate } = useSWR('/api/template/books', fetcher)
   const [loading, setLoading] = useState(false)
   const [template, setTemplate] = useState(null)
   const [response, setResponse] = useState<Response>(null)
@@ -81,7 +83,7 @@ export const TemplateAddModal: React.FC<Props> = ({ open, onClose }) => {
       })
     setResponse(res)
     if (res.result) {
-      mutate()
+      onCreated?.()
       reward()
     }
     setLoading(false)

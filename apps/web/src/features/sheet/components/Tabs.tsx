@@ -1,15 +1,13 @@
-import useSWR from 'swr'
-import { fetcher } from '@/libs/swr'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { FaUser } from 'react-icons/fa'
 import { twMerge } from 'tailwind-merge'
-import { UserImageResponse } from '@/types/api'
 import { Reorder } from 'framer-motion'
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { updateSheetOrdersMutation } from '../api'
 import { useSession } from 'next-auth/react'
 import { useMediaQuery } from 'react-responsive'
+import { userImageQuery } from '@/features/user/api'
 
 interface Props {
   sheets: Array<{ id: string; name: string; order: number }>
@@ -33,10 +31,9 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
   const isMobile = useMediaQuery({ maxWidth: 768 })
   const canDrag = isMine && !isMobile
 
-  const { data } = useSWR<UserImageResponse>(
-    `/api/user/image?username=${username}`,
-    fetcher
-  )
+  const { data } = useQuery(userImageQuery, {
+    variables: { input: { name: username } },
+  })
 
   useEffect(() => {
     // 新しいシートが追加された場合のみ更新
@@ -109,9 +106,9 @@ export const Tabs: React.FC<Props> = ({ value, sheets, username, userId }) => {
           )}
           onClick={() => onClick('total')}
         >
-          {data?.image ? (
+          {data?.userImage ? (
             <img
-              src={data?.image}
+              src={data?.userImage}
               className="mr-4 h-6 min-h-6 w-6 min-w-6 rounded-full"
               alt="user"
             />

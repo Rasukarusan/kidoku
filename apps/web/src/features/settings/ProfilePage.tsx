@@ -1,6 +1,12 @@
 import { useRef, useState } from 'react'
 import { Container } from '@/components/layout/Container'
 import { NextSeo } from 'next-seo'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import {
+  isNameAvailableQuery,
+  updateUserNameMutation,
+  deleteUserMutation,
+} from '@/features/user/api'
 
 interface Props {
   name: string
@@ -12,27 +18,25 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   const [saved, setSaved] = useState(false)
   const savedNameRef = useRef(name)
 
+  const [checkNameAvailable] = useLazyQuery(isNameAvailableQuery)
+  const [updateUserName] = useMutation(updateUserNameMutation)
+  const [deleteUser] = useMutation(deleteUserMutation)
+
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
     setCurrentName(newName)
     setSaved(false)
-    const res = await fetch(`/api/check/name`, {
-      method: 'POST',
-      body: JSON.stringify({ name: newName }),
-      headers: {
-        Accept: 'application/json',
-      },
-    }).then((res) => res.json())
-    setError(res.result ? '' : 'すでに利用されているため登録できません')
+    const { data } = await checkNameAvailable({
+      variables: { input: { name: newName } },
+    })
+    setError(
+      data?.isNameAvailable ? '' : 'すでに利用されているため登録できません'
+    )
   }
   const onBlur = async () => {
     if (error || currentName === savedNameRef.current || !currentName) return
-    await fetch(`/api/me`, {
-      method: 'PUT',
-      body: JSON.stringify({ name: currentName }),
-      headers: {
-        Accept: 'application/json',
-      },
+    await updateUserName({
+      variables: { input: { name: currentName } },
     })
     savedNameRef.current = currentName
     setSaved(true)
@@ -41,10 +45,8 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   const onClickDelete = async () => {
     const confirm = window.confirm('アカウントを削除してもよろしいですか？')
     if (!confirm) return
-    const res: { result: boolean } = await fetch('/api/user', {
-      method: 'DELETE',
-    }).then((res) => res.json())
-    if (res.result) {
+    const { data } = await deleteUser()
+    if (data?.deleteUser) {
       location.href = '/'
     }
   }

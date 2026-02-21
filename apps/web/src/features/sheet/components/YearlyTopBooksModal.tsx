@@ -1,12 +1,16 @@
-import useSWR from 'swr'
+import { useMutation } from '@apollo/client'
 import { Book } from '@/types/book'
-import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
 import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { Loading } from '@/components/icon/Loading'
 import { YearlyTopBook } from '@/types/book'
 import { Modal } from '@/components/layout/Modal'
+import {
+  getYearlyTopBooksQuery,
+  upsertYearlyTopBookMutation,
+  deleteYearlyTopBookMutation,
+} from '../api'
 
 interface Props {
   books: Book[]
@@ -32,7 +36,15 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
     spread: 100,
   })
   const [message, setMessage] = useState('')
-  const { mutate } = useSWR(`/api/yearly?year=${year}`, fetcher)
+  const refetchQueries = [
+    { query: getYearlyTopBooksQuery, variables: { input: { year } } },
+  ]
+  const [upsertYearlyTopBook] = useMutation(upsertYearlyTopBookMutation, {
+    refetchQueries,
+  })
+  const [deleteYearlyTopBook] = useMutation(deleteYearlyTopBookMutation, {
+    refetchQueries,
+  })
 
   useEffect(() => {
     if (!yearlyTopBooks) return
@@ -49,29 +61,17 @@ export const YearlyTopBooksModal: React.FC<Props> = ({
     setLoading(true)
     if (selectItem) {
       // 新規で設定
-      await fetch(`/api/yearly`, {
-        method: 'POST',
-        body: JSON.stringify({ bookId: selectItem.id, year, order }),
-        headers: {
-          Accept: 'application/json',
-        },
-      }).then((res) => res.json())
+      await upsertYearlyTopBook({
+        variables: { input: { bookId: selectItem.id, year, order } },
+      })
       setMessage(`『${selectItem.title}』を${order}位に設定しました`)
     } else {
       // 現在の設定を削除
-      const current = yearlyTopBooks
-        .filter((book) => book.order === order)
-        .pop()
-      await fetch(`/api/yearly`, {
-        method: 'DELETE',
-        body: JSON.stringify({ bookId: current.book.id, year, order }),
-        headers: {
-          Accept: 'application/json',
-        },
-      }).then((res) => res.json())
+      await deleteYearlyTopBook({
+        variables: { input: { year, order } },
+      })
       setMessage(`『${order}位の設定を削除しました`)
     }
-    mutate()
     reward()
     setLoading(false)
   }
