@@ -72,11 +72,7 @@ jobs:
             --timeout 30 \
             --set-env-vars "NODE_ENV=production" \
             --set-env-vars "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" \
-            --set-env-vars "DB_HOST=${{ secrets.DB_HOST }}" \
-            --set-env-vars "DB_PORT=${{ secrets.DB_PORT }}" \
-            --set-env-vars "DB_USER=${{ secrets.DB_USER }}" \
-            --set-env-vars "DB_PASS=${{ secrets.DB_PASS }}" \
-            --set-env-vars "DB_NAME=${{ secrets.DB_NAME }}" \
+            --set-env-vars "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
             --set-env-vars "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" \
             --set-env-vars "MEILI_HOST=${{ secrets.MEILI_HOST }}" \
             --set-env-vars "MEILI_MASTER_KEY=${{ secrets.MEILI_MASTER_KEY }}" \
