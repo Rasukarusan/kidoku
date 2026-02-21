@@ -3,217 +3,186 @@
 GraphQLに移行できていないAPI・CRUD操作の調査結果。
 
 > **更新日:** 2026-02-21
-> **対象ブランチ:** master（PR #161 マージ後 — ORM統一完了）
+> **対象ブランチ:** `claude/investigate-legacy-apis-u5NXX`（GraphQL移行作業ブランチ）
 
 ---
 
 ## 概要
 
-NestJS GraphQL API（バックエンド）とNext.js API Routes（フロントエンド）が混在している。PR #161でバックエンドのORMがDrizzleからPrismaに統一され、フロントエンド・バックエンドともにPrismaを使用する構成になった。
+NestJS GraphQL API（バックエンド）とNext.js API Routes（フロントエンド）が混在していたアーキテクチャに対し、以下の段階的移行を実施済み:
 
-残る課題は、フロントエンド側のAPI Routeが GraphQLを経由せず直接PrismaでDB操作しているレガシーエンドポイントの移行。
+1. **ORM統一**: バックエンドDrizzle→Prisma移行（PR #161）
+2. **バックエンドGraphQL API拡充**: User, YearlyTopBook, AiSummaries, TemplateBooks, Books（sheetNameフィルタ）の各ドメインにリゾルバー・ユースケース・リポジトリを追加
+3. **フロントエンドAPI Route移行**: Prisma直接アクセス → `graphqlClient.execute()` 経由に変更
+4. **Apollo Client直接呼び出し化**: API Route経由の中間層を廃止し、フロントエンドコンポーネントからApollo Client（`useQuery`/`useMutation`/`useLazyQuery`）で直接GraphQLを呼び出すように変更
 
 ### 移行状況サマリー
 
-| ドメイン | GraphQL移行済み | 未移行（Prisma直接） |
-|---|---|---|
-| Books | CRUD（部分的） | POST(create)のみPrisma直接 |
-| Sheets | 完全移行済み | - |
-| User | - | 全操作が未移行 |
-| YearlyTopBook | - | 全操作が未移行 |
-| AiSummaries | - | 全操作が未移行 |
-| Template Books | - | 全操作が未移行 |
-| CSV Export | - | 未移行 |
-| Comments | Read のみ移行済み | - |
-| Search | 完全移行済み（Google Books含む） | - |
-| SoftwareDesign | 完全移行済み | - |
+| ドメイン | GraphQL API | フロントエンド | 残存API Route |
+|---|---|---|---|
+| Books | CRUD完全移行済み | PUT/DELETE: graphqlClient経由API Route | POST: Prisma直接（画像アップロード） |
+| Books一覧（sheet別） | `sheetName`フィルタ追加済み | graphqlClient経由API Route | `[sheet].ts`（snake_case変換のため残存） |
+| Sheets | 完全移行済み | Apollo Client直接 | なし |
+| User | 完全移行済み | Apollo Client直接 | なし |
+| YearlyTopBook | 完全移行済み | Apollo Client直接 | なし |
+| AiSummaries | 非ストリーミング完全移行 | Apollo Client直接 | `_create.ts`（Edge Runtime/ストリーミング） |
+| Template Books | GET/DELETE移行済み | Apollo Client直接 | POST: Prisma直接（画像アップロード） |
+| CSV Export | 未移行 | - | Prisma直接 |
+| Comments | Read移行済み | - | - |
+| Search | 完全移行済み（Google Books含む） | - | - |
+| SoftwareDesign | 完全移行済み | - | - |
 
 ---
 
-## 1. アーキテクチャ変更: ORM統一
+## 1. アーキテクチャ変更履歴
 
-PR #161（commit `3acefac`）でバックエンドのDrizzle ORMがPrismaに置き換えられた。
+### ORM統一（PR #161）
+- バックエンドDrizzle→Prisma移行
+- `PrismaService`追加、全リポジトリ書き換え
+- Prismaスキーマは`apps/web/prisma/schema.prisma`と`apps/api/prisma/schema.prisma`の2箇所に同一内容
 
-### 変更内容
-- **PrismaService追加**: `apps/api/src/infrastructure/database/prisma.service.ts` — `PrismaClient`を継承したNestJSサービス
-- **バックエンドPrismaスキーマ**: `apps/api/prisma/schema.prisma` — 全モデル（User, sheets, books, YearlyTopBook, AiSummaries, template_books等）を定義
-- **リポジトリ書き換え**: `BookRepository`, `CommentRepository`, `SheetRepository`がDrizzle→Prismaに移行
-- **Drizzle関連ファイル削除**: `drizzle.config.ts`, `database.providers.ts`, `schema/*.schema.ts`すべて削除
+### バックエンドGraphQL API拡充（本ブランチ）
+以下のドメインにDDDレイヤー一式（ドメインモデル、リポジトリI/F＋実装、ユースケース、リゾルバー、DTO）を追加:
+- **User**: `userImage`, `isNameAvailable` query / `updateUserName`, `deleteUser` mutation
+- **YearlyTopBook**: `yearlyTopBooks` query / `upsertYearlyTopBook`, `deleteYearlyTopBook` mutation
+- **AiSummaries**: `aiSummaryUsage` query / `saveAiSummary`, `deleteAiSummary` mutation
+- **TemplateBooks**: `templateBooks` query / `deleteTemplateBook` mutation
+- **Books**: `GetBooksInput`に`sheetName`フィルタを追加
 
-### Prismaスキーマの二重管理（注意）
+### フロントエンドAPI Route→graphqlClient移行（本ブランチ）
+Prisma直接アクセスしていたAPI Routeを`graphqlClient.execute()`経由に変更:
+- `yearly.ts`, `me.ts`, `user/index.ts`, `user/image.ts`, `check/name.ts`
+- `ai-summary/usage.ts`, `ai-summary/save.ts`
+- `template/books.ts`（GET/DELETE）
+- `books/[sheet].ts`
 
-Vercel CIの互換性のため、Prismaスキーマが2箇所に同一内容で存在する:
-- `apps/web/prisma/schema.prisma`（フロントエンド）
-- `apps/api/prisma/schema.prisma`（バックエンド）
+### API Route→Apollo Client直接呼び出し化（本ブランチ）
+API Route中間層を廃止し、コンポーネントからApollo Clientで直接GraphQLを呼び出し:
 
-**スキーマ変更時は両方を更新する必要がある。**
+| 削除したAPI Route | 移行先コンポーネント | Apollo Client Hook |
+|---|---|---|
+| `yearly.ts` | YearlyTopBooks.tsx | `useQuery(getYearlyTopBooksQuery)` |
+| `yearly.ts` | YearlyTopBooksModal.tsx | `useMutation(upsertYearlyTopBookMutation)` / `useMutation(deleteYearlyTopBookMutation)` |
+| `me.ts` | ProfilePage.tsx | `useMutation(updateUserNameMutation)` |
+| `user/index.ts` | ProfilePage.tsx | `useMutation(deleteUserMutation)` |
+| `user/image.ts` | Tabs.tsx | `useQuery(userImageQuery)` |
+| `check/name.ts` | ProfilePage.tsx | `useLazyQuery(isNameAvailableQuery)` |
+| `ai-summary/usage.ts` | Confirm.tsx | `useQuery(aiSummaryUsageQuery)` |
+| `ai-summary/save.ts` | Confirm.tsx | `useMutation(saveAiSummaryMutation)` |
+| - | useAiHelpers.ts | `useMutation(deleteAiSummaryMutation)` |
+| `template/books.ts` GET/DELETE | Template.tsx | `useQuery(templateBooksQuery)` / `useMutation(deleteTemplateBookMutation)` |
 
-### 移行への影響
+`/api/graphql`プロキシを公開クエリ対応に更新（未認証時は`executePublic()`で転送）。
 
-バックエンドPrismaスキーマに全モデルが定義済みのため、未移行ドメインのGraphQL化に必要な作業は:
-- ドメインモデル（`domain/models/`）
-- リポジトリインターフェース（`domain/repositories/`）
-- リポジトリ実装（`infrastructure/repositories/`）
-- ユースケース（`application/usecases/`）
-- リゾルバー + DTO（`presentation/resolvers/`, `presentation/dto/`）
-- NestJSモジュール（`presentation/modules/`）
+### GraphQL定義ファイル構成
 
-のみ。スキーマ追加作業は不要。
+```
+apps/web/src/features/
+├── sheet/api/
+│   ├── queries.ts    # getSheetsQuery, getYearlyTopBooksQuery, aiSummaryUsageQuery
+│   ├── mutations.ts  # createSheet, updateSheet, deleteSheet, updateSheetOrders,
+│   │                 # upsertYearlyTopBook, deleteYearlyTopBook,
+│   │                 # deleteAiSummary, saveAiSummary
+│   └── index.ts
+├── books/api/
+│   ├── queries.ts    # getBookQuery, getBookCategoriesQuery
+│   └── index.ts
+├── user/api/
+│   ├── queries.ts    # userImageQuery, isNameAvailableQuery
+│   ├── mutations.ts  # updateUserNameMutation, deleteUserMutation
+│   └── index.ts
+└── template/api/
+    ├── queries.ts    # templateBooksQuery
+    ├── mutations.ts  # deleteTemplateBookMutation
+    └── index.ts
+```
 
 ---
 
 ## 2. GraphQL移行済みの操作
 
-### 現在のGraphQLスキーマ（`apps/api/src/schema.gql`）
+### 現在のGraphQLスキーマ
 
-**Query (11):**
-`sheets`, `comments`, `book`, `books`, `bookCategories`, `searchBooks`, `searchGoogleBooks`, `latestSoftwareDesign`, `softwareDesignByMonth`, `softwareDesignByYear`, `searchSoftwareDesignByISBN`
+**Query (18):**
+`sheets`, `comments`, `book`, `books`, `bookCategories`, `searchBooks`, `searchGoogleBooks`, `latestSoftwareDesign`, `softwareDesignByMonth`, `softwareDesignByYear`, `searchSoftwareDesignByISBN`, `userImage`, `isNameAvailable`, `yearlyTopBooks`, `aiSummaryUsage`, `templateBooks`
 
-**Mutation (8):**
-`createSheet`, `updateSheet`, `deleteSheet`, `updateSheetOrders`, `createBook`, `updateBook`, `deleteBook`, `indexAllBooks`
+**Mutation (16):**
+`createSheet`, `updateSheet`, `deleteSheet`, `updateSheetOrders`, `createBook`, `updateBook`, `deleteBook`, `indexAllBooks`, `updateUserName`, `deleteUser`, `upsertYearlyTopBook`, `deleteYearlyTopBook`, `saveAiSummary`, `deleteAiSummary`, `deleteTemplateBook`
 
-### Books（部分移行）
-- `updateBook` mutation — PUT `/api/books` からGraphQL経由（`apps/web/src/pages/api/books/index.ts:101`）
-- `deleteBook` mutation — DELETE `/api/books` からGraphQL経由（`apps/web/src/pages/api/books/index.ts:140`）
-- `createBook` mutation — **スキーマに存在するが、フロントエンドAPI RouteのPOSTでは未使用**
-- `book` / `books` / `bookCategories` query — Apollo Clientから使用
+> **注:** `schema.gql`はNestJSサーバー起動時に自動再生成。現在のファイルは旧状態だが、リゾルバーコードは全て実装済み。
 
-### Sheets（完全移行）
-- `sheets` query + `createSheet` / `updateSheet` / `deleteSheet` / `updateSheetOrders` mutation
+### フロントエンドでApollo Client直接呼び出しのもの
+- Sheets: `useQuery(getSheetsQuery)`, `useMutation(createSheet/updateSheet/deleteSheet/updateSheetOrders)`
+- User: `useQuery(userImageQuery)`, `useLazyQuery(isNameAvailableQuery)`, `useMutation(updateUserName/deleteUser)`
+- YearlyTopBook: `useQuery(getYearlyTopBooksQuery)`, `useMutation(upsertYearlyTopBook/deleteYearlyTopBook)`
+- AiSummaries: `useQuery(aiSummaryUsageQuery)`, `useMutation(saveAiSummary/deleteAiSummary)`
+- TemplateBooks: `useQuery(templateBooksQuery)`, `useMutation(deleteTemplateBook)`
+- Books: `useQuery(getBookQuery/getBookCategoriesQuery)`
 
-### Search（完全移行）
-- `searchBooks` query — `/api/search/shelf.ts` からGraphQL経由
-- `searchGoogleBooks` query — `/api/search/google-books.ts` からGraphQL経由（`GoogleBookHitResponse`型、`SearchGoogleBooksInput`入力型あり）
-- `indexAllBooks` mutation — Admin API Key Guard付き
-
-### Comments（Read移行済み）
-- `comments` query — 公開コメント取得はGraphQL経由
-
-### SoftwareDesign（完全移行）
-- `latestSoftwareDesign` / `softwareDesignByMonth` / `softwareDesignByYear` / `searchSoftwareDesignByISBN` query
+### API Route（graphqlClient）経由のもの
+- Books PUT/DELETE: `graphqlClient.execute()` → `updateBook`/`deleteBook` mutation
+- Books GET (by sheet): `graphqlClient.execute()` → `books` query（sheetNameフィルタ）
 
 ---
 
-## 3. 未移行のAPI（フロントエンドPrisma直接アクセス）
+## 3. 残存する未移行・部分移行のAPI Route
 
 ### 3-1. Books CREATE（POST）
-**ファイル:** `apps/web/src/pages/api/books/index.ts:53`
+**ファイル:** `apps/web/src/pages/api/books/index.ts`
 
-```
-prisma.books.create({ data })
-prisma.books.update({ where: { id: book.id }, data: { image: url } })
-```
-
-- `createBook` mutationがバックエンドに**既に存在する**のに、API RouteのPOSTではPrisma直接で作成
-- レコード作成→画像Vercel Blobアップロード→画像URL更新という3ステップが密結合しており、GraphQL mutationへの単純な差し替えが困難
-- **移行の難易度:** 高（画像アップロードフローの設計見直しが必要。別タイミングで対応）
+- Prisma直接で`books.create()` → Vercel Blob画像アップロード → `books.update()`
+- `createBook` mutationがバックエンドに存在するが、画像アップロードフローとの密結合で未移行
+- **移行の難易度:** 高（画像アップロードフローの設計見直しが必要）
 
 ### 3-2. Books一覧取得（シート名別）
-**ファイル:** `apps/web/src/pages/api/books/[sheet].ts:13`
+**ファイル:** `apps/web/src/pages/api/books/[sheet].ts`
 
-```
-prisma.books.findMany({ where: { userId, sheet: { name: req.query.sheet } } })
-```
+- graphqlClient経由でGraphQL APIを呼び出し済み
+- API Routeが残る理由: レスポンスのsnake_case変換（`isPublicMemo`→`is_public_memo`, `sheetId`→`sheet_id`）とcomputed fields（`month`, `sheet`）の付与
+- **Apollo Client直接化の障壁:** フロントエンドの`Book`型がsnake_caseフィールドを使用しており、多数のコンポーネントに影響。`Book`型のcamelCase統一が前提
 
-- GraphQLの`books` queryは`sheetId`（ID）でフィルタするが、このAPIはシート名（name）でフィルタ
-- **移行の難易度:** 低（`GetBooksInput`に`sheetName`フィルタを追加、リポジトリに`findByUserIdAndSheetName`を追加）
+### 3-3. Template Books POST（画像アップロード）
+**ファイル:** `apps/web/src/pages/api/template/books.ts`（POSTのみ）
 
-### 3-3. User操作（全操作）
-**ファイル:**
-- `apps/web/src/pages/api/me.ts:14` — ユーザー名更新 `prisma.user.update()`
-- `apps/web/src/pages/api/user/index.ts:13` — ユーザー削除 `prisma.user.delete()`
-- `apps/web/src/pages/api/user/image.ts:6` — ユーザー画像取得 `prisma.user.findUnique()`
-- `apps/web/src/pages/api/check/name.ts:16` — ユーザー名重複チェック `prisma.user.findFirst()`
+- Prisma直接で`template_books.create()` → Vercel Blob画像アップロード → `template_books.update()`
+- Books CREATEと同じ画像アップロードパターン
+- **移行の難易度:** 中（Books CREATEと同時に対応するのが効率的）
 
-GraphQLスキーマにUser関連のQuery/Mutationが一切存在しない。
+### 3-4. AI Summary CREATE（ストリーミング）
+**ファイル:** `apps/web/src/pages/api/ai-summary/_create.ts`
 
-- **移行の難易度:** 低〜中
-- **必要なGraphQL操作:**
-  - `Query: userImage(name: String!): String` — ユーザー画像取得
-  - `Query: isNameAvailable(name: String!): Boolean` — ユーザー名重複チェック
-  - `Mutation: updateUserName(name: String!): UserResponse` — ユーザー名更新
-  - `Mutation: deleteUser: Boolean` — ユーザー削除
-- **必要なDDDレイヤー:** Userドメインモデル、リポジトリI/F＋実装、ユースケース4つ、リゾルバー、DTO
+- Edge Runtimeで動作、Cohere AIのストリーミングレスポンス
+- Prisma Edge (`@/libs/prisma/edge`) を使用
+- **移行の難易度:** 困難（Edge Runtime + SSEはGraphQLの通常モデルと非互換）
+- **現状維持が妥当**
 
-### 3-4. YearlyTopBook（全操作）
-**ファイル:** `apps/web/src/pages/api/yearly.ts`
+### 3-5. CSV Export
+**ファイル:** `apps/web/src/pages/api/export/csv.ts`
 
-```
-prisma.yearlyTopBook.findMany()   # GET
-prisma.yearlyTopBook.upsert()     # POST
-prisma.yearlyTopBook.delete()     # DELETE
-```
+- Prisma直接で全シート+ブック取得→CSV生成→ダウンロード
+- **移行の難易度:** 低（データ取得をGraphQL化可能）だが、ファイルダウンロードはREST APIに残すのが適切
+- **現状維持が妥当**
 
-GraphQLスキーマにYearlyTopBook関連の操作が一切存在しない。
+### 3-6. Books PUT/DELETE（API Route経由）
+**ファイル:** `apps/web/src/pages/api/books/index.ts`
 
-- **移行の難易度:** 低
-- **必要なGraphQL操作:**
-  - `Query: yearlyTopBooks(year: String!): [YearlyTopBookResponse!]!`
-  - `Mutation: upsertYearlyTopBook(year: String!, order: Int!, bookId: Int!): Boolean`
-  - `Mutation: deleteYearlyTopBook(year: String!, order: Int!): Boolean`
-- **必要なDDDレイヤー:** ドメインモデル、リポジトリI/F＋実装、ユースケース3つ、リゾルバー、DTO
-
-### 3-5. AiSummaries（全操作）
-**ファイル:**
-- `apps/web/src/pages/api/ai-summary/_create.ts:80` — AI分析作成 `prisma.aiSummaries.create()`
-- `apps/web/src/pages/api/ai-summary/_delete.ts:30` — AI分析削除 `prisma.aiSummaries.deleteMany()`
-- `apps/web/src/pages/api/ai-summary/usage.ts:15` — 使用量取得 `prisma.aiSummaries.findMany()`
-- `apps/web/src/pages/api/ai-summary/save.ts:49` — 手動保存 `prisma.aiSummaries.create()`
-
-GraphQLスキーマにAiSummaries関連の操作が一切存在しない。
-
-- **移行の難易度:** 高（ストリーミング含む）/ 中（ストリーミング以外）
-- **理由:**
-  - `_create.ts`はEdge Runtimeで動作し、Cohere AIのストリーミングレスポンスを返す
-  - Edge Runtime特有のセッション認証（cookieから直接session tokenを取得）
-  - ストリーミング処理はGraphQLの通常のリクエスト/レスポンスモデルと相性が悪い
-- **必要なGraphQL操作（ストリーミング以外）:**
-  - `Query: aiSummaryUsage: Int!` — 月次使用量
-  - `Mutation: saveAiSummary(sheetName: String!, analysis: JSON!): Boolean`
-  - `Mutation: deleteAiSummary(id: Int!): Boolean`
-- **`_create.ts`のストリーミング処理はREST/Edge APIに残すのが現実的**
-
-### 3-6. Template Books（全操作）
-**ファイル:** `apps/web/src/pages/api/template/books.ts`
-
-```
-prisma.template_books.findMany()   # GET
-prisma.template_books.create()     # POST
-prisma.template_books.update()     # POST（画像URL更新）
-prisma.template_books.delete()     # DELETE
-```
-
-GraphQLスキーマにTemplate Books関連の操作が一切存在しない。
-
-- **移行の難易度:** 中（画像アップロード処理の分離が必要、Books CREATEと同じパターン）
-- **必要なGraphQL操作:**
-  - `Query: templateBooks: [TemplateBookResponse!]!`
-  - `Mutation: createTemplateBook(input: CreateTemplateBookInput!): TemplateBookResponse`
-  - `Mutation: deleteTemplateBook(id: Int!): Boolean`
-
-### 3-7. CSV Export
-**ファイル:** `apps/web/src/pages/api/export/csv.ts:23`
-
-```
-prisma.sheets.findMany({ where: { userId }, include: { books: {...} } })
-```
-
-- **移行の難易度:** 低（ただしCSVファイルダウンロードはGraphQLの用途外）
-- GraphQLでデータ取得だけ移行し、CSV生成・ダウンロードはAPI Routeに残すのが現実的
+- graphqlClient経由でGraphQL APIを呼び出し済み
+- API Routeが残る理由: PUT時の画像アップロード（Vercel Blob）処理がある、ISRキャッシュの`revalidate`呼び出し
+- **Apollo Client直接化の障壁:** 画像アップロード処理をどこに置くか、ISR revalidationをどう行うか
 
 ---
 
 ## 4. SSR/ISRページの直接Prismaアクセス
 
-ISR/SSGのためにサーバーサイドで直接DBアクセスしているページ。パフォーマンス要件上、直接アクセスが妥当だが、該当ドメインのGraphQL queryが整備されれば移行も可能。
+ISR/SSGのためにサーバーサイドで直接DBアクセスしているページ。パフォーマンス要件上、直接アクセスが妥当だが、GraphQL queryが整備されたため移行も可能。
 
 | ページ | Prisma操作 | 用途 |
 |---|---|---|
 | `pages/index.tsx` | `prisma.books.findMany()` | トップページの公開メモ一覧（ISR 5s） |
 | `pages/books/[bookId].tsx` | `prisma.books.findFirst()` | 本の詳細（ISR 60s） |
 | `pages/[user]/sheets/index.tsx` | `prisma.sheets.findMany()` | ユーザーのシート一覧（SSR→リダイレクト） |
-| `pages/[user]/sheets/[year].tsx` | `prisma.user.findUnique()`, `prisma.sheets.findMany()`, `prisma.books.findMany()`, `prisma.yearlyTopBook.findMany()`, `prisma.aiSummaries.findMany()` | 個別シートページ（ISR 5s） |
-| `pages/[user]/sheets/total.tsx` | `prisma.user.findUnique()`, `prisma.books.findMany()`, `prisma.$queryRaw`, `prisma.sheets.findMany()`, `prisma.yearlyTopBook.findMany()` | 統計ページ（ISR 5s） |
+| `pages/[user]/sheets/[year].tsx` | `prisma.user.findUnique()` 他5クエリ | 個別シートページ（ISR 5s） |
+| `pages/[user]/sheets/total.tsx` | `prisma.user.findUnique()` 他5クエリ | 統計ページ（ISR 5s） |
 
 ---
 
@@ -225,7 +194,7 @@ ISR/SSGのためにサーバーサイドで直接DBアクセスしているペ�
 |---|---|---|
 | `api/auth/[...nextauth].ts` | NextAuth認証 | フレームワーク要件 |
 | `api/auth/init.ts` | セッション確認 | 単純なセッション検証 |
-| `api/graphql.ts` | GraphQLプロキシ | プロキシ層そのもの |
+| `api/graphql.ts` | GraphQLプロキシ | プロキシ層そのもの（公開クエリ対応済み） |
 | `api/stripe/create-payment-intent.ts` | Stripe決済 | 外部サービス連携 |
 | `api/stripe/webhook.ts` | Stripe Webhook | 外部サービスコールバック |
 | `api/admin/batch/software-design.ts` | 管理バッチ→NestJS REST | 既にNestJSバックエンドを呼び出し |
@@ -235,32 +204,28 @@ ISR/SSGのためにサーバーサイドで直接DBアクセスしているペ�
 
 ---
 
-## 6. 移行優先度の提案
+## 6. 今後の移行優先度
 
-ORM統一により、バックエンドPrismaスキーマに全モデルが定義済み。各ドメインの移行に必要な作業はDDDレイヤーの実装のみで、スキーマ追加は不要。
-
-### 高優先度（低工数・高効果）
-1. **YearlyTopBook** — 最も単純なCRUD。外部サービス依存なし。SSR/ISRページからも参照されており、GraphQL化の効果が大きい
-2. **User操作** — アプリの基盤ドメイン。4エンドポイントすべて単純なDB操作
+### 高優先度
+1. **Books一覧（`[sheet].ts`）のApollo Client直接化** — フロントエンド`Book`型のcamelCase統一が前提。影響範囲が広いが、snake_case/camelCase混在の技術的負債を解消する効果が大きい
+2. **Books PUT/DELETEのApollo Client直接化** — 画像アップロード処理の分離（UploadリンクまたはPresigned URL方式）とISR revalidation方式の検討が必要
 
 ### 中優先度
-3. **Books一覧（シート名ベース）** — `GetBooksInput`に`sheetName`フィールド追加のみの最小変更
-4. **AiSummaries（非ストリーミング）** — usage取得、save、deleteの3操作は移行可能
-5. **Template Books** — 画像アップロード分離が必要だがCRUD自体は単純
+3. **Books CREATE / Template Books POSTのGraphQL化** — 画像アップロードフローの設計見直し（共通パターンなのでまとめて対応）
+4. **CSV ExportのGraphQL化** — データ取得部分のみ。ファイル生成・ダウンロードはAPI Routeに残す
 
 ### 低優先度（現状維持が妥当）
-6. **CSV Export** — ファイルダウンロードはREST APIの方が適切
-7. **AiSummaries CREATE（ストリーミング）** — Edge Runtime + SSEはGraphQL移行困難
-8. **Books CREATE** — 画像アップロード（Vercel Blob）とDB操作が密結合しており、設計見直しが必要。別タイミングで対応
-9. **SSR/ISRの直接Prismaアクセス** — パフォーマンス要件上、直接アクセスが妥当。各ドメインのGraphQL query整備後に段階的に検討
+5. **AI Summary CREATE（ストリーミング）** — Edge Runtime + SSEはGraphQL移行困難
+6. **SSR/ISRの直接Prismaアクセス** — パフォーマンス要件上、直接アクセスが妥当
 
 ---
 
 ## 7. 前回レポートからの変更点
 
-1. **ORM統一完了**: バックエンドがDrizzle→Prismaに移行（PR #161）。旧「Drizzleスキーマ同期状況」セクションは削除
-2. **searchGoogleBooks追加**: `GoogleBookHitResponse`型と`SearchGoogleBooksInput`入力型が追加され、Searchドメインは完全移行済みに
-3. **移行工数の低下**: バックエンドPrismaスキーマに全モデル定義済みのため、各ドメインの移行はDDDレイヤー実装のみ
-4. **Prismaスキーマ二重管理**: `apps/web/prisma/schema.prisma`と`apps/api/prisma/schema.prisma`の両方更新が必要（新しい制約）
-5. **SSR/ISRテーブル更新**: `[year].tsx`ページを追加（5つのPrismaクエリを使用する最も複雑なページ）
-6. **優先度再評価**: YearlyTopBookを最高優先度に。Books CREATEは画像アップロードの密結合により低優先度に変更
+1. **バックエンドGraphQL API大幅拡充**: User（4操作）, YearlyTopBook（3操作）, AiSummaries（3操作）, TemplateBooks（2操作）のリゾルバーを追加。Query 11→18、Mutation 8→16に増加
+2. **API Route大量削除**: `yearly.ts`, `me.ts`, `user/index.ts`, `user/image.ts`, `check/name.ts`, `ai-summary/usage.ts`, `ai-summary/save.ts` を削除。フロントエンドからApollo Client直接呼び出しに置き換え
+3. **Apollo Client直接呼び出し化**: YearlyTopBooks, ProfilePage, Tabs, Confirm, Template, useAiHelpersの各コンポーネントを`useSWR`/`fetch`からApollo Clientフックに移行
+4. **`/api/graphql`プロキシ改善**: 未認証リクエストを公開APIとして転送する機能を追加（`userImage`等の公開クエリ対応）
+5. **template/books.ts簡素化**: GET/DELETEを削除し、POSTのみに変更
+6. **GraphQL定義ファイル構成追加**: `features/user/api/`, `features/template/api/`を新設
+7. **移行優先度再評価**: 大部分の移行が完了し、残存はBooks関連（画像アップロード問題）とストリーミング・SSR/ISRのみ
