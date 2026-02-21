@@ -1,18 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { eq, and, sql } from 'drizzle-orm';
-import { books } from '../database/schema/books.schema';
-import { sheets } from '../database/schema/sheets.schema';
-import { users } from '../database/schema/users.schema';
-import { DrizzleDb } from '../database/types';
-import { INJECTION_TOKENS } from '../../shared/constants/injection-tokens';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../database/prisma.service';
 import { Book } from '../../domain/models/book';
 import { IBookRepository } from '../../domain/repositories/book';
 
 @Injectable()
 export class BookRepository implements IBookRepository {
-  constructor(
-    @Inject(INJECTION_TOKENS.DRIZZLE) private readonly db: DrizzleDb,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: string): Promise<Book | null> {
     const bookId = parseInt(id, 10);
@@ -20,31 +13,27 @@ export class BookRepository implements IBookRepository {
       return null;
     }
 
-    const rows = await this.db
-      .select()
-      .from(books)
-      .where(eq(books.id, bookId))
-      .limit(1);
+    const row = await this.prisma.books.findUnique({
+      where: { id: bookId },
+    });
 
-    if (rows.length === 0) return null;
+    if (!row) return null;
 
-    return this.toEntity(rows[0]);
+    return this.toEntity(row);
   }
 
   async findByUserId(userId: string): Promise<Book[]> {
-    const rows = await this.db
-      .select()
-      .from(books)
-      .where(eq(books.userId, userId));
+    const rows = await this.prisma.books.findMany({
+      where: { userId },
+    });
 
     return rows.map((row) => this.toEntity(row));
   }
 
   async findBySheetId(sheetId: number): Promise<Book[]> {
-    const rows = await this.db
-      .select()
-      .from(books)
-      .where(eq(books.sheetId, sheetId));
+    const rows = await this.prisma.books.findMany({
+      where: { sheet_id: sheetId },
+    });
 
     return rows.map((row) => this.toEntity(row));
   }
@@ -53,41 +42,35 @@ export class BookRepository implements IBookRepository {
     userId: string,
     sheetId: number,
   ): Promise<Book[]> {
-    const rows = await this.db
-      .select()
-      .from(books)
-      .where(and(eq(books.userId, userId), eq(books.sheetId, sheetId)));
+    const rows = await this.prisma.books.findMany({
+      where: { userId, sheet_id: sheetId },
+    });
 
     return rows.map((row) => this.toEntity(row));
   }
 
   async save(book: Book): Promise<Book> {
     if (book.id === null) {
-      // 新規作成
-      const result = (await this.db.insert(books).values({
-        userId: book.userId,
-        sheetId: book.sheetId,
-        title: book.title,
-        author: book.author,
-        category: book.category,
-        image: book.image,
-        impression: book.impression,
-        memo: book.memo,
-        isPublicMemo: book.isPublicMemo ? 1 : 0,
-        isPurchasable: book.isPurchasable ? 1 : 0,
-        finished: book.finished,
-        created: book.created,
-        updated: book.updated,
-      })) as unknown as Array<{ insertId: number }>;
+      const created = await this.prisma.books.create({
+        data: {
+          userId: book.userId,
+          sheet_id: book.sheetId,
+          title: book.title,
+          author: book.author,
+          category: book.category,
+          image: book.image,
+          impression: book.impression,
+          memo: book.memo,
+          is_public_memo: book.isPublicMemo,
+          is_purchasable: book.isPurchasable,
+          finished: book.finished,
+          created: book.created,
+          updated: book.updated,
+        },
+      });
 
-      // Drizzle MySQLの戻り値から insertId を取得
-      if (!result?.[0]?.insertId || typeof result[0].insertId !== 'number') {
-        throw new Error('Failed to create book: No insertId returned');
-      }
-
-      const insertId = result[0].insertId;
       return Book.fromDatabase(
-        insertId.toString(),
+        created.id.toString(),
         book.userId,
         book.sheetId,
         book.title,
@@ -103,28 +86,27 @@ export class BookRepository implements IBookRepository {
         book.updated,
       );
     } else {
-      // 更新
       const bookId = parseInt(book.id, 10);
       if (isNaN(bookId) || bookId <= 0) {
         throw new Error('Invalid book ID');
       }
 
-      await this.db
-        .update(books)
-        .set({
-          sheetId: book.sheetId,
+      await this.prisma.books.update({
+        where: { id: bookId },
+        data: {
+          sheet_id: book.sheetId,
           title: book.title,
           author: book.author,
           category: book.category,
           image: book.image,
           impression: book.impression,
           memo: book.memo,
-          isPublicMemo: book.isPublicMemo ? 1 : 0,
-          isPurchasable: book.isPurchasable ? 1 : 0,
+          is_public_memo: book.isPublicMemo,
+          is_purchasable: book.isPurchasable,
           finished: book.finished,
           updated: book.updated,
-        })
-        .where(eq(books.id, bookId));
+        },
+      });
 
       return book;
     }
@@ -136,9 +118,9 @@ export class BookRepository implements IBookRepository {
       throw new Error('Invalid book ID');
     }
 
-    await this.db
-      .delete(books)
-      .where(and(eq(books.id, bookId), eq(books.userId, userId)));
+    await this.prisma.books.deleteMany({
+      where: { id: bookId, userId },
+    });
   }
 
   async findAllForSearch(): Promise<
@@ -154,33 +136,29 @@ export class BookRepository implements IBookRepository {
       sheetName: string;
     }>
   > {
-    const rows = await this.db
-      .select({
-        id: books.id,
-        title: books.title,
-        author: books.author,
-        image: books.image,
-        memo: books.memo,
-        isPublicMemo: books.isPublicMemo,
-        userName: users.name,
-        userImage: users.image,
-        sheetName: sheets.name,
-      })
-      .from(books)
-      .leftJoin(users, eq(books.userId, users.id))
-      .leftJoin(sheets, eq(books.sheetId, sheets.id))
-      .where(sql`${sheets.id} IS NOT NULL`); // sheetがnullのレコードを除外
+    const rows = await this.prisma.books.findMany({
+      select: {
+        id: true,
+        title: true,
+        author: true,
+        image: true,
+        memo: true,
+        is_public_memo: true,
+        user: { select: { name: true, image: true } },
+        sheet: { select: { name: true } },
+      },
+    });
 
     return rows.map((row) => ({
       id: row.id.toString(),
       title: row.title,
       author: row.author,
       image: row.image,
-      memo: row.isPublicMemo ? row.memo : '',
-      isPublicMemo: row.isPublicMemo === 1,
-      userName: row.userName || '',
-      userImage: row.userImage,
-      sheetName: row.sheetName || '',
+      memo: row.is_public_memo ? row.memo : '',
+      isPublicMemo: row.is_public_memo,
+      userName: row.user.name || '',
+      userImage: row.user.image,
+      sheetName: row.sheet.name,
     }));
   }
 
@@ -200,62 +178,73 @@ export class BookRepository implements IBookRepository {
       return null;
     }
 
-    const rows = await this.db
-      .select({
-        id: books.id,
-        title: books.title,
-        author: books.author,
-        image: books.image,
-        memo: books.memo,
-        isPublicMemo: books.isPublicMemo,
-        userName: users.name,
-        userImage: users.image,
-        sheetName: sheets.name,
-      })
-      .from(books)
-      .leftJoin(users, eq(books.userId, users.id))
-      .leftJoin(sheets, eq(books.sheetId, sheets.id))
-      .where(eq(books.id, bookId))
-      .limit(1);
+    const row = await this.prisma.books.findUnique({
+      where: { id: bookId },
+      select: {
+        id: true,
+        title: true,
+        author: true,
+        image: true,
+        memo: true,
+        is_public_memo: true,
+        user: { select: { name: true, image: true } },
+        sheet: { select: { name: true } },
+      },
+    });
 
-    if (rows.length === 0) return null;
+    if (!row) return null;
 
-    const row = rows[0];
     return {
       id: row.id.toString(),
       title: row.title,
       author: row.author,
       image: row.image,
-      memo: row.isPublicMemo ? row.memo : '',
-      isPublicMemo: row.isPublicMemo === 1,
-      userName: row.userName || '',
-      userImage: row.userImage,
-      sheetName: row.sheetName,
+      memo: row.is_public_memo ? row.memo : '',
+      isPublicMemo: row.is_public_memo,
+      userName: row.user.name || '',
+      userImage: row.user.image,
+      sheetName: row.sheet.name,
     };
   }
 
   async getCategories(userId: string): Promise<string[]> {
-    const rows = await this.db
-      .selectDistinct({ category: books.category })
-      .from(books)
-      .where(eq(books.userId, userId));
+    const rows = await this.prisma.books.findMany({
+      where: { userId },
+      select: { category: true },
+      distinct: ['category'],
+    });
 
     return rows.map((row) => row.category).filter((c) => c && c.trim() !== '');
   }
 
-  private toEntity(row: typeof books.$inferSelect): Book {
+  private toEntity(row: {
+    id: number;
+    userId: string;
+    sheet_id: number;
+    title: string;
+    author: string;
+    category: string;
+    image: string;
+    impression: string;
+    memo: string;
+    is_public_memo: boolean;
+    is_purchasable: boolean;
+    finished: Date | null;
+    created: Date;
+    updated: Date;
+  }): Book {
     return Book.fromDatabase(
       row.id.toString(),
       row.userId,
-      row.sheetId,
+      row.sheet_id,
       row.title,
       row.author,
       row.category,
       row.image,
       row.impression,
       row.memo,
-      row.isPublicMemo === 1,
-      row.isPurchasable === 1,
+      row.is_public_memo,
+      row.is_purchasable,
       row.finished ?? null,
       row.created ?? new Date(),
       row.updated ?? new Date(),

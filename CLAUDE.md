@@ -27,8 +27,9 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 
 ### データベースアクセス
 
-- **フロントエンド**: Prisma ORM → MySQL
-- **バックエンド**: Drizzle ORM → 同一MySQL（スキーマ同期が必要）
+- **フロントエンド**: `@prisma/client`（`apps/web/prisma/schema.prisma`）→ MySQL
+- **バックエンド**: `@prisma/client`（`apps/api/prisma/schema.prisma`）→ 同一MySQL
+- スキーマは `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の2箇所に同じ内容が存在する。スキーマ変更時は両方を更新すること。
 
 ### API アーキテクチャ（DDD）
 
@@ -44,7 +45,7 @@ apps/api/src/
 │   └── usecases/     # 各機能のユースケース
 ├── infrastructure/   # インフラ層（外部システムとの接続）
 │   ├── auth/         # 認証（Guards, Strategies, Decorators）
-│   ├── database/     # Drizzle設定・スキーマ
+│   ├── database/     # Prisma設定・PrismaService
 │   └── repositories/ # リポジトリ実装
 ├── presentation/     # プレゼンテーション層（GraphQL API）
 │   ├── resolvers/    # GraphQLリゾルバー
@@ -87,14 +88,12 @@ pnpm --filter api build
 ### データベース操作
 
 ```bash
-# Prisma (フロントエンド)
-pnpm --filter web prisma generate    # クライアント生成
-pnpm --filter web db:push            # スキーマ反映
-pnpm --filter web db:studio          # Prisma Studio起動
+# スキーマをDBに反映
+pnpm --filter web db:push
+pnpm --filter api db:push
 
-# Drizzle (バックエンド)
-pnpm --filter api db:push            # スキーマ反映
-pnpm --filter api db:generate        # マイグレーション生成
+# Prisma Studio起動
+pnpm --filter web db:studio
 ```
 
 ### テスト
@@ -154,8 +153,8 @@ pnpm --filter web lighthouse
 
 ### データベース
 
-- `apps/web/prisma/schema.prisma` - Prismaスキーマ定義
-- `apps/api/src/infrastructure/database/schema/` - Drizzleスキーマ定義
+- `apps/web/prisma/schema.prisma` - Prismaスキーマ定義（web側）
+- `apps/api/prisma/schema.prisma` - Prismaスキーマ定義（API側）
 
 ### 検索
 
@@ -172,10 +171,9 @@ pnpm --filter web lighthouse
 
 ### データベーススキーマ変更
 
-1. Prismaスキーマを編集
-2. `pnpm --filter web db:push`でDBに反映
-3. Drizzleスキーマも手動で同期（重要）
-4. `pnpm --filter api db:push`でバックエンドも更新
+1. `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の両方を編集
+2. `pnpm --filter web db:push` でDBに反映
+3. `pnpm --filter web build` / `pnpm --filter api build` でPrismaクライアントが自動生成される
 
 ### MeiliSearch
 
@@ -224,7 +222,8 @@ node /tmp/screenshot.mjs
 pnpm --filter web codegen
 
 # Prismaクライアント再生成
-cd apps/web && npx prisma generate
+pnpm --filter web prisma generate
+pnpm --filter api prisma generate
 # サンドボックス環境では PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 を付与
 ```
 

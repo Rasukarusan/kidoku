@@ -8,13 +8,12 @@ import { GoogleBooksRepository } from '../../infrastructure/repositories/google-
 import { BookRepository } from '../../infrastructure/repositories/book';
 import { MeiliSearchProvider } from '../../infrastructure/search/meilisearch.providers';
 import { AuthModule } from '../../infrastructure/auth/auth.module';
-import { DatabaseModule } from '../../infrastructure/database/database.module';
 import { ISearchRepository } from '../../domain/repositories/search';
 import { IGoogleBooksRepository } from '../../domain/repositories/google-books';
 import { IBookRepository } from '../../domain/repositories/book';
 
 @Module({
-  imports: [AuthModule, DatabaseModule],
+  imports: [AuthModule],
   providers: [
     SearchResolver,
     SearchBooksUseCase,

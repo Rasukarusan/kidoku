@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { SearchRepository } from '../infrastructure/repositories/search';
 import { BookRepository } from '../infrastructure/repositories/book';
 import { MeiliSearchProvider } from '../infrastructure/search/meilisearch.providers';
@@ -12,12 +11,7 @@ import {
 import { IBookRepository } from '../domain/repositories/book';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    DatabaseModule,
-  ],
+  imports: [DatabaseModule],
   providers: [
     MeiliSearchProvider,
     {
