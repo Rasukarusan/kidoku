@@ -3,7 +3,7 @@
   "packageManager": "pnpm@10.5.2",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm --filter @kidoku/database prisma:generate && next build",
     "start": "next start",
     "lint": "eslint src/** --ext .ts,.tsx",
     "lint:fix": "eslint --fix src/** --ext .ts,.tsx",
