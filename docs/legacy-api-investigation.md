@@ -105,9 +105,8 @@ prisma.books.update({ where: { id: book.id }, data: { image: url } })
 ```
 
 - `createBook` mutationがバックエンドに**既に存在する**のに、API RouteのPOSTではPrisma直接で作成
-- 画像のVercel Blobアップロード処理がAPI Route側にあるため移行が複雑
-- **移行方針:** 画像アップロードはAPI Routeに残し、DB操作のみ`createBook` mutationに委譲。アップロード後にGraphQL `updateBook`で画像URLを更新
-- **移行の難易度:** 低（バックエンド側の追加実装不要、フロントエンド側リファクタのみ）
+- レコード作成→画像Vercel Blobアップロード→画像URL更新という3ステップが密結合しており、GraphQL mutationへの単純な差し替えが困難
+- **移行の難易度:** 高（画像アップロードフローの設計見直しが必要。別タイミングで対応）
 
 ### 3-2. Books一覧取得（シート名別）
 **ファイル:** `apps/web/src/pages/api/books/[sheet].ts:13`
@@ -243,16 +242,16 @@ ORM統一により、バックエンドPrismaスキーマに全モデルが定�
 ### 高優先度（低工数・高効果）
 1. **YearlyTopBook** — 最も単純なCRUD。外部サービス依存なし。SSR/ISRページからも参照されており、GraphQL化の効果が大きい
 2. **User操作** — アプリの基盤ドメイン。4エンドポイントすべて単純なDB操作
-3. **Books CREATE** — `createBook` mutationが既にバックエンドに存在。フロントエンド側のリファクタのみで移行可能（画像アップロードはAPI Routeに残し、DB操作をGraphQL経由に変更）
 
 ### 中優先度
-4. **Books一覧（シート名ベース）** — `GetBooksInput`に`sheetName`フィールド追加のみの最小変更
-5. **AiSummaries（非ストリーミング）** — usage取得、save、deleteの3操作は移行可能
-6. **Template Books** — 画像アップロード分離が必要だがCRUD自体は単純
+3. **Books一覧（シート名ベース）** — `GetBooksInput`に`sheetName`フィールド追加のみの最小変更
+4. **AiSummaries（非ストリーミング）** — usage取得、save、deleteの3操作は移行可能
+5. **Template Books** — 画像アップロード分離が必要だがCRUD自体は単純
 
 ### 低優先度（現状維持が妥当）
-7. **CSV Export** — ファイルダウンロードはREST APIの方が適切
-8. **AiSummaries CREATE（ストリーミング）** — Edge Runtime + SSEはGraphQL移行困難
+6. **CSV Export** — ファイルダウンロードはREST APIの方が適切
+7. **AiSummaries CREATE（ストリーミング）** — Edge Runtime + SSEはGraphQL移行困難
+8. **Books CREATE** — 画像アップロード（Vercel Blob）とDB操作が密結合しており、設計見直しが必要。別タイミングで対応
 9. **SSR/ISRの直接Prismaアクセス** — パフォーマンス要件上、直接アクセスが妥当。各ドメインのGraphQL query整備後に段階的に検討
 
 ---
@@ -264,4 +263,4 @@ ORM統一により、バックエンドPrismaスキーマに全モデルが定�
 3. **移行工数の低下**: バックエンドPrismaスキーマに全モデル定義済みのため、各ドメインの移行はDDDレイヤー実装のみ
 4. **Prismaスキーマ二重管理**: `apps/web/prisma/schema.prisma`と`apps/api/prisma/schema.prisma`の両方更新が必要（新しい制約）
 5. **SSR/ISRテーブル更新**: `[year].tsx`ページを追加（5つのPrismaクエリを使用する最も複雑なページ）
-6. **優先度再評価**: Books CREATEの難易度を「中→低」に変更（バックエンド側の追加実装不要のため）。YearlyTopBookを最高優先度に
+6. **優先度再評価**: YearlyTopBookを最高優先度に。Books CREATEは画像アップロードの密結合により低優先度に変更
