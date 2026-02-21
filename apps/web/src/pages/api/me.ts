@@ -1,4 +1,4 @@
-import prisma from '@/libs/prisma'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 
@@ -10,11 +10,18 @@ export default async (req, res) => {
     }
     const body = JSON.parse(req.body)
     const { name } = body
-    const id = session.user.id
-    await prisma.user.update({
-      where: { id },
-      data: { name },
-    })
+    const userId = session.user.id
+    await graphqlClient.execute(
+      userId,
+      `
+      mutation UpdateUserName($input: UpdateUserNameInput!) {
+        updateUserName(input: $input) {
+          name
+        }
+      }
+    `,
+      { input: { name } }
+    )
     res.status(200).json({ result: true })
   } catch (e) {
     console.error(e)

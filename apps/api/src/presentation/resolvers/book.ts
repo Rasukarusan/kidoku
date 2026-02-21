@@ -49,6 +49,7 @@ export class BookResolver {
     const books = await this.getBooksUseCase.execute({
       userId: user.id,
       sheetId: input?.sheetId,
+      sheetName: input?.sheetName,
     });
 
     return books.map((book) => {

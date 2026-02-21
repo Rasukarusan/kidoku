@@ -1,4 +1,4 @@
-import prisma from '@/libs/prisma'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 
@@ -9,13 +9,15 @@ export default async (req, res) => {
       res.status(401).json({ result: false })
     }
     if (req.method === 'DELETE') {
-      const id = session.user.id
-      const result = await prisma.user.delete({
-        where: { id },
-      })
-      if (result.id !== id) {
-        return res.status(400).json({ result: false })
-      }
+      const userId = session.user.id
+      await graphqlClient.execute(
+        userId,
+        `
+        mutation DeleteUser {
+          deleteUser
+        }
+      `
+      )
       return res.status(200).json({ result: true })
     }
     res.status(200).json({ result: true })

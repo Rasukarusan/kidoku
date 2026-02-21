@@ -6,11 +6,22 @@ import { IBookRepository } from '../../../domain/repositories/book';
 export class GetBooksUseCase {
   constructor(private readonly bookRepository: IBookRepository) {}
 
-  async execute(params: { userId: string; sheetId?: number }): Promise<Book[]> {
+  async execute(params: {
+    userId: string;
+    sheetId?: number;
+    sheetName?: string;
+  }): Promise<Book[]> {
     if (params.sheetId) {
       return await this.bookRepository.findByUserIdAndSheetId(
         params.userId,
         params.sheetId,
+      );
+    }
+
+    if (params.sheetName) {
+      return await this.bookRepository.findByUserIdAndSheetName(
+        params.userId,
+        params.sheetName,
       );
     }
 

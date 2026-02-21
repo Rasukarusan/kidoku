@@ -1,4 +1,4 @@
-import prisma from '@/libs/prisma'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 
@@ -11,48 +11,56 @@ export default async (req, res) => {
     const userId = session.user.id
     if (req.method === 'GET') {
       const { year } = req.query
-      const yearlyTopBooks = await prisma.yearlyTopBook.findMany({
-        where: { year, user: { id: userId } },
-        select: {
-          year: true,
-          order: true,
-          book: {
-            select: { id: true, title: true, author: true, image: true },
-          },
-        },
-        orderBy: { order: 'asc' },
-      })
-      return res.status(200).json({ result: true, yearlyTopBooks })
+      const data = await graphqlClient.execute<{
+        yearlyTopBooks: Array<{
+          year: string
+          order: number
+          book: { id: number; title: string; author: string; image: string }
+        }>
+      }>(
+        userId,
+        `
+        query YearlyTopBooks($input: GetYearlyTopBooksInput!) {
+          yearlyTopBooks(input: $input) {
+            year
+            order
+            book {
+              id
+              title
+              author
+              image
+            }
+          }
+        }
+      `,
+        { input: { year } }
+      )
+      return res
+        .status(200)
+        .json({ result: true, yearlyTopBooks: data.yearlyTopBooks })
     } else if (req.method === 'POST') {
       const { year, order, bookId } = JSON.parse(req.body)
-      await prisma.yearlyTopBook.upsert({
-        create: {
-          year,
-          order,
-          user: { connect: { id: userId } },
-          book: { connect: { id: bookId } },
-        },
-        update: { book: { connect: { id: bookId } } },
-        where: {
-          userId_order_year: {
-            year,
-            order,
-            userId,
-          },
-        },
-      })
+      await graphqlClient.execute(
+        userId,
+        `
+        mutation UpsertYearlyTopBook($input: UpsertYearlyTopBookInput!) {
+          upsertYearlyTopBook(input: $input)
+        }
+      `,
+        { input: { year, order, bookId } }
+      )
       return res.status(200).json({ result: true })
     } else if (req.method === 'DELETE') {
       const { year, order } = JSON.parse(req.body)
-      await prisma.yearlyTopBook.delete({
-        where: {
-          userId_order_year: {
-            year,
-            order,
-            userId,
-          },
-        },
-      })
+      await graphqlClient.execute(
+        userId,
+        `
+        mutation DeleteYearlyTopBook($input: DeleteYearlyTopBookInput!) {
+          deleteYearlyTopBook(input: $input)
+        }
+      `,
+        { input: { year, order } }
+      )
       return res.status(200).json({ result: true })
     }
   } catch (e) {
