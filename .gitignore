@@ -64,5 +64,9 @@ src/pages/play.tsx
 src/pages/api/play
 src/app/play
 
-# Playwright MCP
+# Playwright
 .playwright-mcp/
+**/test-results/
+**/playwright-report/
+**/blob-report/
+**/playwright/.cache/
