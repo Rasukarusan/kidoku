@@ -13,7 +13,7 @@ const nextConfig = {
     ],
   },
   // Novelとその依存関係をトランスパイル
-  transpilePackages: ['novel', 'katex'],
+  transpilePackages: ['novel', 'katex', '@kidoku/database'],
   webpack(config, options) {
     config.resolve.alias['@'] = path.join(__dirname, 'src')
     return config

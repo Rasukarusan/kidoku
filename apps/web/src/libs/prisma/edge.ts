@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client/edge'
+import { PrismaClient } from '@kidoku/database/edge'
 const prisma = new PrismaClient({
   log: [
     // 'query',
@@ -9,4 +9,4 @@ const prisma = new PrismaClient({
 })
 export default prisma
 
-export * from '@prisma/client/edge'
+export * from '@kidoku/database/edge'

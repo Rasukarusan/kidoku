@@ -30,6 +30,9 @@ importers:
       '@apollo/server':
         specifier: ^4.12.0
         version: 4.12.0(graphql@16.11.0)
+      '@kidoku/database':
+        specifier: workspace:*
+        version: link:../database
       '@nestjs/apollo':
         specifier: ^13.1.0
         version: 13.1.0(@apollo/server@4.12.0(graphql@16.11.0))(@nestjs/common@11.1.0(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.0)(@nestjs/graphql@13.1.0(@nestjs/common@11.1.0(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.0)(class-transformer@0.5.1)(class-validator@0.14.2)(graphql@16.11.0)(reflect-metadata@0.2.2))(graphql@16.11.0)
@@ -51,9 +54,6 @@ importers:
       '@nestjs/platform-express':
         specifier: ^11.0.1
         version: 11.1.0(@nestjs/common@11.1.0(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.0)
-      '@prisma/client':
-        specifier: ^5.2.0
-        version: 5.22.0(prisma@5.22.0)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -130,9 +130,6 @@ importers:
       prettier:
         specifier: ^3.4.2
         version: 3.5.3
-      prisma:
-        specifier: ^5.2.0
-        version: 5.22.0
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -158,6 +155,16 @@ importers:
         specifier: ^8.20.0
         version: 8.31.0(eslint@9.25.1(jiti@1.21.7))(typescript@5.8.2)
 
+  apps/database:
+    dependencies:
+      '@prisma/client':
+        specifier: ^5.2.0
+        version: 5.22.0(prisma@5.22.0)
+    devDependencies:
+      prisma:
+        specifier: ^5.2.0
+        version: 5.22.0
+
   apps/web:
     dependencies:
       '@apollo/client':
@@ -172,12 +179,12 @@ importers:
       '@emotion/styled':
         specifier: ^11.9.3
         version: 11.14.0(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.3.1))(@types/react@18.2.79)(react@18.3.1)
+      '@kidoku/database':
+        specifier: workspace:*
+        version: link:../database
       '@next-auth/prisma-adapter':
         specifier: ^1.0.7
         version: 1.0.7(@prisma/client@5.22.0(prisma@5.22.0))(next-auth@4.24.11(next@14.2.28(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
-      '@prisma/client':
-        specifier: ^5.2.0
-        version: 5.22.0(prisma@5.22.0)
       '@react-email/components':
         specifier: 0.0.10
         version: 0.0.10(@types/react@18.2.79)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.11.22)(@types/node@17.0.45)(typescript@4.9.5))
@@ -256,9 +263,6 @@ importers:
       novel:
         specifier: ^0.5.0
         version: 0.5.0(@tiptap/extension-code-block@2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1))(@types/react@18.2.79)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      prisma:
-        specifier: ^5.2.0
-        version: 5.22.0
       react:
         specifier: ^18.2.0
         version: 18.3.1
