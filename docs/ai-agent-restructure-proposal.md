@@ -105,17 +105,17 @@ APIの `test/app.e2e-spec.ts` はNestJSのデフォルトが残っているだ�
   - ユースケースのテンプレート
 - テストの書き方パターン
 - よくあるミス・禁止事項の一覧
-- Dual ORMスキーマ同期の具体的手順（どのファイルをどう変更するか）
+- Dual Prismaスキーマ同期の具体的手順（どのファイルをどう変更するか）
 
-### 課題4: Dual ORM問題の曖昧なドキュメント ★★☆
+### 課題4: Dual Prismaスキーマ同期の曖昧なドキュメント ★★☆
 
-同一MySQLに対してフロントエンド(Prisma)とバックエンド(Drizzle)で2つのORMが使われている。CLAUDE.mdに「手動で同期が必要」と記載はあるが、具体的にどのファイルをどう同期するかが不明確。
+同一MySQLに対してフロントエンド(`apps/web/prisma/schema.prisma`)とバックエンド(`apps/api/prisma/schema.prisma`)で2つのPrismaスキーマが存在する。CLAUDE.mdに「手動で同期が必要」と記載はあるが、具体的にどのファイルをどう同期するかが不明確。
 
 **関連ファイル**:
-- Prismaスキーマ: `apps/web/prisma/schema.prisma`
-- Drizzleスキーマ: `apps/api/src/infrastructure/database/schema/*.schema.ts`（9ファイル）
+- Webスキーマ: `apps/web/prisma/schema.prisma`
+- APIスキーマ: `apps/api/prisma/schema.prisma`
 
-AIエージェントがPrisma側だけ更新してDrizzle側を忘れる（またはその逆）リスクが高い。
+AIエージェントがWeb側だけ更新してAPI側を忘れる（またはその逆）リスクが高い。
 
 ### 課題5: バリデーションの一括実行手段がない ★★☆
 
@@ -219,10 +219,10 @@ Claude Code固有の設定（許可コマンド、カスタム指示等）が未
 ファイル: `apps/api/src/infrastructure/repositories/tag.ts`
 - @Injectable() + ITagRepository を implements
 
-### Step 4: Drizzleスキーマ追加
-ファイル: `apps/api/src/infrastructure/database/schema/tags.schema.ts`
-- テーブル定義
-- `schema/index.ts` にexport追加
+### Step 4: APIのPrismaスキーマ追加
+ファイル: `apps/api/prisma/schema.prisma`
+- `apps/web/prisma/schema.prisma` と同じモデル定義を追加
+- `pnpm --filter api prisma generate` でクライアント再生成
 
 ### Step 5: ユースケース作成
 ファイル: `apps/api/src/application/usecases/tags/*.ts`
@@ -248,41 +248,37 @@ Claude Code固有の設定（許可コマンド、カスタム指示等）が未
 - ドメインモデルのユニットテスト
 - ユースケースのユニットテスト
 
-### Step 11: Prismaスキーマとの同期（DBスキーマ変更時）
+### Step 11: Prismaスキーマの同期（DBスキーマ変更時）
 1. `apps/web/prisma/schema.prisma` にモデル追加
-2. `pnpm --filter web db:push` でDB反映
-3. Drizzleスキーマも上記Step 4で同期済み
-4. `pnpm --filter api db:push`
+2. `apps/api/prisma/schema.prisma` にも同じモデル定義を追加
+3. `pnpm --filter web db:push` でDB反映
+4. `pnpm --filter api db:push` でバックエンドも反映
+5. 両方の `prisma generate` でクライアント再生成
 ```
 
 #### 1-3. スキーマ同期ガイド
 
 ```markdown
-## Prisma ⇔ Drizzle スキーマ同期
+## Dual Prismaスキーマ同期
 
-同一MySQLに対してPrisma(web)とDrizzle(api)の2つのORMを使用しているため、
-スキーマ変更時は**必ず両方を更新**する。
+同一MySQLに対してWeb(`apps/web/prisma/schema.prisma`)とAPI(`apps/api/prisma/schema.prisma`)の
+2つのPrismaスキーマが存在するため、スキーマ変更時は**必ず両方を更新**する。
 
-### 対応表
+### 対応ファイル
 
-| Prismaスキーマ (`apps/web/prisma/schema.prisma`) | Drizzleスキーマ (`apps/api/src/infrastructure/database/schema/`) |
-|--------------------------------------------------|-------------------------------------------------------------------|
-| model books { ... }                              | `books.schema.ts`                                                 |
-| model sheets { ... }                             | `sheets.schema.ts`                                                |
-| model User { ... }                               | `users.schema.ts`                                                 |
-| model Account { ... }                            | `accounts.schema.ts`                                              |
-| model Session { ... }                            | `sessions.schema.ts`                                              |
-| model VerificationToken { ... }                  | `verificationtokens.schema.ts`                                    |
-| model template_books { ... }                     | `template-books.schema.ts`                                        |
-| model ai_summaries { ... }                       | `ai-summaries.schema.ts`                                          |
-| model yearly_top_books { ... }                   | `yearly-top-books.schema.ts`                                      |
+| Webスキーマ | APIスキーマ |
+|-------------|-------------|
+| `apps/web/prisma/schema.prisma` | `apps/api/prisma/schema.prisma` |
+
+両ファイルのモデル定義を同一内容に保つこと。
 
 ### 変更手順
-1. Prismaスキーマ (`schema.prisma`) を編集
-2. `pnpm --filter web db:push` でDBに反映
-3. 対応するDrizzleスキーマファイルを手動で同期
-4. `pnpm --filter api db:push` でバックエンドも更新
-5. `pnpm --filter web prisma generate` でPrismaクライアント再生成
+1. `apps/web/prisma/schema.prisma` を編集
+2. `apps/api/prisma/schema.prisma` にも同じ変更を反映
+3. `pnpm --filter web db:push` でDBに反映
+4. `pnpm --filter api db:push` でバックエンドも反映
+5. `pnpm --filter web prisma generate` でWebのPrismaクライアント再生成
+6. `pnpm --filter api prisma generate` でAPIのPrismaクライアント再生成
 ```
 
 #### 1-4. 禁止事項・よくあるミス
@@ -299,7 +295,7 @@ Claude Code固有の設定（許可コマンド、カスタム指示等）が未
 - ✅ presentation/ → application/ + domain/ (リゾルバーがユースケースを呼び出し)
 
 ### スキーマ変更
-- ❌ Prismaだけ変更してDrizzleを忘れる（またはその逆）
+- ❌ Web側のPrismaスキーマだけ変更してAPI側を忘れる（またはその逆）
 - ❌ スキーマ変更後に `db:push` を忘れる
 
 ### NestJS DI
@@ -681,7 +677,7 @@ CLAUDE.md
 ├── ★ 機能追加ガイド                      ← NEW
 │   ├── 新しいGraphQLエンドポイント追加手順
 │   ├── 新しいフロントエンドページ追加手順
-│   └── DBスキーマ変更手順（Prisma⇔Drizzle同期）
+│   └── DBスキーマ変更手順（Dual Prismaスキーマ同期）
 ├── ★ テストガイド                        ← NEW
 │   ├── テストファイルの配置規約
 │   ├── ドメインモデルテストの書き方
@@ -689,7 +685,7 @@ CLAUDE.md
 ├── ★ 禁止事項・よくあるミス              ← NEW
 ├── 開発コマンド
 ├── 重要ファイル・ディレクトリ
-├── ★ Prisma⇔Drizzle対応表               ← NEW
+├── ★ Dual Prismaスキーマ同期ガイド        ← NEW
 ├── 開発時の注意事項
 ├── サンドボックス環境での開発
 └── トラブルシューティング
@@ -698,7 +694,7 @@ CLAUDE.md
 ### 将来的な改善候補（本提案のスコープ外）
 
 - **共有パッケージ (`packages/`)** の導入: web/api間で共有する型定義を `packages/shared-types` に切り出し
-- **ORMの統一**: Prisma or Drizzle のどちらかに統一してスキーマ同期問題を根本解決
+- **Prismaスキーマの一元化**: web/apiで別々に管理しているPrismaスキーマを共有パッケージ等で一元管理し、同期問題を根本解決
 - **TypeScript strict mode 有効化** (web): 段階的に `strict: true` に移行
 - **ESLint設定統一**: 共有ESLint config パッケージの作成
 - **E2Eテスト**: Playwright を使ったフロントエンドE2Eテスト
