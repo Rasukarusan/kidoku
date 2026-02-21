@@ -20,8 +20,15 @@ const getGraphQLEndpoint = () => {
 }
 
 // HttpLinkの作成
+// Network TABでoperationNameが見えるようにURIを動的に生成
 const httpLink = new HttpLink({
-  uri: getGraphQLEndpoint(),
+  uri: (operation) => {
+    const endpoint = getGraphQLEndpoint()
+    const operationName = operation.operationName
+    return operationName
+      ? `${endpoint}?operationName=${operationName}`
+      : endpoint
+  },
   credentials: 'same-origin', // 同一オリジンでクッキーを送信
 })
 
