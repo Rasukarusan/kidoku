@@ -27,9 +27,9 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 
 ### データベースアクセス
 
-- **共有パッケージ**: `@kidoku/database`（`apps/database`）でPrismaスキーマとクライアントを一元管理
-- **フロントエンド**: `@kidoku/database` → MySQL
-- **バックエンド**: `@kidoku/database` → 同一MySQL
+- **フロントエンド**: `@prisma/client`（`apps/web/prisma/schema.prisma`）→ MySQL
+- **バックエンド**: `@prisma/client`（`apps/api/prisma/schema.prisma`）→ 同一MySQL
+- スキーマは `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の2箇所に同じ内容が存在する。スキーマ変更時は両方を更新すること。
 
 ### API アーキテクチャ（DDD）
 
@@ -88,14 +88,12 @@ pnpm --filter api build
 ### データベース操作
 
 ```bash
-# Prismaクライアント生成（共有パッケージ）
-pnpm --filter @kidoku/database prisma:generate
-
 # スキーマをDBに反映
-pnpm --filter @kidoku/database db:push
+pnpm --filter web db:push
+pnpm --filter api db:push
 
 # Prisma Studio起動
-pnpm --filter @kidoku/database db:studio
+pnpm --filter web db:studio
 ```
 
 ### テスト
@@ -155,9 +153,8 @@ pnpm --filter web lighthouse
 
 ### データベース
 
-- `apps/database/prisma/schema.prisma` - Prismaスキーマ定義（唯一のソース）
-- `apps/database/src/index.ts` - PrismaClient再エクスポート
-- `apps/database/src/edge.ts` - Edge Runtime用PrismaClient
+- `apps/web/prisma/schema.prisma` - Prismaスキーマ定義（web側）
+- `apps/api/prisma/schema.prisma` - Prismaスキーマ定義（API側）
 
 ### 検索
 
@@ -174,9 +171,9 @@ pnpm --filter web lighthouse
 
 ### データベーススキーマ変更
 
-1. `apps/database/prisma/schema.prisma`を編集（スキーマは1ファイルのみ）
-2. `pnpm --filter @kidoku/database db:push`でDBに反映
-3. `pnpm --filter @kidoku/database prisma:generate`でクライアントを再生成
+1. `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の両方を編集
+2. `pnpm --filter web db:push` でDBに反映
+3. `pnpm --filter web build` / `pnpm --filter api build` でPrismaクライアントが自動生成される
 
 ### MeiliSearch
 
@@ -225,7 +222,8 @@ node /tmp/screenshot.mjs
 pnpm --filter web codegen
 
 # Prismaクライアント再生成
-pnpm --filter @kidoku/database prisma:generate
+pnpm --filter web prisma generate
+pnpm --filter api prisma generate
 # サンドボックス環境では PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 を付与
 ```
 

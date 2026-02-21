@@ -9,14 +9,12 @@ WORKDIR /app
 # 依存関係ファイルをコピー
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
-COPY apps/database/package.json ./apps/database/
 
 # ワークスペース全体の依存関係をインストール
 RUN pnpm install --frozen-lockfile
 
 # ソースコードをコピー
 COPY apps/api ./apps/api
-COPY apps/database ./apps/database
 
 # NestJSアプリケーションをビルド
 RUN pnpm --filter api run build
@@ -36,7 +34,6 @@ WORKDIR /app
 # 依存関係ファイルをコピー
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
-COPY apps/database/package.json ./apps/database/
 
 # 本番用の依存関係のみインストール
 ENV HUSKY=0
