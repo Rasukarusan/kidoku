@@ -24,7 +24,6 @@ import { SearchModule } from './presentation/modules/search';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         user: req.user, // HeaderStrategy → req.user
       }),
-      playground: true,
     }),
     DatabaseModule,
     SheetModule,
