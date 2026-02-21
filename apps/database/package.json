@@ -8,6 +8,11 @@
     ".": "./src/index.ts",
     "./edge": "./src/edge.ts"
   },
+  "typesVersions": {
+    "*": {
+      "edge": ["./src/edge.ts"]
+    }
+  },
   "scripts": {
     "prisma:generate": "prisma generate",
     "db:push": "prisma db push",
