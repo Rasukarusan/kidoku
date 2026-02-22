@@ -1,5 +1,3 @@
-import useSWR from 'swr'
-import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
@@ -7,17 +5,17 @@ import { BookDetailSidebar } from './BookDetailSidebar'
 import { NO_IMAGE } from '@/libs/constants'
 import { AiFillLock } from 'react-icons/ai'
 import { useRouter } from 'next/router'
+import { useApolloClient } from '@apollo/client'
 
 interface Props {
   bookId: string
   books: Book[]
-  year: string
 }
-export const Books: React.FC<Props> = ({ bookId, books, year }) => {
+export const Books: React.FC<Props> = ({ bookId, books }) => {
   const initialHovers = Array(books.length).fill(false)
   const router = useRouter()
   const [hovers, setHovers] = useState(initialHovers)
-  const { mutate } = useSWR(`/api/books/${year}`, fetcher)
+  const apolloClient = useApolloClient()
 
   // サイドバー用の状態管理
   const [openSidebar, setOpenSidebar] = useState(false)
@@ -98,7 +96,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
         open={openSidebar}
         book={sidebarBook}
         onClose={() => {
-          mutate()
+          apolloClient.refetchQueries({ include: ['GetBooks'] })
           setOpenSidebar(false)
           setSidebarBook(null)
         }}

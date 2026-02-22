@@ -3,11 +3,9 @@ import { useEffect, useState } from 'react'
 import { BookDetailReadModal } from './BookDetailReadModal'
 import { BookDetailEditModal } from './BookDetailEditModal'
 import { useReward } from 'react-rewards'
-import { useSWRConfig } from 'swr'
-import { useRouter } from 'next/router'
 import { IoMdClose, IoMdExpand } from 'react-icons/io'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLazyQuery } from '@apollo/client'
+import { useApolloClient, useLazyQuery } from '@apollo/client'
 import { getBookQuery } from '@/features/books/api'
 
 interface Props {
@@ -23,8 +21,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
   onClose,
   onExpandToFullPage,
 }) => {
-  const router = useRouter()
-  const { mutate } = useSWRConfig()
+  const apolloClient = useApolloClient()
   const [edit, setEdit] = useState(false)
   const [currentBook, setCurrentBook] = useState<Book>(book)
   const [newBook, setNewBook] = useState<Book>(book)
@@ -126,7 +123,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
     reward()
     setLoading(false)
     setEdit(false)
-    mutate(`/api/books/${router.query.year}`)
+    apolloClient.refetchQueries({ include: ['GetBooks'] })
   }
 
   const onDelete = async () => {
