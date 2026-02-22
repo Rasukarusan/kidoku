@@ -47,7 +47,7 @@ test.describe('静的ページ', () => {
   test('特定商取引法ページが表示される', async ({ page }) => {
     await page.goto('/law')
     await expect(
-      page.getByText('特定商取引法に基づく表記', { exact: true })
+      page.getByRole('heading', { name: '特定商取引法に基づく表記' })
     ).toBeVisible()
     await expect(page.getByText('事業者', { exact: true })).toBeVisible()
   })
