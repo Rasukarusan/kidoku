@@ -73,12 +73,12 @@ export const SheetPage: React.FC<Props> = ({
 
   const isMine = session && session.user.id === userId
   useEffect(() => {
-    if (isMine) {
-      setCurrentData(res?.books || [])
-    } else {
+    if (isMine && res?.result && res?.books) {
+      setCurrentData(res.books)
+    } else if (!isMine) {
       setCurrentData(data)
     }
-  }, [res, session, data])
+  }, [res, session, data, isMine])
 
   const setShowData = (newData: Book[]) => {
     setCurrentData(newData)
@@ -206,7 +206,7 @@ export const SheetPage: React.FC<Props> = ({
           <button
             onClick={() => {
               setFilter('')
-              if (isMine) {
+              if (isMine && res?.result && res?.books) {
                 setCurrentData(res.books)
               } else {
                 setCurrentData(data)
