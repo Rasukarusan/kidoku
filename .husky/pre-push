@@ -1,1 +1,1 @@
-pnpm validate
+pnpm lint:fix && pnpm test
