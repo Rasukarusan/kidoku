@@ -19,6 +19,12 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
   const [book, setBook] = useState(initialBook)
   const isOwner = useIsBookOwner(book)
 
+  // ナビゲーション時にpropsの変更を反映
+  useEffect(() => {
+    setBook(initialBook)
+    setEditMode(false)
+  }, [initialBook])
+
   // 所有者の場合、GraphQL経由で完全なメモデータを取得
   useEffect(() => {
     if (!isOwner || !book) return
