@@ -1,44 +1,58 @@
-import { ApiClient } from '@/libs/apiClient'
 import { SearchResult } from '@/types/search'
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+import { mask } from '@/utils/string'
+import { gql } from '@apollo/client'
+import client from '@/libs/apollo'
+
+const SEARCH_BOOKS_QUERY = gql`
+  query SearchBooks($input: SearchBooksInput!) {
+    searchBooks(input: $input) {
+      hits {
+        id
+        title
+        author
+        image
+        memo
+        username
+        userImage
+        sheet
+      }
+      hasMore
+    }
+  }
+`
+
+const SEARCH_GOOGLE_BOOKS_QUERY = gql`
+  query SearchGoogleBooks($input: SearchGoogleBooksInput!) {
+    searchGoogleBooks(input: $input) {
+      id
+      title
+      author
+      category
+      image
+    }
+  }
+`
+
+const LATEST_SOFTWARE_DESIGN_QUERY = gql`
+  query LatestSoftwareDesign {
+    latestSoftwareDesign {
+      yearMonth
+      title
+      coverImageUrl
+      author
+      category
+    }
+  }
+`
 
 /**
  * Software Designの最新号を取得
  */
 const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
   try {
-    // サーバーサイドかクライアントサイドかを判定
-    const isServer = typeof window === 'undefined'
-
-    // APIエンドポイントのURLを適切に設定
-    const graphqlEndpoint = isServer
-      ? 'http://localhost:4000/graphql' // サーバーサイドでは直接localhost
-      : process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
-        'http://localhost:4000/graphql'
-
-    // 認証不要のクライアントを作成
-    const publicApolloClient = new ApolloClient({
-      uri: graphqlEndpoint,
-      cache: new InMemoryCache(),
-      defaultOptions: {
-        query: {
-          fetchPolicy: 'no-cache',
-        },
-      },
-    })
-
-    const { data } = await publicApolloClient.query({
-      query: gql`
-        query {
-          latestSoftwareDesign {
-            yearMonth
-            title
-            coverImageUrl
-            author
-            category
-          }
-        }
-      `,
+    const { data } = await client.query({
+      query: LATEST_SOFTWARE_DESIGN_QUERY,
+      fetchPolicy: 'no-cache',
     })
 
     if (data?.latestSoftwareDesign) {
@@ -54,13 +68,6 @@ const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
     }
   } catch (error) {
     console.error('Failed to fetch latest Software Design:', error)
-    // エラーの詳細を確認
-    if (error.networkError) {
-      console.error('Network error:', error.networkError)
-    }
-    if (error.graphQLErrors) {
-      console.error('GraphQL errors:', error.graphQLErrors)
-    }
 
     // フォールバック: 現在の年月を計算して固定データを返す
     const now = new Date()
@@ -86,7 +93,6 @@ const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
  * 書籍検索
  */
 export const searchBooks = async (title: string): Promise<SearchResult[]> => {
-  const client = new ApiClient()
   const result: SearchResult[] = []
 
   // Software Design検索の判定
@@ -106,28 +112,32 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
     }
   }
 
-  // バックエンド経由でGoogle Books APIを検索
-  await client
-    .get(`/api/search/google-books?q=${encodeURIComponent(title)}`)
-    .then((res) => {
-      const items: Array<{
-        id: string
-        title: string
-        author: string
-        category: string
-        image: string
-      }> = res.data
-      items?.map((item) => {
-        result.push({
-          id: item.id,
-          title: item.title,
-          author: item.author,
-          category: item.category,
-          image: item.image,
-          memo: '',
-        })
+  // GraphQL経由でGoogle Books APIを検索
+  const { data } = await client.query({
+    query: SEARCH_GOOGLE_BOOKS_QUERY,
+    variables: { input: { query: title } },
+    fetchPolicy: 'no-cache',
+  })
+
+  data.searchGoogleBooks?.forEach(
+    (item: {
+      id: string
+      title: string
+      author: string
+      category: string
+      image: string
+    }) => {
+      result.push({
+        id: item.id,
+        title: item.title,
+        author: item.author,
+        category: item.category,
+        image: item.image,
+        memo: '',
       })
-    })
+    }
+  )
+
   return result
 }
 
@@ -137,9 +147,35 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
 export const searchUserBooks = async (
   title: string
 ): Promise<SearchResult[]> => {
-  const client = new ApiClient()
-  const result = await client
-    .get(`/api/search/shelf?q=${title}`)
-    .then((res) => res.data)
-  return result.hits
+  const { data } = await client.query({
+    query: SEARCH_BOOKS_QUERY,
+    variables: { input: { query: title } },
+    fetchPolicy: 'no-cache',
+  })
+
+  const searchResult = data.searchBooks
+  if (!searchResult || searchResult.hits.length === 0) return []
+
+  return searchResult.hits.map(
+    (hit: {
+      id: string
+      title: string
+      author: string
+      image: string
+      memo: string
+      username: string
+      userImage: string | null
+      sheet: string
+    }) => ({
+      id: hit.id,
+      title: hit.title,
+      author: hit.author,
+      image: hit.image,
+      category: '',
+      memo: mask(hit.memo),
+      username: hit.username,
+      userImage: hit.userImage,
+      sheet: hit.sheet,
+    })
+  )
 }
