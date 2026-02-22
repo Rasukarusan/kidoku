@@ -1,5 +1,3 @@
-import useSWR from 'swr'
-import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { Book } from '@/types/book'
 import { HoverBook } from './HoverBook'
@@ -11,13 +9,12 @@ import { useRouter } from 'next/router'
 interface Props {
   bookId: string
   books: Book[]
-  year: string
+  onRefetch?: () => void
 }
-export const Books: React.FC<Props> = ({ bookId, books, year }) => {
+export const Books: React.FC<Props> = ({ bookId, books, onRefetch }) => {
   const initialHovers = Array(books.length).fill(false)
   const router = useRouter()
   const [hovers, setHovers] = useState(initialHovers)
-  const { mutate } = useSWR(`/api/books/${year}`, fetcher)
 
   // サイドバー用の状態管理
   const [openSidebar, setOpenSidebar] = useState(false)
@@ -98,7 +95,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
         open={openSidebar}
         book={sidebarBook}
         onClose={() => {
-          mutate()
+          onRefetch?.()
           setOpenSidebar(false)
           setSidebarBook(null)
         }}

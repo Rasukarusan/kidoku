@@ -4,16 +4,14 @@ import { useEffect, useState } from 'react'
 import { BookDetailReadModal } from './BookDetailReadModal'
 import { BookDetailEditModal } from './BookDetailEditModal'
 import { useReward } from 'react-rewards'
-import { useSWRConfig } from 'swr'
-import { useRouter } from 'next/router'
 import {
   getBookDraft,
   saveBookDraft,
   removeBookDraft,
   cleanupOldDrafts,
 } from '@/utils/localStorage'
-import { useLazyQuery } from '@apollo/client'
-import { getBookQuery } from '@/features/books/api'
+import { useApolloClient, useLazyQuery } from '@apollo/client'
+import { getBooksQuery, getBookQuery } from '@/features/books/api'
 
 interface Props {
   book?: Book
@@ -22,8 +20,7 @@ interface Props {
 }
 
 export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
-  const router = useRouter()
-  const { mutate } = useSWRConfig()
+  const client = useApolloClient()
   const [edit, setEdit] = useState(false)
   const [currentBook, setCurrentBook] = useState<Book>(book)
   const [newBook, setNewBook] = useState<Book>(book)
@@ -145,7 +142,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
     reward()
     setLoading(false)
     setEdit(false)
-    mutate(`/api/books/${router.query.year}`)
+    await client.refetchQueries({ include: [getBooksQuery] })
   }
 
   const onDelete = async () => {

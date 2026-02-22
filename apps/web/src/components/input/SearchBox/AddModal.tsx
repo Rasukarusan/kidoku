@@ -1,10 +1,8 @@
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
-import { fetcher } from '@/libs/swr'
 import { useEffect, useState } from 'react'
 import { useReward } from 'react-rewards'
-import useSWR from 'swr'
-import { useQuery } from '@apollo/client'
+import { useApolloClient, useQuery } from '@apollo/client'
 import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
 import { Modal } from '@/components/layout/Modal'
@@ -27,7 +25,7 @@ import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
 
 import { getSheetsQuery } from '@/features/sheet/api'
-import { getBookCategoriesQuery } from '@/features/books/api'
+import { getBooksQuery, getBookCategoriesQuery } from '@/features/books/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -57,12 +55,9 @@ export const AddModal: React.FC = () => {
   const [open, setOpen] = useAtom(openAddModalAtom)
   const item = useAtomValue(addBookAtom)
   const { data: session } = useSession()
+  const apolloClient = useApolloClient()
   const { data: sheetsData, refetch: refetchSheets } = useQuery(getSheetsQuery)
   const sheets = sheetsData?.sheets || []
-  const { mutate } = useSWR(
-    `/api/books/${router.asPath.split('/').pop()}`,
-    fetcher
-  )
   const [loading, setLoading] = useState(false)
   const [book, setBook] = useState(null)
   const [response, setResponse] = useState<Response>(null)
@@ -127,7 +122,7 @@ export const AddModal: React.FC = () => {
       })
     setResponse(res)
     if (res.result) {
-      mutate()
+      await apolloClient.refetchQueries({ include: [getBooksQuery] })
       reward()
     }
     setLoading(false)

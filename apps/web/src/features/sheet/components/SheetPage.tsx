@@ -1,6 +1,7 @@
-import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import dayjs from 'dayjs'
+import { useQuery } from '@apollo/client'
 import { Container } from '@/components/layout/Container'
 import { Book } from '@/types/book'
 import { BarGraph } from './BarGraph'
@@ -8,7 +9,6 @@ import { Books } from './Books'
 import { BookRows } from './BookRows'
 import { BookDetailSidebar } from './BookDetailSidebar'
 import { BookDetailModal } from './BookDetailModal'
-import { fetcher } from '@/libs/swr'
 import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
 import { YearlyTopBooks } from './YearlyTopBooks'
@@ -23,7 +23,7 @@ import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
 import { IoGrid } from 'react-icons/io5'
 import { twMerge } from 'tailwind-merge'
-import { BooksResponse } from '@/types/api'
+import { getBooksQuery } from '@/features/books/api'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -51,10 +51,15 @@ export const SheetPage: React.FC<Props> = ({
 }) => {
   const router = useRouter()
   const { data: session } = useSession()
+  const isMine = session && session.user.id === userId
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
-  const { data: res } = useSWR<BooksResponse>(`/api/books/${year}`, fetcher, {
-    fallbackData: { result: true, books: data },
-  })
+  const { data: booksQueryData, refetch: refetchBooks } = useQuery(
+    getBooksQuery,
+    {
+      variables: { input: { sheetName: year } },
+      skip: !isMine,
+    }
+  )
   const [currentData, setCurrentData] = useState<Book[]>(data)
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
@@ -71,14 +76,22 @@ export const SheetPage: React.FC<Props> = ({
   const [openFullPageModal, setOpenFullPageModal] = useState(false)
   const [fullPageBook, setFullPageBook] = useState<Book>(null)
 
-  const isMine = session && session.user.id === userId
   useEffect(() => {
-    if (isMine && res?.result && res?.books) {
-      setCurrentData(res.books)
+    if (isMine && booksQueryData?.books) {
+      const books: Book[] = booksQueryData.books.map((book) => ({
+        ...book,
+        id: Number(book.id),
+        month:
+          (book.finished
+            ? dayjs(book.finished).format('M')
+            : dayjs().format('M')) + '月',
+        memo: book.memo || '',
+      }))
+      setCurrentData(books)
     } else if (!isMine) {
       setCurrentData(data)
     }
-  }, [res, session, data, isMine])
+  }, [booksQueryData, session, data, isMine])
 
   const setShowData = (newData: Book[]) => {
     setCurrentData(newData)
@@ -206,8 +219,17 @@ export const SheetPage: React.FC<Props> = ({
           <button
             onClick={() => {
               setFilter('')
-              if (isMine && res?.result && res?.books) {
-                setCurrentData(res.books)
+              if (isMine && booksQueryData?.books) {
+                const books: Book[] = booksQueryData.books.map((book) => ({
+                  ...book,
+                  id: Number(book.id),
+                  month:
+                    (book.finished
+                      ? dayjs(book.finished).format('M')
+                      : dayjs().format('M')) + '月',
+                  memo: book.memo || '',
+                }))
+                setCurrentData(books)
               } else {
                 setCurrentData(data)
               }
@@ -274,8 +296,8 @@ export const SheetPage: React.FC<Props> = ({
         {mode === 'grid' ? (
           <Books
             books={sortBooks(currentData)}
-            year={year}
             bookId={(router.query.book as string) || ''}
+            onRefetch={() => refetchBooks()}
           />
         ) : (
           <BookRows books={sortBooks(currentData)} />
