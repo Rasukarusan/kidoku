@@ -98,6 +98,40 @@ type IndexBooksResponse {
   count: Int!
 }
 
+type YearlyTopBookBookInfo {
+  id: Int!
+  title: String!
+  author: String!
+  image: String!
+}
+
+type YearlyTopBookResponse {
+  year: String!
+  order: Int!
+  book: YearlyTopBookBookInfo!
+}
+
+type UserResponse {
+  name: String!
+}
+
+type DeleteAiSummaryResponse {
+  deletedCount: Int!
+}
+
+type TemplateBookResponse {
+  id: ID!
+  name: String!
+  title: String!
+  author: String!
+  category: String!
+  image: String!
+  memo: String!
+  isPublicMemo: Boolean!
+  created: DateTime!
+  updated: DateTime!
+}
+
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
@@ -110,6 +144,11 @@ type Query {
   bookCategories: [String!]!
   searchBooks(input: SearchBooksInput!): SearchBooksResponse!
   searchGoogleBooks(input: SearchGoogleBooksInput!): [GoogleBookHitResponse!]!
+  yearlyTopBooks(input: GetYearlyTopBooksInput!): [YearlyTopBookResponse!]!
+  userImage(input: GetUserImageInput!): String!
+  isNameAvailable(input: CheckNameAvailableInput!): Boolean!
+  aiSummaryUsage: Int!
+  templateBooks: [TemplateBookResponse!]!
 }
 
 input GetCommentsInput {
@@ -128,6 +167,7 @@ input GetBookInput {
 
 input GetBooksInput {
   sheetId: Int
+  sheetName: String
 }
 
 input SearchBooksInput {
@@ -139,6 +179,18 @@ input SearchGoogleBooksInput {
   query: String!
 }
 
+input GetYearlyTopBooksInput {
+  year: String!
+}
+
+input GetUserImageInput {
+  name: String!
+}
+
+input CheckNameAvailableInput {
+  name: String!
+}
+
 type Mutation {
   createSheet(input: CreateSheetInput!): SheetResponse!
   updateSheet(input: UpdateSheetInput!): SheetResponse!
@@ -148,6 +200,14 @@ type Mutation {
   updateBook(input: UpdateBookInput!): BookResponse!
   deleteBook(input: DeleteBookInput!): Boolean!
   indexAllBooks: IndexBooksResponse!
+  upsertYearlyTopBook(input: UpsertYearlyTopBookInput!): Boolean!
+  deleteYearlyTopBook(input: DeleteYearlyTopBookInput!): Boolean!
+  updateUserName(input: UpdateUserNameInput!): UserResponse!
+  deleteUser: Boolean!
+  saveAiSummary(input: SaveAiSummaryInput!): Boolean!
+  deleteAiSummary(input: DeleteAiSummaryInput!): DeleteAiSummaryResponse!
+  createTemplateBook(input: CreateTemplateBookInput!): TemplateBookResponse!
+  deleteTemplateBook(input: DeleteTemplateBookInput!): Boolean!
 }
 
 input CreateSheetInput {
@@ -201,4 +261,45 @@ input UpdateBookInput {
 
 input DeleteBookInput {
   id: ID!
+}
+
+input UpsertYearlyTopBookInput {
+  year: String!
+  order: Int!
+  bookId: Int!
+}
+
+input DeleteYearlyTopBookInput {
+  year: String!
+  order: Int!
+}
+
+input UpdateUserNameInput {
+  name: String!
+}
+
+input SaveAiSummaryInput {
+  sheetName: String!
+  analysis: JSON!
+}
+
+"""JSON custom scalar type"""
+scalar JSON
+
+input DeleteAiSummaryInput {
+  id: Int!
+}
+
+input CreateTemplateBookInput {
+  name: String!
+  title: String!
+  author: String!
+  category: String!
+  image: String!
+  memo: String!
+  isPublicMemo: Boolean!
+}
+
+input DeleteTemplateBookInput {
+  id: Int!
 }
