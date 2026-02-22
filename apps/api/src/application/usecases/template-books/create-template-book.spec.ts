@@ -1,6 +1,6 @@
-import { CreateTemplateBookUseCase } from '../create-template-book';
-import { ITemplateBookRepository } from '../../../../domain/repositories/template-book';
-import { TemplateBook } from '../../../../domain/models/template-book';
+import { CreateTemplateBookUseCase } from './create-template-book';
+import { ITemplateBookRepository } from '../../../domain/repositories/template-book';
+import { TemplateBook } from '../../../domain/models/template-book';
 
 describe('CreateTemplateBookUseCase', () => {
   let useCase: CreateTemplateBookUseCase;

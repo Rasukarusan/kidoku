@@ -1,5 +1,5 @@
-import { SearchBooksUseCase } from '../search-books';
-import { ISearchRepository } from '../../../../domain/repositories/search';
+import { SearchBooksUseCase } from './search-books';
+import { ISearchRepository } from '../../../domain/repositories/search';
 
 describe('SearchBooksUseCase', () => {
   let useCase: SearchBooksUseCase;

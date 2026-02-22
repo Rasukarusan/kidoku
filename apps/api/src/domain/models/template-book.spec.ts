@@ -1,4 +1,4 @@
-import { TemplateBook } from '../template-book';
+import { TemplateBook } from './template-book';
 
 describe('TemplateBook', () => {
   describe('create', () => {

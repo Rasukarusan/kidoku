@@ -1,4 +1,4 @@
-import { Sheet } from '../sheet';
+import { Sheet } from './sheet';
 
 describe('Sheet', () => {
   describe('create', () => {

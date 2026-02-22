@@ -1,8 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
-import { UpdateBookUseCase } from '../update-book';
-import { IBookRepository } from '../../../../domain/repositories/book';
-import { ISearchRepository } from '../../../../domain/repositories/search';
-import { Book } from '../../../../domain/models/book';
+import { UpdateBookUseCase } from './update-book';
+import { IBookRepository } from '../../../domain/repositories/book';
+import { ISearchRepository } from '../../../domain/repositories/search';
+import { Book } from '../../../domain/models/book';
 
 describe('UpdateBookUseCase', () => {
   let useCase: UpdateBookUseCase;

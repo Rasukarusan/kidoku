@@ -1,7 +1,7 @@
-import { CreateBookUseCase } from '../create-book';
-import { IBookRepository } from '../../../../domain/repositories/book';
-import { ISearchRepository } from '../../../../domain/repositories/search';
-import { Book } from '../../../../domain/models/book';
+import { CreateBookUseCase } from './create-book';
+import { IBookRepository } from '../../../domain/repositories/book';
+import { ISearchRepository } from '../../../domain/repositories/search';
+import { Book } from '../../../domain/models/book';
 
 describe('CreateBookUseCase', () => {
   let useCase: CreateBookUseCase;

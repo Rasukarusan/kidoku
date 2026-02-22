@@ -1,6 +1,6 @@
-import { GetBooksUseCase } from '../get-books';
-import { IBookRepository } from '../../../../domain/repositories/book';
-import { Book } from '../../../../domain/models/book';
+import { GetBooksUseCase } from './get-books';
+import { IBookRepository } from '../../../domain/repositories/book';
+import { Book } from '../../../domain/models/book';
 
 describe('GetBooksUseCase', () => {
   let useCase: GetBooksUseCase;

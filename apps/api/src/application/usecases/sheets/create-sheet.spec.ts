@@ -1,6 +1,6 @@
-import { CreateSheetUseCase } from '../create-sheet';
-import { ISheetRepository } from '../../../../domain/repositories/sheet';
-import { Sheet } from '../../../../domain/models/sheet';
+import { CreateSheetUseCase } from './create-sheet';
+import { ISheetRepository } from '../../../domain/repositories/sheet';
+import { Sheet } from '../../../domain/models/sheet';
 
 describe('CreateSheetUseCase', () => {
   let useCase: CreateSheetUseCase;
