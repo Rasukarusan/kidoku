@@ -25,9 +25,7 @@ const httpLink = new HttpLink({
   uri: (operation) => {
     const endpoint = getGraphQLEndpoint()
     const operationName = operation.operationName
-    return operationName
-      ? `${endpoint}?operationName=${operationName}`
-      : endpoint
+    return operationName ? `${endpoint}?q=${operationName}` : endpoint
   },
   credentials: 'same-origin', // 同一オリジンでクッキーを送信
 })
