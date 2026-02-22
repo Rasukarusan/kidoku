@@ -9,6 +9,10 @@ import { SheetModule } from './presentation/modules/sheet';
 import { CommentModule } from './presentation/modules/comment';
 import { BookModule } from './presentation/modules/book';
 import { SearchModule } from './presentation/modules/search';
+import { YearlyTopBookModule } from './presentation/modules/yearly-top-book';
+import { UserModule } from './presentation/modules/user';
+import { AiSummaryModule } from './presentation/modules/ai-summary';
+import { TemplateBookModule } from './presentation/modules/template-book';
 
 @Module({
   imports: [
@@ -31,6 +35,10 @@ import { SearchModule } from './presentation/modules/search';
     SoftwareDesignModule,
     BookModule,
     SearchModule,
+    YearlyTopBookModule,
+    UserModule,
+    AiSummaryModule,
+    TemplateBookModule,
   ],
 })
 export class AppModule {}

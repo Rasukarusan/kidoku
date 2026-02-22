@@ -8,6 +8,10 @@ export abstract class IBookRepository {
     userId: string,
     sheetId: number,
   ): Promise<Book[]>;
+  abstract findByUserIdAndSheetName(
+    userId: string,
+    sheetName: string,
+  ): Promise<Book[]>;
   abstract save(book: Book): Promise<Book>;
   abstract delete(id: string, userId: string): Promise<void>;
   abstract findAllForSearch(): Promise<

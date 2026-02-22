@@ -1,4 +1,4 @@
-import prisma from '@/libs/prisma'
+import { graphqlClient } from '@/libs/graphql/backend-client'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import dayjs from 'dayjs'
 import { getServerSession } from 'next-auth/next'
@@ -10,45 +10,63 @@ export default async (req, res) => {
       return res.status(200).json({ result: false, books: [] })
     }
     const userId = session.user.id
-    const books = await prisma.books.findMany({
-      where: { userId, sheet: { name: req.query.sheet } },
-      include: { sheet: { select: { name: true } } },
-    })
-    const data = books.map((book) => {
+    const sheetName = req.query.sheet as string
+    const data = await graphqlClient.execute<{
+      books: Array<{
+        id: string
+        userId: string
+        sheetId: number
+        title: string
+        author: string
+        category: string
+        image: string
+        impression: string
+        memo: string
+        isPublicMemo: boolean
+        finished: string | null
+      }>
+    }>(
+      userId,
+      `
+      query Books($input: GetBooksInput) {
+        books(input: $input) {
+          id
+          userId
+          sheetId
+          title
+          author
+          category
+          image
+          impression
+          memo
+          isPublicMemo
+          finished
+        }
+      }
+    `,
+      { input: { sheetName } }
+    )
+    const books = data.books.map((book) => {
       const month = dayjs(book.finished).format('M') + '月'
-      const {
-        id,
-        userId,
-        title,
-        author,
-        category,
-        image,
-        impression,
-        memo,
-        finished,
-        is_public_memo,
-        sheet_id,
-        sheet,
-      } = book
       return {
-        id,
-        userId,
+        id: Number(book.id),
+        userId: book.userId,
         month,
-        title,
-        author,
-        category,
-        image,
-        impression,
-        memo,
-        finished,
-        is_public_memo,
-        sheet_id,
-        sheet: sheet?.name,
+        title: book.title,
+        author: book.author,
+        category: book.category,
+        image: book.image,
+        impression: book.impression,
+        memo: book.memo,
+        finished: book.finished,
+        is_public_memo: book.isPublicMemo,
+        sheet_id: book.sheetId,
+        sheet: sheetName,
       }
     })
     return res.status(200).json({
       result: true,
-      books: data,
+      books,
     })
   } catch (e) {
     console.error(e)
