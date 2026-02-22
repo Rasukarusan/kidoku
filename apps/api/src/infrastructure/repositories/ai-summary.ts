@@ -34,7 +34,7 @@ export class AiSummaryRepository implements IAiSummaryRepository {
     await this.prisma.aiSummaries.create({
       data: {
         userId,
-        sheet_id: sheetId,
+        sheetId: sheetId,
         analysis: analysis as Prisma.InputJsonValue,
         token,
       },

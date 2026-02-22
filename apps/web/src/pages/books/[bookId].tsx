@@ -160,7 +160,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     // ISR: 非所有者向けのページを生成（所有者のメモはクライアントサイドで取得）
     const sanitizedBook = { ...book }
 
-    if (!book.is_public_memo) {
+    if (!book.isPublicMemo) {
       // 非公開メモの場合、メモ内容を除外
       sanitizedBook.memo = null
     } else {
@@ -179,7 +179,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         book: parse({
           ...sanitizedBook,
           month,
-          sheet_id: book.sheet_id,
+          sheetId: book.sheetId,
           sheet: book.sheet?.name ?? null,
         }),
       },

@@ -14,7 +14,7 @@ export class CommentRepository implements ICommentRepository {
   ): Promise<PaginatedResult<Comment>> {
     const [results, total] = await Promise.all([
       this.prisma.books.findMany({
-        where: { is_public_memo: true },
+        where: { isPublicMemo: true },
         select: {
           id: true,
           title: true,
@@ -29,7 +29,7 @@ export class CommentRepository implements ICommentRepository {
         skip: offset,
       }),
       this.prisma.books.count({
-        where: { is_public_memo: true },
+        where: { isPublicMemo: true },
       }),
     ]);
 

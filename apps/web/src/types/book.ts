@@ -12,9 +12,9 @@ export interface Book {
   impression: string // 感想 ex.) ◎
   memo: string
   finished: string
-  is_public_memo: boolean
-  is_purchasable: boolean
-  sheet_id?: number
+  isPublicMemo: boolean
+  isPurchasable: boolean
+  sheetId?: number
   sheet?: string
   user?: {
     id: string
@@ -32,6 +32,6 @@ export type YearlyTopBook = {
     author: string
     image: string
     memo: string
-    is_public_memo: boolean
+    isPublicMemo: boolean
   }
 }

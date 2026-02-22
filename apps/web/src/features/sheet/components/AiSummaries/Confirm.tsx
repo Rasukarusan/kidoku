@@ -72,7 +72,7 @@ export const Confirm: React.FC<Props> = ({
   const prompt = useMemo(() => {
     const targetBooks = books
       .filter((book) => book.finished)
-      .filter((book) => book.is_public_memo) // is_public_memo = trueの本のみ対象
+      .filter((book) => book.isPublicMemo) // isPublicMemo = trueの本のみ対象
       .filter((book) => {
         const month = dayjs(book.finished).month() + 1
         return months.includes(month) && categories.includes(book.category)

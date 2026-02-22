@@ -29,7 +29,7 @@ export default async (req, res) => {
 
     // POST: 画像アップロードを含むため、Prisma直接アクセスを維持
     const body = JSON.parse(req.body)
-    const { name, title, author, image, category, is_public_memo, memo } = body
+    const { name, title, author, image, category, isPublicMemo, memo } = body
     const data = {
       userId,
       name,
@@ -38,7 +38,7 @@ export default async (req, res) => {
       image,
       category,
       memo,
-      is_public_memo,
+      isPublicMemo,
     }
     const isImageSelected = image !== NO_IMAGE && !image.includes('http')
     // 画像選択された際はそのままDBに保存するとカラムの容量エラーとなるため、一旦空文字でDB保存し、VercelにアップロードしたあとにVercelのURLをDB保存する

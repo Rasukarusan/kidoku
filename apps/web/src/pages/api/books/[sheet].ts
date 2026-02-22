@@ -59,8 +59,8 @@ export default async (req, res) => {
         impression: book.impression,
         memo: book.memo,
         finished: book.finished,
-        is_public_memo: book.isPublicMemo,
-        sheet_id: book.sheetId,
+        isPublicMemo: book.isPublicMemo,
+        sheetId: book.sheetId,
         sheet: sheetName,
       }
     })

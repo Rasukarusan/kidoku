@@ -32,7 +32,7 @@ export const HoverBook: React.FC<Props> = ({ book }) => {
         </div>
         <div className="mt-1 text-[10px] text-gray-300">{book.author}</div>
 
-        {(isMine || book.is_public_memo) && book.memo && (
+        {(isMine || book.isPublicMemo) && book.memo && (
           <div className="mt-1 overflow-hidden">
             <motion.div
               className="inline-flex whitespace-nowrap text-[10px] text-gray-200"
@@ -55,7 +55,7 @@ export const HoverBook: React.FC<Props> = ({ book }) => {
           </div>
         )}
 
-        {!isMine && !book.is_public_memo && (
+        {!isMine && !book.isPublicMemo && (
           <div className="mt-1 text-[10px] text-gray-400">非公開メモ</div>
         )}
       </motion.div>

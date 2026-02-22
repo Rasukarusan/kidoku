@@ -138,11 +138,11 @@ export const BookDetailEditModal: React.FC<Props> = ({
         />
       </div>
       <SheetSelectBox
-        value={book?.sheet_id}
+        value={book?.sheetId}
         onChange={(sheet) => {
           setBook({
             ...book,
-            sheet_id: sheet.id,
+            sheetId: sheet.id,
             sheet: sheet.name,
           })
         }}
@@ -170,11 +170,11 @@ export const BookDetailEditModal: React.FC<Props> = ({
         <div>
           <ToggleButton
             label="メモを公開する"
-            checked={book.is_public_memo}
+            checked={book.isPublicMemo}
             onChange={() => {
               setBook({
                 ...book,
-                is_public_memo: !book.is_public_memo,
+                isPublicMemo: !book.isPublicMemo,
               })
             }}
             disabled={false}
@@ -184,14 +184,14 @@ export const BookDetailEditModal: React.FC<Props> = ({
             <div className="mb-2 flex items-center">
               <ToggleButton
                 label="課金によるメモの解放を許可する"
-                checked={book.is_purchasable}
+                checked={book.isPurchasable}
                 onChange={() => {
                   setBook({
                     ...book,
-                    is_purchasable: !book.is_purchasable,
+                    isPurchasable: !book.isPurchasable,
                   })
                 }}
-                disabled={book.is_public_memo}
+                disabled={book.isPublicMemo}
                 className="mr-1"
               />
               <div data-tooltip-id="toggle-purchase-tooltip">
