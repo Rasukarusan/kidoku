@@ -1,4 +1,3 @@
-import useSWR from 'swr'
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { Container } from '@/components/layout/Container'
@@ -8,7 +7,6 @@ import { Books } from './Books'
 import { BookRows } from './BookRows'
 import { BookDetailSidebar } from './BookDetailSidebar'
 import { BookDetailModal } from './BookDetailModal'
-import { fetcher } from '@/libs/swr'
 import { useSession } from 'next-auth/react'
 import { YearlyTopBook } from '@/types/book'
 import { YearlyTopBooks } from './YearlyTopBooks'
@@ -23,7 +21,9 @@ import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
 import { IoGrid } from 'react-icons/io5'
 import { twMerge } from 'tailwind-merge'
-import { BooksResponse } from '@/types/api'
+import { useQuery } from '@apollo/client'
+import { getBooksQuery } from '@/features/books/api'
+import dayjs from 'dayjs'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -52,9 +52,46 @@ export const SheetPage: React.FC<Props> = ({
   const router = useRouter()
   const { data: session } = useSession()
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
-  const { data: res } = useSWR<BooksResponse>(`/api/books/${year}`, fetcher, {
-    fallbackData: { result: true, books: data },
+  const { data: booksData } = useQuery(getBooksQuery, {
+    variables: { input: { sheetName: year } },
   })
+  const res = booksData?.books
+    ? {
+        books: booksData.books.map(
+          (book: {
+            id: string
+            userId: string
+            sheetId: number
+            title: string
+            author: string
+            category: string
+            image: string
+            impression: string
+            memo: string
+            isPublicMemo: boolean
+            isPurchasable: boolean
+            finished: string | null
+          }) => ({
+            id: Number(book.id),
+            userId: book.userId,
+            month: book.finished
+              ? ((dayjs(book.finished).format('M') + '月') as Book['month'])
+              : ('1月' as Book['month']),
+            title: book.title,
+            author: book.author,
+            category: book.category,
+            image: book.image,
+            impression: book.impression,
+            memo: book.memo ?? '',
+            finished: book.finished,
+            isPublicMemo: book.isPublicMemo,
+            isPurchasable: book.isPurchasable,
+            sheetId: book.sheetId,
+            sheet: year,
+          })
+        ),
+      }
+    : { books: data }
   const [currentData, setCurrentData] = useState<Book[]>(data)
   // 一覧表示か書影表示か
   const [mode, setMode] = useState<'row' | 'grid'>('grid')
@@ -274,7 +311,6 @@ export const SheetPage: React.FC<Props> = ({
         {mode === 'grid' ? (
           <Books
             books={sortBooks(currentData)}
-            year={year}
             bookId={(router.query.book as string) || ''}
           />
         ) : (
