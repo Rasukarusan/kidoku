@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
-import { UpdateSheetUseCase } from '../update-sheet';
-import { ISheetRepository } from '../../../../domain/repositories/sheet';
-import { Sheet } from '../../../../domain/models/sheet';
+import { UpdateSheetUseCase } from './update-sheet';
+import { ISheetRepository } from '../../../domain/repositories/sheet';
+import { Sheet } from '../../../domain/models/sheet';
 
 describe('UpdateSheetUseCase', () => {
   let useCase: UpdateSheetUseCase;

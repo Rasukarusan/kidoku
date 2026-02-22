@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
-import { DeleteSheetUseCase } from '../delete-sheet';
-import { ISheetRepository } from '../../../../domain/repositories/sheet';
-import { Sheet } from '../../../../domain/models/sheet';
+import { DeleteSheetUseCase } from './delete-sheet';
+import { ISheetRepository } from '../../../domain/repositories/sheet';
+import { Sheet } from '../../../domain/models/sheet';
 
 describe('DeleteSheetUseCase', () => {
   let useCase: DeleteSheetUseCase;

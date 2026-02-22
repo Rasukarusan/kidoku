@@ -1,4 +1,4 @@
-import { SoftwareDesign } from '../software-design';
+import { SoftwareDesign } from './software-design';
 
 describe('SoftwareDesign', () => {
   describe('fromYearMonth', () => {

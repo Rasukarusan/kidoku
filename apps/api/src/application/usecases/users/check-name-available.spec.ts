@@ -1,6 +1,6 @@
-import { CheckNameAvailableUseCase } from '../check-name-available';
-import { IUserRepository } from '../../../../domain/repositories/user';
-import { User } from '../../../../domain/models/user';
+import { CheckNameAvailableUseCase } from './check-name-available';
+import { IUserRepository } from '../../../domain/repositories/user';
+import { User } from '../../../domain/models/user';
 
 describe('CheckNameAvailableUseCase', () => {
   let useCase: CheckNameAvailableUseCase;

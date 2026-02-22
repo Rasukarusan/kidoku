@@ -1,13 +1,11 @@
 import { NotFoundException } from '@nestjs/common';
-import { DeleteBookUseCase } from '../delete-book';
-import { IBookRepository } from '../../../../domain/repositories/book';
-import { ISearchRepository } from '../../../../domain/repositories/search';
-import { Book } from '../../../../domain/models/book';
+import { GetBookUseCase } from './get-book';
+import { IBookRepository } from '../../../domain/repositories/book';
+import { Book } from '../../../domain/models/book';
 
-describe('DeleteBookUseCase', () => {
-  let useCase: DeleteBookUseCase;
+describe('GetBookUseCase', () => {
+  let useCase: GetBookUseCase;
   let mockBookRepo: jest.Mocked<IBookRepository>;
-  let mockSearchRepo: jest.Mocked<ISearchRepository>;
 
   beforeEach(() => {
     mockBookRepo = {
@@ -23,17 +21,10 @@ describe('DeleteBookUseCase', () => {
       getCategories: jest.fn(),
     } as unknown as jest.Mocked<IBookRepository>;
 
-    mockSearchRepo = {
-      addDocuments: jest.fn(),
-      updateDocument: jest.fn(),
-      deleteDocument: jest.fn(),
-      search: jest.fn(),
-    } as unknown as jest.Mocked<ISearchRepository>;
-
-    useCase = new DeleteBookUseCase(mockBookRepo, mockSearchRepo);
+    useCase = new GetBookUseCase(mockBookRepo);
   });
 
-  it('所有する書籍を削除できる', async () => {
+  it('所有する書籍を取得できる', async () => {
     const book = Book.fromDatabase(
       '1',
       'user-1',
@@ -53,10 +44,8 @@ describe('DeleteBookUseCase', () => {
 
     mockBookRepo.findById.mockResolvedValue(book);
 
-    await useCase.execute('user-1', '1');
-
-    expect(mockBookRepo.delete).toHaveBeenCalledWith('1', 'user-1');
-    expect(mockSearchRepo.deleteDocument).toHaveBeenCalledWith('1');
+    const result = await useCase.execute('user-1', '1');
+    expect(result.title).toBe('テスト書籍');
   });
 
   it('書籍が見つからない場合はNotFoundExceptionを投げる', async () => {
@@ -67,7 +56,7 @@ describe('DeleteBookUseCase', () => {
     );
   });
 
-  it('他ユーザーの書籍を削除しようとするとNotFoundExceptionを投げる', async () => {
+  it('他ユーザーの書籍はNotFoundExceptionを投げる', async () => {
     const book = Book.fromDatabase(
       '1',
       'other-user',
@@ -90,8 +79,5 @@ describe('DeleteBookUseCase', () => {
     await expect(useCase.execute('user-1', '1')).rejects.toThrow(
       NotFoundException,
     );
-
-    expect(mockBookRepo.delete).not.toHaveBeenCalled();
-    expect(mockSearchRepo.deleteDocument).not.toHaveBeenCalled();
   });
 });

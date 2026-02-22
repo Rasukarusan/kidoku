@@ -1,4 +1,4 @@
-import { AiSummary } from '../ai-summary';
+import { AiSummary } from './ai-summary';
 
 describe('AiSummary', () => {
   describe('create', () => {
