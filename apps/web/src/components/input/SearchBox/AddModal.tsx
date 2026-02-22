@@ -98,7 +98,7 @@ export const AddModal: React.FC = () => {
     const finished = dayjs().format('YYYY-MM-DD')
     setBook({
       ...item,
-      is_public_memo: false,
+      isPublicMemo: false,
       memo: item.memo ? item.memo : '[期待]\n\n[感想]\n',
       impression: '-',
       finished,
@@ -260,11 +260,11 @@ export const AddModal: React.FC = () => {
                 />
                 <ToggleButton
                   label="メモを公開する"
-                  checked={!!book?.is_public_memo}
+                  checked={!!book?.isPublicMemo}
                   onChange={() => {
                     setBook({
                       ...book,
-                      is_public_memo: !book?.is_public_memo,
+                      isPublicMemo: !book?.isPublicMemo,
                     })
                   }}
                 />

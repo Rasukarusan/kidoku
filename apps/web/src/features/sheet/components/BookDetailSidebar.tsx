@@ -95,9 +95,9 @@ export const BookDetailSidebar: React.FC<Props> = ({
       const fetched = {
         ...book,
         ...data.book,
-        is_public_memo: data.book.isPublicMemo,
-        is_purchasable: data.book.isPurchasable,
-        sheet_id: data.book.sheetId,
+        isPublicMemo: data.book.isPublicMemo,
+        isPurchasable: data.book.isPurchasable,
+        sheetId: data.book.sheetId,
       }
       setCurrentBook(fetched)
       setNewBook(fetched)
@@ -107,7 +107,7 @@ export const BookDetailSidebar: React.FC<Props> = ({
 
   const onClickSave = async () => {
     setLoading(true)
-    // sheet_idなど新しく追加されたキーも比較対象にする
+    // sheetIdなど新しく追加されたキーも比較対象にする
     const allKeys = new Set([...Object.keys(book), ...Object.keys(newBook)])
     const isDiff = [...allKeys].some((key) => book[key] !== newBook[key])
     if (!isDiff) {

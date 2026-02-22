@@ -27,7 +27,7 @@ export class TemplateBookRepository implements ITemplateBookRepository {
           category: templateBook.category,
           image: templateBook.image,
           memo: templateBook.memo,
-          is_public_memo: templateBook.isPublicMemo,
+          isPublicMemo: templateBook.isPublicMemo,
         },
       });
 
@@ -55,7 +55,7 @@ export class TemplateBookRepository implements ITemplateBookRepository {
           category: templateBook.category,
           image: templateBook.image,
           memo: templateBook.memo,
-          is_public_memo: templateBook.isPublicMemo,
+          isPublicMemo: templateBook.isPublicMemo,
         },
       });
       return templateBook;
@@ -77,7 +77,7 @@ export class TemplateBookRepository implements ITemplateBookRepository {
     category: string;
     image: string;
     memo: string;
-    is_public_memo: boolean;
+    isPublicMemo: boolean;
     created: Date;
     updated: Date;
   }): TemplateBook {
@@ -90,7 +90,7 @@ export class TemplateBookRepository implements ITemplateBookRepository {
       row.category,
       row.image,
       row.memo,
-      row.is_public_memo,
+      row.isPublicMemo,
       row.created,
       row.updated,
     );

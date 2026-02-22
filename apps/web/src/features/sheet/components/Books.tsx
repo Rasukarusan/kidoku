@@ -81,7 +81,7 @@ export const Books: React.FC<Props> = ({ bookId, books, year }) => {
                     onClick={(e) => onClickImage(book, e)}
                     loading={i > 6 ? 'lazy' : 'eager'}
                   />
-                  {!book.is_public_memo && (
+                  {!book.isPublicMemo && (
                     <p className="absolute right-[-5px] top-[-3px]">
                       <AiFillLock size={25} />
                     </p>

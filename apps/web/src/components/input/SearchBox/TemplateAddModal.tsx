@@ -59,7 +59,7 @@ export const TemplateAddModal: React.FC<Props> = ({
       author: '',
       image: NO_IMAGE,
       category: '',
-      is_public_memo: false,
+      isPublicMemo: false,
       memo: '',
     }
     setLoading(true)
@@ -195,11 +195,11 @@ export const TemplateAddModal: React.FC<Props> = ({
             />
             <ToggleButton
               label="メモを公開する"
-              checked={!!template?.is_public_memo}
+              checked={!!template?.isPublicMemo}
               onChange={() => {
                 setTemplate({
                   ...template,
-                  is_public_memo: !template?.is_public_memo,
+                  isPublicMemo: !template?.isPublicMemo,
                 })
               }}
             />

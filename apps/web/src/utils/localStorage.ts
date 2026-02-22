@@ -16,7 +16,7 @@ export interface BookDraftData {
   finished?: string
   title?: string
   author?: string
-  is_public_memo?: boolean
+  isPublicMemo?: boolean
   timestamp: number // 保存日時
 }
 
