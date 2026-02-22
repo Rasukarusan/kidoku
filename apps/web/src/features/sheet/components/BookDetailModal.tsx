@@ -60,7 +60,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
         finished: draft.finished ?? prev.finished,
         title: draft.title ?? prev.title,
         author: draft.author ?? prev.author,
-        is_public_memo: draft.is_public_memo ?? prev.is_public_memo,
+        isPublicMemo: draft.isPublicMemo ?? prev.isPublicMemo,
       }))
     }
   }, [edit, book?.id])
@@ -77,7 +77,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
         finished: newBook.finished,
         title: newBook.title,
         author: newBook.author,
-        is_public_memo: newBook.is_public_memo,
+        isPublicMemo: newBook.isPublicMemo,
       })
     }, 500) // 500msのデバウンス
 
@@ -91,7 +91,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
     newBook?.finished,
     newBook?.title,
     newBook?.author,
-    newBook?.is_public_memo,
+    newBook?.isPublicMemo,
   ])
 
   const onClickEdit = async () => {
@@ -109,9 +109,9 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
       const fetched = {
         ...book,
         ...data.book,
-        is_public_memo: data.book.isPublicMemo,
-        is_purchasable: data.book.isPurchasable,
-        sheet_id: data.book.sheetId,
+        isPublicMemo: data.book.isPublicMemo,
+        isPurchasable: data.book.isPurchasable,
+        sheetId: data.book.sheetId,
       }
       setCurrentBook(fetched)
       setNewBook(fetched)

@@ -32,7 +32,7 @@ export class BookRepository implements IBookRepository {
 
   async findBySheetId(sheetId: number): Promise<Book[]> {
     const rows = await this.prisma.books.findMany({
-      where: { sheet_id: sheetId },
+      where: { sheetId: sheetId },
     });
 
     return rows.map((row) => this.toEntity(row));
@@ -43,7 +43,7 @@ export class BookRepository implements IBookRepository {
     sheetId: number,
   ): Promise<Book[]> {
     const rows = await this.prisma.books.findMany({
-      where: { userId, sheet_id: sheetId },
+      where: { userId, sheetId: sheetId },
     });
 
     return rows.map((row) => this.toEntity(row));
@@ -65,15 +65,15 @@ export class BookRepository implements IBookRepository {
       const created = await this.prisma.books.create({
         data: {
           userId: book.userId,
-          sheet_id: book.sheetId,
+          sheetId: book.sheetId,
           title: book.title,
           author: book.author,
           category: book.category,
           image: book.image,
           impression: book.impression,
           memo: book.memo,
-          is_public_memo: book.isPublicMemo,
-          is_purchasable: book.isPurchasable,
+          isPublicMemo: book.isPublicMemo,
+          isPurchasable: book.isPurchasable,
           finished: book.finished,
           created: book.created,
           updated: book.updated,
@@ -105,15 +105,15 @@ export class BookRepository implements IBookRepository {
       await this.prisma.books.update({
         where: { id: bookId },
         data: {
-          sheet_id: book.sheetId,
+          sheetId: book.sheetId,
           title: book.title,
           author: book.author,
           category: book.category,
           image: book.image,
           impression: book.impression,
           memo: book.memo,
-          is_public_memo: book.isPublicMemo,
-          is_purchasable: book.isPurchasable,
+          isPublicMemo: book.isPublicMemo,
+          isPurchasable: book.isPurchasable,
           finished: book.finished,
           updated: book.updated,
         },
@@ -154,7 +154,7 @@ export class BookRepository implements IBookRepository {
         author: true,
         image: true,
         memo: true,
-        is_public_memo: true,
+        isPublicMemo: true,
         user: { select: { name: true, image: true } },
         sheet: { select: { name: true } },
       },
@@ -165,8 +165,8 @@ export class BookRepository implements IBookRepository {
       title: row.title,
       author: row.author,
       image: row.image,
-      memo: row.is_public_memo ? row.memo : '',
-      isPublicMemo: row.is_public_memo,
+      memo: row.isPublicMemo ? row.memo : '',
+      isPublicMemo: row.isPublicMemo,
       userName: row.user.name || '',
       userImage: row.user.image,
       sheetName: row.sheet.name,
@@ -197,7 +197,7 @@ export class BookRepository implements IBookRepository {
         author: true,
         image: true,
         memo: true,
-        is_public_memo: true,
+        isPublicMemo: true,
         user: { select: { name: true, image: true } },
         sheet: { select: { name: true } },
       },
@@ -210,8 +210,8 @@ export class BookRepository implements IBookRepository {
       title: row.title,
       author: row.author,
       image: row.image,
-      memo: row.is_public_memo ? row.memo : '',
-      isPublicMemo: row.is_public_memo,
+      memo: row.isPublicMemo ? row.memo : '',
+      isPublicMemo: row.isPublicMemo,
       userName: row.user.name || '',
       userImage: row.user.image,
       sheetName: row.sheet.name,
@@ -231,15 +231,15 @@ export class BookRepository implements IBookRepository {
   private toEntity(row: {
     id: number;
     userId: string;
-    sheet_id: number;
+    sheetId: number;
     title: string;
     author: string;
     category: string;
     image: string;
     impression: string;
     memo: string;
-    is_public_memo: boolean;
-    is_purchasable: boolean;
+    isPublicMemo: boolean;
+    isPurchasable: boolean;
     finished: Date | null;
     created: Date;
     updated: Date;
@@ -247,15 +247,15 @@ export class BookRepository implements IBookRepository {
     return Book.fromDatabase(
       row.id.toString(),
       row.userId,
-      row.sheet_id,
+      row.sheetId,
       row.title,
       row.author,
       row.category,
       row.image,
       row.impression,
       row.memo,
-      row.is_public_memo,
-      row.is_purchasable,
+      row.isPublicMemo,
+      row.isPurchasable,
       row.finished ?? null,
       row.created ?? new Date(),
       row.updated ?? new Date(),

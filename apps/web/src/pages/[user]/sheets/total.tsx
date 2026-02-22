@@ -69,7 +69,7 @@ export const getStaticProps = async (ctx) => {
           author: true,
           image: true,
           memo: true,
-          is_public_memo: true,
+          isPublicMemo: true,
         },
       },
     },
@@ -94,7 +94,7 @@ export const getStaticProps = async (ctx) => {
         ...entry,
         book: {
           ...entry.book,
-          memo: entry.book.is_public_memo ? mask(entry.book.memo) : '',
+          memo: entry.book.isPublicMemo ? mask(entry.book.memo) : '',
         },
       })),
     },

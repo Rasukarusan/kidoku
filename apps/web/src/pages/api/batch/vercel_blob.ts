@@ -10,7 +10,7 @@ const get = async (request: NextApiRequest, response: NextApiResponse) => {
 }
 
 const post = async (request: NextApiRequest, response: NextApiResponse) => {
-  const books = await prisma.books.findMany({ where: { sheet_id: 9 } })
+  const books = await prisma.books.findMany({ where: { sheetId: 9 } })
   // const books = r.slice(0, 2)
   for (let i = 0; i < books.length; i++) {
     const book = books[i]

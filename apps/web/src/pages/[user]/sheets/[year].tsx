@@ -29,7 +29,7 @@ export async function getStaticProps(context) {
   }
   const books = await prisma.books.findMany({
     where: {
-      sheet_id: sheet.id,
+      sheetId: sheet.id,
       userId,
     },
     select: {
@@ -41,7 +41,7 @@ export async function getStaticProps(context) {
       image: true,
       impression: true,
       memo: true,
-      is_public_memo: true,
+      isPublicMemo: true,
       finished: true,
       created: false,
       updated: false,
@@ -51,7 +51,7 @@ export async function getStaticProps(context) {
     const month = book.finished
       ? dayjs(book.finished).format('M') + '月'
       : dayjs().format('M') + '月' // まだ読み終わっていない場合は今月とする
-    const memo = book.is_public_memo ? mask(book.memo) : ''
+    const memo = book.isPublicMemo ? mask(book.memo) : ''
     return {
       ...book,
       month,
@@ -69,7 +69,7 @@ export async function getStaticProps(context) {
   })
 
   const aiSummaries = await prisma.aiSummaries.findMany({
-    where: { userId, sheet_id: sheet.id },
+    where: { userId, sheetId: sheet.id },
     select: { id: true, analysis: true },
     orderBy: { created: 'desc' },
   })

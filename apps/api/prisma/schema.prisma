@@ -24,19 +24,19 @@ model sheets {
 model books {
   id               Int             @id @default(autoincrement()) @db.UnsignedInt
   userId           String          @map("user_id")
-  sheet_id         Int
+  sheetId          Int             @map("sheet_id")
   title            String          @db.VarChar(120)
   author           String          @db.VarChar(120)
   category         String          @db.VarChar(120)
   image            String          @db.VarChar(255)
   impression       String          @db.VarChar(5)
   memo             String          @db.MediumText
-  is_public_memo   Boolean         @default(false)
-  is_purchasable   Boolean         @default(false)
+  isPublicMemo     Boolean         @default(false) @map("is_public_memo")
+  isPurchasable    Boolean         @default(false) @map("is_purchasable")
   finished         DateTime?       @db.DateTime(0)
   created          DateTime        @default(now()) @db.DateTime(0)
   updated          DateTime        @default(now()) @db.DateTime(0)
-  sheet            sheets          @relation(fields: [sheet_id], references: [id], onDelete: Cascade)
+  sheet            sheets          @relation(fields: [sheetId], references: [id], onDelete: Cascade)
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   yearly_top_books YearlyTopBook[]
 }
@@ -100,13 +100,13 @@ model VerificationToken {
 model YearlyTopBook {
   id      Int      @id @default(autoincrement()) @db.UnsignedInt
   userId  String   @map("user_id")
-  book_id Int
+  bookId  Int      @map("book_id")
   order   Int      @default(1)
   year    String   @db.VarChar(120)
   created DateTime @default(now()) @db.DateTime(0)
   updated DateTime @default(now()) @db.DateTime(0)
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book    books    @relation(fields: [book_id], references: [id], onDelete: Cascade)
+  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@unique([userId, order, year], map: "uniq_user_order_year")
   @@map("yearly_top_books")
@@ -115,7 +115,7 @@ model YearlyTopBook {
 model AiSummaries {
   id       Int       @id @default(autoincrement()) @db.UnsignedInt
   userId   String    @map("user_id")
-  sheet_id Int
+  sheetId  Int @map("sheet_id")
   analysis Json
   token    Int
   created  DateTime? @default(now()) @db.DateTime(0)
@@ -134,7 +134,7 @@ model template_books {
   category       String   @db.VarChar(120)
   image          String   @db.VarChar(255)
   memo           String   @db.MediumText
-  is_public_memo Boolean  @default(false)
+  isPublicMemo   Boolean  @default(false) @map("is_public_memo")
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)

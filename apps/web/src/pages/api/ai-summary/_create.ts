@@ -80,7 +80,7 @@ export const handleCreate = async (req: Request) => {
             await prisma.aiSummaries.create({
               data: {
                 userId,
-                sheet_id: sheet.id,
+                sheetId: sheet.id,
                 analysis: {
                   _schemaVersion: 2,
                   character_summary,

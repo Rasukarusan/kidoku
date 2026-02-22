@@ -8,11 +8,11 @@ export interface Props {
     order: number
     image: string
     memo: string
-    is_public_memo: boolean
+    isPublicMemo: boolean
   }
 }
 export const Book: React.FC<Props> = ({ book }) => {
-  const { id, title, author, order, image, memo, is_public_memo } = book
+  const { id, title, author, order, image, memo, isPublicMemo } = book
   const ribbonClass =
     order === 1
       ? 'ribbon-gold'
@@ -48,7 +48,7 @@ export const Book: React.FC<Props> = ({ book }) => {
           {title}
         </Link>
         <div className="mb-2 text-xs text-gray-500">{author}</div>
-        {is_public_memo ? (
+        {isPublicMemo ? (
           memo && (
             <div className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-gray-700 sm:text-sm">
               {memo}
