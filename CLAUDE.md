@@ -4,8 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 重要
 
-pushする前に`pnpm validate`を実行してください（lint、型チェック、テストを一括実行）。
-最低限`pnpm lint:fix`は必ず行ってください。
+CIでlint・型チェック・テストが自動実行されます。
+ローカルで確認したい場合は `pnpm run validate`（lint + check-types + test 一括実行）を使ってください。
 
 ## プロジェクト概要
 
