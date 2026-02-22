@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 重要
 
-pushする前にpnpm lint:fixを行ってください。
+pushする前に`pnpm validate`を実行してください（lint、型チェック、テストを一括実行）。
+最低限`pnpm lint:fix`は必ず行ってください。
 
 ## プロジェクト概要
 
@@ -67,6 +68,90 @@ apps/api/src/
 - **MeiliSearch日本語版**（`getmeili/meilisearch:prototype-japanese-6`）を使用
 - Dockerfileで専用イメージをビルド
 
+## コーディング規約
+
+### ファイル命名
+
+- ケバブケース: `create-book.ts`, `book.ts`, `injection-tokens.ts`
+- 1ファイル1責務: 1つのクラス/モジュールに対して1ファイル
+- テストファイル: `*.spec.ts`（API）, `*.test.ts`（Web）
+
+### ドメインモデル
+
+- private constructor + static factory methods パターンを使用
+- `create()`: 新規作成（バリデーション込み）
+- `fromDatabase()`: DB復元（バリデーションなし）
+- フィールドはprivate、getterのみ公開
+- 更新は `update()` メソッド経由
+
+### リポジトリ
+
+- `domain/repositories/` に abstract class として定義
+- `infrastructure/repositories/` に実装
+- NestJSモジュールで `{ provide: IXxxRepository, useClass: XxxRepository }` でDI
+
+### ユースケース
+
+- `application/usecases/{feature}/` に配置
+- `@Injectable()` デコレータ必須
+- コンストラクタでリポジトリを注入
+- `execute()` メソッドに処理を実装
+
+## 新しいGraphQLエンドポイント追加手順
+
+例: `Tag` エンティティを追加する場合
+
+1. **ドメインモデル作成**: `apps/api/src/domain/models/tag.ts` — private constructor + create() + fromDatabase() パターン
+2. **リポジトリインターフェース作成**: `apps/api/src/domain/repositories/tag.ts` — abstract class ITagRepository
+3. **リポジトリ実装**: `apps/api/src/infrastructure/repositories/tag.ts` — @Injectable() + ITagRepository を implements
+4. **Prismaスキーマ追加**: `apps/api/prisma/schema.prisma` と `apps/web/prisma/schema.prisma` の両方にモデル定義を追加
+5. **ユースケース作成**: `apps/api/src/application/usecases/tags/*.ts` — create-tag.ts, get-tags.ts 等
+6. **DTO作成**: `apps/api/src/presentation/dto/tag.ts` — @InputType, @ObjectType
+7. **リゾルバー作成**: `apps/api/src/presentation/resolvers/tag.ts` — @Resolver + @Query/@Mutation
+8. **モジュール作成**: `apps/api/src/presentation/modules/tag.ts` — imports, providers, provide/useClass
+9. **AppModuleに登録**: `apps/api/src/app.module.ts` の imports に TagModule 追加
+10. **テスト作成**: ドメインモデル・ユースケースのユニットテストを作成
+11. **Prismaクライアント再生成**: `pnpm --filter web prisma generate && pnpm --filter api prisma generate`
+12. **フロントエンド型生成**: `pnpm --filter web codegen`
+
+## Dual Prismaスキーマ同期ガイド
+
+同一MySQLに対してWeb(`apps/web/prisma/schema.prisma`)とAPI(`apps/api/prisma/schema.prisma`)の2つのPrismaスキーマが存在するため、スキーマ変更時は**必ず両方を更新**する。
+
+### 変更手順
+
+1. `apps/web/prisma/schema.prisma` を編集
+2. `apps/api/prisma/schema.prisma` にも同じ変更を反映
+3. `pnpm --filter web db:push` でDBに反映
+4. `pnpm --filter api db:push` でバックエンドも反映
+5. `pnpm --filter web prisma generate` でWebのPrismaクライアント再生成
+6. `pnpm --filter api prisma generate` でAPIのPrismaクライアント再生成
+
+## 禁止事項・よくあるミス
+
+### レイヤー依存ルール（厳守）
+
+- ❌ domain/ から infrastructure/ や presentation/ をimportしない
+- ❌ application/ から infrastructure/ や presentation/ をimportしない
+- ❌ presentation/ から infrastructure/repositories/ を直接使わない（ユースケース経由）
+- ✅ infrastructure/ → domain/ (リポジトリ実装がドメインモデルを使用)
+- ✅ application/ → domain/ (ユースケースがドメインモデル・リポジトリを使用)
+- ✅ presentation/ → application/ + domain/ (リゾルバーがユースケースを呼び出し)
+
+### スキーマ変更
+
+- ❌ Web側のPrismaスキーマだけ変更してAPI側を忘れる（またはその逆）
+- ❌ スキーマ変更後に `db:push` を忘れる
+
+### NestJS DI
+
+- ❌ モジュールのprovidersに登録せずにクラスを@Injectする
+- ❌ AppModuleにモジュールを追加し忘れる
+
+### GraphQL
+
+- ❌ リゾルバー変更後にフロントエンドの codegen を忘れる → `pnpm --filter web codegen` で型を再生成すること
+
 ## 開発コマンド
 
 ### 基本操作
@@ -111,13 +196,14 @@ pnpm --filter api test:cov          # カバレッジ
 pnpm --filter api test:e2e          # E2Eテスト
 ```
 
-### リント・フォーマット
+### リント・フォーマット・一括検証
 
 ```bash
 pnpm lint                           # 全体のリント
 pnpm lint:fix                       # 自動修正
 pnpm format                         # Prettierフォーマット
 pnpm check-types                    # 型チェック
+pnpm validate                       # lint + 型チェック + テストを一括実行
 ```
 
 ### その他の開発コマンド
