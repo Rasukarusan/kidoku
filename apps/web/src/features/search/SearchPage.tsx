@@ -1,19 +1,57 @@
-import useSWR from 'swr'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Container } from '@/components/layout/Container'
-import { fetcher } from '@/libs/swr'
 import { SkeltonView } from './SkeltonView'
-import { SearchResponse } from '@/types/api'
+import { gql, useQuery } from '@apollo/client'
+import { mask } from '@/utils/string'
+
+const SEARCH_BOOKS_QUERY = gql`
+  query SearchBooks($input: SearchBooksInput!) {
+    searchBooks(input: $input) {
+      hits {
+        id
+        title
+        author
+        image
+        memo
+        username
+        userImage
+        sheet
+      }
+      hasMore
+    }
+  }
+`
 
 export const SearchPage: React.FC = () => {
   const router = useRouter()
   const { q } = router.query
   const page = Number(router.query.page as string) || 1
-  const { data } = useSWR<SearchResponse>(
-    `/api/search/shelf?q=${q}&page=${page}`,
-    fetcher
-  )
+  const { data: queryData } = useQuery(SEARCH_BOOKS_QUERY, {
+    variables: { input: { query: q as string, page } },
+    skip: !q,
+    fetchPolicy: 'no-cache',
+  })
+  const data = queryData?.searchBooks
+    ? {
+        hits: queryData.searchBooks.hits.map(
+          (hit: {
+            id: string
+            title: string
+            author: string
+            image: string
+            memo: string
+            username: string
+            userImage: string | null
+            sheet: string
+          }) => ({
+            ...hit,
+            memo: mask(hit.memo),
+          })
+        ),
+        next: queryData.searchBooks.hasMore,
+      }
+    : undefined
   if (!q) return null
   return (
     <Container>
