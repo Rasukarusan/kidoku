@@ -1,6 +1,8 @@
 {
   "permissions": {
     "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm install --frozen-lockfile)",
       "Bash(pnpm lint:fix)",
       "Bash(pnpm lint)",
       "Bash(pnpm check-types)",
