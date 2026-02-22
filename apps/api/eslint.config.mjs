@@ -34,4 +34,10 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 'off', // 上記同様
     },
   },
+  {
+    files: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off', // jest.Mocked のアサーションで誤検知するため
+    },
+  },
 );

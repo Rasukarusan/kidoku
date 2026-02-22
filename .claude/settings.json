@@ -1,2 +1,26 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(pnpm lint:fix)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm check-types)",
+      "Bash(pnpm test)",
+      "Bash(pnpm validate)",
+      "Bash(pnpm --filter api test)",
+      "Bash(pnpm --filter api test:*)",
+      "Bash(pnpm --filter web test)",
+      "Bash(pnpm --filter web test:*)",
+      "Bash(pnpm build)",
+      "Bash(pnpm --filter web build)",
+      "Bash(pnpm --filter api build)",
+      "Bash(pnpm --filter web codegen)",
+      "Bash(pnpm --filter web prisma generate)",
+      "Bash(pnpm --filter api prisma generate)",
+      "Bash(pnpm --filter web db:push)",
+      "Bash(pnpm --filter api db:push)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm --filter web dev)",
+      "Bash(pnpm --filter api dev)"
+    ]
+  }
 }
