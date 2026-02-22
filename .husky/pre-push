@@ -1,1 +1,1 @@
-pnpm lint:fix && pnpm test
+pnpm test
