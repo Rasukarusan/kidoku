@@ -17,7 +17,10 @@
     "email": "email dev -d src/libs/resend/templates -p 3001",
     "test": "jest",
     "test:w": "jest --watch",
-    "test:c": "jest --coverage"
+    "test:c": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",
@@ -75,6 +78,7 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^12.3.1",
     "@next/eslint-plugin-next": "^12.1.6",
+    "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@types/jest": "^29.5.12",
