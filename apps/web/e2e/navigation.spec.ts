@@ -11,7 +11,10 @@ test.describe('ナビゲーション', () => {
 
   test('特定商取引法ページから利用規約リンクに遷移できる', async ({ page }) => {
     await page.goto('/law')
-    await page.getByRole('link', { name: '利用規約' }).click()
+    await page
+      .getByRole('link', { name: '利用規約' })
+      .first()
+      .click()
     await expect(page).toHaveURL('/terms')
     await expect(
       page.getByRole('heading', { name: 'kidoku利用規約' })
@@ -22,7 +25,10 @@ test.describe('ナビゲーション', () => {
     page,
   }) => {
     await page.goto('/law')
-    await page.getByRole('link', { name: 'プライバシーポリシー' }).click()
+    await page
+      .getByRole('link', { name: 'プライバシーポリシー' })
+      .first()
+      .click()
     await expect(page).toHaveURL('/privacy')
     await expect(
       page.getByRole('heading', { name: 'プライバシーポリシー' })
