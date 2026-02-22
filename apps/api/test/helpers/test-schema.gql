@@ -1,0 +1,156 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type BookResponse {
+  id: ID!
+  userId: ID!
+  sheetId: Int!
+  title: String!
+  author: String!
+  category: String!
+  image: String!
+  impression: String!
+  memo: String
+  isPublicMemo: Boolean!
+  isPurchasable: Boolean!
+  finished: DateTime
+  created: DateTime!
+  updated: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type SheetResponse {
+  id: ID!
+  name: String!
+  userId: ID!
+  created: DateTime
+  updated: DateTime
+  order: Int
+}
+
+type CommentItem {
+  id: ID!
+  title: String!
+  memo: String!
+  image: String!
+  updated: DateTime!
+  username: String!
+  userImage: String
+  sheet: String!
+}
+
+type CommentResponse {
+  total: Float!
+  hasMore: Boolean!
+  comments: [CommentItem!]!
+}
+
+type UserResponse {
+  name: String!
+}
+
+type Query {
+  book(input: GetBookInput!): BookResponse
+  books(input: GetBooksInput): [BookResponse!]!
+  bookCategories: [String!]!
+  sheets: [SheetResponse!]!
+  comments(input: GetCommentsInput!): CommentResponse!
+  userImage(input: GetUserImageInput!): String!
+  isNameAvailable(input: CheckNameAvailableInput!): Boolean!
+}
+
+input GetBookInput {
+  id: ID!
+}
+
+input GetBooksInput {
+  sheetId: Int
+  sheetName: String
+}
+
+input GetCommentsInput {
+  limit: Int!
+  offset: Int!
+}
+
+input GetUserImageInput {
+  name: String!
+}
+
+input CheckNameAvailableInput {
+  name: String!
+}
+
+type Mutation {
+  createBook(input: CreateBookInput!): BookResponse!
+  updateBook(input: UpdateBookInput!): BookResponse!
+  deleteBook(input: DeleteBookInput!): Boolean!
+  createSheet(input: CreateSheetInput!): SheetResponse!
+  updateSheet(input: UpdateSheetInput!): SheetResponse!
+  deleteSheet(input: DeleteSheetInput!): Boolean!
+  updateSheetOrders(input: UpdateSheetOrdersInput!): Boolean!
+  updateUserName(input: UpdateUserNameInput!): UserResponse!
+  deleteUser: Boolean!
+}
+
+input CreateBookInput {
+  sheetId: Int!
+  title: String!
+  author: String!
+  category: String!
+  image: String!
+  impression: String!
+  memo: String!
+  isPublicMemo: Boolean!
+  isPurchasable: Boolean
+  finished: DateTime
+}
+
+input UpdateBookInput {
+  id: ID!
+  title: String
+  author: String
+  category: String
+  image: String
+  impression: String
+  memo: String
+  isPublicMemo: Boolean
+  isPurchasable: Boolean
+  finished: DateTime
+  sheetId: Int
+}
+
+input DeleteBookInput {
+  id: ID!
+}
+
+input CreateSheetInput {
+  name: String!
+}
+
+input UpdateSheetInput {
+  id: ID!
+  name: String!
+}
+
+input DeleteSheetInput {
+  id: ID!
+}
+
+input UpdateSheetOrdersInput {
+  sheets: [SheetOrderItem!]!
+}
+
+input SheetOrderItem {
+  id: ID!
+  order: Int!
+}
+
+input UpdateUserNameInput {
+  name: String!
+}
