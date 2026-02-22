@@ -12,7 +12,7 @@ export const getStaticProps = async () => {
         select: { name: true },
       },
     },
-    where: { is_public_memo: true },
+    where: { isPublicMemo: true },
     orderBy: [{ updated: 'desc' }],
     take: 10,
   })

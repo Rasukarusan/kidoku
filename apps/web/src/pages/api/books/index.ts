@@ -31,14 +31,14 @@ export default async (req, res) => {
         author,
         image,
         category,
-        is_public_memo,
+        isPublicMemo,
         impression,
         memo,
         finished,
         sheet,
       } = body
       const data = {
-        sheet_id: Number(sheet.id),
+        sheetId: Number(sheet.id),
         userId,
         title,
         author,
@@ -46,7 +46,7 @@ export default async (req, res) => {
         category,
         impression,
         memo,
-        is_public_memo,
+        isPublicMemo,
         finished: finished ? new Date(finished) : null,
       }
       data['image'] = image === NO_IMAGE || image.includes('http') ? image : ''
@@ -116,10 +116,10 @@ export default async (req, res) => {
             image: imageUrl,
             impression: body.impression,
             memo: body.memo,
-            isPublicMemo: body.is_public_memo,
-            isPurchasable: body.is_purchasable,
+            isPublicMemo: body.isPublicMemo,
+            isPurchasable: body.isPurchasable,
             finished: body.finished ? new Date(body.finished) : null,
-            sheetId: body.sheet_id ? Number(body.sheet_id) : undefined,
+            sheetId: body.sheetId ? Number(body.sheetId) : undefined,
           },
         }
       )

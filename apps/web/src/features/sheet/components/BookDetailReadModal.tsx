@@ -102,7 +102,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
           <div className="mb-4">
             <div className="mb-2 flex items-center">
               <h2 className="text-lg font-semibold text-gray-800">メモ</h2>
-              {!book.is_public_memo && (
+              {!book.isPublicMemo && (
                 <>
                   <div data-tooltip-id="memo-lock">
                     <AiFillLock className="mx-2 w-[18px]" />
@@ -116,20 +116,20 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
               )}
             </div>
 
-            {(isMine || book.is_public_memo) && (
+            {(isMine || book.isPublicMemo) && (
               <div className="rounded-lg bg-gray-50 p-4">
                 <Memo memo={book.memo} />
               </div>
             )}
 
-            {!isMine && !book.is_public_memo && (
+            {!isMine && !book.isPublicMemo && (
               <div className="rounded-lg bg-gray-100 p-8 text-center">
                 <AiFillLock className="mx-auto mb-2 text-gray-400" size={24} />
                 <p className="text-gray-600">
                   このメモは非公開に設定されています
                 </p>
                 {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
-                  book.is_purchasable && (
+                  book.isPurchasable && (
                     <button
                       className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                       onClick={() => setOpen(true)}

@@ -76,7 +76,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
         finished: draft.finished ?? prev.finished,
         title: draft.title ?? prev.title,
         author: draft.author ?? prev.author,
-        is_public_memo: draft.is_public_memo ?? prev.is_public_memo,
+        isPublicMemo: draft.isPublicMemo ?? prev.isPublicMemo,
       }))
       setHasDraft(true)
     }
@@ -94,7 +94,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
         finished: book.finished,
         title: book.title,
         author: book.author,
-        is_public_memo: book.is_public_memo,
+        isPublicMemo: book.isPublicMemo,
       })
     }, 500) // 500msのデバウンス
 
@@ -107,7 +107,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
     book.finished,
     book.title,
     book.author,
-    book.is_public_memo,
+    book.isPublicMemo,
   ])
 
   // カテゴリ一覧（GraphQL）
@@ -302,11 +302,11 @@ export const BookDetailEditPage: React.FC<Props> = ({
                   シート
                 </label>
                 <SheetSelectBox
-                  value={book?.sheet_id}
+                  value={book?.sheetId}
                   onChange={(sheet) => {
                     setBook({
                       ...book,
-                      sheet_id: sheet.id,
+                      sheetId: sheet.id,
                       sheet: sheet.name,
                     })
                   }}
@@ -330,11 +330,11 @@ export const BookDetailEditPage: React.FC<Props> = ({
               <div className="flex items-center space-x-2">
                 <ToggleButton
                   label="公開する"
-                  checked={book?.is_public_memo || false}
+                  checked={book?.isPublicMemo || false}
                   onChange={() =>
                     setBook({
                       ...book,
-                      is_public_memo: !(book.is_public_memo || false),
+                      isPublicMemo: !(book.isPublicMemo || false),
                     })
                   }
                 />

@@ -11,7 +11,7 @@ export interface Template {
   image: string
   category: string
   memo: string
-  is_public_memo: boolean
+  isPublicMemo: boolean
 }
 
 export interface TemplatesResponse {
