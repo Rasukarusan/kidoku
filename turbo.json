@@ -40,9 +40,6 @@
       "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig.json"],
       "outputs": ["coverage/**"]
     },
-    "validate": {
-      "dependsOn": ["lint", "check-types", "test"]
-    },
     "dev": {
       "cache": false,
       "persistent": true
