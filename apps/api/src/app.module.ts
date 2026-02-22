@@ -21,7 +21,10 @@ import { TemplateBookModule } from './presentation/modules/template-book';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile:
+        process.env.NODE_ENV === 'production'
+          ? true
+          : join(process.cwd(), 'src/schema.gql'),
       context: ({ req }: { req: any }) => ({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         req,
