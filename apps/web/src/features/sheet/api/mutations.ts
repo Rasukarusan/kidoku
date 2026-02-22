@@ -35,3 +35,29 @@ export const updateSheetOrdersMutation = gql`
     updateSheetOrders(input: $input)
   }
 `
+
+export const upsertYearlyTopBookMutation = gql`
+  mutation UpsertYearlyTopBook($input: UpsertYearlyTopBookInput!) {
+    upsertYearlyTopBook(input: $input)
+  }
+`
+
+export const deleteYearlyTopBookMutation = gql`
+  mutation DeleteYearlyTopBook($input: DeleteYearlyTopBookInput!) {
+    deleteYearlyTopBook(input: $input)
+  }
+`
+
+export const deleteAiSummaryMutation = gql`
+  mutation DeleteAiSummary($input: DeleteAiSummaryInput!) {
+    deleteAiSummary(input: $input) {
+      deletedCount
+    }
+  }
+`
+
+export const saveAiSummaryMutation = gql`
+  mutation SaveAiSummary($input: SaveAiSummaryInput!) {
+    saveAiSummary(input: $input)
+  }
+`

@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { fetcher } from '@/libs/swr'
 import { TemplateAddModal } from './TemplateAddModal'
-import useSWR from 'swr'
 import { useSetAtom } from 'jotai'
 import { openAddModalAtom } from '@/store/modal/atom'
 import { addBookAtom } from '@/store/book/atom'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { Loading } from '@/components/icon/Loading'
-import { TemplatesResponse } from '@/types/api'
+import { useMutation, useQuery } from '@apollo/client'
+import {
+  templateBooksQuery,
+  deleteTemplateBookMutation,
+} from '@/features/template/api'
 
 interface Props {
   input: string
@@ -17,10 +19,10 @@ interface Props {
 export const Template: React.FC<Props> = () => {
   const [open, setOpen] = useState(false)
   const [hoverTemplate, setHoverTemplate] = useState(null)
-  const { data, mutate } = useSWR<TemplatesResponse>(
-    '/api/template/books',
-    fetcher
-  )
+  const { data, refetch } = useQuery(templateBooksQuery)
+  const [deleteTemplateBook] = useMutation(deleteTemplateBookMutation, {
+    refetchQueries: [{ query: templateBooksQuery }],
+  })
   const setOpenAddModal = useSetAtom(openAddModalAtom)
   const setSelectItem = useSetAtom(addBookAtom)
 
@@ -31,28 +33,26 @@ export const Template: React.FC<Props> = () => {
         onClose={() => {
           setOpen(false)
         }}
+        onCreated={() => refetch()}
       />
       <div className="p-8">
         {!data && <Loading className="mr-2 h-[18px] w-[18px] border-[3px]" />}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {data?.templates?.map((template) => (
+          {data?.templateBooks?.map((template) => (
             <div key={template.id} className="relative mx-auto">
               <button
                 className="absolute right-0 top-0 z-10 bg-white"
                 onClick={async () => {
                   const yes = confirm(`${template.name}を削除しますか?`)
                   if (!yes) return
-                  const res = await fetch(`/api/template/books`, {
-                    method: 'DELETE',
-                    body: JSON.stringify({
-                      id: template.id,
-                    }),
-                    headers: {
-                      Accept: 'application/json',
-                    },
-                  }).then((res) => res.json())
-                  mutate()
-                  alert(res.result ? '削除しました' : '削除に失敗しました')
+                  try {
+                    await deleteTemplateBook({
+                      variables: { input: { id: Number(template.id) } },
+                    })
+                    alert('削除しました')
+                  } catch {
+                    alert('削除に失敗しました')
+                  }
                 }}
               >
                 {hoverTemplate?.id === template.id && <FaRegTrashAlt />}

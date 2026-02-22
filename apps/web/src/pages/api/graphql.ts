@@ -15,25 +15,16 @@ export default async function handler(
     // セッション情報を取得
     const session = await getServerSession(req, res, authOptions)
 
-    // 認証チェック（オプション：認証が必要な場合）
+    const { query, variables } = req.body
+
+    // 未認証の場合は公開APIとして転送
     if (!session?.user?.id) {
-      // 未認証の場合は空のレスポンスまたはエラーを返す
-      // ここでは認証なしでもGraphQLサーバーに転送する実装にする
-      return res.status(401).json({
-        errors: [
-          {
-            message: 'Unauthorized',
-            extensions: {
-              code: 'UNAUTHORIZED',
-            },
-          },
-        ],
-      })
+      const data = await graphqlClient.executePublic(query, variables)
+      return res.status(200).json({ data })
     }
 
     const userId = session.user.id
     const isAdmin = session.user.admin || false
-    const { query, variables } = req.body
 
     // GraphQLクライアントを使用してリクエストを転送
     const data = await graphqlClient.execute(userId, query, variables, isAdmin)
