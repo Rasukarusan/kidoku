@@ -274,6 +274,70 @@ pnpm --filter web lighthouse
 
 ## サンドボックス環境での開発
 
+### Docker デーモンを起動する手順
+
+#### 前提
+
+- Docker コマンドはプリインストール済み（Docker 29.2.1）
+- カーネルが古い（Linux 4.4.0）ため `nftables` 非対応
+- ネットワークは egress プロキシ経由（ホワイトリスト方式）
+
+#### 手順
+
+```bash
+# 1. pnpm install
+pnpm install
+
+# 2. .env をexampleからコピー
+cp .env.example .env
+
+# 3. iptables を legacy に切り替え（nftables がカーネル非対応のため）
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+
+# 4. Docker デーモンを起動（vfsストレージドライバー、iptables・ブリッジ無効）
+sudo -E dockerd --iptables=false --bridge=none --storage-driver=vfs &>/tmp/dockerd.log &
+sleep 5
+
+# 5. 起動確認
+docker info
+
+# 6. DB起動（MariaDBで代替、--network=host必須）
+docker run -d --name kidoku_db --network=host \
+  -e MARIADB_ROOT_PASSWORD=pass \
+  -e MARIADB_DATABASE=kidoku \
+  -e MARIADB_USER=dev \
+  -e MARIADB_PASSWORD=pass \
+  mariadb:lts
+
+# 7. MeiliSearch起動
+docker run -d --name kidoku_meilisearch --network=host \
+  -e MEILI_HTTP_ADDR=0.0.0.0:7700 \
+  -e MEILI_MASTER_KEY=YourMasterKey \
+  getmeili/meilisearch:prototype-japanese-6
+
+# 8. 起動確認
+sleep 15 && docker ps
+```
+
+#### 制限事項
+
+| 項目 | 状況 |
+|---|---|
+| Docker デーモン起動 | `--iptables=false --bridge=none --storage-driver=vfs` で可能 |
+| Docker Hub 接続 | プロキシ経由で到達可能 |
+| イメージ pull（Alpine系） | **可能**（alpine, node:20-alpine, mariadb:lts, meilisearch等） |
+| イメージ pull（非Alpine系） | **不可**（mysql:9.3等はレイヤー展開時に`operation not permitted`） |
+| `docker compose up` | overlayfsの制限により不可。`docker run`で個別起動すること |
+| ブリッジネットワーク | 無効化しているため `--network=host` が必要 |
+| MySQL | pull不可のため **MariaDB（`mariadb:lts`）で代替**すること |
+
+#### 注意点
+
+- `docker-compose.yml` は使えないため、`docker run` で個別にコンテナを起動する
+- DB接続先のポートはホストネットワーク上の `3306`（docker-compose.ymlの `13306` ではなく）になる
+- `.env` の `DB_PORT` をサンドボックスでは `3306` に変更すること
+
 ### Playwright MCPが使用できない場合のスクリーンショット撮影
 
 ```bash
