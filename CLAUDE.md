@@ -274,30 +274,7 @@ pnpm --filter web lighthouse
 
 ## サンドボックス環境での開発
 
-### Playwright MCPが使用できない場合のスクリーンショット撮影
-
-```bash
-cat > /tmp/screenshot.mjs << 'EOF'
-import { chromium } from '/root/.npm/_npx/b6ca8615f3c4955e/node_modules/playwright/index.mjs';
-
-const browser = await chromium.launch({
-  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
-});
-const page = await browser.newPage();
-await page.goto('http://localhost:3000', { waitUntil: 'networkidle', timeout: 60000 });
-await page.screenshot({ path: '/home/user/kidoku/screenshot.png', fullPage: true });
-console.log('Screenshot saved');
-await browser.close();
-EOF
-
-node /tmp/screenshot.mjs
-```
-
-### 注意事項
-
-- **外部サービスへの接続制限**: Google Fonts、Prisma Accelerate等への接続がブロックされる場合があります
-- **ページ表示エラー**: DB接続エラーはサンドボックスのネットワーク制限が原因の場合があり、コード自体の問題ではありません
-- **`pnpm dev`の起動確認**: TypeScriptコンパイルエラー0件、Next.js/NestJSの起動成功メッセージで判断してください
+詳細は [SANDBOX_SETUP.md](./SANDBOX_SETUP.md) を参照。
 
 ## トラブルシューティング
 
