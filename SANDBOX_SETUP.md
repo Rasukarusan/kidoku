@@ -247,9 +247,24 @@ function query(label, body) {
 
 ## Playwright MCP が使用できない場合のスクリーンショット撮影
 
+### 初回のみ: Playwright とブラウザのインストール
+
 ```bash
-cat > /tmp/screenshot.mjs << 'EOF'
-import { chromium } from '/root/.npm/_npx/b6ca8615f3c4955e/node_modules/playwright/index.mjs';
+npx playwright@1.50.0 install chromium
+```
+
+### スクリーンショット撮影
+
+`npx` キャッシュのパスはインストール時に変わるため、`find` で動的に解決する。
+
+```bash
+PW_INDEX=$(find /root/.npm/_npx -path "*/playwright/index.mjs" -exec \
+  node -e "const p=require(process.argv[1].replace('/index.mjs','/package.json')); \
+           if(p.version==='1.50.0') console.log(process.argv[1])" {} \; \
+  | head -1)
+
+cat > /tmp/screenshot.mjs << EOF
+import { chromium } from '${PW_INDEX}';
 
 const browser = await chromium.launch({
   args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
