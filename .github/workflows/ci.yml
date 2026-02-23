@@ -15,8 +15,8 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter api prisma generate
-      - run: pnpm --filter web prisma generate
+      - run: pnpm --filter api exec prisma generate
+      - run: pnpm --filter web exec prisma generate
       - run: pnpm lint
 
   type-check:
@@ -29,8 +29,8 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter api prisma generate
-      - run: pnpm --filter web prisma generate
+      - run: pnpm --filter api exec prisma generate
+      - run: pnpm --filter web exec prisma generate
       - run: pnpm check-types
 
   test-api:
@@ -43,7 +43,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter api prisma generate
+      - run: pnpm --filter api exec prisma generate
       - run: pnpm --filter api test
 
   test-web:
@@ -56,5 +56,5 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter web prisma generate
+      - run: pnpm --filter web exec prisma generate
       - run: pnpm --filter web test
