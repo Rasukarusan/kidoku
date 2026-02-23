@@ -8,7 +8,11 @@ import {
   Appearance,
 } from '@stripe/stripe-js'
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+// Stripeの公開キーが設定されている場合のみloadStripeを実行
+// サンドボックス環境など外部ネットワークにアクセスできない場合はキーを空にしておく
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null
 
 interface Props {
   open: boolean

@@ -1,10 +1,17 @@
 import dayjs from 'dayjs'
 import { Fragment, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { Book } from '@/types/book'
 import { AiFillLock } from 'react-icons/ai'
 import { useIsBookOwner } from '@/hooks/useIsBookOwner'
-import { CheckoutModal } from '@/components/form/CheckoutModal'
 import { MdEdit } from 'react-icons/md'
+
+// Stripeが設定されている場合のみCheckoutModalを読み込む（サンドボックス環境対応）
+const CheckoutModal = dynamic(
+  () =>
+    import('@/components/form/CheckoutModal').then((mod) => mod.CheckoutModal),
+  { ssr: false }
+)
 import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
 import { Memo } from './Memo'
@@ -143,12 +150,14 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
         </div>
       </div>
 
-      <CheckoutModal
-        open={open}
-        onClose={() => setOpen(false)}
-        returnUrl={returnUrl()}
-        purchaseText="書籍を購入"
-      />
+      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+        <CheckoutModal
+          open={open}
+          onClose={() => setOpen(false)}
+          returnUrl={returnUrl()}
+          purchaseText="書籍を購入"
+        />
+      )}
     </div>
   )
 }
