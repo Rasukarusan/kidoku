@@ -242,6 +242,133 @@ function query(label, body) {
 # → books:  {"data":{"books":[{"id":"1","title":"リーダブルコード","author":"Dustin Boswell"}]}}
 ```
 
+## 裏口ログイン（Playwright でのセッション取得）
+
+サンドボックス環境ではGoogle OAuthが使えないため、裏口ログイン（CredentialsProvider）でセッションを取得する。
+`apps/web/.env` に `NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN=true` と `BACKDOOR_USER_EMAIL=test@example.com` が設定されている前提。
+
+### curl でのログイン
+
+```bash
+# 1. CSRFトークン取得
+CSRF_TOKEN=$(curl -s -c /tmp/cookies.txt http://localhost:3000/api/auth/csrf | node -e "process.stdin.on('data', d => console.log(JSON.parse(d).csrfToken))")
+
+# 2. 裏口ログイン実行（セッションCookieが /tmp/cookies.txt に保存される）
+curl -s -b /tmp/cookies.txt -c /tmp/cookies.txt \
+  -X POST http://localhost:3000/api/auth/callback/backdoor \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "csrfToken=${CSRF_TOKEN}&email=test@example.com" \
+  -o /dev/null -w "Login: %{http_code}\n"
+# → Login: 302 が返ればログイン成功
+
+# 3. 認証付きで GraphQL クエリ（プロキシ経由）
+curl -s -b /tmp/cookies.txt \
+  -X POST http://localhost:3000/api/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ books { id title } }"}'
+# → {"data":{"books":[...]}} が返れば OK
+```
+
+### Playwright でのログイン付きスクリーンショット
+
+```bash
+PW_INDEX=$(find /root/.npm/_npx -path "*/playwright/index.mjs" -exec \
+  node -e "const p=require(process.argv[1].replace('/index.mjs','/package.json')); \
+           if(p.version==='1.50.0') console.log(process.argv[1])" {} \; \
+  | head -1)
+
+cat > /tmp/screenshot_login.mjs << SCRIPT_EOF
+import { chromium } from '${PW_INDEX}';
+
+const browser = await chromium.launch({
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
+});
+const context = await browser.newContext();
+const page = await context.newPage();
+
+// ログイン
+const csrfRes = await page.request.get('http://localhost:3000/api/auth/csrf');
+const { csrfToken } = await csrfRes.json();
+await page.request.post('http://localhost:3000/api/auth/callback/backdoor', {
+  form: { csrfToken, email: 'test@example.com' },
+  maxRedirects: 0,
+});
+
+// シートページ（ログイン済み）
+await page.goto('http://localhost:3000/testuser/sheets/本棚', { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(5000);
+await page.screenshot({ path: '/home/user/kidoku/screenshot_sheet.png', fullPage: true });
+console.log('Sheet screenshot saved');
+
+await browser.close();
+SCRIPT_EOF
+
+node /tmp/screenshot_login.mjs
+```
+
+## 環境の再起動
+
+セッションが切れてコンテナや開発サーバーが停止した場合の再起動手順。
+
+### 1. Docker デーモン起動
+
+```bash
+sudo -E dockerd --iptables=false --bridge=none --storage-driver=vfs &>/tmp/dockerd.log &
+sleep 5 && docker info
+```
+
+### 2. コンテナ再起動
+
+既存コンテナが残っている場合は `start`、なければ `run` で再作成する。
+
+```bash
+# 既存コンテナの再起動を試みる
+docker start kidoku_db kidoku_meilisearch 2>/dev/null || {
+  echo "コンテナが存在しないため再作成..."
+  docker run -d --name kidoku_db --network=host \
+    -e MARIADB_ROOT_PASSWORD=pass \
+    -e MARIADB_DATABASE=kidoku \
+    -e MARIADB_USER=dev \
+    -e MARIADB_PASSWORD=pass \
+    mariadb:lts
+  docker run -d --name kidoku_meilisearch --network=host \
+    -e MEILI_HTTP_ADDR=0.0.0.0:7700 \
+    -e MEILI_MASTER_KEY=YourMasterKey \
+    getmeili/meilisearch:prototype-japanese-6
+}
+sleep 15 && docker ps
+```
+
+> **注意**: コンテナの `start` が失敗する場合（`Error: No such container`）は、先に `docker rm -f kidoku_db kidoku_meilisearch` してから `docker run` で再作成する。
+
+### 3. DB テーブル・データ確認
+
+```bash
+# テーブルが存在するか確認
+docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SHOW TABLES;"
+
+# テーブルがなければ再作成
+DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" \
+  npx prisma db push --schema=apps/web/prisma/schema.prisma
+
+# データがなければシード再投入
+DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" \
+  npx tsx apps/web/prisma/seed.ts
+```
+
+### 4. 開発サーバー起動
+
+```bash
+# バックエンド
+pnpm --filter api dev > /tmp/api.log 2>&1 &
+sleep 10 && tail -3 /tmp/api.log
+
+# フロントエンド
+pnpm --filter web dev > /tmp/web.log 2>&1 &
+sleep 20 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+# → 200 が返れば OK
+```
+
 ## 制限事項
 
 | 項目 | 状況 |
