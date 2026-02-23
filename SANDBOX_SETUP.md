@@ -110,7 +110,16 @@ docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SHOW TABLES;"
 | verificationtokens |
 | yearly_top_books |
 
-### 10. 各アプリの環境変数ファイルを作成
+### 10. シードデータ投入（オプション）
+
+開発用のサンプルデータを投入する。テストユーザー・本棚・書籍（19冊）・年間ベスト・AI要約・テンプレートが作成される。
+
+```bash
+DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" \
+  npx tsx apps/web/prisma/seed.ts
+```
+
+### 11. 各アプリの環境変数ファイルを作成
 
 ```bash
 cp apps/web/.env.example apps/web/.env
@@ -132,14 +141,14 @@ DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku"
 MEILI_HOST=http://localhost:7700
 ```
 
-### 11. Prisma クライアント生成
+### 12. Prisma クライアント生成
 
 ```bash
 PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/web/prisma/schema.prisma
 PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/api/prisma/schema.prisma
 ```
 
-### 12. 開発サーバー起動
+### 13. 開発サーバー起動
 
 **バックエンド（NestJS API）**:
 
@@ -157,7 +166,7 @@ pnpm --filter web dev
 
 `✓ Ready` が表示されれば成功。
 
-### 13. 動作確認
+### 14. 動作確認
 
 **フロントエンド**:
 
@@ -178,7 +187,7 @@ curl -s http://localhost:4000/graphql -X POST \
 **バックエンド（認証付きでデータ取得）**:
 
 GraphQL の `sheets` / `books` クエリは HMAC-SHA256 署名が必要。
-以下のスクリプトでテストユーザーの作成からデータ取得まで確認できる。
+以下のスクリプトでテストユーザーの作成からデータ取得まで確認できる（手順10でseed実行済みの場合、手順1・2はスキップ可）。
 
 ```bash
 # 1. テストユーザー作成
