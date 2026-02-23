@@ -110,6 +110,69 @@ docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SHOW TABLES;"
 | verificationtokens |
 | yearly_top_books |
 
+### 10. 各アプリの環境変数ファイルを作成
+
+```bash
+cp apps/web/.env.example apps/web/.env
+cp apps/api/.env.example apps/api/.env
+```
+
+`apps/web/.env` を編集:
+
+```
+DATABASE_URL=mysql://dev:pass@localhost:3306/kidoku
+NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN=true
+BACKDOOR_USER_EMAIL=test@example.com
+```
+
+`apps/api/.env` を編集:
+
+```
+DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku"
+MEILI_HOST=http://localhost:7700
+```
+
+### 11. Prisma クライアント生成
+
+```bash
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/web/prisma/schema.prisma
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/api/prisma/schema.prisma
+```
+
+### 12. 開発サーバー起動
+
+**バックエンド（NestJS API）**:
+
+```bash
+pnpm --filter api dev
+```
+
+`🚀 NestJS ready: http://localhost:4000` が表示されれば成功。
+
+**フロントエンド（Next.js）**:
+
+```bash
+DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" pnpm --filter web dev
+```
+
+`✓ Ready` が表示されれば成功。
+
+> **重要**: フロントエンドは `DATABASE_URL` を環境変数として明示的に渡して起動する必要がある。`.env` ファイルだけだと Prisma が Data Proxy モードで接続しようとして `P5010` エラーになる。
+
+### 13. 動作確認
+
+```bash
+# バックエンド
+curl -s http://localhost:4000/graphql -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ __typename }"}'
+# → {"data":{"__typename":"Query"}} が返れば OK
+
+# フロントエンド
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+# → 200 が返れば OK
+```
+
 ## 制限事項
 
 | 項目 | 状況 |
