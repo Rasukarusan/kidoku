@@ -152,25 +152,85 @@ pnpm --filter api dev
 **フロントエンド（Next.js）**:
 
 ```bash
-DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" pnpm --filter web dev
+pnpm --filter web dev
 ```
 
 `✓ Ready` が表示されれば成功。
 
-> **重要**: フロントエンドは `DATABASE_URL` を環境変数として明示的に渡して起動する必要がある。`.env` ファイルだけだと Prisma が Data Proxy モードで接続しようとして `P5010` エラーになる。
-
 ### 13. 動作確認
 
+**フロントエンド**:
+
 ```bash
-# バックエンド
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
+# → 200 が返れば OK
+```
+
+**バックエンド（認証なし）**:
+
+```bash
 curl -s http://localhost:4000/graphql -X POST \
   -H "Content-Type: application/json" \
   -d '{"query":"{ __typename }"}'
 # → {"data":{"__typename":"Query"}} が返れば OK
+```
 
-# フロントエンド
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
-# → 200 が返れば OK
+**バックエンド（認証付きでデータ取得）**:
+
+GraphQL の `sheets` / `books` クエリは HMAC-SHA256 署名が必要。
+以下のスクリプトでテストユーザーの作成からデータ取得まで確認できる。
+
+```bash
+# 1. テストユーザー作成
+docker exec kidoku_db mariadb -u dev -ppass kidoku -e "
+  INSERT IGNORE INTO users (id, name, email, admin)
+  VALUES ('test-user-id', 'testuser', 'test@example.com', 0);
+"
+
+# 2. テストデータ投入（シート＋本）
+docker exec kidoku_db mariadb -u dev -ppass kidoku -e "
+  INSERT IGNORE INTO sheets (id, user_id, name, \`order\`)
+  VALUES (1, 'test-user-id', 'テスト本棚', 1);
+  INSERT IGNORE INTO books (id, user_id, sheet_id, title, author, category, image, impression, memo, is_public_memo, is_purchasable, created, updated)
+  VALUES (1, 'test-user-id', 1, 'リーダブルコード', 'Dustin Boswell', '技術書', 'https://example.com/image.jpg', '5', 'テストメモ', 0, 0, NOW(), NOW());
+"
+
+# 3. 署名付き GraphQL クエリで取得
+node -e "
+const crypto = require('crypto');
+const http = require('http');
+const secret = 'kidoku-local-nextauth-secret';
+const userId = 'test-user-id';
+const isAdmin = 'false';
+
+function query(label, body) {
+  return new Promise((resolve) => {
+    const ts = Date.now().toString();
+    const sig = crypto.createHmac('sha256', secret)
+      .update(userId + ':' + isAdmin + ':' + ts).digest('hex');
+    const req = http.request('http://localhost:4000/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': userId, 'x-user-admin': isAdmin,
+        'x-timestamp': ts, 'x-signature': sig,
+      },
+    }, (res) => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => { console.log(label + ':', d); resolve(); });
+    });
+    req.write(body); req.end();
+  });
+}
+
+(async () => {
+  await query('sheets', JSON.stringify({ query: '{ sheets { id name } }' }));
+  await query('books',  JSON.stringify({ query: '{ books { id title author } }' }));
+})();
+"
+# → sheets: {"data":{"sheets":[{"id":"1","name":"テスト本棚"}]}}
+# → books:  {"data":{"books":[{"id":"1","title":"リーダブルコード","author":"Dustin Boswell"}]}}
 ```
 
 ## 制限事項
