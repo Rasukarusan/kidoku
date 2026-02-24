@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@kidoku/database';
 import { PrismaService } from '../database/prisma.service';
 import { IAiSummaryRepository } from '../../domain/repositories/ai-summary';
 
