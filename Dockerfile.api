@@ -10,17 +10,21 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # 依存関係ファイルをコピー
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/api/package.json ./apps/api/
+COPY packages/database/package.json ./packages/database/
+COPY packages/tsconfig/package.json ./packages/tsconfig/
 
 # ワークスペース全体の依存関係をインストール
 RUN pnpm install --frozen-lockfile
 
 # ソースコードをコピー
+COPY packages/database ./packages/database
+COPY packages/tsconfig ./packages/tsconfig
 COPY apps/api ./apps/api
 
-# NestJSアプリケーションをビルド（prisma generate含む）
-RUN pnpm --filter api run build
+# @kidoku/databaseをビルド（prisma generate + tsc）後、NestJSアプリケーションをビルド
+RUN pnpm --filter @kidoku/database run build && pnpm --filter api run build
 
 # 本番ステージ
 FROM node:22-alpine AS production
@@ -37,8 +41,11 @@ WORKDIR /app
 # ビルダーからnode_modulesをコピー（.pnpm仮想ストア + ワークスペースのシンボリックリンク）
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/node_modules ./apps/api/node_modules
+COPY --from=builder --chown=nestjs:nodejs /app/packages/database/node_modules ./packages/database/node_modules
 
 # ビルド済みのアプリケーションをコピー
+COPY --from=builder --chown=nestjs:nodejs /app/packages/database/dist ./packages/database/dist
+COPY --from=builder --chown=nestjs:nodejs /app/packages/database/package.json ./packages/database/package.json
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
 
 # ユーザーを切り替え

@@ -33,6 +33,9 @@ importers:
       '@as-integrations/express5':
         specifier: ^1.1.2
         version: 1.1.2(@apollo/server@5.4.0(graphql@16.12.0))(express@5.2.1)
+      '@kidoku/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@nestjs/apollo':
         specifier: ^13.1.0
         version: 13.2.4(@apollo/server@5.4.0(graphql@16.12.0))(@as-integrations/express5@1.1.2(@apollo/server@5.4.0(graphql@16.12.0))(express@5.2.1))(@nestjs/common@11.1.14(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.14)(@nestjs/graphql@13.2.4(@nestjs/common@11.1.14(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.14)(class-transformer@0.5.1)(class-validator@0.14.3)(graphql@16.12.0)(reflect-metadata@0.2.2))(graphql@16.12.0)
@@ -54,9 +57,6 @@ importers:
       '@nestjs/platform-express':
         specifier: ^11.0.1
         version: 11.1.14(@nestjs/common@11.1.14(class-transformer@0.5.1)(class-validator@0.14.3)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.14)
-      '@prisma/client':
-        specifier: ^5.2.0
-        version: 5.22.0(prisma@5.22.0)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -88,6 +88,9 @@ importers:
       '@eslint/js':
         specifier: ^9.18.0
         version: 9.39.3
+      '@kidoku/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       '@nestjs/cli':
         specifier: ^11.0.0
         version: 11.0.16(@swc/cli@0.6.0(@swc/core@1.15.11(@swc/helpers@0.5.18))(chokidar@4.0.3))(@swc/core@1.15.11(@swc/helpers@0.5.18))(@types/node@22.19.11)
@@ -133,9 +136,6 @@ importers:
       prettier:
         specifier: ^3.4.2
         version: 3.8.1
-      prisma:
-        specifier: ^5.2.0
-        version: 5.22.0
       source-map-support:
         specifier: ^0.5.21
         version: 0.5.21
@@ -175,12 +175,12 @@ importers:
       '@emotion/styled':
         specifier: ^11.9.3
         version: 11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.3.1))(@types/react@18.2.79)(react@18.3.1)
+      '@kidoku/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@next-auth/prisma-adapter':
         specifier: ^1.0.7
         version: 1.0.7(@prisma/client@5.22.0(prisma@5.22.0))(next-auth@4.24.13(next@14.2.35(@babel/core@7.29.0)(@playwright/test@1.58.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
-      '@prisma/client':
-        specifier: ^5.2.0
-        version: 5.22.0(prisma@5.22.0)
       '@react-email/components':
         specifier: 0.0.10
         version: 0.0.10(@types/react@18.2.79)(react@18.3.1)(ts-node@10.9.2(@swc/core@1.15.11(@swc/helpers@0.5.18))(@types/node@17.0.45)(typescript@4.9.5))
@@ -259,9 +259,6 @@ importers:
       novel:
         specifier: ^0.5.0
         version: 0.5.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@tiptap/extension-code-block@2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))(@tiptap/pm@2.27.2))(@types/react@18.2.79)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      prisma:
-        specifier: ^5.2.0
-        version: 5.22.0
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -317,6 +314,12 @@ importers:
         specifier: ^4.5.4
         version: 4.9.5
     devDependencies:
+      '@kidoku/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@kidoku/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       '@next/bundle-analyzer':
         specifier: ^12.3.1
         version: 12.3.7
@@ -407,6 +410,27 @@ importers:
       webpack-bundle-analyzer:
         specifier: ^4.6.1
         version: 4.10.2
+
+  packages/database:
+    dependencies:
+      '@prisma/client':
+        specifier: ^5.2.0
+        version: 5.22.0(prisma@5.22.0)
+    devDependencies:
+      prisma:
+        specifier: ^5.2.0
+        version: 5.22.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.2
+
+  packages/eslint-config:
+    dependencies:
+      eslint:
+        specifier: '>=8'
+        version: 9.39.3(jiti@1.21.7)
+
+  packages/tsconfig: {}
 
 packages:
 
@@ -13636,7 +13660,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
