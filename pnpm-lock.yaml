@@ -424,7 +424,11 @@ importers:
         specifier: ^5.7.3
         version: 5.8.2
 
-  packages/eslint-config: {}
+  packages/eslint-config:
+    dependencies:
+      eslint:
+        specifier: '>=8'
+        version: 9.39.3(jiti@1.21.7)
 
   packages/tsconfig: {}
 
@@ -13656,7 +13660,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
