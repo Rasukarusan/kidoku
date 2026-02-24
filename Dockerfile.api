@@ -13,12 +13,14 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/api/package.json ./apps/api/
 COPY packages/database/package.json ./packages/database/
+COPY packages/tsconfig/package.json ./packages/tsconfig/
 
 # ワークスペース全体の依存関係をインストール
 RUN pnpm install --frozen-lockfile
 
 # ソースコードをコピー
 COPY packages/database ./packages/database
+COPY packages/tsconfig ./packages/tsconfig
 COPY apps/api ./apps/api
 
 # @kidoku/databaseをビルド（prisma generate + tsc）後、NestJSアプリケーションをビルド
