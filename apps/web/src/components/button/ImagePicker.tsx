@@ -17,7 +17,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   const readFileAsBase64 = (file: File) => {
     const reader = new FileReader()
     reader.onload = (e) => {
-      setImage(e.target.result as string)
+      setImage(e.target?.result as string)
     }
     reader.readAsDataURL(file)
   }

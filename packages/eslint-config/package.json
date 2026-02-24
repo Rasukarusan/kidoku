@@ -5,5 +5,8 @@
   "main": "web.js",
   "files": [
     "web.js"
-  ]
+  ],
+  "peerDependencies": {
+    "eslint": ">=8"
+  }
 }
