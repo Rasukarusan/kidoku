@@ -13,23 +13,6 @@ Kidoku（きどく）は、読書記録・分析アプリケーションです�
 
 ## アーキテクチャ概要
 
-### モノレポ構成
-
-```text
-apps/
-├─ api/                # NestJS GraphQL API
-└─ web/                # Next.js フロントエンド
-
-packages/
-├─ database/           # Prisma schema + 生成クライアント（@kidoku/database）
-├─ eslint-config/      # 共有ESLint設定（@kidoku/eslint-config）
-└─ tsconfig/           # 共有TypeScript設定（@kidoku/tsconfig）
-```
-
-- `@kidoku/database`: Prismaスキーマの一元管理。`prisma generate` + `tsc` でクライアントをビルドし、両アプリから `@kidoku/database` として参照
-- `@kidoku/tsconfig`: `base.json`（共通）、`nextjs.json`（Web用）、`nestjs.json`（API用）を提供
-- `@kidoku/eslint-config`: Web用ESLint設定を共有パッケージとして提供
-
 ### 認証フロー
 
 1. **フロントエンド**: NextAuth.js（Google OAuth + 裏口ログイン）でセッション管理
@@ -45,10 +28,9 @@ packages/
 
 ### データベースアクセス
 
-- **共有パッケージ**: `@kidoku/database`（`packages/database/prisma/schema.prisma`）→ MySQL
-- **フロントエンド**: `@kidoku/database` 経由で `PrismaClient` を利用
-- **バックエンド**: `@kidoku/database` 経由で `PrismaClient` を利用
-- スキーマは `packages/database/prisma/schema.prisma` に**一元管理**
+- **フロントエンド**: `@prisma/client`（`apps/web/prisma/schema.prisma`）→ MySQL
+- **バックエンド**: `@prisma/client`（`apps/api/prisma/schema.prisma`）→ 同一MySQL
+- スキーマは `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の2箇所に同じ内容が存在する。スキーマ変更時は両方を更新すること。
 
 ### API アーキテクチャ（DDD）
 
@@ -122,25 +104,28 @@ apps/api/src/
 1. **ドメインモデル作成**: `apps/api/src/domain/models/tag.ts` — private constructor + create() + fromDatabase() パターン
 2. **リポジトリインターフェース作成**: `apps/api/src/domain/repositories/tag.ts` — abstract class ITagRepository
 3. **リポジトリ実装**: `apps/api/src/infrastructure/repositories/tag.ts` — @Injectable() + ITagRepository を implements
-4. **Prismaスキーマ追加**: `packages/database/prisma/schema.prisma` にモデル定義を追加
+4. **Prismaスキーマ追加**: `apps/api/prisma/schema.prisma` と `apps/web/prisma/schema.prisma` の両方にモデル定義を追加
 5. **ユースケース作成**: `apps/api/src/application/usecases/tags/*.ts` — create-tag.ts, get-tags.ts 等
 6. **DTO作成**: `apps/api/src/presentation/dto/tag.ts` — @InputType, @ObjectType
 7. **リゾルバー作成**: `apps/api/src/presentation/resolvers/tag.ts` — @Resolver + @Query/@Mutation
 8. **モジュール作成**: `apps/api/src/presentation/modules/tag.ts` — imports, providers, provide/useClass
 9. **AppModuleに登録**: `apps/api/src/app.module.ts` の imports に TagModule 追加
 10. **テスト作成**: ドメインモデル・ユースケースのユニットテストを作成
-11. **Prismaクライアント再生成**: `pnpm --filter @kidoku/database build`
+11. **Prismaクライアント再生成**: `pnpm --filter web prisma generate && pnpm --filter api prisma generate`
 12. **フロントエンド型生成**: `pnpm --filter web codegen`
 
-## Prismaスキーマ変更ガイド
+## Dual Prismaスキーマ同期ガイド
 
-Prismaスキーマは `packages/database/prisma/schema.prisma` に一元管理されている。
+同一MySQLに対してWeb(`apps/web/prisma/schema.prisma`)とAPI(`apps/api/prisma/schema.prisma`)の2つのPrismaスキーマが存在するため、スキーマ変更時は**必ず両方を更新**する。
 
 ### 変更手順
 
-1. `packages/database/prisma/schema.prisma` を編集
-2. `pnpm --filter @kidoku/database db:push` でDBに反映
-3. `pnpm --filter @kidoku/database build` でPrismaクライアント再生成（prisma generate + tsc）
+1. `apps/web/prisma/schema.prisma` を編集
+2. `apps/api/prisma/schema.prisma` にも同じ変更を反映
+3. `pnpm --filter web db:push` でDBに反映
+4. `pnpm --filter api db:push` でバックエンドも反映
+5. `pnpm --filter web prisma generate` でWebのPrismaクライアント再生成
+6. `pnpm --filter api prisma generate` でAPIのPrismaクライアント再生成
 
 ## 禁止事項・よくあるミス
 
@@ -155,8 +140,8 @@ Prismaスキーマは `packages/database/prisma/schema.prisma` に一元管理�
 
 ### スキーマ変更
 
-- ❌ スキーマ変更後に `pnpm --filter @kidoku/database db:push` を忘れる
-- ❌ スキーマ変更後に `pnpm --filter @kidoku/database build` を忘れる
+- ❌ Web側のPrismaスキーマだけ変更してAPI側を忘れる（またはその逆）
+- ❌ スキーマ変更後に `db:push` を忘れる
 
 ### NestJS DI
 
@@ -189,13 +174,11 @@ pnpm --filter api build
 
 ```bash
 # スキーマをDBに反映
-pnpm --filter @kidoku/database db:push
-
-# Prismaクライアント再生成
-pnpm --filter @kidoku/database build
+pnpm --filter web db:push
+pnpm --filter api db:push
 
 # Prisma Studio起動
-pnpm --filter @kidoku/database db:studio
+pnpm --filter web db:studio
 ```
 
 ### テスト
@@ -256,9 +239,8 @@ pnpm --filter web lighthouse
 
 ### データベース
 
-- `packages/database/prisma/schema.prisma` - Prismaスキーマ定義（一元管理）
-- `packages/database/src/index.ts` - Prismaクライアント再エクスポート
-- `packages/database/src/edge.ts` - Edge Runtime用Prismaクライアント再エクスポート
+- `apps/web/prisma/schema.prisma` - Prismaスキーマ定義（web側）
+- `apps/api/prisma/schema.prisma` - Prismaスキーマ定義（API側）
 
 ### 検索
 
@@ -275,9 +257,9 @@ pnpm --filter web lighthouse
 
 ### データベーススキーマ変更
 
-1. `packages/database/prisma/schema.prisma` を編集
-2. `pnpm --filter @kidoku/database db:push` でDBに反映
-3. `pnpm --filter @kidoku/database build` でPrismaクライアントが再生成される（Turboの `^build` により、アプリビルド時にも自動実行）
+1. `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の両方を編集
+2. `pnpm --filter web db:push` でDBに反映
+3. `pnpm --filter web build` / `pnpm --filter api build` でPrismaクライアントが自動生成される
 
 ### MeiliSearch
 
@@ -303,7 +285,8 @@ pnpm --filter web lighthouse
 pnpm --filter web codegen
 
 # Prismaクライアント再生成
-pnpm --filter @kidoku/database build
+pnpm --filter web prisma generate
+pnpm --filter api prisma generate
 # サンドボックス環境では PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 を付与
 ```
 
