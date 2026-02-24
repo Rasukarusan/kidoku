@@ -17,7 +17,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   const readFileAsBase64 = (file: File) => {
     const reader = new FileReader()
     reader.onload = (e) => {
-      setImage(e.target.result as string)
+      setImage(e.target?.result as string)
     }
     reader.readAsDataURL(file)
   }
@@ -31,6 +31,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
         canvas.width = img.width
         canvas.height = img.height
         const ctx = canvas.getContext('2d')
+        if (!ctx) return
         ctx.drawImage(img, 0, 0)
         const dataURL = canvas.toDataURL()
         setImage(dataURL)
