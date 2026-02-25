@@ -1,4 +1,4 @@
-import { PrismaClient } from '@kidoku/database'
+import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient({
   log: [
     // 'query',
@@ -9,7 +9,7 @@ const prisma = new PrismaClient({
 })
 export default prisma
 
-export * from '@kidoku/database'
+export * from '@prisma/client'
 
 /**
  * Next.jsの問題で、DATE型を含むレコードをPropsとして渡すと下記のエラーになるため、一度stringに戻す必要がある。

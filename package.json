@@ -9,7 +9,6 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "build:libraries": "pnpm --filter @kidoku/database build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
