@@ -77,6 +77,7 @@
     "typescript": "^4.5.4"
   },
   "devDependencies": {
+    "@kidoku/eslint-config": "workspace:*",
     "@next/bundle-analyzer": "^12.3.1",
     "@next/eslint-plugin-next": "^12.1.6",
     "@playwright/test": "^1.58.2",
