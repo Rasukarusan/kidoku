@@ -317,6 +317,9 @@ importers:
         specifier: ^4.5.4
         version: 4.9.5
     devDependencies:
+      '@kidoku/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
       '@next/bundle-analyzer':
         specifier: ^12.3.1
         version: 12.3.7
@@ -407,6 +410,12 @@ importers:
       webpack-bundle-analyzer:
         specifier: ^4.6.1
         version: 4.10.2
+
+  packages/eslint-config:
+    dependencies:
+      eslint:
+        specifier: '>=8'
+        version: 9.39.3(jiti@1.21.7)
 
 packages:
 
@@ -13636,7 +13645,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
