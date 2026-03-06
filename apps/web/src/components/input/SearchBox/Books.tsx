@@ -42,7 +42,9 @@ export const Books: React.FC<Props> = ({ input }) => {
         const items = await searchBooks(input)
         setBooks(items ?? [])
       } catch {
-        setError('検索中にエラーが発生しました')
+        setError(
+          'Google検索に失敗しました。しばらくしてから再度お試しください。'
+        )
         setBooks([])
       } finally {
         setLoading(false)
@@ -67,10 +69,10 @@ export const Books: React.FC<Props> = ({ input }) => {
           </div>
         )}
 
-        {/* エラー */}
+        {/* Google検索エラー */}
         {error && !loading && (
-          <div className="py-8 text-center">
-            <p className="text-sm text-gray-500">{error}</p>
+          <div className="mx-4 my-4 rounded-md border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
 
