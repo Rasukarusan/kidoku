@@ -10,17 +10,47 @@ const NO_IMAGE = '/no-image.png';
 export class GoogleBooksRepository implements IGoogleBooksRepository {
   private readonly baseUrl = 'https://www.googleapis.com/books/v1/volumes';
   private readonly logger = new Logger(GoogleBooksRepository.name);
+  private readonly maxRetries = 3;
+
+  private async fetchWithRetry(url: string): Promise<Response> {
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      let response: Response;
+      try {
+        response = await fetch(url);
+      } catch (error) {
+        if (attempt < this.maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000;
+          this.logger.warn(
+            `Google Books APIへの接続に失敗しました（試行${attempt + 1}/${this.maxRetries + 1}）。${delay}ms後にリトライします`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue;
+        }
+        this.logger.error(
+          `Google Books APIへの接続に失敗しました: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        throw new Error('Google Books APIへの接続に失敗しました');
+      }
+
+      if (response.status === 429 && attempt < this.maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000;
+        this.logger.warn(
+          `Google Books APIレート制限（429）。${delay}ms後にリトライします（試行${attempt + 1}/${this.maxRetries + 1}）`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      return response;
+    }
+
+    throw new Error('Google Books APIへの接続に失敗しました');
+  }
 
   async searchByTitle(query: string): Promise<GoogleBookItem[]> {
-    let response: Response;
-    try {
-      response = await fetch(`${this.baseUrl}?q=${encodeURIComponent(query)}`);
-    } catch (error) {
-      this.logger.error(
-        `Google Books APIへの接続に失敗しました: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      throw new Error('Google Books APIへの接続に失敗しました');
-    }
+    const response = await this.fetchWithRetry(
+      `${this.baseUrl}?q=${encodeURIComponent(query)}`,
+    );
 
     if (!response.ok) {
       this.logger.error(
