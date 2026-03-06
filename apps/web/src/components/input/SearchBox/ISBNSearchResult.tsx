@@ -68,13 +68,13 @@ export const ISBNSearchResult: React.FC<Props> = ({ isbn }) => {
       )}
 
       {result && !loading && (
-        <div className="flex items-start gap-4 rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col items-center gap-4 rounded-lg border border-gray-200 p-4 sm:flex-row sm:items-start">
           <img
             className="h-[150px] w-auto shrink-0 object-contain"
             src={result.image}
             alt={result.title}
           />
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 self-stretch sm:flex-1">
             <div className="truncate font-bold text-gray-900">
               {result.title}
             </div>
@@ -83,7 +83,7 @@ export const ISBNSearchResult: React.FC<Props> = ({ isbn }) => {
             </div>
             <div className="mt-1 text-xs text-gray-400">{result.category}</div>
             <button
-              className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700"
+              className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700 sm:w-auto"
               onClick={() => {
                 if (!session) {
                   setOpenLoginModal(true)
