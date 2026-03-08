@@ -1,9 +1,8 @@
 // @ts-check
 import path from 'path';
-import eslint from '@eslint/js';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import { createCommonConfig } from './common.mjs';
 
 /**
  * ファイルパスからDDDレイヤー名を返す。
@@ -121,7 +120,8 @@ function createDddLayerBoundariesRule(srcDir) {
 }
 
 /**
- * バックエンド（NestJS）用のESLint共通設定を生成する。
+ * バックエンド（NestJS）用のESLint設定を生成する。
+ * 共通設定（common）に加え、型チェック付きルール・DDDレイヤー境界・NestJS固有設定を追加。
  * @param {{ tsconfigRootDir: string, srcDir: string }} options
  * @returns {import('typescript-eslint').ConfigArray}
  */
@@ -136,9 +136,7 @@ export function createApiConfig({ tsconfigRootDir, srcDir }) {
     {
       ignores: ['eslint.config.mjs'],
     },
-    eslint.configs.recommended,
-    ...tseslint.configs.recommendedTypeChecked,
-    eslintPluginPrettierRecommended,
+    ...createCommonConfig({ typeChecked: true }),
     {
       languageOptions: {
         globals: {
