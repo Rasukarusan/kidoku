@@ -3,14 +3,14 @@ import { UseGuards, ForbiddenException } from '@nestjs/common';
 import { AdminApiKeyGuard } from '../../infrastructure/auth/admin-api-key.guard';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
 import { SearchBooksUseCase } from '../../application/usecases/search/search-books';
-import { SearchGoogleBooksUseCase } from '../../application/usecases/search/search-google-books';
+import { SearchExternalBooksUseCase } from '../../application/usecases/search/search-external-books';
 import { IndexAllBooksUseCase } from '../../application/usecases/search/index-all-books';
 import {
   SearchBooksInput,
   SearchBooksResponse,
   SearchHitResponse,
-  SearchGoogleBooksInput,
-  GoogleBookHitResponse,
+  SearchExternalBooksInput,
+  ExternalBookHitResponse,
   IndexBooksResponse,
 } from '../dto/search';
 
@@ -18,7 +18,7 @@ import {
 export class SearchResolver {
   constructor(
     private readonly searchBooksUseCase: SearchBooksUseCase,
-    private readonly searchGoogleBooksUseCase: SearchGoogleBooksUseCase,
+    private readonly searchExternalBooksUseCase: SearchExternalBooksUseCase,
     private readonly indexAllBooksUseCase: IndexAllBooksUseCase,
   ) {}
 
@@ -51,11 +51,11 @@ export class SearchResolver {
     };
   }
 
-  @Query(() => [GoogleBookHitResponse])
-  async searchGoogleBooks(
-    @Args('input') input: SearchGoogleBooksInput,
-  ): Promise<GoogleBookHitResponse[]> {
-    return await this.searchGoogleBooksUseCase.execute(input.query);
+  @Query(() => [ExternalBookHitResponse])
+  async searchExternalBooks(
+    @Args('input') input: SearchExternalBooksInput,
+  ): Promise<ExternalBookHitResponse[]> {
+    return await this.searchExternalBooksUseCase.execute(input.query);
   }
 
   @Mutation(() => IndexBooksResponse)
