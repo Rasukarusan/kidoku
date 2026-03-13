@@ -68,37 +68,45 @@ const searchSoftwareDesign = async (
 }
 
 /**
- * Google Books APIで書籍を検索
+ * 楽天ブックスAPIで書籍を検索（ISBN）
  */
-export const searchGoogleBooks = async (
+export const searchRakutenBooks = async (
   isbn: string
 ): Promise<SearchResult | undefined> => {
   const client = new ApiClient()
   try {
+    const applicationId = process.env.NEXT_PUBLIC_RAKUTEN_APPLICATION_ID
+    if (!applicationId) {
+      console.error('NEXT_PUBLIC_RAKUTEN_APPLICATION_ID が設定されていません')
+      return undefined
+    }
+
+    const params = new URLSearchParams({
+      applicationId,
+      isbn: isbn.replace(/-/g, ''),
+      outOfStockFlag: '1',
+    })
     const res = await client.get(
-      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`
+      `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404?${params.toString()}`
     )
-    const item = res.data.items?.pop()
+
+    const item = res.data.Items?.[0]?.Item
     if (!item) return undefined
 
-    const { title, authors, categories, imageLinks, industryIdentifiers } =
-      item.volumeInfo
     return {
-      id: item.id,
-      title: title || '不明なタイトル',
-      author: Array.isArray(authors) ? authors.join(', ') : '著者不明',
-      category: categories ? categories.join(', ') : '未分類',
+      id: item.isbn || isbn,
+      title: item.title || '不明なタイトル',
+      author: item.author || '著者不明',
+      category: item.booksGenreId || '未分類',
       image:
-        imageLinks?.thumbnail?.replace('http:', 'https:') ||
-        imageLinks?.smallThumbnail?.replace('http:', 'https:') ||
+        item.largeImageUrl?.replace('http:', 'https:') ||
+        item.mediumImageUrl?.replace('http:', 'https:') ||
         NO_IMAGE,
       memo: '',
-      isbn:
-        industryIdentifiers?.find((id) => id.type === 'ISBN_13')?.identifier ||
-        isbn,
+      isbn: item.isbn || isbn,
     }
   } catch (error) {
-    console.error('Google Books API error:', error)
+    console.error('楽天ブックスAPI error:', error)
     return undefined
   }
 }
@@ -147,26 +155,26 @@ export const searchBookWithMultipleSources = async (
 ): Promise<SearchResult | undefined> => {
   const normalizedISBN = normalizeISBN(isbn)
 
-  // 1. まずGoogle Books APIで検索（画像取得の成功率が高い）
-  const googleResult = await searchGoogleBooks(normalizedISBN)
-  if (googleResult && googleResult.title !== '不明なタイトル') {
+  // 1. まず楽天ブックスAPIで検索
+  const rakutenResult = await searchRakutenBooks(normalizedISBN)
+  if (rakutenResult && rakutenResult.title !== '不明なタイトル') {
     // Software DesignのISBNの場合は専用処理で画像を更新
-    if (isSoftwareDesignISBN(normalizedISBN, googleResult.title)) {
+    if (isSoftwareDesignISBN(normalizedISBN, rakutenResult.title)) {
       const softwareDesignResult = await searchSoftwareDesign(
         normalizedISBN,
-        googleResult.title
+        rakutenResult.title
       )
       if (softwareDesignResult) {
         return {
-          ...googleResult,
-          image: softwareDesignResult.image, // 正しい画像URLに更新
+          ...rakutenResult,
+          image: softwareDesignResult.image,
         }
       }
     }
-    return googleResult
+    return rakutenResult
   }
 
-  // 2. Google Books APIで見つからない場合はopenBDで検索
+  // 2. 楽天で見つからない場合はopenBDで検索
   const openBDResult = await searchOpenBD(normalizedISBN)
   if (openBDResult) {
     // Software DesignのISBNの場合は専用処理で画像を更新
@@ -178,25 +186,23 @@ export const searchBookWithMultipleSources = async (
       if (softwareDesignResult) {
         return {
           ...openBDResult,
-          image: softwareDesignResult.image, // 正しい画像URLに更新
+          image: softwareDesignResult.image,
         }
       }
     }
 
-    // Googleの部分的な結果とopenBDの結果をマージ
-    if (googleResult) {
+    // 楽天の部分的な結果とopenBDの結果をマージ
+    if (rakutenResult) {
       return {
         ...openBDResult,
-        // Googleの画像があれば優先（画像取得率が高いため）
         image:
-          googleResult.image !== NO_IMAGE
-            ? googleResult.image
+          rakutenResult.image !== NO_IMAGE
+            ? rakutenResult.image
             : openBDResult.image,
-        // カテゴリーはopenBDを優先（日本の書籍カテゴリー情報が正確）
         category:
           openBDResult.category !== '未分類'
             ? openBDResult.category
-            : googleResult.category,
+            : rakutenResult.category,
       }
     }
     return openBDResult
@@ -211,7 +217,7 @@ export const searchBookWithMultipleSources = async (
   }
 
   // 4. 最終的に部分的な結果でも返す
-  return googleResult || openBDResult
+  return rakutenResult || openBDResult
 }
 
 /**
