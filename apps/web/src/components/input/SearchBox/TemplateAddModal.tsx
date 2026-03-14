@@ -39,7 +39,8 @@ export const TemplateAddModal: React.FC<Props> = ({
 
   // カテゴリ一覧（GraphQL）
   const { data: categoriesData } = useQuery<{ bookCategories: string[] }>(
-    getBookCategoriesQuery
+    getBookCategoriesQuery,
+    { skip: !session }
   )
   const options = categoriesData
     ? categoriesData.bookCategories.map((category) => ({

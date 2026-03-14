@@ -55,13 +55,13 @@ export class SearchBooksResponse {
 }
 
 @InputType()
-export class SearchGoogleBooksInput {
+export class SearchExternalBooksInput {
   @Field()
   query: string;
 }
 
 @ObjectType()
-export class GoogleBookHitResponse {
+export class ExternalBookHitResponse {
   @Field()
   id: string;
 

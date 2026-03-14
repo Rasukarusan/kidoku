@@ -15,7 +15,9 @@ import { getSheetsQuery } from '@/features/sheet/api'
  */
 export const StoreAccessToken = () => {
   const { data: session, status } = useSession()
-  const { data: sheetsData } = useQuery(getSheetsQuery)
+  const { data: sheetsData } = useQuery(getSheetsQuery, {
+    skip: status !== 'authenticated',
+  })
 
   useEffect(() => {
     if (status === 'authenticated' && session) {

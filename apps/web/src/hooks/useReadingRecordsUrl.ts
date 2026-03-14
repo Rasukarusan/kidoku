@@ -8,7 +8,7 @@ import { useCachedSession, loadSheetsFromCache } from '@/hooks/useCachedSession'
  */
 export function useReadingRecordsUrl(): string {
   const { session } = useCachedSession()
-  const { data } = useQuery(getSheetsQuery)
+  const { data } = useQuery(getSheetsQuery, { skip: !session })
   const sheets = data?.sheets || loadSheetsFromCache() || []
 
   if (!session) return '/'

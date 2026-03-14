@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { SearchResolver } from '../resolvers/search';
 import { SearchBooksUseCase } from '../../application/usecases/search/search-books';
-import { SearchGoogleBooksUseCase } from '../../application/usecases/search/search-google-books';
+import { SearchExternalBooksUseCase } from '../../application/usecases/search/search-external-books';
 import { IndexAllBooksUseCase } from '../../application/usecases/search/index-all-books';
 import { SearchRepository } from '../../infrastructure/repositories/search';
-import { GoogleBooksRepository } from '../../infrastructure/repositories/google-books';
+import { RakutenBooksRepository } from '../../infrastructure/repositories/rakuten-books';
 import { BookRepository } from '../../infrastructure/repositories/book';
 import { MeiliSearchProvider } from '../../infrastructure/search/meilisearch.providers';
 import { AuthModule } from '../../infrastructure/auth/auth.module';
 import { ISearchRepository } from '../../domain/repositories/search';
-import { IGoogleBooksRepository } from '../../domain/repositories/google-books';
+import { IBookSearchRepository } from '../../domain/repositories/book-search';
 import { IBookRepository } from '../../domain/repositories/book';
 
 @Module({
@@ -17,7 +17,7 @@ import { IBookRepository } from '../../domain/repositories/book';
   providers: [
     SearchResolver,
     SearchBooksUseCase,
-    SearchGoogleBooksUseCase,
+    SearchExternalBooksUseCase,
     IndexAllBooksUseCase,
     MeiliSearchProvider,
     {
@@ -25,8 +25,8 @@ import { IBookRepository } from '../../domain/repositories/book';
       useClass: SearchRepository,
     },
     {
-      provide: IGoogleBooksRepository,
-      useClass: GoogleBooksRepository,
+      provide: IBookSearchRepository,
+      useClass: RakutenBooksRepository,
     },
     {
       provide: IBookRepository,
