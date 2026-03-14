@@ -56,9 +56,12 @@ export const AddModal: React.FC = () => {
   const item = useAtomValue(addBookAtom)
   const { data: session } = useSession()
   const apolloClient = useApolloClient()
-  const { data: sheetsData, refetch: refetchSheets } = useQuery(getSheetsQuery, {
-    skip: !session,
-  })
+  const { data: sheetsData, refetch: refetchSheets } = useQuery(
+    getSheetsQuery,
+    {
+      skip: !session,
+    }
+  )
   const sheets = sheetsData?.sheets || []
   const [loading, setLoading] = useState(false)
   const [book, setBook] = useState(null)

@@ -86,7 +86,7 @@ type SearchBooksResponse {
   hasMore: Boolean!
 }
 
-type GoogleBookHitResponse {
+type ExternalBookHitResponse {
   id: String!
   title: String!
   author: String!
@@ -143,7 +143,7 @@ type Query {
   books(input: GetBooksInput): [BookResponse!]!
   bookCategories: [String!]!
   searchBooks(input: SearchBooksInput!): SearchBooksResponse!
-  searchGoogleBooks(input: SearchGoogleBooksInput!): [GoogleBookHitResponse!]!
+  searchExternalBooks(input: SearchExternalBooksInput!): [ExternalBookHitResponse!]!
   yearlyTopBooks(input: GetYearlyTopBooksInput!): [YearlyTopBookResponse!]!
   userImage(input: GetUserImageInput!): String!
   isNameAvailable(input: CheckNameAvailableInput!): Boolean!
@@ -175,7 +175,7 @@ input SearchBooksInput {
   page: Int = 1
 }
 
-input SearchGoogleBooksInput {
+input SearchExternalBooksInput {
   query: String!
 }
 

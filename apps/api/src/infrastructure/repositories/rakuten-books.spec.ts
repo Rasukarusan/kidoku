@@ -13,6 +13,7 @@ describe('RakutenBooksRepository', () => {
 
   it('RAKUTEN_APPLICATION_ID が未設定の場合エラーをスローする', async () => {
     delete process.env.RAKUTEN_APPLICATION_ID;
+    delete process.env.RAKUTEN_ACCESS_KEY;
 
     await expect(repository.searchByTitle('テスト')).rejects.toThrow(
       '楽天ブックスAPIの設定が不足しています',
@@ -21,6 +22,7 @@ describe('RakutenBooksRepository', () => {
 
   it('APIレスポンスを正しくマッピングする', async () => {
     process.env.RAKUTEN_APPLICATION_ID = 'test-app-id';
+    process.env.RAKUTEN_ACCESS_KEY = 'test-access-key';
 
     const mockResponse = {
       Items: [
@@ -49,13 +51,14 @@ describe('RakutenBooksRepository', () => {
       id: '9784297123456',
       title: 'テスト書籍',
       author: 'テスト著者',
-      category: '001004',
+      category: '小説・エッセイ',
       image: 'https://example.com/large.jpg',
     });
   });
 
   it('検索結果がない場合は空配列を返す', async () => {
     process.env.RAKUTEN_APPLICATION_ID = 'test-app-id';
+    process.env.RAKUTEN_ACCESS_KEY = 'test-access-key';
 
     jest.spyOn(global, 'fetch').mockResolvedValue({
       ok: true,
@@ -69,12 +72,14 @@ describe('RakutenBooksRepository', () => {
 
   it('APIエラー時にエラーをスローする', async () => {
     process.env.RAKUTEN_APPLICATION_ID = 'test-app-id';
+    process.env.RAKUTEN_ACCESS_KEY = 'test-access-key';
 
     jest.spyOn(global, 'fetch').mockResolvedValue({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
-    } as Response);
+      text: () => Promise.resolve('error'),
+    } as unknown as Response);
 
     await expect(repository.searchByTitle('テスト')).rejects.toThrow(
       '楽天ブックスAPIがエラーを返しました',
@@ -83,10 +88,9 @@ describe('RakutenBooksRepository', () => {
 
   it('接続エラー時にエラーをスローする', async () => {
     process.env.RAKUTEN_APPLICATION_ID = 'test-app-id';
+    process.env.RAKUTEN_ACCESS_KEY = 'test-access-key';
 
-    jest
-      .spyOn(global, 'fetch')
-      .mockRejectedValue(new Error('Network error'));
+    jest.spyOn(global, 'fetch').mockRejectedValue(new Error('Network error'));
 
     await expect(repository.searchByTitle('テスト')).rejects.toThrow(
       '楽天ブックスAPIへの接続に失敗しました',
@@ -95,6 +99,7 @@ describe('RakutenBooksRepository', () => {
 
   it('画像URLがない場合はデフォルト画像を使用する', async () => {
     process.env.RAKUTEN_APPLICATION_ID = 'test-app-id';
+    process.env.RAKUTEN_ACCESS_KEY = 'test-access-key';
 
     const mockResponse = {
       Items: [

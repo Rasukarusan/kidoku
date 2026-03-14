@@ -68,60 +68,18 @@ const searchSoftwareDesign = async (
 }
 
 /**
- * 楽天ブックスAPIで書籍を検索（ISBN）
- */
-export const searchRakutenBooks = async (
-  isbn: string
-): Promise<SearchResult | undefined> => {
-  const client = new ApiClient()
-  try {
-    const applicationId = process.env.NEXT_PUBLIC_RAKUTEN_APPLICATION_ID
-    if (!applicationId) {
-      console.error('NEXT_PUBLIC_RAKUTEN_APPLICATION_ID が設定されていません')
-      return undefined
-    }
-
-    const params = new URLSearchParams({
-      applicationId,
-      isbn: isbn.replace(/-/g, ''),
-      outOfStockFlag: '1',
-    })
-    const res = await client.get(
-      `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404?${params.toString()}`
-    )
-
-    const item = res.data.Items?.[0]?.Item
-    if (!item) return undefined
-
-    return {
-      id: item.isbn || isbn,
-      title: item.title || '不明なタイトル',
-      author: item.author || '著者不明',
-      category: item.booksGenreId || '未分類',
-      image:
-        item.largeImageUrl?.replace('http:', 'https:') ||
-        item.mediumImageUrl?.replace('http:', 'https:') ||
-        NO_IMAGE,
-      memo: '',
-      isbn: item.isbn || isbn,
-    }
-  } catch (error) {
-    console.error('楽天ブックスAPI error:', error)
-    return undefined
-  }
-}
-
-/**
  * openBD APIで書籍を検索
  */
 export const searchOpenBD = async (
   isbn: string
 ): Promise<SearchResult | undefined> => {
-  const client = new ApiClient()
+  const apiClient = new ApiClient()
   try {
     // ISBN-13に変換
     const isbn13 = isbn.length === 10 ? convertISBN10to13(isbn) : isbn
-    const res = await client.get(`https://api.openbd.jp/v1/get?isbn=${isbn13}`)
+    const res = await apiClient.get(
+      `https://api.openbd.jp/v1/get?isbn=${isbn13}`
+    )
 
     if (!res.data || res.data.length === 0 || !res.data[0]) return undefined
 
@@ -155,26 +113,7 @@ export const searchBookWithMultipleSources = async (
 ): Promise<SearchResult | undefined> => {
   const normalizedISBN = normalizeISBN(isbn)
 
-  // 1. まず楽天ブックスAPIで検索
-  const rakutenResult = await searchRakutenBooks(normalizedISBN)
-  if (rakutenResult && rakutenResult.title !== '不明なタイトル') {
-    // Software DesignのISBNの場合は専用処理で画像を更新
-    if (isSoftwareDesignISBN(normalizedISBN, rakutenResult.title)) {
-      const softwareDesignResult = await searchSoftwareDesign(
-        normalizedISBN,
-        rakutenResult.title
-      )
-      if (softwareDesignResult) {
-        return {
-          ...rakutenResult,
-          image: softwareDesignResult.image,
-        }
-      }
-    }
-    return rakutenResult
-  }
-
-  // 2. 楽天で見つからない場合はopenBDで検索
+  // 1. openBDで検索
   const openBDResult = await searchOpenBD(normalizedISBN)
   if (openBDResult) {
     // Software DesignのISBNの場合は専用処理で画像を更新
@@ -190,25 +129,10 @@ export const searchBookWithMultipleSources = async (
         }
       }
     }
-
-    // 楽天の部分的な結果とopenBDの結果をマージ
-    if (rakutenResult) {
-      return {
-        ...openBDResult,
-        image:
-          rakutenResult.image !== NO_IMAGE
-            ? rakutenResult.image
-            : openBDResult.image,
-        category:
-          openBDResult.category !== '未分類'
-            ? openBDResult.category
-            : rakutenResult.category,
-      }
-    }
     return openBDResult
   }
 
-  // 3. どちらでも見つからない場合、Software DesignのISBNならタイトルなしで検索
+  // 2. openBDで見つからない場合、Software DesignのISBNならタイトルなしで検索
   if (isSoftwareDesignISBN(normalizedISBN)) {
     const softwareDesignResult = await searchSoftwareDesign(normalizedISBN)
     if (softwareDesignResult) {
@@ -216,8 +140,7 @@ export const searchBookWithMultipleSources = async (
     }
   }
 
-  // 4. 最終的に部分的な結果でも返す
-  return rakutenResult || openBDResult
+  return undefined
 }
 
 /**
