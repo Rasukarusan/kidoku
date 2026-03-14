@@ -21,9 +21,9 @@ const SEARCH_BOOKS_QUERY = gql`
   }
 `
 
-const SEARCH_GOOGLE_BOOKS_QUERY = gql`
-  query SearchGoogleBooks($input: SearchGoogleBooksInput!) {
-    searchGoogleBooks(input: $input) {
+const SEARCH_EXTERNAL_BOOKS_QUERY = gql`
+  query SearchExternalBooks($input: SearchExternalBooksInput!) {
+    searchExternalBooks(input: $input) {
       id
       title
       author
@@ -112,14 +112,14 @@ export const searchBooks = async (title: string): Promise<SearchResult[]> => {
     }
   }
 
-  // GraphQL経由でGoogle Books APIを検索
+  // GraphQL経由で外部書籍APIを検索
   const { data } = await client.query({
-    query: SEARCH_GOOGLE_BOOKS_QUERY,
+    query: SEARCH_EXTERNAL_BOOKS_QUERY,
     variables: { input: { query: title } },
     fetchPolicy: 'no-cache',
   })
 
-  data.searchGoogleBooks?.forEach(
+  data.searchExternalBooks?.forEach(
     (item: {
       id: string
       title: string

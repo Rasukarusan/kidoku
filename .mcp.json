@@ -8,6 +8,13 @@
         "--browser", "chromium",
         "--viewport-size", "1920,1080"
       ]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ]
     }
   }
 }

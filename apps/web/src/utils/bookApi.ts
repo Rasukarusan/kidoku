@@ -68,52 +68,18 @@ const searchSoftwareDesign = async (
 }
 
 /**
- * Google Books APIで書籍を検索
- */
-export const searchGoogleBooks = async (
-  isbn: string
-): Promise<SearchResult | undefined> => {
-  const client = new ApiClient()
-  try {
-    const res = await client.get(
-      `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`
-    )
-    const item = res.data.items?.pop()
-    if (!item) return undefined
-
-    const { title, authors, categories, imageLinks, industryIdentifiers } =
-      item.volumeInfo
-    return {
-      id: item.id,
-      title: title || '不明なタイトル',
-      author: Array.isArray(authors) ? authors.join(', ') : '著者不明',
-      category: categories ? categories.join(', ') : '未分類',
-      image:
-        imageLinks?.thumbnail?.replace('http:', 'https:') ||
-        imageLinks?.smallThumbnail?.replace('http:', 'https:') ||
-        NO_IMAGE,
-      memo: '',
-      isbn:
-        industryIdentifiers?.find((id) => id.type === 'ISBN_13')?.identifier ||
-        isbn,
-    }
-  } catch (error) {
-    console.error('Google Books API error:', error)
-    return undefined
-  }
-}
-
-/**
  * openBD APIで書籍を検索
  */
 export const searchOpenBD = async (
   isbn: string
 ): Promise<SearchResult | undefined> => {
-  const client = new ApiClient()
+  const apiClient = new ApiClient()
   try {
     // ISBN-13に変換
     const isbn13 = isbn.length === 10 ? convertISBN10to13(isbn) : isbn
-    const res = await client.get(`https://api.openbd.jp/v1/get?isbn=${isbn13}`)
+    const res = await apiClient.get(
+      `https://api.openbd.jp/v1/get?isbn=${isbn13}`
+    )
 
     if (!res.data || res.data.length === 0 || !res.data[0]) return undefined
 
@@ -147,26 +113,7 @@ export const searchBookWithMultipleSources = async (
 ): Promise<SearchResult | undefined> => {
   const normalizedISBN = normalizeISBN(isbn)
 
-  // 1. まずGoogle Books APIで検索（画像取得の成功率が高い）
-  const googleResult = await searchGoogleBooks(normalizedISBN)
-  if (googleResult && googleResult.title !== '不明なタイトル') {
-    // Software DesignのISBNの場合は専用処理で画像を更新
-    if (isSoftwareDesignISBN(normalizedISBN, googleResult.title)) {
-      const softwareDesignResult = await searchSoftwareDesign(
-        normalizedISBN,
-        googleResult.title
-      )
-      if (softwareDesignResult) {
-        return {
-          ...googleResult,
-          image: softwareDesignResult.image, // 正しい画像URLに更新
-        }
-      }
-    }
-    return googleResult
-  }
-
-  // 2. Google Books APIで見つからない場合はopenBDで検索
+  // 1. openBDで検索
   const openBDResult = await searchOpenBD(normalizedISBN)
   if (openBDResult) {
     // Software DesignのISBNの場合は専用処理で画像を更新
@@ -178,31 +125,14 @@ export const searchBookWithMultipleSources = async (
       if (softwareDesignResult) {
         return {
           ...openBDResult,
-          image: softwareDesignResult.image, // 正しい画像URLに更新
+          image: softwareDesignResult.image,
         }
-      }
-    }
-
-    // Googleの部分的な結果とopenBDの結果をマージ
-    if (googleResult) {
-      return {
-        ...openBDResult,
-        // Googleの画像があれば優先（画像取得率が高いため）
-        image:
-          googleResult.image !== NO_IMAGE
-            ? googleResult.image
-            : openBDResult.image,
-        // カテゴリーはopenBDを優先（日本の書籍カテゴリー情報が正確）
-        category:
-          openBDResult.category !== '未分類'
-            ? openBDResult.category
-            : googleResult.category,
       }
     }
     return openBDResult
   }
 
-  // 3. どちらでも見つからない場合、Software DesignのISBNならタイトルなしで検索
+  // 2. openBDで見つからない場合、Software DesignのISBNならタイトルなしで検索
   if (isSoftwareDesignISBN(normalizedISBN)) {
     const softwareDesignResult = await searchSoftwareDesign(normalizedISBN)
     if (softwareDesignResult) {
@@ -210,8 +140,7 @@ export const searchBookWithMultipleSources = async (
     }
   }
 
-  // 4. 最終的に部分的な結果でも返す
-  return googleResult || openBDResult
+  return undefined
 }
 
 /**
