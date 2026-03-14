@@ -6,6 +6,7 @@ import { addBookAtom } from '@/store/book/atom'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { Loading } from '@/components/icon/Loading'
 import { useMutation, useQuery } from '@apollo/client'
+import { useSession } from 'next-auth/react'
 import {
   templateBooksQuery,
   deleteTemplateBookMutation,
@@ -17,9 +18,10 @@ interface Props {
 }
 
 export const Template: React.FC<Props> = () => {
+  const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [hoverTemplate, setHoverTemplate] = useState(null)
-  const { data, refetch } = useQuery(templateBooksQuery)
+  const { data, refetch } = useQuery(templateBooksQuery, { skip: !session })
   const [deleteTemplateBook] = useMutation(deleteTemplateBookMutation, {
     refetchQueries: [{ query: templateBooksQuery }],
   })
