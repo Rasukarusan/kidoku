@@ -76,7 +76,9 @@ jobs:
             --set-env-vars "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" \
             --set-env-vars "MEILI_HOST=${{ secrets.MEILI_HOST }}" \
             --set-env-vars "MEILI_MASTER_KEY=${{ secrets.MEILI_MASTER_KEY }}" \
-            --set-env-vars "ADMIN_API_KEY=${{ secrets.ADMIN_API_KEY }}"
+            --set-env-vars "ADMIN_API_KEY=${{ secrets.ADMIN_API_KEY }}" \
+            --set-env-vars "RAKUTEN_APPLICATION_ID=${{ secrets.RAKUTEN_APPLICATION_ID }}" \
+            --set-env-vars "RAKUTEN_ACCESS_KEY=${{ secrets.RAKUTEN_ACCESS_KEY }}"
 
       - name: Show Service URL
         run: |
