@@ -1,701 +1,174 @@
 # AIエージェントフレンドリーなリポジトリ構造改善提案
 
 > 調査日: 2026-02-21
+> 最終更新: 2026-03-15
 > 対象リポジトリ: kidoku（読書記録・分析アプリケーション）
 
-## 目次
+## 進捗サマリー
 
-- [現状分析](#現状分析)
-- [課題一覧](#課題一覧)
-- [改善提案](#改善提案)
-  - [Phase 1: CLAUDE.mdの抜本的強化](#phase-1-claudemdの抜本的強化)
-  - [Phase 2: テスト基盤の構築](#phase-2-テスト基盤の構築)
-  - [Phase 3: CI/CD（PR検証ワークフロー）](#phase-3-cicdpr検証ワークフロー)
-  - [Phase 4: 開発ガードレール](#phase-4-開発ガードレール)
-  - [Phase 5: Turborepoタスク整備](#phase-5-turborepoタスク整備)
-- [補足: 各Phaseの詳細実装ガイド](#補足-各phaseの詳細実装ガイド)
-
----
-
-## 現状分析
-
-### リポジトリ構成
-
-```
-kidoku/
-├── apps/
-│   ├── api/          # NestJS GraphQL API (DDD構成)
-│   │   ├── src/
-│   │   │   ├── domain/           # ドメイン層 (models, repositories, types)
-│   │   │   ├── application/      # アプリケーション層 (usecases)
-│   │   │   ├── infrastructure/   # インフラ層 (auth, database, repositories, search)
-│   │   │   ├── presentation/     # プレゼンテーション層 (resolvers, dto, modules)
-│   │   │   ├── shared/           # 横断的関心事 (constants)
-│   │   │   └── scripts/          # 運用スクリプト
-│   │   └── test/                 # E2Eテスト (デフォルトのみ)
-│   └── web/          # Next.js 14 フロントエンド
-│       ├── src/
-│       │   ├── components/       # 共通UIコンポーネント
-│       │   ├── features/         # 機能別モジュール
-│       │   ├── hooks/            # カスタムhooks
-│       │   ├── libs/             # 外部ライブラリ統合
-│       │   ├── pages/            # Next.js Pages Router
-│       │   ├── store/            # 状態管理 (Jotai)
-│       │   ├── types/            # 型定義
-│       │   └── utils/            # ユーティリティ
-│       └── prisma/               # Prismaスキーマ・マイグレーション
-├── docker/                       # MeiliSearch, MySQL設定
-├── docs/                         # ドキュメント
-├── scripts/                      # シードスクリプト
-├── .github/workflows/            # deploy-api.yml のみ
-└── CLAUDE.md                     # AIエージェント向けガイド
-```
-
-### 良い点（維持すべき）
-
-1. **APIのDDDアーキテクチャ**: domain/application/infrastructure/presentationの4層分離が明確
-2. **ドメインモデル設計**: private constructor + factory methods (create/fromDatabase) パターンが一貫している
-3. **DIパターン**: abstract classをインターフェースとして使用し、NestJSモジュールで`provide/useClass`で注入
-4. **CLAUDE.md**: アーキテクチャ概要、コマンド一覧、トラブルシューティングが既に記載
-5. **モノレポ構成**: Turborepo + pnpmで整理されている
-
-### コード規模
-
-| エリア | ファイル数 | 主な内容 |
-|--------|-----------|---------|
-| `apps/api/src/` | 約75ファイル | DDD構成のGraphQL API |
-| `apps/web/src/` | 約196ファイル | Next.js Pages Router + Feature-based構成 |
-| テストファイル | **2ファイル** | `migrator.test.ts`, `string.test.ts` のみ |
-| CIワークフロー | 1ファイル | デプロイ用のみ（PR検証なし）|
+| Phase | 内容 | 状態 |
+|-------|------|------|
+| Phase 1 | CLAUDE.mdの抜本的強化 | **完了** |
+| Phase 2 | テスト基盤の構築 | **完了** (51テストファイル) |
+| Phase 3 | CI/CD（PR検証ワークフロー） | **完了** |
+| Phase 4 | 開発ガードレール | **完了** |
+| Phase 5 | Turborepoタスク整備 | **完了** |
+| 追加 | サンドボックス自動セットアップ | **完了** |
+| 追加 | pnpm v10 ビルドスクリプト許可 | **完了** |
 
 ---
 
-## 課題一覧
+## 完了済みの項目
 
-### 課題1: テストがほぼ存在しない ★★★ 最重要
+### Phase 1: CLAUDE.mdの抜本的強化 ✅
 
-プロジェクト全体でテストファイルが **2つだけ** 。
+- コーディング規約（ファイル命名、ドメインモデル、リポジトリ、ユースケースパターン）
+- 新しいGraphQLエンドポイント追加手順（Step 1〜12）
+- Dual Prismaスキーマ同期ガイド
+- 禁止事項・よくあるミス一覧
+- 開発コマンド一覧
+- サンドボックス環境セットアップへのリンク
 
-- `apps/web/src/features/sheet/components/AiSummaries/migrator.test.ts`
-- `apps/web/src/utils/string.test.ts`
+### Phase 2: テスト基盤の構築 ✅
 
-APIの `test/app.e2e-spec.ts` はNestJSのデフォルトが残っているだけ。
+テストファイル: **2個 → 51個** に大幅増加
 
-**影響**: AIエージェントは変更の正しさを検証する手段がなく、リグレッションを検出できない。特にドメインモデルのバリデーションロジック（Book.createのタイトル必須チェック、最大文字数チェック等）やユースケースの結合テストが存在しないため、ビジネスロジック変更時の安全ネットがゼロ。
+- ドメインモデルテスト: `apps/api/src/domain/models/*.spec.ts` (7ファイル)
+- ユースケーステスト: `apps/api/src/application/usecases/**/*.spec.ts` (多数)
+- インフラ層テスト: `apps/api/src/infrastructure/repositories/*.spec.ts`
+- Webテスト: `apps/web/src/**/*.test.ts`
 
-### 課題2: PRに対するCIが存在しない ★★★
+### Phase 3: CI/CD（PR検証ワークフロー） ✅
 
-`.github/workflows/` には `deploy-api.yml`（mainブランチpush時のCloud Runデプロイ）しか存在しない。
+`.github/workflows/ci.yml` が存在し、PR時に以下を自動実行:
+- lint
+- type-check（Prisma generate 込み）
+- test-api
+- test-web
 
-**影響**: lint・型チェック・テストをPRで自動実行するワークフローがないため、AIエージェントの変更に対するフィードバックループが存在しない。
+### Phase 4: 開発ガードレール ✅
 
-### 課題3: CLAUDE.mdが「作業手順書」になっていない ★★☆
+- `pnpm validate` コマンド（lint + check-types + test 一括実行）
+- `.husky/pre-push` フック（`pnpm test`）
+- `.claude/settings.json` に許可コマンド設定済み
 
-現在のCLAUDE.mdはアーキテクチャの概要説明としては良いが、AIエージェントが「新機能を追加する」「バグを修正する」際の具体的な手順が欠けている。
+### Phase 5: Turborepoタスク整備 ✅
 
-**欠けている情報**:
+`turbo.json` に `test` タスクが追加済み（inputs, outputs, dependsOn 設定あり）
 
-- 新しいGraphQLエンドポイントを追加する際のステップバイステップガイド
-  - どのファイルをどの順序で作成/編集するか
-  - ファイル命名規約
-  - 必ず更新が必要なファイル（module.ts、app.module.ts等）
-- DDDパターンの具体的なチートシート
-  - ドメインモデルのテンプレート
-  - リポジトリインターフェースのテンプレート
-  - ユースケースのテンプレート
-- テストの書き方パターン
-- よくあるミス・禁止事項の一覧
-- Dual Prismaスキーマ同期の具体的手順（どのファイルをどう変更するか）
+### 追加: サンドボックス自動セットアップ ✅
 
-### 課題4: Dual Prismaスキーマ同期の曖昧なドキュメント ★★☆
+- `scripts/sandbox-setup.sh`: Docker・DB・シード・サーバーの一括セットアップ
+- `scripts/dev-server.sh`: 開発サーバー管理（start/stop/restart/status/logs）
+- `scripts/health-check.sh`: 全コンポーネントのヘルスチェック
+- `.claude/hooks.json`: SessionStart Hook で自動実行
+- `pnpm-workspace.yaml`: `onlyBuiltDependencies` でPrisma等のビルドスクリプト許可
 
-同一MySQLに対してフロントエンド(`apps/web/prisma/schema.prisma`)とバックエンド(`apps/api/prisma/schema.prisma`)で2つのPrismaスキーマが存在する。CLAUDE.mdに「手動で同期が必要」と記載はあるが、具体的にどのファイルをどう同期するかが不明確。
+### 追加: ESLint設定統一 ✅
 
-**関連ファイル**:
-- Webスキーマ: `apps/web/prisma/schema.prisma`
-- APIスキーマ: `apps/api/prisma/schema.prisma`
-
-AIエージェントがWeb側だけ更新してAPI側を忘れる（またはその逆）リスクが高い。
-
-### 課題5: バリデーションの一括実行手段がない ★★☆
-
-`pnpm lint`, `pnpm check-types`, テスト(`pnpm --filter web test`, `pnpm --filter api test`)は個別に存在するが、push前に全チェックを一括実行する統合コマンドがない。
-
-CLAUDE.mdで「pushする前にpnpm lint:fixを行ってください」と書かれているが、lint:fix以外のチェック（型チェック、テスト）が含まれていない。huskyのpre-pushフックでも強制されていない。
-
-### 課題6: ESLint設定が統一されていない ★☆☆
-
-| アプリ | 設定ファイル | 形式 |
-|--------|-------------|------|
-| `apps/web` | `.eslintrc` | JSON (レガシーフォーマット) |
-| `apps/api` | `eslint.config.mjs` | flat config (新形式) |
-
-AIエージェントがESLint設定を変更する際に混乱する可能性がある。ただし個別のアプリ内で閉じているので、実害は限定的。
-
-### 課題7: TypeScript strictモードがwebで無効 ★☆☆
-
-`apps/web/tsconfig.json` で `"strict": true` が設定されていない（`"strictNullChecks"` 等も無効）。AIエージェントが型安全でないコードを書いても、型チェックで検出されにくい。
-
-### 課題8: .claude/settings.json が空 ★☆☆
-
-```json
-{}
-```
-
-Claude Code固有の設定（許可コマンド、カスタム指示等）が未設定。
-
-### 課題9: turbo.jsonにtestタスクが未定義 ★☆☆
-
-```json
-{
-  "tasks": {
-    "build": { ... },
-    "lint": { ... },
-    "lint:fix": { ... },
-    "check-types": { ... },
-    "dev": { ... }
-    // "test" がない
-  }
-}
-```
-
-`pnpm test` がTurborepoで管理されておらず、キャッシュや依存関係管理が効かない。
+web/api ともに `eslint.config.mjs`（flat config）に統一済み。
 
 ---
 
-## 改善提案
+## 残りのTODO
 
-### Phase 1: CLAUDE.mdの抜本的強化
+### 優先度: 高
 
-**目的**: AIエージェントが「何を」「どこに」「どの順序で」変更すべきか迷わないようにする
+#### 1. TypeScript strict mode 有効化（Web）
 
-**追加すべきセクション**:
+`apps/web/tsconfig.json` で `"strict": false`, `"strictNullChecks": false` のまま。
 
-#### 1-1. コーディング規約
+**現状の問題**: 型安全でないコードがチェックをすり抜ける。`null` や `undefined` に起因するバグをコンパイル時に検出できない。
 
-```markdown
-## コーディング規約
+**対応方針**:
+1. まず `"strictNullChecks": true` を有効化（影響が最も大きい設定）
+2. 型エラーを段階的に修正（`as` キャストや `!` の乱用は避け、適切な型ガードを使用）
+3. 最終的に `"strict": true` に移行
 
-### ファイル命名
-- ケバブケース: `create-book.ts`, `book.ts`, `injection-tokens.ts`
-- 1ファイル1責務: 1つのクラス/モジュールに対して1ファイル
-- テストファイル: `*.spec.ts`（API）, `*.test.ts`（Web）
+**推定影響範囲**: `apps/web/src/` 配下の約196ファイル。大量の型エラーが出る可能性が高いため段階的に対応すること。
 
-### ドメインモデル
-- private constructor + static factory methods パターンを使用
-- `create()`: 新規作成（バリデーション込み）
-- `fromDatabase()`: DB復元（バリデーションなし）
-- フィールドはprivate、getterのみ公開
-- 更新は `update()` メソッド経由
+#### 2. E2Eテストの導入
 
-### リポジトリ
-- `domain/repositories/` に abstract class として定義
-- `infrastructure/repositories/` に実装
-- NestJSモジュールで `{ provide: IXxxRepository, useClass: XxxRepository }` でDI
+現在はユニットテストのみ。ユーザーの主要フローをカバーするE2Eテストがない。
 
-### ユースケース
-- `application/usecases/{feature}/` に配置
-- `@Injectable()` デコレータ必須
-- コンストラクタでリポジトリを注入
-- `execute()` メソッドに処理を実装
-```
+**対応方針**:
+1. Playwright をセットアップ（`apps/web` に導入）
+2. 主要フローのE2Eテストを作成:
+   - ログイン → 本棚表示
+   - 書籍追加 → 一覧に反映
+   - 書籍検索
+   - シート操作（作成・切替・削除）
+3. CI に E2E テストジョブを追加（DBコンテナが必要なため `services` を設定）
 
-#### 1-2. 新しいGraphQLエンドポイント追加手順
+**関連**: サンドボックス環境の `scripts/sandbox-setup.sh` がそのまま活用可能。Playwright MCP も `.mcp.json` に設定済み。
 
-```markdown
-## 新しいGraphQLエンドポイント（CRUD）の追加手順
+#### 3. APIインテグレーションテスト
 
-例: `Tag` エンティティを追加する場合
+リポジトリ実装のテストがモック依存。実際のDBに対するインテグレーションテストがない。
 
-### Step 1: ドメインモデル作成
-ファイル: `apps/api/src/domain/models/tag.ts`
-- private constructor + create() + fromDatabase() パターン
+**対応方針**:
+1. テスト用DBコンテナを起動する仕組みを用意（docker-compose.test.yml 等）
+2. `apps/api/test/` にインテグレーションテストを配置
+3. Prisma の `$transaction` + ロールバックパターンでテストデータの分離
+4. 対象: BookRepository, SheetRepository 等の主要リポジトリ
 
-### Step 2: リポジトリインターフェース作成
-ファイル: `apps/api/src/domain/repositories/tag.ts`
-- abstract class ITagRepository
+### 優先度: 中
 
-### Step 3: リポジトリ実装
-ファイル: `apps/api/src/infrastructure/repositories/tag.ts`
-- @Injectable() + ITagRepository を implements
+#### 4. Prismaスキーマの一元化
 
-### Step 4: APIのPrismaスキーマ追加
-ファイル: `apps/api/prisma/schema.prisma`
-- `apps/web/prisma/schema.prisma` と同じモデル定義を追加
-- `pnpm --filter api prisma generate` でクライアント再生成
+現状 `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` が別々に存在し、手動同期が必要。
 
-### Step 5: ユースケース作成
-ファイル: `apps/api/src/application/usecases/tags/*.ts`
-- create-tag.ts, get-tags.ts, update-tag.ts, delete-tag.ts
+**対応方針**:
+1. `packages/database/` 共有パッケージを作成
+2. Prisma スキーマを一元管理し、生成された Client を web/api から参照
+3. `pnpm-workspace.yaml` の packages に追加
+4. CLAUDE.md のスキーマ同期ガイドを更新
 
-### Step 6: DTO作成
-ファイル: `apps/api/src/presentation/dto/tag.ts`
-- @InputType, @ObjectType
+**注意**: web と api で異なる Prisma Client 設定（generator の output 等）が必要な場合は、共有スキーマから複数の Client を生成する設計にする。
 
-### Step 7: リゾルバー作成
-ファイル: `apps/api/src/presentation/resolvers/tag.ts`
-- @Resolver + @Query/@Mutation
+#### 5. 共有型定義パッケージの導入
 
-### Step 8: モジュール作成
-ファイル: `apps/api/src/presentation/modules/tag.ts`
-- imports, providers, provide/useClass
-
-### Step 9: AppModuleに登録
-ファイル: `apps/api/src/app.module.ts`
-- imports に TagModule 追加
-
-### Step 10: テスト作成
-- ドメインモデルのユニットテスト
-- ユースケースのユニットテスト
-
-### Step 11: Prismaスキーマの同期（DBスキーマ変更時）
-1. `apps/web/prisma/schema.prisma` にモデル追加
-2. `apps/api/prisma/schema.prisma` にも同じモデル定義を追加
-3. `pnpm --filter web db:push` でDB反映
-4. `pnpm --filter api db:push` でバックエンドも反映
-5. 両方の `prisma generate` でクライアント再生成
-```
-
-#### 1-3. スキーマ同期ガイド
-
-```markdown
-## Dual Prismaスキーマ同期
-
-同一MySQLに対してWeb(`apps/web/prisma/schema.prisma`)とAPI(`apps/api/prisma/schema.prisma`)の
-2つのPrismaスキーマが存在するため、スキーマ変更時は**必ず両方を更新**する。
-
-### 対応ファイル
-
-| Webスキーマ | APIスキーマ |
-|-------------|-------------|
-| `apps/web/prisma/schema.prisma` | `apps/api/prisma/schema.prisma` |
-
-両ファイルのモデル定義を同一内容に保つこと。
-
-### 変更手順
-1. `apps/web/prisma/schema.prisma` を編集
-2. `apps/api/prisma/schema.prisma` にも同じ変更を反映
-3. `pnpm --filter web db:push` でDBに反映
-4. `pnpm --filter api db:push` でバックエンドも反映
-5. `pnpm --filter web prisma generate` でWebのPrismaクライアント再生成
-6. `pnpm --filter api prisma generate` でAPIのPrismaクライアント再生成
-```
-
-#### 1-4. 禁止事項・よくあるミス
-
-```markdown
-## 禁止事項・よくあるミス
-
-### レイヤー依存ルール（厳守）
-- ❌ domain/ から infrastructure/ や presentation/ をimportしない
-- ❌ application/ から infrastructure/ や presentation/ をimportしない
-- ❌ presentation/ から infrastructure/repositories/ を直接使わない（ユースケース経由）
-- ✅ infrastructure/ → domain/ (リポジトリ実装がドメインモデルを使用)
-- ✅ application/ → domain/ (ユースケースがドメインモデル・リポジトリを使用)
-- ✅ presentation/ → application/ + domain/ (リゾルバーがユースケースを呼び出し)
-
-### スキーマ変更
-- ❌ Web側のPrismaスキーマだけ変更してAPI側を忘れる（またはその逆）
-- ❌ スキーマ変更後に `db:push` を忘れる
-
-### NestJS DI
-- ❌ モジュールのprovidersに登録せずにクラスを@Injectする
-- ❌ AppModuleにモジュールを追加し忘れる
-
-### GraphQL
-- ❌ リゾルバー変更後にフロントエンドの codegen を忘れる
-  → `pnpm --filter web codegen` で型を再生成すること
-```
-
-### Phase 2: テスト基盤の構築
-
-**目的**: AIエージェントが変更を検証でき、新しいテストを書く際の「テンプレート」を提供する
-
-#### 2-1. ドメインモデルのユニットテスト
-
-```
-apps/api/src/domain/models/__tests__/
-├── book.spec.ts        # Book.create, update, getSanitizedMemo
-├── sheet.spec.ts       # Sheet.create, update
-├── comment.spec.ts     # Comment のテスト
-└── software-design.spec.ts
-```
-
-**テスト例** (`book.spec.ts`):
-
-```typescript
-import { Book } from '../book';
-
-describe('Book', () => {
-  describe('create', () => {
-    it('有効なパラメータで書籍を作成できる', () => {
-      const book = Book.create({
-        userId: 'user-1',
-        sheetId: 1,
-        title: 'テスト書籍',
-        author: 'テスト著者',
-        category: '技術書',
-        image: 'https://example.com/image.jpg',
-        impression: '★★★',
-        memo: 'メモ',
-        isPublicMemo: false,
-        finished: new Date('2025-01-01'),
-      });
-
-      expect(book.title).toBe('テスト書籍');
-      expect(book.author).toBe('テスト著者');
-      expect(book.id).toBeNull(); // 未永続化
-    });
-
-    it('タイトルが空の場合エラーになる', () => {
-      expect(() =>
-        Book.create({
-          userId: 'user-1',
-          sheetId: 1,
-          title: '',
-          author: '',
-          category: '',
-          image: '',
-          impression: '',
-          memo: '',
-          isPublicMemo: false,
-          finished: null,
-        }),
-      ).toThrow('書籍タイトルは必須です');
-    });
-
-    it('タイトルが100文字を超える場合エラーになる', () => {
-      expect(() =>
-        Book.create({
-          userId: 'user-1',
-          sheetId: 1,
-          title: 'a'.repeat(101),
-          author: '',
-          category: '',
-          image: '',
-          impression: '',
-          memo: '',
-          isPublicMemo: false,
-          finished: null,
-        }),
-      ).toThrow('タイトルは100文字以下で入力してください');
-    });
-  });
-
-  describe('getSanitizedMemo', () => {
-    it('所有者は全メモを閲覧できる', () => {
-      const book = Book.fromDatabase(
-        '1', 'user-1', 1, 'title', 'author', 'category',
-        'image', 'impression', '秘密のメモ', false, false,
-        null, new Date(), new Date(),
-      );
-      expect(book.getSanitizedMemo(true)).toBe('秘密のメモ');
-    });
-
-    it('非所有者は非公開メモを閲覧できない', () => {
-      const book = Book.fromDatabase(
-        '1', 'user-1', 1, 'title', 'author', 'category',
-        'image', 'impression', '秘密のメモ', false, false,
-        null, new Date(), new Date(),
-      );
-      expect(book.getSanitizedMemo(false)).toBeNull();
-    });
-
-    it('非所有者は公開メモをマスキングされた状態で閲覧できる', () => {
-      const book = Book.fromDatabase(
-        '1', 'user-1', 1, 'title', 'author', 'category',
-        'image', 'impression', '公開メモ', true, false,
-        null, new Date(), new Date(),
-      );
-      const sanitized = book.getSanitizedMemo(false);
-      expect(sanitized).not.toBe('公開メモ'); // マスキングされている
-      expect(sanitized).toContain('公'); // 先頭は見える
-    });
-  });
-});
-```
-
-#### 2-2. ユースケースのユニットテスト
-
-```
-apps/api/src/application/usecases/books/__tests__/
-└── create-book.spec.ts
-```
-
-**テスト例** (`create-book.spec.ts`):
-
-```typescript
-import { CreateBookUseCase } from '../create-book';
-import { IBookRepository } from '../../../../domain/repositories/book';
-import { ISearchRepository } from '../../../../domain/repositories/search';
-import { Book } from '../../../../domain/models/book';
-
-describe('CreateBookUseCase', () => {
-  let useCase: CreateBookUseCase;
-  let mockBookRepo: jest.Mocked<IBookRepository>;
-  let mockSearchRepo: jest.Mocked<ISearchRepository>;
-
-  beforeEach(() => {
-    mockBookRepo = {
-      save: jest.fn(),
-      findById: jest.fn(),
-      findByUserId: jest.fn(),
-      findBySheetId: jest.fn(),
-      findByUserIdAndSheetId: jest.fn(),
-      delete: jest.fn(),
-      findAllForSearch: jest.fn(),
-      findForSearchById: jest.fn(),
-      getCategories: jest.fn(),
-    } as any;
-
-    mockSearchRepo = {
-      updateDocument: jest.fn(),
-      deleteDocument: jest.fn(),
-      search: jest.fn(),
-      indexAllDocuments: jest.fn(),
-    } as any;
-
-    useCase = new CreateBookUseCase(mockBookRepo, mockSearchRepo);
-  });
-
-  it('書籍を作成しMeiliSearchにインデックスする', async () => {
-    const savedBook = Book.fromDatabase(
-      '1', 'user-1', 1, 'テスト書籍', '著者', 'カテゴリ',
-      'image.jpg', '★', 'メモ', false, false,
-      null, new Date(), new Date(),
-    );
-
-    mockBookRepo.save.mockResolvedValue(savedBook);
-    mockBookRepo.findForSearchById.mockResolvedValue({
-      id: '1', title: 'テスト書籍', author: '著者',
-      image: 'image.jpg', memo: '', isPublicMemo: false,
-      userName: 'user', userImage: null, sheetName: 'シート1',
-    });
-
-    const result = await useCase.execute({
-      userId: 'user-1',
-      sheetId: 1,
-      title: 'テスト書籍',
-      author: '著者',
-      category: 'カテゴリ',
-      image: 'image.jpg',
-      impression: '★',
-      memo: 'メモ',
-      isPublicMemo: false,
-      finished: null,
-    });
-
-    expect(result.title).toBe('テスト書籍');
-    expect(mockBookRepo.save).toHaveBeenCalled();
-    expect(mockSearchRepo.updateDocument).toHaveBeenCalled();
-  });
-});
-```
-
-#### 2-3. テストヘルパー
-
-```
-apps/api/src/__tests__/
-├── helpers/
-│   └── factory.ts      # テストデータ生成ファクトリ
-└── setup.ts             # テストセットアップ
-```
-
-### Phase 3: CI/CD（PR検証ワークフロー）
-
-**目的**: PR作成時に自動でlint・型チェック・テストを実行し、AIエージェントにフィードバックを提供
-
-```yaml
-# .github/workflows/ci.yml
-name: CI
-
-on:
-  pull_request:
-    branches: [main, master]
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-
-  type-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm check-types
-
-  test-api:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter api test
-
-  test-web:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter web test
-```
-
-### Phase 4: 開発ガードレール
-
-**目的**: push前に問題を自動検出する仕組みを整備
-
-#### 4-1. `validate` コマンド追加
-
-```jsonc
-// package.json (root)
-{
-  "scripts": {
-    "validate": "turbo run lint check-types test"
-  }
-}
-```
-
-#### 4-2. husky pre-push hook
-
-```bash
-# .husky/pre-push
-pnpm validate
-```
-
-#### 4-3. .claude/settings.json
-
-```jsonc
-{
-  "permissions": {
-    "allow": [
-      "Bash(pnpm lint:fix)",
-      "Bash(pnpm lint)",
-      "Bash(pnpm check-types)",
-      "Bash(pnpm validate)",
-      "Bash(pnpm --filter api test)",
-      "Bash(pnpm --filter web test)",
-      "Bash(pnpm --filter api test:watch)",
-      "Bash(pnpm --filter web test:w)",
-      "Bash(pnpm build)",
-      "Bash(pnpm --filter web build)",
-      "Bash(pnpm --filter api build)",
-      "Bash(pnpm --filter web codegen)",
-      "Bash(pnpm --filter web prisma generate)",
-      "Bash(pnpm --filter web db:push)",
-      "Bash(pnpm --filter api db:push)",
-      "Bash(pnpm dev)",
-      "Bash(pnpm --filter web dev)",
-      "Bash(pnpm --filter api dev)"
-    ]
-  }
-}
-```
-
-### Phase 5: Turborepoタスク整備
-
-**目的**: テストをTurborepoのタスクとして管理し、キャッシュと依存関係を最適化
-
-```jsonc
-// turbo.json
-{
-  "tasks": {
-    "build": { ... },
-    "lint": { ... },
-    "lint:fix": { ... },
-    "check-types": { ... },
-    "test": {
-      "dependsOn": ["^build"],
-      "inputs": ["src/**", "test/**", "jest.config.*", "tsconfig.json"],
-      "outputs": ["coverage/**"]
-    },
-    "validate": {
-      "dependsOn": ["lint", "check-types", "test"]
-    },
-    "dev": { ... }
-  }
-}
-```
+web/api 間で共有する型定義（GraphQL の Input/Output 型に対応するもの等）が重複している。
+
+**対応方針**:
+1. `packages/shared-types/` を作成
+2. web の `codegen` で生成される型と api の DTO で共通する型を切り出し
+3. Turborepo の依存関係を設定
+
+#### 6. CI の高速化
+
+現在の CI は4ジョブすべてで `pnpm install` を実行している。
+
+**対応方針**:
+- pnpm store のキャッシュを共有
+- Turborepo の Remote Cache を有効化
+- `pnpm install` ジョブを1つにまとめ、artifact として `node_modules` を共有
+
+### 優先度: 低
+
+#### 7. pre-push フックの強化
+
+現在は `pnpm test` のみ。`pnpm validate`（lint + check-types + test）にすべき。
+
+**対応**: `.husky/pre-push` を `pnpm validate` に変更するだけ。ただし開発体験とのバランスに注意（push が遅くなる）。
+
+#### 8. バンドルサイズの監視
+
+`pnpm --filter web analyze` コマンドは存在するが、CIでの自動チェックがない。
+
+**対応方針**: `@next/bundle-analyzer` の結果を PR コメントに自動投稿する GitHub Action を追加。
+
+#### 9. セキュリティ監査の自動化
+
+依存パッケージの脆弱性チェックが自動化されていない。
+
+**対応方針**: `pnpm audit` を CI に追加、または Dependabot / Renovate を導入。
 
 ---
 
-## 補足: 各Phaseの詳細実装ガイド
+## 将来的な改善候補（スコープ外）
 
-### 実装優先度とインパクト
-
-| Phase | 内容 | 工数 | インパクト | 依存関係 |
-|-------|------|------|-----------|----------|
-| **Phase 1** | CLAUDE.md強化 | 小 | ★★★ | なし |
-| **Phase 2** | テスト基盤構築 | 中 | ★★★ | なし |
-| **Phase 3** | CI/CDワークフロー | 小 | ★★☆ | Phase 2のテストが必要 |
-| **Phase 4** | 開発ガードレール | 小 | ★★☆ | Phase 2, 5が先にあると効果的 |
-| **Phase 5** | Turborepoタスク整備 | 小 | ★☆☆ | Phase 2のテストが必要 |
-
-### 推奨実装順序
-
-1. **Phase 1 → Phase 2** を先行（AIエージェントへの直接的な効果が最大）
-2. **Phase 5 → Phase 3 → Phase 4** を後続（CI/自動化基盤）
-
-### Phase 1 の CLAUDE.md 変更後の構成イメージ
-
-```
-CLAUDE.md
-├── 重要（push前の手順）
-├── プロジェクト概要
-├── アーキテクチャ概要
-│   ├── 認証フロー
-│   ├── データベースアクセス
-│   └── API アーキテクチャ（DDD）
-├── ★ コーディング規約                    ← NEW
-│   ├── ファイル命名規約
-│   ├── ドメインモデルパターン
-│   ├── リポジトリパターン
-│   ├── ユースケースパターン
-│   └── レイヤー依存ルール
-├── ★ 機能追加ガイド                      ← NEW
-│   ├── 新しいGraphQLエンドポイント追加手順
-│   ├── 新しいフロントエンドページ追加手順
-│   └── DBスキーマ変更手順（Dual Prismaスキーマ同期）
-├── ★ テストガイド                        ← NEW
-│   ├── テストファイルの配置規約
-│   ├── ドメインモデルテストの書き方
-│   └── ユースケーステストの書き方
-├── ★ 禁止事項・よくあるミス              ← NEW
-├── 開発コマンド
-├── 重要ファイル・ディレクトリ
-├── ★ Dual Prismaスキーマ同期ガイド        ← NEW
-├── 開発時の注意事項
-├── サンドボックス環境での開発
-└── トラブルシューティング
-```
-
-### 将来的な改善候補（本提案のスコープ外）
-
-- **共有パッケージ (`packages/`)** の導入: web/api間で共有する型定義を `packages/shared-types` に切り出し
-- **Prismaスキーマの一元化**: web/apiで別々に管理しているPrismaスキーマを共有パッケージ等で一元管理し、同期問題を根本解決
-- **TypeScript strict mode 有効化** (web): 段階的に `strict: true` に移行
-- **ESLint設定統一**: 共有ESLint config パッケージの作成
-- **E2Eテスト**: Playwright を使ったフロントエンドE2Eテスト
-- **APIインテグレーションテスト**: テスト用DBを使ったリポジトリ実装のテスト
+- Prisma Migrate への移行（現在は `db:push` のみ）
+- MeiliSearch の Docker イメージを日本語プロトタイプから正式版に移行（upstream の対応待ち）
+- Next.js App Router への移行（Pages Router からの段階的移行）
+- モノレポツールの Nx 移行検討（Turborepo からの乗り換え）
