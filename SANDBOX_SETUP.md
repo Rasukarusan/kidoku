@@ -435,26 +435,31 @@ Claude Code on the Web では `.mcp.json` に設定された **Playwright MCP** 
 
 ### 代替手段: Playwright スクリプトによるブラウザ操作
 
-MCP の代わりに、Playwright を直接スクリプトとして実行することでブラウザ操作（スクリーンショット撮影、ページ遷移、要素クリック等）が可能。
+MCP の代わりに、**Playwright v1.50.0 をスクリプトとして直接実行**することでブラウザ操作が可能。
+スクリーンショット撮影、ページ遷移、要素クリック、フォーム入力など Playwright の全 API が使える。
 
-#### 初回のみ: Playwright とブラウザのインストール
+> **重要**: バージョンは必ず `1.50.0` を使用すること。`@playwright/mcp` が内部で `npx playwright install` を実行すると、v1.50.0 用の Chromium headless shell（`chromium_headless_shell-1155`）が削除されることがある。削除された場合は `npx playwright@1.50.0 install chromium` で再インストールする。
+
+#### 1. 初回セットアップ: Playwright とブラウザのインストール
 
 ```bash
 npx playwright@1.50.0 install chromium
 ```
 
-#### Playwright パスの解決
+#### 2. Playwright パスの解決
 
-`npx` キャッシュのパスはインストール時に変わるため、`find` で動的に解決する。以降のスクリプトではこの `PW_INDEX` を使用する。
+`npx` キャッシュのパスはインストール時に変わるため、`find` で動的に解決する。
+**以降のすべてのスクリプトはこの `PW_INDEX` が設定済みである前提。**
 
 ```bash
 PW_INDEX=$(find /root/.npm/_npx -path "*/playwright/index.mjs" -exec \
   node -e "const p=require(process.argv[1].replace('/index.mjs','/package.json')); \
            if(p.version==='1.50.0') console.log(process.argv[1])" {} \; \
   | head -1)
+echo "PW_INDEX=${PW_INDEX}"  # パスが表示されることを確認
 ```
 
-#### スクリーンショット撮影（未ログイン）
+#### 3. スクリーンショット撮影（未ログイン）
 
 ```bash
 cat > /tmp/screenshot.mjs << EOF
@@ -473,7 +478,9 @@ EOF
 node /tmp/screenshot.mjs
 ```
 
-#### スクリーンショット撮影（裏口ログイン済み）
+撮影したスクリーンショットは Read ツールで画像として確認できる。
+
+#### 4. スクリーンショット撮影（裏口ログイン済み）
 
 認証が必要なページを確認する場合は、裏口ログインでセッションを取得してからスクリーンショットを撮影する。
 
@@ -487,7 +494,7 @@ const browser = await chromium.launch({
 const context = await browser.newContext();
 const page = await context.newPage();
 
-// ログイン
+// 裏口ログイン
 const csrfRes = await page.request.get('http://localhost:3000/api/auth/csrf');
 const { csrfToken } = await csrfRes.json();
 await page.request.post('http://localhost:3000/api/auth/callback/backdoor', {
@@ -507,9 +514,7 @@ SCRIPT_EOF
 node /tmp/screenshot_login.mjs
 ```
 
-#### 要素操作（クリック・入力・フォーム送信など）
-
-Playwright の全 API が使えるため、スクリーンショット以外の操作も可能。
+#### 5. 要素操作（クリック・入力・フォーム送信など）
 
 ```bash
 cat > /tmp/browser_action.mjs << SCRIPT_EOF
@@ -521,7 +526,7 @@ const browser = await chromium.launch({
 const context = await browser.newContext();
 const page = await context.newPage();
 
-// ログイン（認証が必要な場合）
+// 裏口ログイン（認証が必要な場合）
 const csrfRes = await page.request.get('http://localhost:3000/api/auth/csrf');
 const { csrfToken } = await csrfRes.json();
 await page.request.post('http://localhost:3000/api/auth/callback/backdoor', {
@@ -553,6 +558,15 @@ SCRIPT_EOF
 
 node /tmp/browser_action.mjs
 ```
+
+#### トラブルシューティング
+
+| エラー | 原因 | 対処 |
+|---|---|---|
+| `Executable doesn't exist at .../chromium_headless_shell-1155/...` | `@playwright/mcp` の install が v1.50.0 用の headless shell を削除した | `npx playwright@1.50.0 install chromium` で再インストール |
+| `PW_INDEX` が空 | Playwright v1.50.0 がインストールされていない | `npx playwright@1.50.0 install chromium` を実行 |
+| `page.goto: net::ERR_CONNECTION_REFUSED` | 開発サーバーが起動していない | `bash scripts/dev-server.sh status` で確認、`bash scripts/dev-server.sh start` で起動 |
+| `Browser was not launched` | sandbox の制限で起動オプションが不足 | `--no-sandbox --single-process --no-zygote` 等のフラグが漏れていないか確認 |
 
 ## 注意事項
 
