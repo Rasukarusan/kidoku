@@ -422,25 +422,46 @@ sleep 20 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
 | `docker compose up` | overlayfsの制限により不可。`docker run`で個別起動すること |
 | ブリッジネットワーク | 無効化しているため `--network=host` が必要 |
 | MySQL | pull不可のため **MariaDB（`mariadb:lts`）で代替**すること |
+| Playwright MCP / Chrome DevTools MCP | **使用不可**（後述） |
 
-## Playwright MCP が使用できない場合のスクリーンショット撮影
+## MCP によるブラウザ操作の制限
 
-### 初回のみ: Playwright とブラウザのインストール
+Claude Code on the Web では `.mcp.json` に設定された **Playwright MCP** および **Chrome DevTools MCP** は使用できない。
+
+### 使用できない理由
+
+- **Playwright MCP (`@playwright/mcp@latest`)**: MCP サーバーが内部で使用する Playwright のバージョン（alpha 版）と、`npx playwright install` でインストールされる Chromium のビルド番号が一致しない。MCP サーバーが要求する Chromium（例: `chromium-1212`）がインストールされておらず `Browser "chromium" is not installed` エラーになる。MCP 側の install コマンドも sandbox 環境では正常に動作しない。
+- **Chrome DevTools MCP (`chrome-devtools-mcp`)**: Google Chrome がプリインストールされていないため `Could not find Google Chrome executable` エラーになる。
+
+### 代替手段: Playwright スクリプトによるブラウザ操作
+
+MCP の代わりに、**Playwright v1.50.0 をスクリプトとして直接実行**することでブラウザ操作が可能。
+スクリーンショット撮影、ページ遷移、要素クリック、フォーム入力など Playwright の全 API が使える。
+
+> **重要**: バージョンは必ず `1.50.0` を使用すること。`@playwright/mcp` が内部で `npx playwright install` を実行すると、v1.50.0 用の Chromium headless shell（`chromium_headless_shell-1155`）が削除されることがある。削除された場合は `npx playwright@1.50.0 install chromium` で再インストールする。
+
+#### 1. 初回セットアップ: Playwright とブラウザのインストール
 
 ```bash
 npx playwright@1.50.0 install chromium
 ```
 
-### スクリーンショット撮影
+#### 2. Playwright パスの解決
 
 `npx` キャッシュのパスはインストール時に変わるため、`find` で動的に解決する。
+**以降のすべてのスクリプトはこの `PW_INDEX` が設定済みである前提。**
 
 ```bash
 PW_INDEX=$(find /root/.npm/_npx -path "*/playwright/index.mjs" -exec \
   node -e "const p=require(process.argv[1].replace('/index.mjs','/package.json')); \
            if(p.version==='1.50.0') console.log(process.argv[1])" {} \; \
   | head -1)
+echo "PW_INDEX=${PW_INDEX}"  # パスが表示されることを確認
+```
 
+#### 3. スクリーンショット撮影（未ログイン）
+
+```bash
 cat > /tmp/screenshot.mjs << EOF
 import { chromium } from '${PW_INDEX}';
 
@@ -457,8 +478,99 @@ EOF
 node /tmp/screenshot.mjs
 ```
 
+撮影したスクリーンショットは Read ツールで画像として確認できる。
+
+#### 4. スクリーンショット撮影（裏口ログイン済み）
+
+認証が必要なページを確認する場合は、裏口ログインでセッションを取得してからスクリーンショットを撮影する。
+
+```bash
+cat > /tmp/screenshot_login.mjs << SCRIPT_EOF
+import { chromium } from '${PW_INDEX}';
+
+const browser = await chromium.launch({
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
+});
+const context = await browser.newContext();
+const page = await context.newPage();
+
+// 裏口ログイン
+const csrfRes = await page.request.get('http://localhost:3000/api/auth/csrf');
+const { csrfToken } = await csrfRes.json();
+await page.request.post('http://localhost:3000/api/auth/callback/backdoor', {
+  form: { csrfToken, email: 'test@example.com' },
+  maxRedirects: 0,
+});
+
+// ページ遷移 & スクリーンショット
+await page.goto('http://localhost:3000', { waitUntil: 'networkidle', timeout: 60000 });
+await page.waitForTimeout(3000);
+await page.screenshot({ path: '/home/user/kidoku/screenshot.png', fullPage: true });
+console.log('Screenshot saved');
+
+await browser.close();
+SCRIPT_EOF
+
+node /tmp/screenshot_login.mjs
+```
+
+#### 5. 要素操作（クリック・入力・フォーム送信など）
+
+```bash
+cat > /tmp/browser_action.mjs << SCRIPT_EOF
+import { chromium } from '${PW_INDEX}';
+
+const browser = await chromium.launch({
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
+});
+const context = await browser.newContext();
+const page = await context.newPage();
+
+// 裏口ログイン（認証が必要な場合）
+const csrfRes = await page.request.get('http://localhost:3000/api/auth/csrf');
+const { csrfToken } = await csrfRes.json();
+await page.request.post('http://localhost:3000/api/auth/callback/backdoor', {
+  form: { csrfToken, email: 'test@example.com' },
+  maxRedirects: 0,
+});
+
+// --- ここに操作を記述 ---
+await page.goto('http://localhost:3000', { waitUntil: 'networkidle', timeout: 60000 });
+
+// 例: 要素のクリック
+// await page.click('button[data-testid="add-book"]');
+
+// 例: テキスト入力
+// await page.fill('input[name="title"]', 'テスト書籍');
+
+// 例: ページ内テキストの取得
+// const text = await page.textContent('h1');
+// console.log('Page title:', text);
+
+// 例: 特定の要素のスクリーンショット
+// await page.locator('.book-card').first().screenshot({ path: '/home/user/kidoku/element.png' });
+
+await page.screenshot({ path: '/home/user/kidoku/screenshot.png', fullPage: true });
+console.log('Done');
+
+await browser.close();
+SCRIPT_EOF
+
+node /tmp/browser_action.mjs
+```
+
+#### トラブルシューティング
+
+| エラー | 原因 | 対処 |
+|---|---|---|
+| `Executable doesn't exist at .../chromium_headless_shell-1155/...` | `@playwright/mcp` の install が v1.50.0 用の headless shell を削除した | `npx playwright@1.50.0 install chromium` で再インストール |
+| `PW_INDEX` が空 | Playwright v1.50.0 がインストールされていない | `npx playwright@1.50.0 install chromium` を実行 |
+| `page.goto: net::ERR_CONNECTION_REFUSED` | 開発サーバーが起動していない | `bash scripts/dev-server.sh status` で確認、`bash scripts/dev-server.sh start` で起動 |
+| `Browser was not launched` | sandbox の制限で起動オプションが不足 | `--no-sandbox --single-process --no-zygote` 等のフラグが漏れていないか確認 |
+
 ## 注意事項
 
+- **MCP ブラウザツール非対応**: Playwright MCP・Chrome DevTools MCP は Claude Code on the Web では動作しない。上記の Playwright スクリプト方式を使うこと
 - **外部サービスへの接続制限**: Google Fonts、Prisma Accelerate等への接続がブロックされる場合がある
 - **ページ表示エラー**: DB接続エラーはサンドボックスのネットワーク制限が原因の場合があり、コード自体の問題ではない
 - **`pnpm dev`の起動確認**: TypeScriptコンパイルエラー0件、Next.js/NestJSの起動成功メッセージで判断する
