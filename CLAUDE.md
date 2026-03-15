@@ -7,6 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 CIでlint・型チェック・テストが自動実行されます。
 ローカルで確認したい場合は `pnpm run validate`（lint + check-types + test 一括実行）を使ってください。
 
+### MCP ツールの使用禁止
+
+Playwright MCP や Chrome DevTools MCP などのブラウザ操作ツールは使用しないこと。動作確認はブラウザツールに頼らず、テストやcurl等で行う。
+
 ## プロジェクト概要
 
 Kidoku（きどく）は、読書記録・分析アプリケーションです。モノレポ構成（Turborepo + pnpm）で、Next.jsフロントエンドとNestJS GraphQL APIを統合しています。
