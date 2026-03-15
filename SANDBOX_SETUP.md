@@ -2,6 +2,31 @@
 
 Claude Code のサンドボックス環境で Docker コンテナを立ち上げ、DB テーブルを作成するまでの手順書。
 
+## 自動セットアップ（推奨）
+
+SessionStart Hook により、サンドボックスセッション開始時に環境が自動構築されます。
+手動で実行する場合は以下のコマンドで一括セットアップできます:
+
+```bash
+SANDBOX=1 bash scripts/sandbox-setup.sh
+```
+
+### 個別スクリプト
+
+| スクリプト | 用途 |
+|---|---|
+| `scripts/sandbox-setup.sh` | 環境の一括セットアップ（Docker・DB・シード・サーバー起動） |
+| `scripts/dev-server.sh start\|stop\|restart\|status\|logs` | 開発サーバーの管理 |
+| `scripts/health-check.sh` | 全コンポーネントのヘルスチェック |
+
+### AI Agent 自律開発の仕組み
+
+- **`.claude/hooks.json`**: SessionStart Hook でセッション開始時に `sandbox-setup.sh` を自動実行
+- **`.claude/settings.json`**: Docker・Prisma・curl 等のコマンドを事前許可し、agent の自律動作を阻害しない
+- **`.mcp.json`**: Playwright / Chrome DevTools MCP でブラウザ操作による動作確認が可能
+
+## 手動セットアップ（詳細手順）
+
 ## 前提
 
 - Docker コマンドはプリインストール済み（Docker 29.2.1）
