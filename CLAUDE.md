@@ -7,6 +7,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 CIでlint・型チェック・テストが自動実行されます。
 ローカルで確認したい場合は `pnpm run validate`（lint + check-types + test 一括実行）を使ってください。
 
+### MCP ブラウザツール非対応（Claude Code on the Web）
+
+Playwright MCP（`@playwright/mcp@latest`）および Chrome DevTools MCP（`chrome-devtools-mcp`）は Claude Code on the Web では動作しない。**絶対に使用しないこと。**
+
+- **Playwright MCP**: MCP サーバー内部の Playwright バージョン（alpha 版）と、インストール済み Chromium のビルド番号が不一致のため `Browser "chromium" is not installed` エラーになる
+- **Chrome DevTools MCP**: Google Chrome がプリインストールされていないため `Could not find Google Chrome executable` エラーになる
+
+**代替手段**: Playwright v1.50.0 をスクリプトとして直接実行する。詳細は [SANDBOX_SETUP.md](./SANDBOX_SETUP.md) の「Playwright スクリプトによるブラウザ操作」を参照。
+
 ## プロジェクト概要
 
 Kidoku（きどく）は、読書記録・分析アプリケーションです。モノレポ構成（Turborepo + pnpm）で、Next.jsフロントエンドとNestJS GraphQL APIを統合しています。

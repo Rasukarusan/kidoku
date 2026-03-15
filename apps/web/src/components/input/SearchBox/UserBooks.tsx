@@ -83,12 +83,10 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
                 key={item.id}
               >
                 <div className="flex sm:block">
-                  <button
+                  <Link
                     className="mr-2 w-[64px] min-w-[64px] sm:mr-0 sm:w-full sm:p-2"
-                    onClick={() => {
-                      // pushによる遷移だと遷移後のモーダルが表示されないためlocationで遷移
-                      location.href = `/${username}/sheets/${sheet}?book=${id}`
-                    }}
+                    href={`/books/${id}`}
+                    onClick={onClose}
                   >
                     <img
                       className="mx-auto min-w-[64px] object-contain sm:h-[100px]"
@@ -96,12 +94,14 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
                       alt={title}
                       loading="lazy"
                     />
-                  </button>
+                  </Link>
                   <div>
-                    <div
-                      className="mb-1 text-sm font-bold"
+                    <Link
+                      href={`/books/${id}`}
+                      className="mb-1 block text-sm font-bold hover:underline"
                       dangerouslySetInnerHTML={{ __html: title }}
-                    ></div>
+                      onClick={onClose}
+                    ></Link>
                     <div className="text-xs">{truncate(author, 12)}</div>
                     <div
                       className="mb-2 text-xs text-gray-400"
