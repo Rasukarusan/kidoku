@@ -1,13 +1,21 @@
 # サンドボックス環境セットアップ手順
 
-Claude Code のサンドボックス環境で Docker コンテナを立ち上げ、DB テーブルを作成するまでの手順書。
+[Claude Code on the Web](https://code.claude.com/docs/ja/claude-code-on-the-web) のクラウドサンドボックス環境で Docker コンテナを立ち上げ、DB テーブルを作成するまでの手順書。
+
+> **注意**: この手順は Claude Code on the Web（クラウドVM）専用です。ローカル開発では docker-compose を使ってください。
 
 ## 自動セットアップ（推奨）
 
-SessionStart Hook により、サンドボックスセッション開始時に環境が自動構築されます。
-手動で実行する場合は以下のコマンドで一括セットアップできます:
+SessionStart Hook により、Claude Code on the Web のセッション開始時に環境が自動構築されます。
+スクリプトは環境変数 `CLAUDE_CODE_REMOTE=true`（クラウドVM内で自動設定）を検出して実行されます。
+
+手動で実行する場合:
 
 ```bash
+# クラウドVM内（CLAUDE_CODE_REMOTE=true なら自動判定）
+bash scripts/sandbox-setup.sh
+
+# ローカルで強制実行する場合
 SANDBOX=1 bash scripts/sandbox-setup.sh
 ```
 
@@ -24,6 +32,15 @@ SANDBOX=1 bash scripts/sandbox-setup.sh
 - **`.claude/hooks.json`**: SessionStart Hook でセッション開始時に `sandbox-setup.sh` を自動実行
 - **`.claude/settings.json`**: Docker・Prisma・curl 等のコマンドを事前許可し、agent の自律動作を阻害しない
 - **`.mcp.json`**: Playwright / Chrome DevTools MCP でブラウザ操作による動作確認が可能
+
+### 環境判別
+
+| 環境変数 | 値 | 設定元 |
+|---|---|---|
+| `CLAUDE_CODE_REMOTE` | `"true"` | Claude Code on the Web が自動設定 |
+| `CLAUDE_PROJECT_DIR` | プロジェクトルートパス | Claude Code on the Web が自動設定 |
+
+詳細: https://code.claude.com/docs/ja/claude-code-on-the-web
 
 ## 手動セットアップ（詳細手順）
 
