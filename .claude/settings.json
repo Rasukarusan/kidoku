@@ -22,7 +22,31 @@
       "Bash(pnpm --filter api db:push)",
       "Bash(pnpm dev)",
       "Bash(pnpm --filter web dev)",
-      "Bash(pnpm --filter api dev)"
+      "Bash(pnpm --filter api dev)",
+      "Bash(pnpm format)",
+      "Bash(docker info)",
+      "Bash(docker ps*)",
+      "Bash(docker start *)",
+      "Bash(docker run *)",
+      "Bash(docker exec *)",
+      "Bash(docker logs *)",
+      "Bash(sudo -E dockerd *)",
+      "Bash(sudo update-alternatives *)",
+      "Bash(DATABASE_URL=* npx prisma *)",
+      "Bash(PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=* npx prisma*)",
+      "Bash(DATABASE_URL=* npx tsx *)",
+      "Bash(npx playwright*)",
+      "Bash(curl *localhost*)",
+      "Bash(bash scripts/*)",
+      "Bash(./scripts/*)",
+      "Bash(node scripts/*)",
+      "Bash(tail *)",
+      "Bash(cat /tmp/*)",
+      "Bash(kill *)",
+      "Bash(pkill *)",
+      "Bash(cp .env.example .env)",
+      "Bash(cp apps/web/.env.example apps/web/.env)",
+      "Bash(cp apps/api/.env.example apps/api/.env)"
     ]
   }
 }
