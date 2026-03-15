@@ -66,7 +66,7 @@ export const SearchPage: React.FC = () => {
             return (
               <div className="flex items-center p-4" key={id}>
                 <div className="pr-4 text-center">
-                  <Link href={`/${username}/sheets/${sheet}?book=${id}`}>
+                  <Link href={`/books/${id}`}>
                     <img
                       className="mb-1 w-[82px] min-w-[82px]"
                       src={image}
@@ -75,7 +75,7 @@ export const SearchPage: React.FC = () => {
                   </Link>
                 </div>
                 <div>
-                  <Link href={`/${username}/sheets/${sheet}?book=${id}`}>
+                  <Link href={`/books/${id}`}>
                     <div
                       className="mb-2 text-sm font-bold text-gray-600 sm:text-base"
                       dangerouslySetInnerHTML={{ __html: title }}
