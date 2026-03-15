@@ -1,3 +1,14 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+
+onlyBuiltDependencies:
+  - '@apollo/protobufjs'
+  - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@swc/core'
+  - esbuild
+  - fast-folder-size
+  - prisma
+  - sharp
