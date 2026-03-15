@@ -163,12 +163,12 @@ sed -i 's|^MEILI_HOST=.*|MEILI_HOST=http://localhost:7700|' "$PROJECT_ROOT/apps/
 # 8. Prisma スキーマ反映 + クライアント生成
 # ==============================================================================
 yellow "Prisma スキーマを DB に反映中..."
-DATABASE_URL="$DB_URL" npx prisma db push --schema=apps/web/prisma/schema.prisma --skip-generate 2>"$LOG_DIR/prisma-push.log"
+DATABASE_URL="$DB_URL" pnpm --filter web exec prisma db push --skip-generate 2>"$LOG_DIR/prisma-push.log"
 green "Prisma db push 完了"
 
 yellow "Prisma クライアントを生成中..."
-PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/web/prisma/schema.prisma 2>"$LOG_DIR/prisma-gen-web.log"
-PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/api/prisma/schema.prisma 2>"$LOG_DIR/prisma-gen-api.log"
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web exec prisma generate 2>"$LOG_DIR/prisma-gen-web.log"
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api exec prisma generate 2>"$LOG_DIR/prisma-gen-api.log"
 green "Prisma クライアント生成完了"
 
 # ==============================================================================
@@ -177,9 +177,8 @@ green "Prisma クライアント生成完了"
 SEED_CHECK=$(docker exec kidoku_db mariadb -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM users" 2>/dev/null || echo "0")
 if [ "$SEED_CHECK" = "0" ] || [ "$SEED_CHECK" = "" ]; then
   yellow "シードデータを投入中..."
-  DATABASE_URL="$DB_URL" npx tsx apps/web/prisma/seed.ts 2>"$LOG_DIR/seed.log" || {
-    info "seed.ts が失敗。sandbox-seed.js を試行..."
-    DATABASE_URL="$DB_URL" node scripts/sandbox-seed.js 2>>"$LOG_DIR/seed.log" || true
+  DATABASE_URL="$DB_URL" node "$PROJECT_ROOT/scripts/sandbox-seed.js" 2>"$LOG_DIR/seed.log" || {
+    info "sandbox-seed.js が失敗しました。ログ: $LOG_DIR/seed.log"
   }
   green "シードデータ投入完了"
 else
