@@ -20,7 +20,7 @@ interface Props {
 export const BookComment: React.FC<Props> = ({ comment }) => {
   const { memo, image, username, userImage, sheet } = comment
   return (
-    <div className="flex min-w-[300px] items-center p-4">
+    <div className="flex w-[300px] shrink-0 items-center p-4">
       <div className="pr-4 text-center">
         <Link href={`/${username}/sheets/${sheet}?book=${comment.id}`}>
           <img className="mb-1 w-[82px] min-w-[82px]" src={image} alt="" />
