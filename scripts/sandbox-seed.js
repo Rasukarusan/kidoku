@@ -1,5 +1,6 @@
 // Sandbox seed script - creates sample data for development
-const { PrismaClient } = require('@prisma/client');
+const path = require('path');
+const { PrismaClient } = require(path.join(__dirname, '..', 'apps', 'web', 'node_modules', '@prisma', 'client'));
 
 const prisma = new PrismaClient();
 
@@ -23,7 +24,7 @@ async function main() {
   // Create a default sheet
   const sheet = await prisma.sheets.upsert({
     where: {
-      uniq_user_id_name: {
+      userId_name: {
         userId: user.id,
         name: '読んだ本',
       },
@@ -66,16 +67,16 @@ async function main() {
   for (const bookData of sampleBooks) {
     const book = await prisma.books.create({
       data: {
-        userId: user.id,
-        sheet_id: sheet.id,
+        user: { connect: { id: user.id } },
+        sheet: { connect: { id: sheet.id } },
         title: bookData.title,
         author: bookData.author,
         category: bookData.category,
         image: '',
         impression: bookData.impression,
         memo: bookData.memo,
-        is_public_memo: false,
-        is_purchasable: false,
+        isPublicMemo: false,
+        isPurchasable: false,
         finished: new Date(),
       },
     });
