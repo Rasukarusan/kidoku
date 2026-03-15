@@ -13,7 +13,7 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
         <div className="flex items-center">
           <h2 className="p-2 text-2xl font-bold">Comments</h2>
         </div>
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mb-8 flex gap-4 overflow-x-auto pb-4">
           {comments.map((comment) => (
             <BookComment key={comment.id} comment={comment} />
           ))}
