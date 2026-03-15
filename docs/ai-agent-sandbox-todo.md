@@ -1,6 +1,45 @@
 # AI Agent サンドボックス自律開発 — 対応状況と残TODO
 
 > 最終更新: 2026-03-15
+> 対象環境: **Claude Code on the Web**（クラウドサンドボックス）
+
+## Claude Code on the Web とは
+
+[Claude Code on the Web](https://code.claude.com/docs/ja/claude-code-on-the-web) は、claude.ai からブラウザ上で Claude Code タスクを実行できる機能。Anthropic 管理の仮想マシン上でリポジトリがクローンされ、セキュアなクラウド環境でコード変更・テスト・PR作成が行われる。
+
+本ドキュメントの自動セットアップは、このクラウドVM上で Docker コンテナ（MariaDB・MeiliSearch）を起動し、開発サーバーを立ち上げて AI agent が自律的に開発・動作確認できるようにするためのもの。
+
+### 環境の判別方法
+
+| 環境変数 | 値 | 意味 |
+|---|---|---|
+| `CLAUDE_CODE_REMOTE` | `"true"` | Claude Code on the Web のクラウドVM内 |
+| `SANDBOX` | `"1"` | 手動で強制実行する場合のフォールバック |
+
+スクリプト内での判定例:
+```bash
+if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ] && [ -z "${SANDBOX:-}" ]; then
+  echo "Claude Code on the Web 環境ではありません"
+  exit 0
+fi
+```
+
+### セットアップスクリプト vs SessionStart Hook
+
+Claude Code on the Web には2つのセットアップ手段がある（[公式ドキュメント参照](https://code.claude.com/docs/ja/claude-code-on-the-web#setup-scripts)）:
+
+| | セットアップスクリプト | SessionStart Hook |
+|---|---|---|
+| 設定場所 | クラウド環境 UI | リポジトリの `.claude/settings.json` |
+| 実行タイミング | Claude Code 起動**前**、新規セッションのみ | Claude Code 起動**後**、再開含む全セッション |
+| スコープ | クラウド環境のみ | ローカル + クラウド両方 |
+
+本リポジトリでは **SessionStart Hook** を採用（`.claude/hooks.json`）。理由:
+- リポジトリにコミットされるため設定が共有される
+- セッション再開時も実行される（コンテナが停止していた場合の復帰に有効）
+- `CLAUDE_CODE_REMOTE` で環境判定してローカルでは実行しない
+
+---
 
 ## 対応状況サマリー
 
@@ -15,7 +54,7 @@
 
 ---
 
-## 完了済み（今回のセッションで対応）
+## 完了済み
 
 ### 1. SessionStart Hook
 
@@ -52,7 +91,7 @@
 
 ### 3. 環境セットアップ自動化スクリプト (`scripts/sandbox-setup.sh`)
 
-ワンコマンドで以下を実行:
+`CLAUDE_CODE_REMOTE=true` を検出して、ワンコマンドで以下を実行:
 
 1. `pnpm install`
 2. iptables を legacy モードに切り替え
@@ -65,7 +104,7 @@
 9. 開発サーバー起動
 10. ヘルスチェック実行
 
-**動作確認済み**: 実際にサンドボックス上で全ステップが正常完了することを確認。
+**動作確認済み**: 実際にクラウドサンドボックス上で全ステップが正常完了することを確認。
 
 **セッション中に発見・修正した問題**:
 - `npx prisma` が v7 を取得する → `pnpm --filter exec prisma` に変更
@@ -114,7 +153,6 @@
   npx playwright install chromium --with-deps
   ```
 - [ ] `pnpm --filter web test:e2e` をサンドボックスで実行できるようにする
-- [ ] `.claude/settings.json` に `Bash(npx playwright install*)` を追加（※現在は `Bash(npx playwright*)` で包含されているはず）
 - [ ] E2Eテスト実行時にフロントエンド・APIが起動済みか確認し、未起動なら `scripts/dev-server.sh start` を先に呼ぶ仕組み
 - [ ] CI (`.github/workflows/ci.yml`) に E2E テストジョブを追加
   - MariaDB / MeiliSearch を `services` で起動
@@ -130,9 +168,9 @@
 |---|---|
 | `.claude/hooks.json` | SessionStart Hook 定義 |
 | `.claude/settings.json` | 許可コマンド設定 |
-| `scripts/sandbox-setup.sh` | 環境一括セットアップ |
+| `scripts/sandbox-setup.sh` | 環境一括セットアップ（`CLAUDE_CODE_REMOTE` で判定） |
 | `scripts/dev-server.sh` | 開発サーバー管理 |
 | `scripts/health-check.sh` | ヘルスチェック |
 | `scripts/sandbox-seed.js` | シードデータ投入 |
 | `pnpm-workspace.yaml` | ビルドスクリプト許可設定（`onlyBuiltDependencies`） |
-| `SANDBOX_SETUP.md` | セットアップ手順ドキュメント |
+| `SANDBOX_SETUP.md` | セットアップ手順ドキュメント（手動手順） |

@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-# サンドボックス環境の自動セットアップスクリプト
+# Claude Code on the Web（クラウドサンドボックス）環境の自動セットアップスクリプト
 # SessionStart Hook から呼び出されることを想定
+#
+# 環境判定:
+#   CLAUDE_CODE_REMOTE=true  → Claude Code on the Web のクラウド環境
+#   SANDBOX=1                → 手動で強制実行する場合
+#
+# 参考: https://code.claude.com/docs/ja/claude-code-on-the-web
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -15,10 +21,12 @@ red() { echo -e "\033[31m✗ $*\033[0m"; }
 info() { echo -e "\033[36mℹ $*\033[0m"; }
 
 # ==============================================================================
-# 1. サンドボックス環境判定
+# 1. Claude Code on the Web 環境判定
 # ==============================================================================
-if [ -z "${SANDBOX:-}" ] && [ ! -f /run/.containerenv ] && [ ! -f /.dockerenv ]; then
-  info "サンドボックス環境ではないようです。SANDBOX=1 を設定して強制実行できます。"
+# CLAUDE_CODE_REMOTE: Claude Code on the Web のクラウドVM内で "true" に設定される
+# SANDBOX: 手動実行用のフォールバック
+if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ] && [ -z "${SANDBOX:-}" ]; then
+  info "Claude Code on the Web 環境ではありません。SANDBOX=1 を設定して強制実行できます。"
   exit 0
 fi
 
