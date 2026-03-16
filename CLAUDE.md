@@ -297,7 +297,9 @@ pnpm --filter web lighthouse
 
 詳細は [SANDBOX_SETUP.md](./SANDBOX_SETUP.md) を参照。
 
-## AI Agent 自律開発フロー
+## AI Agent 自律開発フロー（Claude Code on the Web）
+
+> **対象環境**: このフローは **Claude Code on the Web**（サンドボックス環境）での自律開発を前提としている。ローカル環境では一部手順が異なる場合がある。
 
 AI agentが新機能の実装からUI動作確認までを自律的に行うための標準フロー。
 **各ステップを省略せず、順番に実行すること。**
