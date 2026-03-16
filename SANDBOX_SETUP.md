@@ -26,12 +26,13 @@ SANDBOX=1 bash scripts/sandbox-setup.sh
 | `scripts/sandbox-setup.sh` | 環境の一括セットアップ（Docker・DB・シード・サーバー起動） |
 | `scripts/dev-server.sh start\|stop\|restart\|status\|logs` | 開発サーバーの管理 |
 | `scripts/health-check.sh` | 全コンポーネントのヘルスチェック |
+| `scripts/ui-check.sh [パス...]` | 指定ページのスクリーンショット撮影（裏口ログイン付き） |
 
 ### AI Agent 自律開発の仕組み
 
 - **`.claude/hooks.json`**: SessionStart Hook でセッション開始時に `sandbox-setup.sh` を自動実行
 - **`.claude/settings.json`**: Docker・Prisma・curl 等のコマンドを事前許可し、agent の自律動作を阻害しない
-- **`.mcp.json`**: Playwright / Chrome DevTools MCP でブラウザ操作による動作確認が可能
+- **`scripts/ui-check.sh`**: 変更後のUI確認を自動化。指定パスのスクリーンショットを撮影し、Read ツールで画像確認が可能
 
 ### 環境判別
 
