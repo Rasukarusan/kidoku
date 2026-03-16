@@ -215,6 +215,18 @@ pnpm check-types                    # 型チェック
 pnpm validate                       # lint + 型チェック + テストを一括実行
 ```
 
+### UI確認（サンドボックス環境）
+
+```bash
+# 指定パスのスクリーンショットを撮影（裏口ログイン付き）
+bash scripts/ui-check.sh /                              # トップページ
+bash scripts/ui-check.sh /testuser/sheets/本棚           # 認証付きページ
+bash scripts/ui-check.sh / /testuser/sheets/本棚         # 複数ページ一括
+bash scripts/ui-check.sh --no-login /                   # ログインなしで撮影
+# 出力先: /tmp/kidoku/screenshots/<ファイル名>.png
+# 撮影後は Read ツールで画像を確認可能
+```
+
 ### その他の開発コマンド
 
 ```bash
