@@ -14,7 +14,7 @@ Playwright MCP（`@playwright/mcp@latest`）および Chrome DevTools MCP（`chr
 - **Playwright MCP**: MCP サーバー内部の Playwright バージョン（alpha 版）と、インストール済み Chromium のビルド番号が不一致のため `Browser "chromium" is not installed` エラーになる
 - **Chrome DevTools MCP**: Google Chrome がプリインストールされていないため `Could not find Google Chrome executable` エラーになる
 
-**代替手段**: Playwright v1.50.0 をスクリプトとして直接実行する。詳細は [SANDBOX_SETUP.md](./SANDBOX_SETUP.md) の「Playwright スクリプトによるブラウザ操作」を参照。
+**代替手段**: Playwright v1.50.0 をスクリプトとして直接実行する。詳細は [docs/SANDBOX_SETUP.md](./docs/SANDBOX_SETUP.md) の「Playwright スクリプトによるブラウザ操作」を参照。
 
 ## プロジェクト概要
 
@@ -295,7 +295,7 @@ pnpm --filter web lighthouse
 
 ## サンドボックス環境での開発
 
-詳細は [SANDBOX_SETUP.md](./SANDBOX_SETUP.md) を参照。
+詳細は [docs/SANDBOX_SETUP.md](./docs/SANDBOX_SETUP.md) を参照。
 
 ## トラブルシューティング
 
