@@ -53,7 +53,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -f Dockerfile.api -t ${{ env.IMAGE }}:${{ github.sha }} -t ${{ env.IMAGE }}:latest .
+          docker build -f docker/Dockerfile.api -t ${{ env.IMAGE }}:${{ github.sha }} -t ${{ env.IMAGE }}:latest .
           docker push ${{ env.IMAGE }}:${{ github.sha }}
           docker push ${{ env.IMAGE }}:latest
 
