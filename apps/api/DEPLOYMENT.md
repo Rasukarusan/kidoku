@@ -63,7 +63,7 @@ gcloud iam service-accounts keys create key.json \
 cd /path/to/kidoku
 
 # イメージをビルド（プロジェクトルートから）
-docker build -f Dockerfile.api -t kidoku-api:local .
+docker build -f docker/Dockerfile.api -t kidoku-api:local .
 
 # ローカルで実行
 docker run -p 4000:4000 \
