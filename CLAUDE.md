@@ -297,6 +297,126 @@ pnpm --filter web lighthouse
 
 詳細は [SANDBOX_SETUP.md](./SANDBOX_SETUP.md) を参照。
 
+## AI Agent 自律開発フロー（Claude Code on the Web）
+
+> **対象環境**: このフローは **Claude Code on the Web**（サンドボックス環境）での自律開発を前提としている。ローカル環境では一部手順が異なる場合がある。
+
+AI agentが新機能の実装からUI動作確認までを自律的に行うための標準フロー。
+**各ステップを省略せず、順番に実行すること。**
+
+### フロー全体像
+
+```
+1. 環境確認 → 2. 実装 → 3. 静的検証 → 4. サーバー再起動 → 5. 動作確認 → 6. コミット
+```
+
+### Step 1: 環境確認
+
+開発を始める前に環境が正常か確認する。SessionStart Hookで自動セットアップ済みだが、セッション中に壊れている可能性がある。
+
+```bash
+bash scripts/health-check.sh
+```
+
+- **全チェック成功** → Step 2 へ
+- **失敗あり** → `bash scripts/sandbox-setup.sh` で再セットアップ、それでも失敗なら「トラブルシューティング」セクションを参照
+
+### Step 2: 実装
+
+「新しいGraphQLエンドポイント追加手順」「コーディング規約」「禁止事項・よくあるミス」に従いコードを実装する。以下のチェックを実装中に意識すること。
+
+#### 実装時の必須チェック
+
+| 変更内容 | 必要なアクション |
+|---|---|
+| Prismaスキーマ変更 | `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の**両方**を更新 |
+| Prismaスキーマ変更 | `pnpm --filter web db:push && pnpm --filter api db:push` でDBに反映 |
+| Prismaスキーマ変更 | `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web prisma generate && PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api prisma generate` でクライアント再生成 |
+| GraphQLリゾルバー変更 | API側の変更が完了してからStep 4でサーバー再起動後に `pnpm --filter web codegen` で型を再生成 |
+| 新しいNestJSモジュール追加 | `app.module.ts` の imports に登録 |
+| ドメインモデル・ユースケース追加 | ユニットテスト(`*.spec.ts`)を作成 |
+
+### Step 3: 静的検証
+
+実装が終わったら、まず静的検証で基本的な品質を確認する。
+
+```bash
+pnpm validate
+```
+
+これにより **lint + 型チェック + テスト** が一括実行される。
+
+- **成功** → Step 4 へ
+- **失敗** → エラーを修正して再実行。よくある失敗:
+  - lint エラー → `pnpm lint:fix` で自動修正を試す
+  - 型エラー → codegen / prisma generate の漏れを確認
+  - テスト失敗 → 既存テストを壊していないか確認
+
+### Step 4: サーバー再起動
+
+コード変更をdev serverに反映する。特に新ファイル追加やモジュール登録はwatchモードで拾えないことがあるため、**必ず再起動する**。
+
+```bash
+bash scripts/dev-server.sh restart
+```
+
+再起動後、サーバーが安定するまで待つ:
+
+```bash
+bash scripts/dev-server.sh status
+```
+
+#### GraphQLリゾルバーを変更した場合
+
+サーバー再起動でスキーマが自動生成されるため、**再起動後に**フロントエンド型を再生成する:
+
+```bash
+pnpm --filter web codegen
+```
+
+### Step 5: 動作確認
+
+UIスクリーンショットを撮影し、変更が正しく反映されているか目視確認する。
+
+```bash
+# 変更に関連するページを撮影
+bash scripts/ui-check.sh /対象ページパス
+
+# 例: トップページと本棚ページを確認
+bash scripts/ui-check.sh / /testuser/sheets/本棚
+```
+
+撮影後、Read ツールで画像を確認:
+
+```
+Read /tmp/kidoku/screenshots/対象ページ.png
+```
+
+- **期待通り** → Step 6 へ
+- **表示がおかしい** → Step 2 に戻って修正
+
+### Step 6: コミット
+
+すべての検証が通ったら変更をコミットする。
+
+```bash
+git add <変更ファイル>
+git commit -m "feat: 機能の説明"
+```
+
+### よくあるエラーと自動回復
+
+| 症状 | 原因 | 回復コマンド |
+|---|---|---|
+| `ECONNREFUSED :3000` | Webサーバー停止 | `bash scripts/dev-server.sh restart` |
+| `ECONNREFUSED :4000` | APIサーバー停止 | `bash scripts/dev-server.sh restart` |
+| `Can't reach database server` | MariaDBコンテナ停止 | `docker start kidoku_db && sleep 3` |
+| `Table 'kidoku.xxx' doesn't exist` | db:push 漏れ | `pnpm --filter web db:push && pnpm --filter api db:push` |
+| `Unknown type "XxxInput"` | codegen 漏れ | `pnpm --filter web codegen` |
+| `Cannot find module '@prisma/client'` | prisma generate 漏れ | `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web prisma generate && PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api prisma generate` |
+| dev-server起動しない | ポート競合 | `bash scripts/dev-server.sh stop && bash scripts/dev-server.sh start` |
+| Prismaスキーマ不一致 | 片方だけ編集した | `diff apps/web/prisma/schema.prisma apps/api/prisma/schema.prisma` で差分確認し両方を同期 |
+
 ## トラブルシューティング
 
 ### 型エラー
