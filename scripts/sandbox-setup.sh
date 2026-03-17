@@ -194,12 +194,35 @@ else
 fi
 
 # ==============================================================================
-# 10. 開発サーバー起動
+# 10. MeiliSearch シードデータ投入
+# ==============================================================================
+MEILI_HEALTH=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:7700/health 2>/dev/null || echo "000")
+if [ "$MEILI_HEALTH" = "200" ]; then
+  MEILI_DOCS=$(curl -s -H "Authorization: Bearer YourMasterKey" http://localhost:7700/indexes/books/stats 2>/dev/null | node -e "
+    let d=''; process.stdin.on('data',c=>d+=c); process.stdin.on('end',()=>{
+      try { console.log(JSON.parse(d).numberOfDocuments||0) } catch { console.log(0) }
+    })
+  " 2>/dev/null || echo "0")
+  if [ "$MEILI_DOCS" = "0" ] || [ "$MEILI_DOCS" = "" ]; then
+    yellow "MeiliSearch シードデータを投入中..."
+    DATABASE_URL="$DB_URL" node "$PROJECT_ROOT/scripts/seed-meilisearch.js" 2>"$LOG_DIR/seed-meili.log" || {
+      info "seed-meilisearch.js が失敗しました。ログ: $LOG_DIR/seed-meili.log"
+    }
+    green "MeiliSearch シードデータ投入完了"
+  else
+    green "MeiliSearch シードデータは既に存在 (documents: $MEILI_DOCS 件)"
+  fi
+else
+  info "MeiliSearch が起動していないため、シード投入をスキップしました"
+fi
+
+# ==============================================================================
+# 11. 開発サーバー起動
 # ==============================================================================
 "$SCRIPT_DIR/dev-server.sh" start
 
 # ==============================================================================
-# 11. ヘルスチェック
+# 12. ヘルスチェック
 # ==============================================================================
 "$SCRIPT_DIR/health-check.sh"
 
