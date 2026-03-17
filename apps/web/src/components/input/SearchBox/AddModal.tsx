@@ -18,9 +18,9 @@ import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 import { AiOutlineFileAdd } from 'react-icons/ai'
 import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useAtom, useAtomValue } from 'jotai'
-import { openAddModalAtom } from '@/store/modal/atom'
-import { addBookAtom } from '@/store/book/atom'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { openAddModalAtom, openSearchModalAtom } from '@/store/modal/atom'
+import { addBookAtom, registeredBookCountAtom } from '@/store/book/atom'
 import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
 
@@ -55,6 +55,8 @@ export const AddModal: React.FC = () => {
   const [open, setOpen] = useAtom(openAddModalAtom)
   const item = useAtomValue(addBookAtom)
   const { data: session } = useSession()
+  const setOpenSearchModal = useSetAtom(openSearchModalAtom)
+  const [registeredCount, setRegisteredCount] = useAtom(registeredBookCountAtom)
   const apolloClient = useApolloClient()
   const { data: sheetsData, refetch: refetchSheets } = useQuery(
     getSheetsQuery,
@@ -129,6 +131,7 @@ export const AddModal: React.FC = () => {
     setResponse(res)
     if (res.result) {
       apolloClient.refetchQueries({ include: ['GetBooks'] })
+      setRegisteredCount((c) => c + 1)
       reward()
     }
     setLoading(false)
@@ -318,7 +321,7 @@ export const AddModal: React.FC = () => {
                     {response.result ? (
                       <SuccessAlert
                         open={!!response}
-                        text={`『${response.bookTitle}』を「${response.sheetName}」に追加しました`}
+                        text={`『${response.bookTitle}』を「${response.sheetName}」に追加しました${registeredCount > 1 ? `（今回${registeredCount}冊目）` : ''}`}
                         onClose={() => {
                           setResponse(null)
                         }}
@@ -335,17 +338,28 @@ export const AddModal: React.FC = () => {
                   </div>
                 )}
                 {response?.bookId > 0 ? (
-                  <button
-                    className="flex h-12 w-full items-center justify-center rounded-b-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700 disabled:bg-blue-700"
-                    onClick={() => {
-                      setOpen(false)
-                      router.push(
-                        `/${session.user.name}/sheets/${response.sheetName}`
-                      )
-                    }}
-                  >
-                    <span id="rewardId">シートに飛ぶ</span>
-                  </button>
+                  <div className="flex w-full">
+                    <button
+                      className="flex h-12 flex-1 items-center justify-center rounded-bl-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700"
+                      onClick={() => {
+                        setOpen(false)
+                        setOpenSearchModal(true)
+                      }}
+                    >
+                      <span id="rewardId">続けて登録</span>
+                    </button>
+                    <button
+                      className="flex h-12 flex-1 items-center justify-center rounded-br-md bg-green-600 px-4 py-1 font-bold text-white hover:bg-green-700"
+                      onClick={() => {
+                        setOpen(false)
+                        router.push(
+                          `/${session.user.name}/sheets/${response.sheetName}`
+                        )
+                      }}
+                    >
+                      シートに飛ぶ
+                    </button>
+                  </div>
                 ) : (
                   <button
                     className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"

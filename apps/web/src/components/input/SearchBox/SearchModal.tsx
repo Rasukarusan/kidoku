@@ -5,7 +5,8 @@ import { Books } from './Books'
 import { UserBooks } from './UserBooks'
 import { BarcodeScan } from './BarcodeScan'
 import { openSearchModalAtom } from '@/store/modal/atom'
-import { useAtom } from 'jotai'
+import { useAtom, useAtomValue } from 'jotai'
+import { registeredBookCountAtom } from '@/store/book/atom'
 import { Template } from './Template'
 import { ISBNSearchResult } from './ISBNSearchResult'
 
@@ -26,6 +27,7 @@ const isISBNLike = (input: string): boolean => {
 
 export const SearchModal: React.FC = () => {
   const [open, setOpen] = useAtom(openSearchModalAtom)
+  const registeredCount = useAtomValue(registeredBookCountAtom)
   const ref = useRef<HTMLInputElement>(null)
   const [showCamera, setShowCamera] = useState(false)
   const [inputValue, setInputValue] = useState('')
@@ -56,6 +58,16 @@ export const SearchModal: React.FC = () => {
       onClose={onClose}
       className="h-3/4 w-full overflow-auto sm:w-3/4 lg:w-1/2"
     >
+      {/* 登録冊数バッジ */}
+      {registeredCount > 0 && (
+        <div className="flex items-center gap-2 border-b border-b-[#f1f5f9] bg-blue-50 px-4 py-2">
+          <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-blue-600 px-1.5 text-xs font-bold text-white">
+            {registeredCount}
+          </span>
+          <span className="text-sm text-blue-700">冊登録済み</span>
+        </div>
+      )}
+
       {/* 検索入力 + カメラボタン */}
       <div className="flex shrink-0 items-center border-b border-b-[#f1f5f9] px-2 pt-2">
         <div className="relative w-full text-gray-600">
