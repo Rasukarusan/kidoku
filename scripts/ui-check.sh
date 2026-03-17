@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# UI確認スクリプト — Playwright v1.50.0 でスクリーンショットを撮影
+# UI確認スクリプト — Playwright v1.50.0 でスクリーンショットを撮影・操作検証
 #
 # 使い方:
 #   bash scripts/ui-check.sh [パス1] [パス2] ...
@@ -7,6 +7,11 @@
 #   bash scripts/ui-check.sh /testuser/sheets/本棚           # 認証付きページ
 #   bash scripts/ui-check.sh --no-login /                   # ログインなしで撮影
 #   bash scripts/ui-check.sh                                # デフォルトページ一覧を撮影
+#
+# インタラクションモード（--script でPlaywright操作を記述）:
+#   bash scripts/ui-check.sh --script /tmp/kidoku/my-test.mjs
+#     スクリプトには async function run(page, context) が必要。
+#     撮影は page.screenshot() を直接呼ぶ。
 #
 # 出力:
 #   /tmp/kidoku/screenshots/<ファイル名>.png
@@ -31,16 +36,22 @@ red() { echo -e "\033[31m✗ $*\033[0m"; }
 # ==============================================================================
 LOGIN=true
 PATHS=()
+CUSTOM_SCRIPT=""
 
-for arg in "$@"; do
-  case "$arg" in
+while [ $# -gt 0 ]; do
+  case "$1" in
     --no-login) LOGIN=false ;;
-    *) PATHS+=("$arg") ;;
+    --script)
+      shift
+      CUSTOM_SCRIPT="$1"
+      ;;
+    *) PATHS+=("$1") ;;
   esac
+  shift
 done
 
 # デフォルトページ
-if [ ${#PATHS[@]} -eq 0 ]; then
+if [ ${#PATHS[@]} -eq 0 ] && [ -z "$CUSTOM_SCRIPT" ]; then
   PATHS=("/")
 fi
 
@@ -122,6 +133,74 @@ path_to_filename() {
     echo "$p" | sed 's|^/||; s|/|_|g; s|[^a-zA-Z0-9_-]|_|g'
   fi
 }
+
+# ==============================================================================
+# 3a. カスタムスクリプトモード（--script 指定時）
+# ==============================================================================
+if [ -n "$CUSTOM_SCRIPT" ]; then
+  if [ ! -f "$CUSTOM_SCRIPT" ]; then
+    red "スクリプトが見つかりません: $CUSTOM_SCRIPT"
+    exit 1
+  fi
+
+  cat > /tmp/kidoku/ui-check-wrapper.mjs << WRAPPER_EOF
+import { chromium } from '${PW_INDEX}';
+
+const login = ${LOGIN};
+const screenshotDir = '${SCREENSHOT_DIR}';
+
+const browser = await chromium.launch({
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-gpu',
+    '--disable-dev-shm-usage',
+    '--no-zygote',
+  ],
+});
+
+const context = await browser.newContext({
+  viewport: { width: 1280, height: 720 },
+});
+
+// 外部フォント読み込みをブロック（タイムアウト防止）
+await context.route('**/*.woff2', route => route.abort());
+await context.route('**/*.woff', route => route.abort());
+await context.route('**/fonts.googleapis.com/**', route => route.abort());
+await context.route('**/fonts.gstatic.com/**', route => route.abort());
+
+const page = await context.newPage();
+
+// 裏口ログイン
+if (login) {
+  try {
+    const csrfRes = await page.request.get('http://localhost:3000/api/auth/csrf');
+    const { csrfToken } = await csrfRes.json();
+    await page.request.post('http://localhost:3000/api/auth/callback/backdoor', {
+      form: { csrfToken, email: 'test@example.com' },
+      maxRedirects: 0,
+    });
+    console.log('✓ ログイン完了');
+  } catch (e) {
+    console.error('⚠ ログイン失敗:', e.message);
+  }
+}
+
+// カスタムスクリプトを実行
+const mod = await import('${CUSTOM_SCRIPT}');
+await mod.default({ page, context, screenshotDir });
+
+await browser.close();
+console.log('✓ カスタムスクリプト完了');
+WRAPPER_EOF
+
+  node /tmp/kidoku/ui-check-wrapper.mjs
+  exit $?
+fi
+
+# ==============================================================================
+# 3b. スクリーンショットモード（デフォルト）
+# ==============================================================================
 
 # JSON配列を組み立て
 PAGES_JSON="["
