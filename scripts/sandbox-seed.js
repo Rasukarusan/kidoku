@@ -7,14 +7,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding sandbox database...');
 
-  // Create a sandbox user
+  // Create a test user (matches backdoor login email and health-check expectations)
   const user = await prisma.user.upsert({
-    where: { email: 'sandbox@example.com' },
+    where: { email: 'test@example.com' },
     update: {},
     create: {
-      id: 'sandbox-user-id',
-      email: 'sandbox@example.com',
-      name: 'Sandbox User',
+      id: 'test-user-id',
+      email: 'test@example.com',
+      name: 'testuser',
       admin: false,
     },
   });
