@@ -58,3 +58,107 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web exec prisma generate
       - run: pnpm --filter web test
+
+  test-e2e:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: mysql:9.3
+        env:
+          MYSQL_ROOT_PASSWORD: pass
+          MYSQL_DATABASE: kidoku
+          MYSQL_USER: dev
+          MYSQL_PASSWORD: pass
+        ports:
+          - 13306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -ppass"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      meilisearch:
+        image: getmeili/meilisearch:prototype-japanese-6
+        env:
+          MEILI_HTTP_ADDR: 0.0.0.0:7700
+          MEILI_MASTER_KEY: YourMasterKey
+        ports:
+          - 7700:7700
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma clients
+        run: |
+          pnpm --filter api exec prisma generate
+          pnpm --filter web exec prisma generate
+
+      - name: Push schema to database
+        run: |
+          pnpm --filter web exec prisma db push --skip-generate --accept-data-loss
+          pnpm --filter api exec prisma db push --skip-generate --accept-data-loss
+        env:
+          DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
+
+      - name: Seed test data
+        run: node scripts/sandbox-seed.js
+        env:
+          DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
+
+      - name: Build applications
+        run: |
+          pnpm --filter api build
+          pnpm --filter web build
+        env:
+          DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
+          NEXTAUTH_SECRET: kidoku-ci-nextauth-secret
+          NEXT_PUBLIC_HOST: http://localhost:3000
+          NESTJS_GRAPHQL_ENDPOINT: http://localhost:4000/graphql
+          NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN: 'true'
+          NEXT_PUBLIC_FLAG_KIDOKU_1: 'true'
+
+      - name: Install Playwright browsers
+        run: pnpm --filter web exec playwright install chromium --with-deps
+
+      - name: Start API server
+        run: pnpm --filter api start &
+        env:
+          DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
+          NEXTAUTH_SECRET: kidoku-ci-nextauth-secret
+          PORT: '4000'
+          MEILI_HOST: http://localhost:7700
+          MEILI_MASTER_KEY: YourMasterKey
+
+      - name: Wait for API server
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4000/graphql?query=%7B__typename%7D > /dev/null 2>&1 && exit 0
+            sleep 2
+          done
+          echo "API server failed to start" && exit 1
+
+      - name: Run E2E tests
+        run: pnpm --filter web test:e2e
+        env:
+          CI: 'true'
+          DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
+          NEXTAUTH_SECRET: kidoku-ci-nextauth-secret
+          NEXT_PUBLIC_HOST: http://localhost:3000
+          NESTJS_GRAPHQL_ENDPOINT: http://localhost:4000/graphql
+          NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN: 'true'
+          BACKDOOR_USER_EMAIL: test@example.com
+          NEXT_PUBLIC_FLAG_KIDOKU_1: 'true'
+          MEILI_HOST: http://localhost:7700
+          MEILI_MASTER_KEY: YourMasterKey
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 14
