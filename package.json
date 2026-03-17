@@ -15,7 +15,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
-    "validate": "turbo run lint check-types test",
+    "test:e2e": "turbo run test:e2e",
+    "validate": "turbo run lint check-types test test:e2e",
     "prepare": "husky"
   },
   "devDependencies": {
