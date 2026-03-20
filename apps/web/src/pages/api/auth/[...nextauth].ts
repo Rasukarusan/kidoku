@@ -75,6 +75,15 @@ export const authOptions: NextAuthOptions = {
                 return null
               }
 
+              // 裏口ログインではcreateUserイベントが発火しないため、
+              // シートが未作成の場合はここで初期化する
+              const sheetCount = await prisma.sheets.count({
+                where: { userId: user.id },
+              })
+              if (sheetCount === 0) {
+                await initUser(user)
+              }
+
               return {
                 id: user.id,
                 email: user.email,
