@@ -22,4 +22,4 @@ export const test = base.extend<{ authedPage: Page }>({
   },
 })
 
-export { expect, backdoorLogin }
+export { expect, backdoorLogin, type Page }
