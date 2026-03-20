@@ -56,12 +56,14 @@ export const AddModal: React.FC = () => {
   const item = useAtomValue(addBookAtom)
   const { data: session } = useSession()
   const apolloClient = useApolloClient()
-  const { data: sheetsData, refetch: refetchSheets } = useQuery(
-    getSheetsQuery,
-    {
-      skip: !session,
-    }
-  )
+  const {
+    data: sheetsData,
+    refetch: refetchSheets,
+    loading: sheetsLoading,
+  } = useQuery(getSheetsQuery, {
+    skip: !session,
+    fetchPolicy: 'network-only',
+  })
   const sheets = sheetsData?.sheets || []
   const [loading, setLoading] = useState(false)
   const [book, setBook] = useState(null)
@@ -86,6 +88,14 @@ export const AddModal: React.FC = () => {
         label: category,
       }))
     : []
+
+  // モーダルが開いたときにシートを再取得する
+  // セッション確立直後はサーバー側でセッション取得に失敗することがあるため
+  useEffect(() => {
+    if (open && session && sheets.length === 0 && !sheetsLoading) {
+      refetchSheets()
+    }
+  }, [open, session])
 
   // シート取得次第、一番上のシートを選択状態にする
   useEffect(() => {
@@ -277,7 +287,12 @@ export const AddModal: React.FC = () => {
                       refetchSheets()
                     }}
                   />
-                  {sheets.length === 0 ? (
+                  {sheetsLoading ? (
+                    <div className="flex items-center justify-center py-2 text-sm text-gray-500">
+                      <Loading className="mr-2 h-[16px] w-[16px] border-[2px] border-gray-400" />
+                      シートを読み込み中...
+                    </div>
+                  ) : sheets.length === 0 ? (
                     <button
                       className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white disabled:bg-gray-500"
                       onClick={() => {
