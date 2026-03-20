@@ -1,11 +1,36 @@
-import { test, expect } from '../fixtures'
+import { test, expect, type Page } from '../fixtures'
+
+/**
+ * ISRキャッシュの再検証を待ってからページをリロードし、要素の表示を確認する。
+ * revalidate: 5s のため、6秒間隔で最大3回リトライする。
+ */
+async function waitForISRAndExpect(
+  page: Page,
+  url: string,
+  locator: () => ReturnType<Page['locator']>,
+  maxRetries = 3
+) {
+  for (let i = 0; i < maxRetries; i++) {
+    if (i > 0) {
+      // ISR revalidate (5s) を超える間隔で待機してからリロード
+      await page.waitForTimeout(6000)
+      await page.goto(url, { timeout: 30000 })
+    }
+    try {
+      await expect(locator()).toBeVisible({ timeout: 5000 })
+      return
+    } catch {
+      if (i === maxRetries - 1) throw new Error(`Element not visible after ${maxRetries} ISR reload retries`)
+    }
+  }
+}
 
 /**
  * 書籍ライフサイクルE2Eテスト
  *
- * 主要フロー: ログイン → 書籍追加 → データ検証 → 詳細確認 → 更新 → 削除
- * API経由で書籍を操作し、GraphQL APIとUIで結果を検証する統合テスト
- * 本棚ページはISR(revalidate: 5s)のため、書籍作成直後のUI反映はGraphQL APIで検証する
+ * 主要フロー: ログイン → 書籍追加 → 一覧表示確認 → 書籍詳細確認 → 更新 → 削除
+ * API経由で書籍を操作し、UIで結果を検証する統合テスト
+ * 本棚ページはISR(revalidate: 5s)のため、データ変更後は再検証を待ってリロードする
  */
 test.describe('書籍ライフサイクル（E2Eフロー）', () => {
   const testBook = {
@@ -58,8 +83,6 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
     bookId = createJson.bookId
 
     // ---- Step 4: GraphQLで書籍データの整合性を確認 ----
-    // 本棚ページはISR(revalidate: 5s)のため、API経由で作成した書籍が即座に
-    // ページに反映されない。CI環境ではGraphQL APIで直接データを検証する。
     const booksRes = await page.request.post('/api/graphql', {
       data: { query: '{ books { id title author category impression } }' },
     })
@@ -73,7 +96,19 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
     expect(createdBook.category).toBe(testBook.category)
     expect(createdBook.impression).toBe(testBook.impression)
 
-    // ---- Step 5: 書籍詳細ページで表示を確認 ----
+    // ---- Step 5: 本棚ページで書籍が表示されることを確認 ----
+    // ISR(revalidate: 5s)のため、再検証を待ってリロードする
+    const sheetUrl = `/testuser/sheets/${sheetName}`
+    await page.goto(sheetUrl, { timeout: 30000 })
+    await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
+    await waitForISRAndExpect(page, sheetUrl, () =>
+      page
+        .locator(`img[alt="${testBook.title}"]`)
+        .or(page.getByText(testBook.title))
+        .first()
+    )
+
+    // ---- Step 6: 書籍詳細ページで表示を確認 ----
     await page.goto(`/books/${bookId}`, {
       timeout: 30000,
       waitUntil: 'domcontentloaded',
@@ -86,7 +121,7 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
       page.getByRole('heading', { name: testBook.title })
     ).toBeVisible({ timeout: 15000 })
 
-    // ---- Step 6: 書籍更新（API経由） ----
+    // ---- Step 7: 書籍更新（API経由） ----
     const updatedTitle = 'E2Eフローテスト書籍（更新済み）'
     const updatedAuthor = 'フローテスト著者（更新済み）'
     const updateRes = await page.request.fetch('/api/books', {
@@ -107,7 +142,7 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
     const updateJson = await updateRes.json()
     expect(updateJson.result).toBe(true)
 
-    // ---- Step 7: 更新後のデータをGraphQLで確認 ----
+    // ---- Step 8: 更新後のデータをGraphQLで確認 ----
     const updatedBooksRes = await page.request.post('/api/graphql', {
       data: { query: '{ books { id title author impression } }' },
     })
@@ -120,9 +155,17 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
     expect(updatedBook.author).toBe(updatedAuthor)
     expect(updatedBook.impression).toBe('◎')
 
-    // ---- Step 8: 書籍削除（API経由） ----
-    // ISRキャッシュの影響で本棚ページへの即時反映は保証されないため、
-    // UIでの更新確認はスキップし、直接削除に進む。
+    // ---- Step 9: 更新後の本棚ページで反映を確認 ----
+    await page.goto(sheetUrl, { timeout: 30000 })
+    await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
+    await waitForISRAndExpect(page, sheetUrl, () =>
+      page
+        .locator(`img[alt="${updatedTitle}"]`)
+        .or(page.getByText(updatedTitle))
+        .first()
+    )
+
+    // ---- Step 10: 書籍削除（API経由） ----
     const deleteRes = await page.request.fetch('/api/books', {
       method: 'DELETE',
       headers: { Accept: 'application/json' },
@@ -131,7 +174,7 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
     const deleteJson = await deleteRes.json()
     expect(deleteJson.result).toBe(true)
 
-    // ---- Step 9: 削除後にGraphQLで確認 ----
+    // ---- Step 11: 削除後にGraphQLで確認 ----
     const afterDeleteRes = await page.request.post('/api/graphql', {
       data: { query: '{ books { id title } }' },
     })
@@ -188,8 +231,9 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
     const afterCount = (await afterRes.json()).data.books.length
     expect(afterCount).toBe(initialCount + 2)
 
-    // 本棚ページで両方の書籍が表示されることを確認
-    await page.goto(`/testuser/sheets/${sheet.name}`, { timeout: 30000 })
+    // 本棚ページで累計読書数が表示されることを確認
+    const sheetUrl = `/testuser/sheets/${sheet.name}`
+    await page.goto(sheetUrl, { timeout: 30000 })
     await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
 
     // クリーンアップ: 登録した書籍を削除
