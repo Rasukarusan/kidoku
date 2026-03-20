@@ -8,13 +8,18 @@ async function waitForISRAndExpect(
   page: Page,
   url: string,
   locator: () => ReturnType<Page['locator']>,
-  maxRetries = 3
+  options?: { maxRetries?: number; setup?: () => Promise<void> }
 ) {
+  const maxRetries = options?.maxRetries ?? 3
   for (let i = 0; i < maxRetries; i++) {
     if (i > 0) {
       // ISR revalidate (5s) を超える間隔で待機してからリロード
       await page.waitForTimeout(6000)
       await page.goto(url, { timeout: 30000 })
+    }
+    // ページロード後のセットアップ（例: 表示モードの切り替え）
+    if (options?.setup) {
+      await options.setup()
     }
     try {
       await expect(locator()).toBeVisible({ timeout: 5000 })
@@ -100,14 +105,21 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
 
     // ---- Step 5: 本棚ページで書籍が表示されることを確認 ----
     // ISR(revalidate: 5s)のため、再検証を待ってリロードする
+    // Grid表示ではタイトルがhover時のみ表示されるため、List表示に切り替えて確認する
     const sheetUrl = `/testuser/sheets/${sheetName}`
+    const switchToListView = async () => {
+      await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
+      const listBtn = page.getByRole('button', { name: /List/i })
+      if (await listBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+        await listBtn.click()
+      }
+    }
     await page.goto(sheetUrl, { timeout: 30000 })
-    await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
-    await waitForISRAndExpect(page, sheetUrl, () =>
-      page
-        .locator(`img[alt="${testBook.title}"]`)
-        .or(page.getByText(testBook.title))
-        .first()
+    await waitForISRAndExpect(
+      page,
+      sheetUrl,
+      () => page.getByText(testBook.title).first(),
+      { setup: switchToListView }
     )
 
     // ---- Step 6: 書籍詳細ページで表示を確認 ----
@@ -158,13 +170,13 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
     expect(updatedBook.impression).toBe('◎')
 
     // ---- Step 9: 更新後の本棚ページで反映を確認 ----
+    // List表示に切り替えてタイトルを確認
     await page.goto(sheetUrl, { timeout: 30000 })
-    await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
-    await waitForISRAndExpect(page, sheetUrl, () =>
-      page
-        .locator(`img[alt="${updatedTitle}"]`)
-        .or(page.getByText(updatedTitle))
-        .first()
+    await waitForISRAndExpect(
+      page,
+      sheetUrl,
+      () => page.getByText(updatedTitle).first(),
+      { setup: switchToListView }
     )
 
     // ---- Step 10: 書籍削除（API経由） ----
