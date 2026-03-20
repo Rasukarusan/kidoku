@@ -24,7 +24,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
   defaultValue,
   value,
   options,
-  // eslint-disable-next-line
+
   onChange = () => {},
   isChanged = false,
 }) => {

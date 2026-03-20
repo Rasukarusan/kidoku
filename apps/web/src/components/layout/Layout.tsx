@@ -1,4 +1,3 @@
-import { AddModal } from '@/components/input/SearchBox/AddModal'
 import { SearchModal } from '../input/SearchBox/SearchModal'
 import { LoginModal } from './LoginModal'
 import { Sidebar } from './Sidebar'
@@ -14,7 +13,6 @@ export const Layout: React.FC<Props> = ({ children }) => {
       <Sidebar />
       <div className="flex min-h-screen flex-1 flex-col overflow-x-hidden">
         <SearchModal />
-        <AddModal />
         <LoginModal />
         <main className="flex-1 pb-14">{children}</main>
         <BottomNav />

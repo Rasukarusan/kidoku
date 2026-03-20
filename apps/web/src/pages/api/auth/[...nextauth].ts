@@ -12,10 +12,8 @@ const isEdge =
   process.env.NEXT_PUBLIC_USE_EDGE === 'true'
 
 const prisma = isEdge
-  ? // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('@/libs/prisma/edge').default
-  : // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('@/libs/prisma').default
+  ? require('@/libs/prisma/edge').default
+  : require('@/libs/prisma').default
 
 // 裏口ログインが有効かどうか
 const isBackdoorEnabled =
