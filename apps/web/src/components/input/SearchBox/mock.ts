@@ -1,6 +1,5 @@
 import { SearchResult } from '@/types/search'
 
-/* eslint-disable */
 export const items: SearchResult[] = [
   {
     id: 'H-4rnwEACAAJ',
