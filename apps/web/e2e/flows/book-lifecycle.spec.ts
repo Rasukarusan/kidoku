@@ -51,6 +51,8 @@ test.describe('書籍ライフサイクル（E2Eフロー）', () => {
   test('ログイン → 書籍登録 → 一覧確認 → 詳細確認 → 更新 → 削除', async ({
     authedPage: page,
   }) => {
+    // ISR待機（最大3回×6秒×2箇所）+各種API呼び出し+ページ遷移で30秒超のため延長
+    test.setTimeout(120_000)
     // ---- Step 1: セッション確認 ----
     const sessionRes = await page.request.get('/api/auth/session')
     const session = await sessionRes.json()

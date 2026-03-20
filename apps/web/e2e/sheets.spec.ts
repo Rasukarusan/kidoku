@@ -10,7 +10,8 @@ test.describe('本棚ページ（シート）', () => {
     await page.goto('/testuser/sheets/本棚', { timeout: 30000 })
     await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
     // 読書数が数値として表示されることを確認（他テストでデータが変動しうるため正確な冊数は検証しない）
-    await expect(page.locator('text=/\\d+/')).toBeVisible({ timeout: 15000 })
+    // 「冊」の直前に数値が表示されるはず
+    await expect(page.getByText(/\d+.*冊/)).toBeVisible({ timeout: 15000 })
   })
 
   test('書籍カードの画像が表示される', async ({ page }) => {
