@@ -91,7 +91,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     setBook({
       ...item,
       isPublicMemo: false,
-      memo: item.memo || '',
+      memo: item.memo ? item.memo : '[期待]\n\n[感想]\n',
       impression: '-',
       finished,
     })
@@ -141,16 +141,15 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       </div>
 
       {/* フォーム本体 */}
-      <div className="flex-1 overflow-y-auto p-4">
-        {/* 本の情報カード */}
-        <div className="mb-4 flex items-start rounded-lg bg-gray-50 p-3">
+      <div className="flex-1 overflow-y-auto bg-white p-4">
+        <div className="mb-2 flex items-center">
           <ImagePicker
             img={book?.image}
             onImageLoad={(image) => {
               setBook({ ...book, image })
             }}
           />
-          <div className="min-w-0 flex-1">
+          <div className="mr-2 w-2/3">
             <BookInputField
               value={book?.title}
               onChange={(e) => setBook({ ...book, title: e.target.value })}
@@ -163,38 +162,32 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               label="著者"
               tabIndex={2}
             />
-          </div>
-        </div>
-
-        {/* カテゴリ・感想・読了日 */}
-        <div className="mb-4 space-y-3">
-          <BookCreatableSelectBox
-            label="カテゴリ"
-            defaultValue={{
-              value: book?.category,
-              label: book?.category,
-            }}
-            options={options}
-            tabIndex={3}
-            onChange={(newValue: { value: string; label: string }) => {
-              setBook({
-                ...book,
-                category: newValue?.value ?? '-',
-              })
-            }}
-          />
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <BookSelectBox
-                value={book?.impression}
-                label="感想"
-                tabIndex={4}
-                onChange={(e) =>
-                  setBook({ ...book, impression: e.target.value })
-                }
-              />
-            </div>
-            <div className="flex-1">
+            <BookCreatableSelectBox
+              label="カテゴリ"
+              defaultValue={{
+                value: book?.category,
+                label: book?.category,
+              }}
+              options={options}
+              tabIndex={3}
+              onChange={(newValue: { value: string; label: string }) => {
+                setBook({
+                  ...book,
+                  category: newValue?.value ?? '-',
+                })
+              }}
+            />
+            <div className="mt-2 flex items-center">
+              <div className="mr-4">
+                <BookSelectBox
+                  value={book?.impression}
+                  label="感想"
+                  tabIndex={4}
+                  onChange={(e) =>
+                    setBook({ ...book, impression: e.target.value })
+                  }
+                />
+              </div>
               <BookDatePicker
                 value={dayjs(book?.finished).format('YYYY-MM-DD')}
                 label="読了日"
@@ -211,38 +204,31 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             </div>
           </div>
         </div>
-
-        {/* メモ */}
-        <div className="mb-3">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="flex items-center">
-              <Label text="メモ" className="mb-0 mr-2" />
-              <MaskingHint />
-            </div>
-            <div className="text-xs text-gray-400">
-              {book?.memo?.length || 0} 文字
-            </div>
+        <div className="mb-2 flex items-center justify-between">
+          <div className="flex items-center">
+            <Label text="メモ" className="mb-0 mr-2" />
+            <MaskingHint />
           </div>
-          <MarkdownEditor
-            value={book?.memo || ''}
-            onChange={(memo) => setBook({ ...book, memo })}
-            minHeight="150px"
-          />
-          <ToggleButton
-            label="メモを公開する"
-            checked={!!book?.isPublicMemo}
-            onChange={() => {
-              setBook({
-                ...book,
-                isPublicMemo: !book?.isPublicMemo,
-              })
-            }}
-            className="mt-1"
-          />
+          <div className="text-xs text-gray-500">
+            {book?.memo?.length || 0} 文字
+          </div>
         </div>
-
-        {/* シート選択 */}
-        <div className="text-center text-gray-900">
+        <MarkdownEditor
+          value={book?.memo || ''}
+          onChange={(memo) => setBook({ ...book, memo })}
+          minHeight="200px"
+        />
+        <ToggleButton
+          label="メモを公開する"
+          checked={!!book?.isPublicMemo}
+          onChange={() => {
+            setBook({
+              ...book,
+              isPublicMemo: !book?.isPublicMemo,
+            })
+          }}
+        />
+        <div className="w-full text-center text-gray-900 ">
           <SheetAddModal
             open={openAdd}
             onClose={() => {
@@ -260,29 +246,26 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               {session ? 'シートを追加' : 'ログインしてください'}
             </button>
           ) : (
-            <div className="flex items-center justify-center gap-2">
-              <Label text="シート" className="mb-0" />
-              <select
-                className="cursor-pointer rounded-md border px-3 py-1.5 text-sm"
-                onChange={(e) => {
-                  const selectedOption = e.target.selectedOptions[0]
-                  const sheetId = selectedOption.getAttribute('data-id')
-                  setSheet({
-                    id: Number(sheetId),
-                    name: e.target.value,
-                  })
-                }}
-              >
-                {sheets.map((sheet) => {
-                  const { id, name } = sheet
-                  return (
-                    <option key={name} value={name} data-id={id}>
-                      {name}
-                    </option>
-                  )
-                })}
-              </select>
-            </div>
+            <select
+              className="cursor-pointer border p-2 px-4"
+              onChange={(e) => {
+                const selectedOption = e.target.selectedOptions[0]
+                const sheetId = selectedOption.getAttribute('data-id')
+                setSheet({
+                  id: Number(sheetId),
+                  name: e.target.value,
+                })
+              }}
+            >
+              {sheets.map((sheet) => {
+                const { id, name } = sheet
+                return (
+                  <option key={name} value={name} data-id={id}>
+                    {name}
+                  </option>
+                )
+              })}
+            </select>
           )}
         </div>
 
