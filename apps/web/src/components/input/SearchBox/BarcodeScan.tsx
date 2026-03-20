@@ -1,21 +1,20 @@
 import { EnhancedBarcodeScanner } from '@/components/input/EnhancedBarcodeScanner'
 import { useSession } from 'next-auth/react'
 import { useSetAtom } from 'jotai'
-import { openAddModalAtom, openLoginModalAtom } from '@/store/modal/atom'
-import { addBookAtom } from '@/store/book/atom'
+import { openLoginModalAtom } from '@/store/modal/atom'
 import { useState } from 'react'
 import { ManualRegisterButton } from './ManualRegisterButton'
+import { SearchResult } from '@/types/search'
 
 interface Props {
   input: string
   onClose: () => void
+  onSelectBook: (book: SearchResult) => void
 }
 
-export const BarcodeScan: React.FC<Props> = () => {
+export const BarcodeScan: React.FC<Props> = ({ onSelectBook }) => {
   const { data: session } = useSession()
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
-  const setOpen = useSetAtom(openAddModalAtom)
-  const setBook = useSetAtom(addBookAtom)
   const [scanError, setScanError] = useState<string>('')
 
   return (
@@ -23,7 +22,10 @@ export const BarcodeScan: React.FC<Props> = () => {
       <div className="p-4">
         {/* 手動登録ボタン */}
         <div className="mb-4">
-          <ManualRegisterButton helpText="バーコードが読み取れない本を手動で登録できます" />
+          <ManualRegisterButton
+            helpText="バーコードが読み取れない本を手動で登録できます"
+            onSelectBook={onSelectBook}
+          />
         </div>
 
         {scanError && (
@@ -33,11 +35,11 @@ export const BarcodeScan: React.FC<Props> = () => {
         )}
         <EnhancedBarcodeScanner
           onDetect={(result) => {
-            setBook(result)
-            setOpen(true)
             if (!session) {
               setOpenLoginModal(true)
+              return
             }
+            onSelectBook(result)
           }}
           onError={(error) => {
             setScanError(error)
