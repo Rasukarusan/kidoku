@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useSetAtom } from 'jotai'
-import { openAddModalAtom, openLoginModalAtom } from '@/store/modal/atom'
-import { addBookAtom } from '@/store/book/atom'
+import { openLoginModalAtom } from '@/store/modal/atom'
 import { SearchResult } from '@/types/search'
 import { searchBookWithRetry } from '@/utils/bookApi'
 import { normalizeISBN } from '@/utils/isbn'
@@ -12,13 +11,12 @@ import { ManualRegisterButton } from './ManualRegisterButton'
 interface Props {
   isbn: string
   onClose: () => void
+  onSelectBook: (book: SearchResult) => void
 }
 
-export const ISBNSearchResult: React.FC<Props> = ({ isbn }) => {
+export const ISBNSearchResult: React.FC<Props> = ({ isbn, onSelectBook }) => {
   const { data: session } = useSession()
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
-  const setOpenAddModal = useSetAtom(openAddModalAtom)
-  const setBook = useSetAtom(addBookAtom)
   const [result, setResult] = useState<SearchResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -49,6 +47,14 @@ export const ISBNSearchResult: React.FC<Props> = ({ isbn }) => {
     return () => clearTimeout(timer)
   }, [isbn])
 
+  const handleClick = () => {
+    if (!session) {
+      setOpenLoginModal(true)
+      return
+    }
+    onSelectBook(result)
+  }
+
   return (
     <div className="p-4">
       <div className="mb-3 text-xs font-medium text-gray-400">ISBN検索</div>
@@ -63,12 +69,18 @@ export const ISBNSearchResult: React.FC<Props> = ({ isbn }) => {
       {error && !loading && (
         <div className="py-8 text-center">
           <p className="mb-4 text-sm text-gray-500">{error}</p>
-          <ManualRegisterButton helpText="見つからない場合は手動で登録できます" />
+          <ManualRegisterButton
+            helpText="見つからない場合は手動で登録できます"
+            onSelectBook={onSelectBook}
+          />
         </div>
       )}
 
       {result && !loading && (
-        <div className="flex flex-col items-center gap-4 rounded-lg border border-gray-200 p-4 sm:flex-row sm:items-start">
+        <button
+          className="flex w-full flex-col items-center gap-4 rounded-lg border border-gray-200 p-4 text-left transition-colors hover:bg-blue-50 sm:flex-row sm:items-start"
+          onClick={handleClick}
+        >
           <img
             className="h-[150px] w-auto shrink-0 object-contain"
             src={result.image}
@@ -82,21 +94,11 @@ export const ISBNSearchResult: React.FC<Props> = ({ isbn }) => {
               {result.author}
             </div>
             <div className="mt-1 text-xs text-gray-400">{result.category}</div>
-            <button
-              className="mt-4 w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700 sm:w-auto"
-              onClick={() => {
-                if (!session) {
-                  setOpenLoginModal(true)
-                  return
-                }
-                setBook(result)
-                setOpenAddModal(true)
-              }}
-            >
-              本を登録する
-            </button>
+            <div className="mt-4 text-sm font-medium text-blue-500">
+              この本を登録する →
+            </div>
           </div>
-        </div>
+        </button>
       )}
     </div>
   )
