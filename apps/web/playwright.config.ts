@@ -9,7 +9,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : isSandbox ? 1 : undefined,
   reporter: 'html',
-  timeout: isSandbox ? 60000 : 30000,
+  timeout: isSandbox ? 60000 : process.env.CI ? 90000 : 30000,
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
