@@ -1,27 +1,26 @@
 import { useSession } from 'next-auth/react'
 import { useSetAtom } from 'jotai'
-import { openAddModalAtom, openLoginModalAtom } from '@/store/modal/atom'
-import { addBookAtom } from '@/store/book/atom'
+import { openLoginModalAtom } from '@/store/modal/atom'
+import { SearchResult } from '@/types/search'
 
 interface ManualRegisterButtonProps {
   helpText: string
+  onSelectBook: (book: SearchResult) => void
 }
 
 export const ManualRegisterButton: React.FC<ManualRegisterButtonProps> = ({
   helpText,
+  onSelectBook,
 }) => {
   const { data: session } = useSession()
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
-  const setOpenAddModal = useSetAtom(openAddModalAtom)
-  const setBook = useSetAtom(addBookAtom)
 
   const handleManualRegister = () => {
     if (!session) {
       setOpenLoginModal(true)
       return
     }
-    // 空の本情報を設定してAddModalを開く
-    setBook({
+    onSelectBook({
       id: '',
       title: '',
       author: '',
@@ -29,7 +28,6 @@ export const ManualRegisterButton: React.FC<ManualRegisterButtonProps> = ({
       category: '-',
       memo: '',
     })
-    setOpenAddModal(true)
   }
 
   return (

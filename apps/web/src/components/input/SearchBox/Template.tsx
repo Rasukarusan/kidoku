@@ -1,8 +1,5 @@
 import { useState } from 'react'
 import { TemplateAddModal } from './TemplateAddModal'
-import { useSetAtom } from 'jotai'
-import { openAddModalAtom } from '@/store/modal/atom'
-import { addBookAtom } from '@/store/book/atom'
 import { FaRegTrashAlt } from 'react-icons/fa'
 import { Loading } from '@/components/icon/Loading'
 import { useMutation, useQuery } from '@apollo/client'
@@ -11,13 +8,15 @@ import {
   templateBooksQuery,
   deleteTemplateBookMutation,
 } from '@/features/template/api'
+import { SearchResult } from '@/types/search'
 
 interface Props {
   input: string
   onClose: () => void
+  onSelectBook: (book: SearchResult) => void
 }
 
-export const Template: React.FC<Props> = () => {
+export const Template: React.FC<Props> = ({ onSelectBook }) => {
   const { data: session } = useSession()
   const [open, setOpen] = useState(false)
   const [hoverTemplate, setHoverTemplate] = useState(null)
@@ -25,8 +24,6 @@ export const Template: React.FC<Props> = () => {
   const [deleteTemplateBook] = useMutation(deleteTemplateBookMutation, {
     refetchQueries: [{ query: templateBooksQuery }],
   })
-  const setOpenAddModal = useSetAtom(openAddModalAtom)
-  const setSelectItem = useSetAtom(addBookAtom)
 
   return (
     <>
@@ -64,7 +61,7 @@ export const Template: React.FC<Props> = () => {
                 className="m-2 h-[140px] w-[96px] rounded-md text-2xl shadow-md hover:brightness-95 sm:h-[156px] sm:w-[108px]"
                 onClick={() => {
                   const { id, title, memo, author, category, image } = template
-                  setSelectItem({
+                  onSelectBook({
                     id,
                     title,
                     author,
@@ -72,7 +69,6 @@ export const Template: React.FC<Props> = () => {
                     category,
                     memo,
                   })
-                  setOpenAddModal(true)
                 }}
               >
                 <img src={template.image} alt="" />

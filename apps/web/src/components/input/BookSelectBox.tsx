@@ -14,7 +14,7 @@ export const BookSelectBox: React.FC<Props> = ({
   label,
   tabIndex,
   readonly = false,
-  // eslint-disable-next-line
+
   onChange = () => {},
   isChanged = false,
 }) => {
