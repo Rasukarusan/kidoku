@@ -1,116 +1,154 @@
-# kidoku
+<div align="center">
 
-読書記録・分析アプリケーション - AIによる読書傾向分析機能付き
+# Kidoku
 
-https://kidoku.net/
+**Your Personal Reading Tracker & Analytics**
 
-<img width="1247" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
-<img width="1059" alt="image" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
+AI-powered reading habit analysis with barcode scanning, full-text search, and beautiful statistics.
 
-## 機能
+[Demo](https://kidoku.net/) | [Contributing](./CONTRIBUTING.md) | [Documentation](./docs/)
 
-- 本の検索と登録（バーコードスキャン、タイトル検索）
-- 年別シートでの読書記録管理
-- AIによる読書傾向分析（Cohere）
-- 統計データ（月別読書数、カテゴリ別内訳）
-- MeiliSearchによる高速全文検索
+[![CI](https://github.com/Rasukarusan/kidoku/actions/workflows/ci.yml/badge.svg)](https://github.com/Rasukarusan/kidoku/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-## アーキテクチャ
+</div>
 
-| 項目 | 技術 |
-|------|------|
-| モノレポ管理 | Turborepo + pnpm workspaces |
-| フロントエンド | Next.js 14 + React 18 + TypeScript |
-| バックエンド | NestJS 11 + GraphQL（DDD構成） |
-| データベース | MySQL + Prisma / Drizzle ORM |
-| 認証 | NextAuth.js (Google OAuth) |
-| 検索 | MeiliSearch (日本語対応版) |
+<img width="1247" alt="Kidoku - Reading record management" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
+<img width="1059" alt="Kidoku - Reading statistics" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
+
+---
+
+## Features
+
+- **Book Registration** - Search by title or scan a barcode to add books instantly
+- **Yearly Reading Sheets** - Organize your reading history by year with visual cards
+- **AI Reading Analysis** - Discover your reading tendencies with Cohere-powered insights
+- **Reading Statistics** - Monthly reading counts, category breakdowns, and trends
+- **Full-Text Search** - Lightning-fast Japanese full-text search powered by MeiliSearch
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Monorepo | Turborepo + pnpm workspaces |
+| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS |
+| Backend | NestJS 11, GraphQL, DDD architecture |
+| Database | MySQL 9.3 + Prisma ORM |
+| Auth | NextAuth.js (Google OAuth) |
+| Search | MeiliSearch (Japanese-optimized build) |
 | AI | Cohere |
-| 決済 | Stripe |
+| Payments | Stripe |
 
-## プロジェクト構成
+## Project Structure
 
 ```
 kidoku/
 ├── apps/
-│   ├── web/          # Next.jsフロントエンド
-│   └── api/          # NestJS GraphQL API
-├── docker/           # Docker設定
-└── .github/          # GitHub Actions
+│   ├── web/          # Next.js frontend
+│   └── api/          # NestJS GraphQL API (DDD)
+├── packages/
+│   └── eslint-config # Shared ESLint configuration
+├── docker/           # MeiliSearch & MySQL containers
+├── docs/             # Architecture & deployment docs
+└── scripts/          # Development automation scripts
 ```
 
-詳細は各アプリのREADMEを参照：
-- [apps/web/README.md](./apps/web/README.md) - フロントエンド
-- [apps/api/DEPLOYMENT.md](./apps/api/DEPLOYMENT.md) - APIデプロイ
+## Getting Started
 
-## 環境構築
+### Prerequisites
 
-### 前提条件
-
-- Node.js 22以上
-- pnpm 10.5.2以上
+- Node.js >= 22
+- pnpm >= 10.5.2
 - Docker & Docker Compose
 
-### セットアップ
+### Setup
 
 ```bash
-# 依存関係のインストール
+# Install dependencies
 pnpm install
 
-# 環境変数の設定
+# Configure environment variables
 cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
 
-# Dockerサービスの起動
+# Start Docker services (MySQL, MeiliSearch)
 docker-compose up -d
 
-# データベースのセットアップ
+# Set up database
 pnpm --filter web db:push
 pnpm --filter web prisma generate
 pnpm --filter api db:push
 
-# 開発サーバーの起動
+# Start all dev servers
 pnpm dev
 ```
 
-### 検索環境(meilisearch)構築
+### Access URLs
+
+| Service | URL |
+|---------|-----|
+| Web App | http://localhost:3000 |
+| GraphQL API | http://localhost:4000/graphql |
+| MeiliSearch | http://localhost:7700 |
+
+### Search Setup (MeiliSearch)
 
 ```bash
 docker-compose up --build
 
-# meilisearchが構築できていることを確認
-# 初回はモーダルに.envに記載のMEILI_MASTER_KEYを入力
-open http://localhost:7700
-
-# meilisearchにドキュメント登録
-curl -XPOST -H "Authorization: Bearer ${ADMIN_AUTH_TOKEN}" http://localhost:3000/api/batch/meilisearch
-# {"result":true}
+# Register documents in MeiliSearch
+curl -XPOST -H "Authorization: Bearer ${ADMIN_AUTH_TOKEN}" \
+  http://localhost:3000/api/batch/meilisearch
 ```
 
-### アクセスURL
-
-- **Webアプリ**: http://localhost:3000
-- **GraphQL API**: http://localhost:4000/graphql
-- **MeiliSearch**: http://localhost:7700
-
-## 開発コマンド
+## Development
 
 ```bash
-pnpm dev              # 全サービス起動
-pnpm build            # ビルド
-pnpm lint             # リント
-pnpm format           # フォーマット
-pnpm check-types      # 型チェック
+pnpm dev              # Start all services
+pnpm build            # Build all packages
+pnpm lint             # Run linter
+pnpm lint:fix         # Auto-fix lint issues
+pnpm format           # Format code with Prettier
+pnpm check-types      # Type checking
+pnpm validate         # Run lint + type check + tests (all-in-one)
 ```
 
-## 貢献
+### Testing
 
-1. フォーク
-2. 機能ブランチを作成: `git checkout -b feature/amazing-feature`
-3. コミット: `git commit -m 'Add amazing feature'`
-4. プッシュ: `git push origin feature/amazing-feature`
-5. Pull Request作成
+```bash
+# Frontend
+pnpm --filter web test          # Unit tests
+pnpm --filter web test:c        # With coverage
 
-## ライセンス
+# Backend
+pnpm --filter api test          # Unit tests
+pnpm --filter api test:e2e      # E2E tests
+```
 
-MIT
+## Architecture
+
+The backend API follows **Domain-Driven Design (DDD)** with a layered architecture:
+
+```
+apps/api/src/
+├── domain/           # Core business logic (entities, repository interfaces)
+├── application/      # Use cases
+├── infrastructure/   # External integrations (DB, auth)
+├── presentation/     # GraphQL resolvers, DTOs, modules
+└── shared/           # Cross-cutting concerns
+```
+
+**Dependency rules**: `domain` has no dependencies. `application` depends only on `domain`. `infrastructure` implements `domain` interfaces. `presentation` orchestrates via `application`.
+
+For detailed architecture documentation, see:
+- [Security & Authentication](./docs/SECURITY.md)
+- [Admin API & Batch Processing](./docs/ADMIN_API.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+## License
+
+[MIT](./LICENSE) - Naoto Tanaka
