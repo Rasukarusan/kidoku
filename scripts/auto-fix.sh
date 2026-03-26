@@ -34,11 +34,23 @@ fix_docker() {
     return 0
   fi
   yellow "Docker デーモンを起動中..."
-  if command -v update-alternatives &>/dev/null; then
-    sudo update-alternatives --set iptables /usr/sbin/iptables-legacy 2>/dev/null || true
-    sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy 2>/dev/null || true
+
+  # サンドボックスのエグレスプロキシを Docker デーモンに設定
+  if [ -n "${HTTP_PROXY:-}" ]; then
+    sudo mkdir -p /etc/docker
+    cat <<DAEMON_EOF | sudo tee /etc/docker/daemon.json >/dev/null
+{
+  "proxies": {
+    "http-proxy": "${HTTP_PROXY}",
+    "https-proxy": "${HTTPS_PROXY:-${HTTP_PROXY}}",
+    "no-proxy": "localhost,127.0.0.1"
+  },
+  "dns": ["8.8.8.8", "8.8.4.4"]
+}
+DAEMON_EOF
   fi
-  sudo -E dockerd --iptables=false --bridge=none --storage-driver=vfs &>"$LOG_DIR/dockerd.log" &
+
+  sudo -E dockerd &>"$LOG_DIR/dockerd.log" &
   for i in $(seq 1 30); do
     if docker info &>/dev/null; then
       green "Docker: 修復完了"
@@ -53,7 +65,7 @@ fix_docker() {
 }
 
 # ==============================================================================
-# MariaDB 修復
+# MySQL 修復（docker compose 経由）
 # ==============================================================================
 fix_db() {
   # Docker が必要
@@ -61,46 +73,39 @@ fix_db() {
     fix_docker || return 1
   fi
 
-  if docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SELECT 1" &>/dev/null; then
-    green "MariaDB: 正常"
+  if docker exec kidoku_db mysql -u dev -ppass kidoku -e "SELECT 1" &>/dev/null; then
+    green "MySQL: 正常"
     return 0
   fi
 
-  # コンテナが存在するが停止している場合
-  if docker ps -a --format '{{.Names}}' | grep -q '^kidoku_db$'; then
-    yellow "MariaDB コンテナを再起動中..."
-    docker start kidoku_db
-  else
-    yellow "MariaDB コンテナを作成中..."
-    docker run -d --name kidoku_db --network=host \
-      -e MARIADB_ROOT_PASSWORD=pass \
-      -e MARIADB_DATABASE=kidoku \
-      -e MARIADB_USER=dev \
-      -e MARIADB_PASSWORD=pass \
-      mariadb:lts
+  # docker compose で起動（.env がなければ作成）
+  cd "$PROJECT_ROOT"
+  if [ ! -f "$PROJECT_ROOT/.env" ]; then
+    cp "$PROJECT_ROOT/.env.example" "$PROJECT_ROOT/.env"
   fi
+
+  yellow "MySQL コンテナを docker compose で起動中..."
+  docker compose up -d db 2>"$LOG_DIR/docker-compose.log"
 
   # 接続待ち
   for i in $(seq 1 30); do
-    if docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SELECT 1" &>/dev/null; then
-      green "MariaDB: 修復完了"
+    if docker exec kidoku_db mysql -u dev -ppass kidoku -e "SELECT 1" &>/dev/null; then
+      green "MySQL: 修復完了"
       FIXED=$((FIXED + 1))
 
       # テーブルが存在するか確認
-      TABLE_COUNT=$(docker exec kidoku_db mariadb -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='kidoku'" 2>/dev/null || echo "0")
+      TABLE_COUNT=$(docker exec kidoku_db mysql -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='kidoku'" 2>/dev/null || echo "0")
       if [ "$TABLE_COUNT" -eq 0 ] 2>/dev/null; then
         yellow "テーブルが存在しません。Prisma db push を実行中..."
-        cd "$PROJECT_ROOT"
-        DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" pnpm --filter web exec prisma db push --skip-generate 2>"$LOG_DIR/prisma-push.log"
+        DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" pnpm --filter web exec prisma db push --skip-generate 2>"$LOG_DIR/prisma-push.log"
         green "Prisma db push 完了"
       fi
 
       # ユーザーが存在するか確認
-      USER_COUNT=$(docker exec kidoku_db mariadb -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM users" 2>/dev/null || echo "0")
+      USER_COUNT=$(docker exec kidoku_db mysql -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM users" 2>/dev/null || echo "0")
       if [ "$USER_COUNT" -eq 0 ] 2>/dev/null; then
         yellow "シードデータを投入中..."
-        cd "$PROJECT_ROOT"
-        DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" node scripts/sandbox-seed.js 2>"$LOG_DIR/seed.log" || true
+        DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" node scripts/sandbox-seed.js 2>"$LOG_DIR/seed.log" || true
         green "シードデータ投入完了"
       fi
 
@@ -108,13 +113,13 @@ fix_db() {
     fi
     sleep 1
   done
-  red "MariaDB: 修復失敗"
+  red "MySQL: 修復失敗"
   FAILED=$((FAILED + 1))
   return 1
 }
 
 # ==============================================================================
-# MeiliSearch 修復
+# MeiliSearch 修復（docker compose 経由）
 # ==============================================================================
 fix_meili() {
   if ! docker info &>/dev/null; then
@@ -126,16 +131,20 @@ fix_meili() {
     return 0
   fi
 
-  if docker ps -a --format '{{.Names}}' | grep -q '^kidoku_meilisearch$'; then
-    yellow "MeiliSearch コンテナを再起動中..."
-    docker start kidoku_meilisearch
-  else
-    yellow "MeiliSearch コンテナを作成中..."
-    docker run -d --name kidoku_meilisearch --network=host \
-      -e MEILI_HTTP_ADDR=0.0.0.0:7700 \
-      -e MEILI_MASTER_KEY=YourMasterKey \
-      getmeili/meilisearch:prototype-japanese-6
+  cd "$PROJECT_ROOT"
+  if [ ! -f "$PROJECT_ROOT/.env" ]; then
+    cp "$PROJECT_ROOT/.env.example" "$PROJECT_ROOT/.env"
   fi
+
+  # データディレクトリの互換性問題がある場合はクリア
+  if docker compose logs meilisearch 2>/dev/null | grep -q "failed to infer the version"; then
+    yellow "MeiliSearch データをクリア中（バージョン不一致）..."
+    docker compose rm -f meilisearch 2>/dev/null || true
+    rm -rf "$PROJECT_ROOT/docker/meilisearch/data/meilisearch"
+  fi
+
+  yellow "MeiliSearch コンテナを docker compose で起動中..."
+  docker compose up -d meilisearch 2>"$LOG_DIR/docker-compose.log"
 
   for i in $(seq 1 20); do
     if curl -s -o /dev/null -w '%{http_code}' http://localhost:7700/health 2>/dev/null | grep -q '200'; then
