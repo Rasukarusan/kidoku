@@ -309,7 +309,7 @@ pnpm --filter web lighthouse
 ### MeiliSearch
 
 - 日本語プロトタイプビルド使用のため、通常版との互換性なし
-- インデックスリセット時は`docker-compose restart meilisearch`
+- インデックスリセット時は`docker compose restart meilisearch`
 
 ### デプロイ（GitHub Actions）
 
@@ -464,7 +464,7 @@ git commit -m "feat: 機能の説明"
 |---|---|---|
 | `ECONNREFUSED :3000` | Webサーバー停止 | `bash scripts/auto-fix.sh web` |
 | `ECONNREFUSED :4000` | APIサーバー停止 | `bash scripts/auto-fix.sh api` |
-| `Can't reach database server` | MariaDBコンテナ停止 | `bash scripts/auto-fix.sh db` |
+| `Can't reach database server` | MySQLコンテナ停止 | `bash scripts/auto-fix.sh db` |
 | `Table 'kidoku.xxx' doesn't exist` | db:push 漏れ | `pnpm --filter web db:push && pnpm --filter api db:push` |
 | `Unknown type "XxxInput"` | codegen 漏れ | `pnpm --filter web codegen` |
 | `Cannot find module '@prisma/client'` | prisma generate 漏れ | `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web prisma generate && PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api prisma generate` |
@@ -496,9 +496,9 @@ pnpm --filter api prisma generate
 
 ```bash
 # 全コンテナ再起動
-docker-compose down && docker-compose up -d
+docker compose down && docker compose up -d
 
 # MeiliSearchデータリセット
 rm -rf docker/meilisearch/data/meilisearch
-docker-compose up -d meilisearch
+docker compose up -d meilisearch
 ```

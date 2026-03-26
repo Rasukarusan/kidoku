@@ -43,21 +43,30 @@ fi
 green "依存パッケージのインストール完了"
 
 # ==============================================================================
-# 3. iptables を legacy に切り替え
-# ==============================================================================
-if command -v update-alternatives &>/dev/null; then
-  yellow "iptables を legacy モードに切り替え中..."
-  sudo update-alternatives --set iptables /usr/sbin/iptables-legacy 2>/dev/null || true
-  sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy 2>/dev/null || true
-  green "iptables 設定完了"
-fi
-
-# ==============================================================================
-# 4. Docker デーモン起動
+# 3. Docker デーモン起動（プロキシ設定付き）
 # ==============================================================================
 if ! docker info &>/dev/null; then
   yellow "Docker デーモンを起動中..."
-  sudo -E dockerd --iptables=false --bridge=none --storage-driver=vfs &>"$LOG_DIR/dockerd.log" &
+
+  # サンドボックスのエグレスプロキシを Docker デーモンに設定
+  # curl/npm 等は HTTP_PROXY 環境変数で外部通信できるが、Docker デーモンは
+  # daemon.json の proxies 設定が必要
+  if [ -n "${HTTP_PROXY:-}" ]; then
+    sudo mkdir -p /etc/docker
+    cat <<DAEMON_EOF | sudo tee /etc/docker/daemon.json >/dev/null
+{
+  "proxies": {
+    "http-proxy": "${HTTP_PROXY}",
+    "https-proxy": "${HTTPS_PROXY:-${HTTP_PROXY}}",
+    "no-proxy": "localhost,127.0.0.1"
+  },
+  "dns": ["8.8.8.8", "8.8.4.4"]
+}
+DAEMON_EOF
+    green "Docker プロキシ設定完了"
+  fi
+
+  sudo -E dockerd &>"$LOG_DIR/dockerd.log" &
   # デーモン起動待ち（最大30秒）
   for i in $(seq 1 30); do
     if docker info &>/dev/null; then
@@ -76,71 +85,39 @@ else
 fi
 
 # ==============================================================================
-# 5. DB コンテナ起動（MariaDB）
+# 4. docker compose でコンテナ起動（MySQL + MeiliSearch）
 # ==============================================================================
-if docker ps --format '{{.Names}}' | grep -q '^kidoku_db$'; then
-  green "MariaDB コンテナは既に起動済み"
-elif docker ps -a --format '{{.Names}}' | grep -q '^kidoku_db$'; then
-  yellow "MariaDB コンテナを再起動中..."
-  docker start kidoku_db
-  green "MariaDB コンテナ再起動完了"
-else
-  yellow "MariaDB コンテナを作成中..."
-  docker run -d --name kidoku_db --network=host \
-    -e MARIADB_ROOT_PASSWORD=pass \
-    -e MARIADB_DATABASE=kidoku \
-    -e MARIADB_USER=dev \
-    -e MARIADB_PASSWORD=pass \
-    mariadb:lts
-  green "MariaDB コンテナ作成完了"
+yellow "docker compose でコンテナを起動中..."
+cd "$PROJECT_ROOT"
+
+# .env がなければ .env.example からコピー（docker-compose.yml が参照する変数用）
+if [ ! -f "$PROJECT_ROOT/.env" ]; then
+  cp "$PROJECT_ROOT/.env.example" "$PROJECT_ROOT/.env"
+  green ".env ファイル生成完了"
 fi
 
-# ==============================================================================
-# 6. MeiliSearch コンテナ起動
-# ==============================================================================
-if docker ps --format '{{.Names}}' | grep -q '^kidoku_meilisearch$'; then
-  green "MeiliSearch コンテナは既に起動済み"
-elif docker ps -a --format '{{.Names}}' | grep -q '^kidoku_db$'; then
-  yellow "MeiliSearch コンテナを再起動中..."
-  docker start kidoku_meilisearch 2>/dev/null || {
-    docker run -d --name kidoku_meilisearch --network=host \
-      -e MEILI_HTTP_ADDR=0.0.0.0:7700 \
-      -e MEILI_MASTER_KEY=YourMasterKey \
-      getmeili/meilisearch:prototype-japanese-6
-  }
-  green "MeiliSearch コンテナ起動完了"
-else
-  yellow "MeiliSearch コンテナを作成中..."
-  docker run -d --name kidoku_meilisearch --network=host \
-    -e MEILI_HTTP_ADDR=0.0.0.0:7700 \
-    -e MEILI_MASTER_KEY=YourMasterKey \
-    getmeili/meilisearch:prototype-japanese-6
-  green "MeiliSearch コンテナ作成完了"
-fi
+# docker compose up（イメージ未取得ならpullも実行）
+docker compose up -d 2>"$LOG_DIR/docker-compose.log"
+green "docker compose up 完了"
 
-# コンテナ起動待ち
-yellow "コンテナの起動を待機中..."
+# DB コンテナ起動待ち（最大30秒）
+yellow "MySQL の起動を待機中..."
 for i in $(seq 1 30); do
-  if docker exec kidoku_db mariadb -u dev -ppass -e "SELECT 1" &>/dev/null; then
+  if docker exec kidoku_db mysql -u dev -ppass -e "SELECT 1" &>/dev/null; then
     break
   fi
   sleep 1
 done
-green "コンテナ起動確認完了"
-
-# ==============================================================================
-# 7. 環境変数ファイル生成
-# ==============================================================================
-DB_URL="mysql://dev:pass@localhost:3306/kidoku"
-
-if [ ! -f "$PROJECT_ROOT/.env" ]; then
-  cp "$PROJECT_ROOT/.env.example" "$PROJECT_ROOT/.env"
-  sed -i 's|DB_HOST=.*|DB_HOST=localhost|' "$PROJECT_ROOT/.env"
-  sed -i 's|DB_PORT=.*|DB_PORT=3306|' "$PROJECT_ROOT/.env"
-  green ".env ファイル生成完了"
+if docker exec kidoku_db mysql -u dev -ppass -e "SELECT 1" &>/dev/null; then
+  green "MySQL 起動確認完了"
 else
-  green ".env ファイルは既に存在"
+  red "MySQL の起動に失敗しました。ログ: docker compose logs db"
 fi
+
+# ==============================================================================
+# 5. 環境変数ファイル生成
+# ==============================================================================
+DB_URL="mysql://dev:pass@localhost:13306/kidoku"
 
 if [ ! -f "$PROJECT_ROOT/apps/web/.env" ]; then
   cp "$PROJECT_ROOT/apps/web/.env.example" "$PROJECT_ROOT/apps/web/.env"
@@ -168,7 +145,7 @@ sed -i "s|^DATABASE_URL=.*|DATABASE_URL=\"$DB_URL\"|" "$PROJECT_ROOT/apps/api/.e
 sed -i 's|^MEILI_HOST=.*|MEILI_HOST=http://localhost:7700|' "$PROJECT_ROOT/apps/api/.env"
 
 # ==============================================================================
-# 8. Prisma スキーマ反映 + クライアント生成
+# 6. Prisma スキーマ反映 + クライアント生成
 # ==============================================================================
 yellow "Prisma スキーマを DB に反映中..."
 DATABASE_URL="$DB_URL" pnpm --filter web exec prisma db push --skip-generate 2>"$LOG_DIR/prisma-push.log"
@@ -180,9 +157,9 @@ PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api exec prisma generate 
 green "Prisma クライアント生成完了"
 
 # ==============================================================================
-# 9. シードデータ投入
+# 7. シードデータ投入
 # ==============================================================================
-SEED_CHECK=$(docker exec kidoku_db mariadb -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM users" 2>/dev/null || echo "0")
+SEED_CHECK=$(docker exec kidoku_db mysql -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM users" 2>/dev/null || echo "0")
 if [ "$SEED_CHECK" = "0" ] || [ "$SEED_CHECK" = "" ]; then
   yellow "シードデータを投入中..."
   DATABASE_URL="$DB_URL" node "$PROJECT_ROOT/scripts/sandbox-seed.js" 2>"$LOG_DIR/seed.log" || {
@@ -194,7 +171,7 @@ else
 fi
 
 # ==============================================================================
-# 10. MeiliSearch シードデータ投入
+# 8. MeiliSearch シードデータ投入
 # ==============================================================================
 MEILI_HEALTH=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:7700/health 2>/dev/null || echo "000")
 if [ "$MEILI_HEALTH" = "200" ]; then
@@ -217,12 +194,12 @@ else
 fi
 
 # ==============================================================================
-# 11. 開発サーバー起動
+# 9. 開発サーバー起動
 # ==============================================================================
 "$SCRIPT_DIR/dev-server.sh" start
 
 # ==============================================================================
-# 12. ヘルスチェック
+# 10. ヘルスチェック
 # ==============================================================================
 "$SCRIPT_DIR/health-check.sh"
 

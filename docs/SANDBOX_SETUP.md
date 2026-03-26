@@ -1,8 +1,8 @@
 # サンドボックス環境セットアップ手順
 
-[Claude Code on the Web](https://code.claude.com/docs/ja/claude-code-on-the-web) のクラウドサンドボックス環境で Docker コンテナを立ち上げ、DB テーブルを作成するまでの手順書。
+[Claude Code on the Web](https://code.claude.com/docs/ja/claude-code-on-the-web) のクラウドサンドボックス環境で docker compose を使ってコンテナを起動し、DB テーブルを作成するまでの手順書。
 
-> **注意**: この手順は Claude Code on the Web（クラウドVM）専用です。ローカル開発では docker-compose を使ってください。
+> **注意**: この手順は Claude Code on the Web（クラウドVM）専用です。ローカル開発でも同じ docker-compose.yml を使用できます。
 
 ## 自動セットアップ（推奨）
 
@@ -26,6 +26,7 @@ SANDBOX=1 bash scripts/sandbox-setup.sh
 | `scripts/sandbox-setup.sh` | 環境の一括セットアップ（Docker・DB・シード・サーバー起動） |
 | `scripts/dev-server.sh start\|stop\|restart\|status\|logs` | 開発サーバーの管理 |
 | `scripts/health-check.sh` | 全コンポーネントのヘルスチェック |
+| `scripts/auto-fix.sh` | 個別コンポーネントの自動診断・修復 |
 | `scripts/ui-check.sh [パス...]` | 指定ページのスクリーンショット撮影（裏口ログイン付き） |
 
 ### AI Agent 自律開発の仕組み
@@ -47,9 +48,8 @@ SANDBOX=1 bash scripts/sandbox-setup.sh
 
 ## 前提
 
-- Docker コマンドはプリインストール済み（Docker 29.2.1）
-- カーネルが古い（Linux 4.4.0）ため `nftables` 非対応
-- ネットワークは egress プロキシ経由（ホワイトリスト方式）
+- Docker コマンドはプリインストール済み（Docker 29.2.1 + Compose v5）
+- ネットワークはエグレスプロキシ経由（Docker デーモンにプロキシ設定が必要）
 
 ## 手順
 
@@ -65,78 +65,79 @@ pnpm install
 cp .env.example .env
 ```
 
-`.env` の DB 関連を以下のように変更する（サンドボックスではホストネットワーク上の `3306` を使用）:
+`.env` の内容（docker-compose.yml が参照する変数）:
 
 ```
-DB_HOST=localhost
-DB_PORT=3306
+MEILI_MASTER_KEY=YourMasterKey
+MEILI_HTTP_ADDR=0.0.0.0:7700
+DB_HOST=db
+DB_PORT=13306
 DB_USER=dev
 DB_PASS=pass
 DB_NAME=kidoku
-DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku"
 ```
 
-### 3. iptables を legacy に切り替え
+### 3. Docker デーモン起動（プロキシ設定付き）
 
-nftables がカーネル非対応のため:
-
-```bash
-sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
-sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-```
-
-### 4. Docker デーモンを起動
+サンドボックス環境では外部通信がエグレスプロキシ経由に制限されています。
+Docker デーモンがイメージを pull するには、`daemon.json` にプロキシを設定する必要があります。
 
 ```bash
-sudo -E dockerd --iptables=false --bridge=none --storage-driver=vfs &>/tmp/dockerd.log &
+# daemon.json にプロキシ設定を書き込む
+sudo mkdir -p /etc/docker
+cat <<EOF | sudo tee /etc/docker/daemon.json
+{
+  "proxies": {
+    "http-proxy": "${HTTP_PROXY}",
+    "https-proxy": "${HTTPS_PROXY}",
+    "no-proxy": "localhost,127.0.0.1"
+  },
+  "dns": ["8.8.8.8", "8.8.4.4"]
+}
+EOF
+
+# Docker デーモン起動
+sudo -E dockerd &>/tmp/kidoku/dockerd.log &
 sleep 5
 docker info  # 起動確認
 ```
 
-### 5. DB コンテナ起動（MariaDB）
+> **ポイント**: `--iptables=false` や `--bridge=none` は不要です。プロキシ設定さえあれば通常モードで起動できます。
 
-MySQL イメージは pull 不可のため MariaDB で代替する。`--network=host` 必須。
+### 4. docker compose でコンテナ起動
 
 ```bash
-docker run -d --name kidoku_db --network=host \
-  -e MARIADB_ROOT_PASSWORD=pass \
-  -e MARIADB_DATABASE=kidoku \
-  -e MARIADB_USER=dev \
-  -e MARIADB_PASSWORD=pass \
-  mariadb:lts
+docker compose up -d
 ```
 
-### 6. MeiliSearch コンテナ起動
+MySQL 9.3 と MeiliSearch（日本語版）が起動します。
+
+### 5. コンテナ起動確認
 
 ```bash
-docker run -d --name kidoku_meilisearch --network=host \
-  -e MEILI_HTTP_ADDR=0.0.0.0:7700 \
-  -e MEILI_MASTER_KEY=YourMasterKey \
-  getmeili/meilisearch:prototype-japanese-6
+docker compose ps
 ```
 
-### 7. コンテナ起動確認
+`kidoku_db` と `kidoku-meilisearch-1` が `Up` になっていることを確認。
+
+> **MeiliSearch のバージョン不一致エラー**: `failed to infer the version of the database` が出た場合は、データディレクトリをクリアして再起動:
+> ```bash
+> docker compose rm -f meilisearch
+> rm -rf docker/meilisearch/data/meilisearch
+> docker compose up -d meilisearch
+> ```
+
+### 6. DB テーブル作成（Prisma db push）
 
 ```bash
-sleep 15 && docker ps
-```
-
-MariaDB と MeiliSearch の両方が `Up` になっていることを確認。
-
-### 8. DB テーブル作成（Prisma db push）
-
-Prisma スキーマを DB に反映してテーブルを作成する。
-`DATABASE_URL` に Accelerate URL が設定されている場合は、環境変数で直接接続先を上書きする。
-
-```bash
-DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" \
+DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" \
   npx prisma db push --schema=apps/web/prisma/schema.prisma
 ```
 
-### 9. テーブル作成確認
+### 7. テーブル作成確認
 
 ```bash
-docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SHOW TABLES;"
+docker exec kidoku_db mysql -u dev -ppass kidoku -e "SHOW TABLES;"
 ```
 
 以下のテーブルが作成されていれば成功:
@@ -153,16 +154,16 @@ docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SHOW TABLES;"
 | verificationtokens |
 | yearly_top_books |
 
-### 10. シードデータ投入（オプション）
+### 8. シードデータ投入（オプション）
 
 開発用のサンプルデータを投入する。テストユーザー・本棚・書籍（19冊）・年間ベスト・AI要約・テンプレートが作成される。
 
 ```bash
-DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" \
+DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" \
   npx tsx apps/web/prisma/seed.ts
 ```
 
-### 11. 各アプリの環境変数ファイルを作成
+### 9. 各アプリの環境変数ファイルを作成
 
 ```bash
 cp apps/web/.env.example apps/web/.env
@@ -172,7 +173,7 @@ cp apps/api/.env.example apps/api/.env
 `apps/web/.env` を編集:
 
 ```
-DATABASE_URL=mysql://dev:pass@localhost:3306/kidoku
+DATABASE_URL=mysql://dev:pass@localhost:13306/kidoku
 NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN=true
 BACKDOOR_USER_EMAIL=test@example.com
 ```
@@ -180,18 +181,18 @@ BACKDOOR_USER_EMAIL=test@example.com
 `apps/api/.env` を編集:
 
 ```
-DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku"
+DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku"
 MEILI_HOST=http://localhost:7700
 ```
 
-### 12. Prisma クライアント生成
+### 10. Prisma クライアント生成
 
 ```bash
-PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/web/prisma/schema.prisma
-PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma@5 generate --schema=apps/api/prisma/schema.prisma
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma generate --schema=apps/web/prisma/schema.prisma
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma generate --schema=apps/api/prisma/schema.prisma
 ```
 
-### 13. 開発サーバー起動
+### 11. 開発サーバー起動
 
 **バックエンド（NestJS API）**:
 
@@ -209,7 +210,7 @@ pnpm --filter web dev
 
 `✓ Ready` が表示されれば成功。
 
-### 14. 動作確認
+### 12. 動作確認
 
 **フロントエンド**:
 
@@ -230,17 +231,17 @@ curl -s http://localhost:4000/graphql -X POST \
 **バックエンド（認証付きでデータ取得）**:
 
 GraphQL の `sheets` / `books` クエリは HMAC-SHA256 署名が必要。
-以下のスクリプトでテストユーザーの作成からデータ取得まで確認できる（手順10でseed実行済みの場合、手順1・2はスキップ可）。
+以下のスクリプトでテストユーザーの作成からデータ取得まで確認できる（手順8でseed実行済みの場合、手順1・2はスキップ可）。
 
 ```bash
 # 1. テストユーザー作成
-docker exec kidoku_db mariadb -u dev -ppass kidoku -e "
+docker exec kidoku_db mysql -u dev -ppass kidoku -e "
   INSERT IGNORE INTO users (id, name, email, admin)
   VALUES ('test-user-id', 'testuser', 'test@example.com', 0);
 "
 
 # 2. テストデータ投入（シート＋本）
-docker exec kidoku_db mariadb -u dev -ppass kidoku -e "
+docker exec kidoku_db mysql -u dev -ppass kidoku -e "
   INSERT IGNORE INTO sheets (id, user_id, name, \`order\`)
   VALUES (1, 'test-user-id', 'テスト本棚', 1);
   INSERT IGNORE INTO books (id, user_id, sheet_id, title, author, category, image, impression, memo, is_public_memo, is_purchasable, created, updated)
@@ -356,73 +357,56 @@ node /tmp/screenshot_login.mjs
 ### 1. Docker デーモン起動
 
 ```bash
-sudo -E dockerd --iptables=false --bridge=none --storage-driver=vfs &>/tmp/dockerd.log &
+# プロキシ設定が /etc/docker/daemon.json に残っていれば再設定不要
+sudo -E dockerd &>/tmp/kidoku/dockerd.log &
 sleep 5 && docker info
 ```
 
 ### 2. コンテナ再起動
 
-既存コンテナが残っている場合は `start`、なければ `run` で再作成する。
-
 ```bash
-# 既存コンテナの再起動を試みる
-docker start kidoku_db kidoku_meilisearch 2>/dev/null || {
-  echo "コンテナが存在しないため再作成..."
-  docker run -d --name kidoku_db --network=host \
-    -e MARIADB_ROOT_PASSWORD=pass \
-    -e MARIADB_DATABASE=kidoku \
-    -e MARIADB_USER=dev \
-    -e MARIADB_PASSWORD=pass \
-    mariadb:lts
-  docker run -d --name kidoku_meilisearch --network=host \
-    -e MEILI_HTTP_ADDR=0.0.0.0:7700 \
-    -e MEILI_MASTER_KEY=YourMasterKey \
-    getmeili/meilisearch:prototype-japanese-6
-}
-sleep 15 && docker ps
+docker compose up -d
 ```
 
-> **注意**: コンテナの `start` が失敗する場合（`Error: No such container`）は、先に `docker rm -f kidoku_db kidoku_meilisearch` してから `docker run` で再作成する。
+> コンテナの状態が壊れている場合は `docker compose down && docker compose up -d` で再作成。
 
 ### 3. DB テーブル・データ確認
 
 ```bash
 # テーブルが存在するか確認
-docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SHOW TABLES;"
+docker exec kidoku_db mysql -u dev -ppass kidoku -e "SHOW TABLES;"
 
 # テーブルがなければ再作成
-DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" \
+DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" \
   npx prisma db push --schema=apps/web/prisma/schema.prisma
 
 # データがなければシード再投入
-DATABASE_URL="mysql://dev:pass@localhost:3306/kidoku" \
+DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" \
   npx tsx apps/web/prisma/seed.ts
 ```
 
 ### 4. 開発サーバー起動
 
 ```bash
-# バックエンド
-pnpm --filter api dev > /tmp/api.log 2>&1 &
-sleep 10 && tail -3 /tmp/api.log
+bash scripts/dev-server.sh start
+```
 
-# フロントエンド
-pnpm --filter web dev > /tmp/web.log 2>&1 &
-sleep 20 && curl -s -o /dev/null -w "%{http_code}" http://localhost:3000
-# → 200 が返れば OK
+または自動修復スクリプトで一括対応:
+
+```bash
+bash scripts/auto-fix.sh
 ```
 
 ## 制限事項
 
 | 項目 | 状況 |
 |---|---|
-| Docker デーモン起動 | `--iptables=false --bridge=none --storage-driver=vfs` で可能 |
+| Docker デーモン起動 | エグレスプロキシ設定（`/etc/docker/daemon.json`）が必要 |
 | Docker Hub 接続 | プロキシ経由で到達可能 |
-| イメージ pull（Alpine系） | **可能**（alpine, node:20-alpine, mariadb:lts, meilisearch等） |
-| イメージ pull（非Alpine系） | **不可**（mysql:9.3等はレイヤー展開時に`operation not permitted`） |
-| `docker compose up` | overlayfsの制限により不可。`docker run`で個別起動すること |
-| ブリッジネットワーク | 無効化しているため `--network=host` が必要 |
-| MySQL | pull不可のため **MariaDB（`mariadb:lts`）で代替**すること |
+| イメージ pull | **可能**（mysql:9.3, mariadb, meilisearch, node, alpine 等） |
+| `docker compose up` | **可能**（プロキシ設定済みのデーモンで正常動作） |
+| DB ポート | docker-compose.yml で `13306:3306` にマッピング |
+| 外部DB接続（TCP直接） | **不可**（MySQL/TiDB Cloud 等へのTCP直接接続はブロック。HTTP(S)プロキシ経由のみ通信可能） |
 | Playwright MCP / Chrome DevTools MCP | **使用不可**（後述） |
 
 ## MCP によるブラウザ操作の制限
@@ -573,5 +557,6 @@ node /tmp/browser_action.mjs
 
 - **MCP ブラウザツール非対応**: Playwright MCP・Chrome DevTools MCP は Claude Code on the Web では動作しない。上記の Playwright スクリプト方式を使うこと
 - **外部サービスへの接続制限**: Google Fonts、Prisma Accelerate等への接続がブロックされる場合がある
+- **外部DB接続不可**: TiDB Cloud 等への MySQL TCP 直接接続はサンドボックスのネットワーク制限でブロックされる（HTTP(S)プロキシ経由の通信のみ可能）
 - **ページ表示エラー**: DB接続エラーはサンドボックスのネットワーク制限が原因の場合があり、コード自体の問題ではない
 - **`pnpm dev`の起動確認**: TypeScriptコンパイルエラー0件、Next.js/NestJSの起動成功メッセージで判断する
