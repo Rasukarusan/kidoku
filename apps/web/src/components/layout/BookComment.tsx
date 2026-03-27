@@ -22,13 +22,13 @@ export const BookComment: React.FC<Props> = ({ comment }) => {
   return (
     <div className="flex items-center p-4">
       <div className="pr-4 text-center">
-        <Link href={`/${username}/sheets/${sheet}?book=${comment.id}`}>
+        <Link href={`/books/${comment.id}`}>
           <img className="mb-1 w-[82px] min-w-[82px]" src={image} alt="" />
         </Link>
       </div>
       <div>
         <Link
-          href={`/${username}/sheets/${sheet}?book=${comment.id}`}
+          href={`/books/${comment.id}`}
           className="mb-2 block text-xs font-bold sm:text-sm"
         >
           <div className="line-clamp-3">
