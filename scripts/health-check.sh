@@ -26,34 +26,34 @@ else
   check_fail "Docker デーモンが起動していません"
 fi
 
-# --- MariaDB ---
-echo "--- MariaDB ---"
+# --- MySQL ---
+echo "--- MySQL ---"
 if docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^kidoku_db$'; then
-  check_pass "MariaDB コンテナ起動中"
-  if docker exec kidoku_db mariadb -u dev -ppass kidoku -e "SELECT 1" &>/dev/null; then
-    check_pass "MariaDB 接続可能"
-    TABLE_COUNT=$(docker exec kidoku_db mariadb -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='kidoku'" 2>/dev/null || echo "0")
+  check_pass "MySQL コンテナ起動中"
+  if docker exec kidoku_db mysql -u dev -ppass kidoku -e "SELECT 1" &>/dev/null; then
+    check_pass "MySQL 接続可能"
+    TABLE_COUNT=$(docker exec kidoku_db mysql -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='kidoku'" 2>/dev/null || echo "0")
     if [ "$TABLE_COUNT" -gt 0 ] 2>/dev/null; then
       check_pass "テーブル存在 ($TABLE_COUNT テーブル)"
     else
       check_fail "テーブルが存在しません (prisma db push が必要)"
     fi
-    USER_COUNT=$(docker exec kidoku_db mariadb -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM users" 2>/dev/null || echo "0")
+    USER_COUNT=$(docker exec kidoku_db mysql -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM users" 2>/dev/null || echo "0")
     if [ "$USER_COUNT" -gt 0 ] 2>/dev/null; then
       check_pass "シードデータ存在 (users: $USER_COUNT 件)"
     else
       check_warn "シードデータなし (seed 実行を推奨)"
     fi
   else
-    check_fail "MariaDB に接続できません"
+    check_fail "MySQL に接続できません"
   fi
 else
-  check_fail "MariaDB コンテナが起動していません"
+  check_fail "MySQL コンテナが起動していません"
 fi
 
 # --- MeiliSearch ---
 echo "--- MeiliSearch ---"
-if docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^kidoku_meilisearch$'; then
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'meilisearch'; then
   check_pass "MeiliSearch コンテナ起動中"
   if curl -s -o /dev/null -w '%{http_code}' http://localhost:7700/health 2>/dev/null | grep -q '200'; then
     check_pass "MeiliSearch ヘルスチェック OK"
