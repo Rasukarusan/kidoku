@@ -16,6 +16,8 @@ import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
 import { Memo } from './Memo'
 import { FaLink } from 'react-icons/fa'
+import { FiShare2 } from 'react-icons/fi'
+import { shareToSns } from '@/utils/socialShare'
 
 interface Props {
   book: Book
@@ -29,8 +31,9 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
   const [loading, setLoading] = useState(false)
 
   const returnUrl = () => {
-    return `${process.env.NEXT_PUBLIC_HOST}/books/${book.id}`
+    return `${process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'}/books/${book.id}`
   }
+  const shareUrl = returnUrl()
 
   return (
     <div className="flex h-full min-w-full flex-col justify-between rounded-md">
@@ -40,8 +43,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
             <button
               className="rounded-full bg-gray-200 p-2 hover:brightness-95"
               onClick={() => {
-                const url = returnUrl()
-                navigator.clipboard.writeText(url)
+                navigator.clipboard.writeText(shareUrl)
               }}
               onMouseDown={(e) => e.preventDefault()}
               data-tooltip-id="share-button"
@@ -50,6 +52,20 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
               <FaLink size={18} />
             </button>
             <Tooltip id="share-button" />
+            <button
+              className="rounded-full bg-slate-800 p-2 text-white hover:bg-slate-700"
+              onClick={() =>
+                shareToSns(
+                  `『${book.title}』を読了しました📚 #kidoku`,
+                  shareUrl
+                )
+              }
+              data-tooltip-id="book-sns-share"
+              data-tooltip-content="SNSで共有"
+            >
+              <FiShare2 size={18} />
+            </button>
+            <Tooltip id="book-sns-share" />
 
             {isMine && onEdit && (
               <button
