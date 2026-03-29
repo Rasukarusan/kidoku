@@ -18,6 +18,20 @@ AI-powered reading habit analysis with barcode scanning, full-text search, and b
 
 ---
 
+## Why People Star Kidoku
+
+- **Fast to feel value**: barcode scan + search lets users register books in seconds
+- **Visually satisfying**: yearly cards and monthly stats make progress obvious
+- **Practical AI**: summarizes reading tendencies instead of generic chatbot output
+- **Clean architecture**: DDD + tests + CI make it easy to learn from and contribute to
+
+## One-Minute Product Tour
+
+1. Add a book by title search or barcode scan
+2. Organize books into yearly sheets
+3. Check monthly/category analytics
+4. Generate AI-powered reading insights
+
 ## Features
 
 - **Book Registration** - Search by title or scan a barcode to add books instantly
@@ -148,6 +162,8 @@ For detailed architecture documentation, see:
 ## Contributing
 
 Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+
+If you want to help Kidoku grow on GitHub, see [GitHub Star Growth Playbook](./docs/GITHUB_STAR_GROWTH_PLAYBOOK.md).
 
 ## License
 
