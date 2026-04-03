@@ -1,14 +1,18 @@
 packages:
-  - 'apps/*'
-  - 'packages/*'
+  - "apps/*"
+  - "packages/*"
 
 onlyBuiltDependencies:
-  - '@apollo/protobufjs'
-  - '@nestjs/core'
-  - '@prisma/client'
-  - '@prisma/engines'
-  - '@swc/core'
+  - "@apollo/protobufjs"
+  - "@nestjs/core"
+  - "@prisma/client"
+  - "@prisma/engines"
+  - "@swc/core"
   - esbuild
   - fast-folder-size
   - prisma
   - sharp
+
+minimumReleaseAge: 10080
+trustPolicy: no-downgrade
+strictDepBuilds: true
