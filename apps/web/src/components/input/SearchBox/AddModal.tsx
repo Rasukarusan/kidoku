@@ -50,6 +50,8 @@ interface Response {
   sheetName: string
 }
 
+const DEFAULT_MEMO = '[期待]\n\n[感想]\n'
+
 export const AddModal: React.FC = () => {
   const router = useRouter()
   const [open, setOpen] = useAtom(openAddModalAtom)
@@ -100,7 +102,7 @@ export const AddModal: React.FC = () => {
     setBook({
       ...item,
       isPublicMemo: false,
-      memo: item.memo ? item.memo : '[期待]\n\n[感想]\n',
+      memo: item.memo?.trim() ? item.memo : DEFAULT_MEMO,
       impression: '-',
       finished,
     })
