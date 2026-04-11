@@ -29,6 +29,15 @@ const SEARCH_SOFTWARE_DESIGN_BY_ISBN = gql`
   }
 `
 
+const SEARCH_EXTERNAL_BOOKS_QUERY = gql`
+  query SearchExternalBooks($input: SearchExternalBooksInput!) {
+    searchExternalBooks(input: $input) {
+      id
+      image
+    }
+  }
+`
+
 /**
  * Software DesignのISBNかどうかを判定
  */
@@ -64,6 +73,37 @@ const searchSoftwareDesign = async (
   } catch (error) {
     console.error('Software Design search error:', error)
     return null
+  }
+}
+
+/**
+ * Rakuten Books(backend経由)でISBN検索して表紙画像を取得
+ */
+const searchRakutenBooksCover = async (
+  isbn: string
+): Promise<string | undefined> => {
+  try {
+    const isbn13 = isbn.length === 10 ? convertISBN10to13(isbn) : isbn
+    const { data } = await client.query({
+      query: SEARCH_EXTERNAL_BOOKS_QUERY,
+      variables: { input: { query: isbn13 } },
+      fetchPolicy: 'no-cache',
+    })
+
+    const items = data?.searchExternalBooks || []
+    const exactMatch = items.find((item: { id: string; image: string }) => {
+      return normalizeISBN(item.id || '') === isbn13
+    })
+    const fallback = items.find((item: { image: string }) => {
+      return !!item.image && item.image !== NO_IMAGE
+    })
+    const image = exactMatch?.image || fallback?.image
+
+    if (!image) return undefined
+    return image.replace('http:', 'https:')
+  } catch (error) {
+    console.error('Rakuten Books search error:', error)
+    return undefined
   }
 }
 
@@ -112,6 +152,7 @@ export const searchBookWithMultipleSources = async (
   isbn: string
 ): Promise<SearchResult | undefined> => {
   const normalizedISBN = normalizeISBN(isbn)
+  let rakutenCoverImage: string | undefined
 
   // 1. openBDで検索
   const openBDResult = await searchOpenBD(normalizedISBN)
@@ -123,20 +164,59 @@ export const searchBookWithMultipleSources = async (
         openBDResult.title
       )
       if (softwareDesignResult) {
+        if (!softwareDesignResult.image) {
+          rakutenCoverImage =
+            rakutenCoverImage || (await searchRakutenBooksCover(normalizedISBN))
+        }
         return {
           ...openBDResult,
-          image: softwareDesignResult.image,
+          image:
+            softwareDesignResult.image ||
+            rakutenCoverImage ||
+            openBDResult.image,
         }
       }
     }
-    return openBDResult
+
+    if (!openBDResult.image || openBDResult.image === NO_IMAGE) {
+      rakutenCoverImage =
+        rakutenCoverImage || (await searchRakutenBooksCover(normalizedISBN))
+    }
+    return {
+      ...openBDResult,
+      image:
+        openBDResult.image && openBDResult.image !== NO_IMAGE
+          ? openBDResult.image
+          : rakutenCoverImage || NO_IMAGE,
+    }
   }
 
   // 2. openBDで見つからない場合、Software DesignのISBNならタイトルなしで検索
   if (isSoftwareDesignISBN(normalizedISBN)) {
     const softwareDesignResult = await searchSoftwareDesign(normalizedISBN)
     if (softwareDesignResult) {
-      return softwareDesignResult
+      if (!softwareDesignResult.image) {
+        rakutenCoverImage =
+          rakutenCoverImage || (await searchRakutenBooksCover(normalizedISBN))
+      }
+      return {
+        ...softwareDesignResult,
+        image: softwareDesignResult.image || rakutenCoverImage || NO_IMAGE,
+      }
+    }
+  }
+
+  rakutenCoverImage =
+    rakutenCoverImage || (await searchRakutenBooksCover(normalizedISBN))
+  if (rakutenCoverImage) {
+    return {
+      id: normalizedISBN,
+      title: '不明なタイトル',
+      author: '著者不明',
+      category: '未分類',
+      image: rakutenCoverImage,
+      memo: '',
+      isbn: normalizedISBN,
     }
   }
 
