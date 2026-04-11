@@ -47,6 +47,8 @@ interface RegisterFormProps {
   onSuccess: (response: Response) => void
 }
 
+const DEFAULT_MEMO = '[期待]\n\n[感想]\n'
+
 export const RegisterForm: React.FC<RegisterFormProps> = ({
   item,
   onBack,
@@ -91,7 +93,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     setBook({
       ...item,
       isPublicMemo: false,
-      memo: item.memo ? item.memo : '[期待]\n\n[感想]\n',
+      memo: item.memo?.trim() ? item.memo : DEFAULT_MEMO,
       impression: '-',
       finished,
     })
