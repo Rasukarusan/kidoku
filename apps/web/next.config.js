@@ -3,6 +3,9 @@ const path = require('path')
 
 const nextConfig = {
   swcMinify: true, // パフォーマンス改善のため有効化（framer-motion型エラーは修正済み）
+  experimental: {
+    scrollRestoration: true,
+  },
   images: {
     domains: [
       'books.google.com',
