@@ -75,7 +75,11 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
   const sheetUrl =
     book.user && book.sheet ? `/${book.user.name}/sheets/${book.sheet}` : null
   const host = process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'
-  const ogImage = `${host}/api/og?type=book&user=${encodeURIComponent(book.user?.name ?? 'kidoku user')}&title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}&category=${encodeURIComponent(book.category)}`
+  const coverImageParam =
+    book.image && /^https?:\/\//.test(book.image)
+      ? `&image=${encodeURIComponent(book.image)}`
+      : ''
+  const ogImage = `${host}/api/og?type=book&user=${encodeURIComponent(book.user?.name ?? 'kidoku user')}&title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}&category=${encodeURIComponent(book.category)}${coverImageParam}`
   const pageUrl = `${host}/books/${book.id}`
 
   return (
