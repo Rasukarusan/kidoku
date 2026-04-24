@@ -24,8 +24,6 @@ import { twMerge } from 'tailwind-merge'
 import { useQuery } from '@apollo/client'
 import { getBooksQuery } from '@/features/books/api'
 import dayjs from 'dayjs'
-import { FiShare2 } from 'react-icons/fi'
-import { shareToSns } from '@/utils/socialShare'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -116,7 +114,6 @@ export const SheetPage: React.FC<Props> = ({
 
   const isMine = session && session.user.id === userId
   const host = process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'
-  const pageUrl = `${host}/${encodeURIComponent(username)}/sheets/${encodeURIComponent(year)}`
   const monthlySummary = useMemo(() => {
     const counts = data.reduce(
       (acc, book) => {
@@ -242,18 +239,6 @@ export const SheetPage: React.FC<Props> = ({
       <div className="mt-32 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
-        <button
-          className="mx-auto mt-3 flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2 text-sm text-white hover:bg-slate-700"
-          onClick={() =>
-            shareToSns(
-              `${username}の${year}読書まとめ📚 合計${data.length}冊を記録しました！`,
-              pageUrl
-            )
-          }
-        >
-          <FiShare2 />
-          読了数をシェア
-        </button>
       </div>
 
       <div className="mb-10">
@@ -276,13 +261,6 @@ export const SheetPage: React.FC<Props> = ({
       <div className="mb-14 flex w-full flex-wrap justify-center">
         <div className="w-full text-center sm:w-1/2">
           <TitleWithLine text="月ごとの読書数" className="mb-4" />
-          <button
-            className="mx-auto mb-4 flex items-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-            onClick={() => shareToSns(`📈 ${monthlySummary}`, pageUrl)}
-          >
-            <FiShare2 />
-            月次サマリーをシェア
-          </button>
           <BarGraph
             records={data}
             setShowData={setShowData}
