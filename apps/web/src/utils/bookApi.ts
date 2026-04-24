@@ -108,6 +108,46 @@ const searchRakutenBooksCover = async (
 }
 
 /**
+ * Rakuten Books(backend経由)でタイトル検索して表紙画像を取得
+ * 楽天のISBNインデックスは欠落があるため、openBDから取れたタイトルで検索する。
+ * ISBNが一致する候補を優先し、見つからなければ先頭の画像ありを採用する。
+ */
+const searchRakutenBooksCoverByTitle = async (
+  title: string,
+  isbnForMatch?: string
+): Promise<string | undefined> => {
+  try {
+    const { data } = await client.query({
+      query: SEARCH_EXTERNAL_BOOKS_QUERY,
+      variables: { input: { query: title } },
+      fetchPolicy: 'no-cache',
+    })
+
+    const items = data?.searchExternalBooks || []
+
+    // ISBN完全一致を最優先
+    if (isbnForMatch) {
+      const exactMatch = items.find((item: { id: string; image: string }) => {
+        return normalizeISBN(item.id || '') === isbnForMatch
+      })
+      if (exactMatch?.image && exactMatch.image !== NO_IMAGE) {
+        return exactMatch.image.replace('http:', 'https:')
+      }
+    }
+
+    // 次点: 画像ありの先頭
+    const fallback = items.find((item: { image: string }) => {
+      return !!item.image && item.image !== NO_IMAGE
+    })
+    if (!fallback?.image) return undefined
+    return fallback.image.replace('http:', 'https:')
+  } catch (error) {
+    console.error('Rakuten Books title search error:', error)
+    return undefined
+  }
+}
+
+/**
  * openBD APIで書籍を検索
  */
 export const searchOpenBD = async (
@@ -179,8 +219,13 @@ export const searchBookWithMultipleSources = async (
     }
 
     if (!openBDResult.image || openBDResult.image === NO_IMAGE) {
-      rakutenCoverImage =
-        rakutenCoverImage || (await searchRakutenBooksCover(normalizedISBN))
+      // openBDから取れたタイトルで楽天をタイトル検索（ISBN一致を優先）
+      if (openBDResult.title && openBDResult.title !== '不明なタイトル') {
+        rakutenCoverImage = await searchRakutenBooksCoverByTitle(
+          openBDResult.title,
+          normalizedISBN
+        )
+      }
     }
     return {
       ...openBDResult,
