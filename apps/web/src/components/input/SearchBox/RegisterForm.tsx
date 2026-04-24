@@ -18,6 +18,7 @@ import { MaskingHint } from '@/components/label/MaskingHint'
 import { getSheetsQuery } from '@/features/sheet/api'
 import { getBookCategoriesQuery } from '@/features/books/api'
 import { SearchResult } from '@/types/search'
+import { normalizeCategory } from '@/utils/category'
 
 const MarkdownEditor = dynamic(
   () =>
@@ -90,14 +91,33 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     setError('')
     if (!item) return
     const finished = dayjs().format('YYYY-MM-DD')
+    const existingCategories = categoriesData?.bookCategories
     setBook({
       ...item,
+      category: existingCategories?.length
+        ? normalizeCategory(item.category, existingCategories)
+        : item.category,
       isPublicMemo: false,
       memo: item.memo?.trim() ? item.memo : DEFAULT_MEMO,
       impression: '-',
       finished,
     })
+    // categoriesData を deps に含めるとメモ等の編集を上書きしうるため、到着後の再正規化は下の effect に任せる
   }, [item])
+
+  // categoriesData が遅れて到着した場合、未編集のカテゴリだけを既存カテゴリに寄せる
+  useEffect(() => {
+    if (!item) return
+    const existingCategories = categoriesData?.bookCategories
+    if (!existingCategories?.length) return
+    const normalized = normalizeCategory(item.category, existingCategories)
+    if (normalized === item.category) return
+    setBook((prev) => {
+      if (!prev) return prev
+      if (prev.category !== item.category) return prev
+      return { ...prev, category: normalized }
+    })
+  }, [item, categoriesData])
 
   const onClickAdd = async () => {
     if (!book) return
