@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import {
   EditorRoot,
   EditorContent,
@@ -235,9 +235,9 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     []
   )
 
-  // 初期コンテンツ（マークダウン文字列をそのまま渡す）
-  // MarkdownExtensionがパースしてくれる
-  const initialContent = useMemo(() => value || '', [])
+  // 親の useEffect でセットされる初期値を onCreate 時点で拾うための ref（useMemoだと初回レンダリングの空文字を掴んだままになる）
+  const valueRef = useRef(value)
+  valueRef.current = value
 
   useEffect(() => {
     setMounted(true)
@@ -311,8 +311,9 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           className="rounded-lg border border-gray-200 bg-white shadow-sm"
           onCreate={({ editor }) => {
             // 初期値をマークダウンとしてセット
-            if (initialContent) {
-              editor.commands.setContent(initialContent)
+            const content = valueRef.current
+            if (content) {
+              editor.commands.setContent(content)
             }
           }}
           onUpdate={({ editor }) => {
