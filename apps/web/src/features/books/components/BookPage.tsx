@@ -8,6 +8,7 @@ import { MdChevronRight } from 'react-icons/md'
 import { useIsBookOwner } from '@/hooks/useIsBookOwner'
 import apolloClient from '@/libs/apollo'
 import { getBookQuery } from '@/features/books/api/queries'
+import { NextSeo } from 'next-seo'
 
 interface BookPageProps {
   book: Book | null
@@ -73,9 +74,24 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
 
   const sheetUrl =
     book.user && book.sheet ? `/${book.user.name}/sheets/${book.sheet}` : null
+  const host = process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'
+  const ogImage = `${host}/api/og?type=book&user=${encodeURIComponent(book.user?.name ?? 'kidoku user')}&title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}&category=${encodeURIComponent(book.category)}`
+  const pageUrl = `${host}/books/${book.id}`
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <NextSeo
+        title={`${book.title} | kidoku`}
+        description={`${book.author} / ${book.category} の読書メモ`}
+        canonical={pageUrl}
+        openGraph={{
+          title: `${book.title} | kidoku`,
+          description: `${book.author} / ${book.category} の読書メモ`,
+          url: pageUrl,
+          images: [{ url: ogImage, width: 1200, height: 630 }],
+        }}
+        twitter={{ cardType: 'summary_large_image' }}
+      />
       <div className="mx-auto max-w-4xl py-8">
         {sheetUrl && (
           <nav
