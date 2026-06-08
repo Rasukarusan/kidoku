@@ -19,6 +19,11 @@ import { getSheetsQuery } from '@/features/sheet/api'
 import { getBookCategoriesQuery } from '@/features/books/api'
 import { SearchResult } from '@/types/search'
 import { normalizeCategory } from '@/utils/category'
+import {
+  getBookRegisterDraft,
+  saveBookRegisterDraft,
+  removeBookRegisterDraft,
+} from '@/utils/localStorage'
 
 const MarkdownEditor = dynamic(
   () =>
@@ -70,6 +75,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     name: null,
   })
   const [openAdd, setOpenAdd] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
 
   const { data: categoriesData } = useQuery<{ bookCategories: string[] }>(
     getBookCategoriesQuery,
@@ -84,12 +90,26 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
   useEffect(() => {
     if (sheets.length === 0) return
-    setSheet({ id: sheets[0].id, name: sheets[0].name })
+    // 下書きからシートを復元済みの場合は上書きしない
+    setSheet((prev) =>
+      prev.id ? prev : { id: sheets[0].id, name: sheets[0].name }
+    )
   }, [sheets])
 
   useEffect(() => {
     setError('')
     if (!item) return
+
+    // 同じ本の入力中下書きが残っていれば復元する
+    const draft = getBookRegisterDraft()
+    if (draft?.book && String(draft.item?.id) === String(item.id)) {
+      setBook(draft.book)
+      if (draft.sheet) setSheet(draft.sheet)
+      setHasDraft(true)
+      return
+    }
+
+    setHasDraft(false)
     const finished = dayjs().format('YYYY-MM-DD')
     const existingCategories = categoriesData?.bookCategories
     setBook({
@@ -105,6 +125,16 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     // categoriesData を deps に含めるとメモ等の編集を上書きしうるため、到着後の再正規化は下の effect に任せる
   }, [item])
 
+  // 入力内容をローカルストレージに自動保存（500msデバウンス）
+  // モーダルを誤って閉じても、再度開いたときに続きから再開できるようにする
+  useEffect(() => {
+    if (!item || !book) return
+    const timeoutId = setTimeout(() => {
+      saveBookRegisterDraft({ item, book, sheet })
+    }, 500)
+    return () => clearTimeout(timeoutId)
+  }, [item, book, sheet])
+
   // categoriesData が遅れて到着した場合、未編集のカテゴリだけを既存カテゴリに寄せる
   useEffect(() => {
     if (!item) return
@@ -118,6 +148,25 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       return { ...prev, category: normalized }
     })
   }, [item, categoriesData])
+
+  // 復元した下書きを破棄し、選択した本の初期値に戻す
+  const onClearDraft = () => {
+    if (!item) return
+    removeBookRegisterDraft()
+    setHasDraft(false)
+    const finished = dayjs().format('YYYY-MM-DD')
+    const existingCategories = categoriesData?.bookCategories
+    setBook({
+      ...item,
+      category: existingCategories?.length
+        ? normalizeCategory(item.category, existingCategories)
+        : item.category,
+      isPublicMemo: false,
+      memo: item.memo?.trim() ? item.memo : DEFAULT_MEMO,
+      impression: '-',
+      finished,
+    })
+  }
 
   const onClickAdd = async () => {
     if (!book) return
@@ -141,6 +190,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }
       })
     if (res.result) {
+      removeBookRegisterDraft()
+      setHasDraft(false)
       apolloClient.refetchQueries({ include: ['GetBooks'] })
       onSuccess(res)
     } else {
@@ -160,6 +211,19 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           <IoArrowBack size={20} />
         </button>
         <h2 className="text-sm font-bold text-gray-700">本を登録</h2>
+        {hasDraft && (
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-xs text-gray-400">
+              入力内容を復元しました
+            </span>
+            <button
+              onClick={onClearDraft}
+              className="rounded-md px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+            >
+              クリア
+            </button>
+          </div>
+        )}
       </div>
 
       {/* フォーム本体 */}
