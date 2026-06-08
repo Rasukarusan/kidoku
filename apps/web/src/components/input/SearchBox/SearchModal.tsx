@@ -14,6 +14,7 @@ import { ISBNSearchResult } from './ISBNSearchResult'
 import { RegisterForm } from './RegisterForm'
 import { SuccessView } from './SuccessView'
 import { SearchResult } from '@/types/search'
+import { getBookRegisterDraft } from '@/utils/localStorage'
 
 /**
  * 入力がISBN形式かどうかを判定する
@@ -48,6 +49,16 @@ export const SearchModal: React.FC = () => {
   const [successData, setSuccessData] = useState<SuccessData | null>(null)
   const { data: session } = useSession()
   const router = useRouter()
+
+  // モーダルを開いたとき、入力中の下書きが残っていれば登録ビューから再開する
+  useEffect(() => {
+    if (!open) return
+    const draft = getBookRegisterDraft()
+    if (draft?.item) {
+      setSelectedBook(draft.item)
+      setView('register')
+    }
+  }, [open])
 
   // モーダル開いたら自動でinputフィールドにフォーカスする（検索ビュー、カメラモード以外）
   useEffect(() => {
