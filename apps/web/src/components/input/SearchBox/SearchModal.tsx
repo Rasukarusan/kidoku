@@ -14,6 +14,10 @@ import { ISBNSearchResult } from './ISBNSearchResult'
 import { RegisterForm } from './RegisterForm'
 import { SuccessView } from './SuccessView'
 import { SearchResult } from '@/types/search'
+import {
+  getBookRegistrationDraft,
+  removeBookRegistrationDraft,
+} from '@/utils/localStorage'
 
 /**
  * 入力がISBN形式かどうかを判定する
@@ -56,6 +60,18 @@ export const SearchModal: React.FC = () => {
     }
   }, [open, showCamera, view])
 
+  // 入力途中の登録下書きがあれば、モーダルを開いたタイミングで登録フォームから再開する
+  useEffect(() => {
+    if (!open) return
+
+    const draft = getBookRegistrationDraft()
+    if (!draft) return
+
+    setSelectedBook(draft.item)
+    setInputValue(draft.item.title || '')
+    setView('register')
+  }, [open])
+
   // モーダルが閉じたらリセット
   useEffect(() => {
     if (!open) {
@@ -88,6 +104,7 @@ export const SearchModal: React.FC = () => {
   }
 
   const handleBack = () => {
+    removeBookRegistrationDraft()
     setView('search')
     setSelectedBook(null)
   }

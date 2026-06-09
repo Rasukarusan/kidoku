@@ -26,6 +26,11 @@ import { MaskingHint } from '@/components/label/MaskingHint'
 
 import { getSheetsQuery } from '@/features/sheet/api'
 import { getBookCategoriesQuery } from '@/features/books/api'
+import {
+  getBookRegistrationDraft,
+  removeBookRegistrationDraft,
+  saveBookRegistrationDraft,
+} from '@/utils/localStorage'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -68,6 +73,7 @@ export const AddModal: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [book, setBook] = useState(null)
   const [response, setResponse] = useState<Response>(null)
+  const [hasDraft, setHasDraft] = useState(false)
   const { reward, isAnimating } = useReward('rewardId', 'confetti', {
     elementCount: 200,
   })
@@ -91,13 +97,25 @@ export const AddModal: React.FC = () => {
 
   // シート取得次第、一番上のシートを選択状態にする
   useEffect(() => {
-    if (sheets.length === 0) return
+    if (sheets.length === 0 || sheet.id) return
     setSheet({ id: sheets[0].id, name: sheets[0].name })
-  }, [sheets])
+  }, [sheets, sheet.id])
 
   useEffect(() => {
     setResponse(null)
+    setHasDraft(false)
     if (!item) return
+
+    const draft = getBookRegistrationDraft()
+    if (draft?.item?.id === item.id) {
+      setBook(draft.book)
+      if (draft.sheet?.id) {
+        setSheet(draft.sheet)
+      }
+      setHasDraft(true)
+      return
+    }
+
     const finished = dayjs().format('YYYY-MM-DD')
     setBook({
       ...item,
@@ -107,6 +125,21 @@ export const AddModal: React.FC = () => {
       finished,
     })
   }, [item])
+
+  // 登録フォームの入力内容を自動保存して、モーダルを閉じても再開できるようにする
+  useEffect(() => {
+    if (!item || !book) return
+
+    const timeoutId = setTimeout(() => {
+      saveBookRegistrationDraft({
+        item,
+        book,
+        sheet,
+      })
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [item, book, sheet])
 
   const onClickAdd = async () => {
     if (!book) return
@@ -130,6 +163,7 @@ export const AddModal: React.FC = () => {
       })
     setResponse(res)
     if (res.result) {
+      removeBookRegistrationDraft()
       apolloClient.refetchQueries({ include: ['GetBooks'] })
       reward()
     }
@@ -178,6 +212,11 @@ export const AddModal: React.FC = () => {
           >
             <div className="flex h-full flex-col justify-between">
               <div className="bg-white p-4">
+                {hasDraft && (
+                  <div className="mb-3 rounded-md bg-blue-50 p-3 text-sm text-blue-800">
+                    💾 前回入力中だった内容を復元しました
+                  </div>
+                )}
                 <div className="mb-2 flex items-center">
                   <ImagePicker
                     img={book?.image}

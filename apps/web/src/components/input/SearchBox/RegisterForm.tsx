@@ -19,6 +19,11 @@ import { getSheetsQuery } from '@/features/sheet/api'
 import { getBookCategoriesQuery } from '@/features/books/api'
 import { SearchResult } from '@/types/search'
 import { normalizeCategory } from '@/utils/category'
+import {
+  getBookRegistrationDraft,
+  removeBookRegistrationDraft,
+  saveBookRegistrationDraft,
+} from '@/utils/localStorage'
 
 const MarkdownEditor = dynamic(
   () =>
@@ -65,6 +70,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   const [loading, setLoading] = useState(false)
   const [book, setBook] = useState(null)
   const [error, setError] = useState('')
+  const [hasDraft, setHasDraft] = useState(false)
   const [sheet, setSheet] = useState<{ id: number; name: string }>({
     id: null,
     name: null,
@@ -83,13 +89,25 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     : []
 
   useEffect(() => {
-    if (sheets.length === 0) return
+    if (sheets.length === 0 || sheet.id) return
     setSheet({ id: sheets[0].id, name: sheets[0].name })
-  }, [sheets])
+  }, [sheets, sheet.id])
 
   useEffect(() => {
     setError('')
+    setHasDraft(false)
     if (!item) return
+
+    const draft = getBookRegistrationDraft()
+    if (draft?.item?.id === item.id) {
+      setBook(draft.book)
+      if (draft.sheet?.id) {
+        setSheet(draft.sheet)
+      }
+      setHasDraft(true)
+      return
+    }
+
     const finished = dayjs().format('YYYY-MM-DD')
     const existingCategories = categoriesData?.bookCategories
     setBook({
@@ -119,6 +137,21 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     })
   }, [item, categoriesData])
 
+  // 登録フォームの入力内容を自動保存して、モーダルを閉じても再開できるようにする
+  useEffect(() => {
+    if (!item || !book) return
+
+    const timeoutId = setTimeout(() => {
+      saveBookRegistrationDraft({
+        item,
+        book,
+        sheet,
+      })
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [item, book, sheet])
+
   const onClickAdd = async () => {
     if (!book) return
     setLoading(true)
@@ -141,6 +174,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         }
       })
     if (res.result) {
+      removeBookRegistrationDraft()
       apolloClient.refetchQueries({ include: ['GetBooks'] })
       onSuccess(res)
     } else {
@@ -154,7 +188,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       {/* ヘッダー: 戻るボタン */}
       <div className="flex shrink-0 items-center border-b border-gray-100 px-4 py-3">
         <button
-          onClick={onBack}
+          onClick={() => {
+            removeBookRegistrationDraft()
+            onBack()
+          }}
           className="mr-3 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
         >
           <IoArrowBack size={20} />
@@ -164,6 +201,11 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       {/* フォーム本体 */}
       <div className="flex-1 overflow-y-auto bg-white p-4">
+        {hasDraft && (
+          <div className="mb-3 rounded-md bg-blue-50 p-3 text-sm text-blue-800">
+            💾 前回入力中だった内容を復元しました
+          </div>
+        )}
         <div className="mb-2 flex items-center">
           <ImagePicker
             img={book?.image}

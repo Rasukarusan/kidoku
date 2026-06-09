@@ -1,8 +1,11 @@
+import type { SearchResult } from '@/types/search'
+
 /**
  * ローカルストレージのキー定義
  */
 const STORAGE_KEYS = {
   BOOK_DRAFT: 'kidoku_book_draft',
+  BOOK_REGISTRATION_DRAFT: 'kidoku_book_registration_draft',
 } as const
 
 /**
@@ -17,6 +20,23 @@ export interface BookDraftData {
   title?: string
   author?: string
   isPublicMemo?: boolean
+  timestamp: number // 保存日時
+}
+
+/**
+ * 書籍登録中の下書きデータ型
+ */
+export interface BookRegistrationDraftData {
+  item: SearchResult
+  book: SearchResult & {
+    impression?: string
+    finished?: string
+    isPublicMemo?: boolean
+  }
+  sheet?: {
+    id: number
+    name: string
+  }
   timestamp: number // 保存日時
 }
 
@@ -127,5 +147,74 @@ export const cleanupOldDrafts = (): void => {
     }
   } catch (error) {
     console.error('Failed to cleanup old drafts:', error)
+  }
+}
+
+/**
+ * ローカルストレージから書籍登録フォームの下書きデータを取得
+ */
+export const getBookRegistrationDraft =
+  (): BookRegistrationDraftData | null => {
+    if (typeof window === 'undefined') return null
+
+    try {
+      const data = localStorage.getItem(STORAGE_KEYS.BOOK_REGISTRATION_DRAFT)
+      if (!data) return null
+
+      const draft: BookRegistrationDraftData = JSON.parse(data)
+
+      // 24時間以上経過した下書きは削除
+      if (draft && Date.now() - draft.timestamp > 24 * 60 * 60 * 1000) {
+        removeBookRegistrationDraft()
+        return null
+      }
+
+      return draft || null
+    } catch (error) {
+      console.error(
+        'Failed to get book registration draft from localStorage:',
+        error
+      )
+      return null
+    }
+  }
+
+/**
+ * ローカルストレージに書籍登録フォームの下書きデータを保存
+ */
+export const saveBookRegistrationDraft = (
+  draftData: Omit<BookRegistrationDraftData, 'timestamp'>
+): void => {
+  if (typeof window === 'undefined') return
+
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.BOOK_REGISTRATION_DRAFT,
+      JSON.stringify({
+        ...draftData,
+        timestamp: Date.now(),
+      })
+    )
+  } catch (error) {
+    console.error(
+      'Failed to save book registration draft to localStorage:',
+      error
+    )
+  }
+}
+
+/**
+ * ローカルストレージから書籍登録フォームの下書きデータを削除
+ */
+export const removeBookRegistrationDraft = (): void => {
+  if (typeof window === 'undefined') return
+
+  try {
+    localStorage.removeItem(STORAGE_KEYS.BOOK_REGISTRATION_DRAFT)
+  } catch (error) {
+    console.error(
+      'Failed to remove book registration draft from localStorage:',
+      error
+    )
   }
 }
