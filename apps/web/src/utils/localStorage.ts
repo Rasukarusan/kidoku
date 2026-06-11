@@ -1,8 +1,11 @@
+import type { SearchResult } from '@/types/search'
+
 /**
  * ローカルストレージのキー定義
  */
 const STORAGE_KEYS = {
   BOOK_DRAFT: 'kidoku_book_draft',
+  BOOK_REGISTER_DRAFT: 'kidoku_book_register_draft',
 } as const
 
 /**
@@ -127,5 +130,80 @@ export const cleanupOldDrafts = (): void => {
     }
   } catch (error) {
     console.error('Failed to cleanup old drafts:', error)
+  }
+}
+
+/**
+ * 本登録モーダルの入力中データ型
+ *
+ * 既存本の編集（BookDraftData）とは異なり、まだDBに登録されていない本のための
+ * 下書き。登録フローは同時に1冊しか進行しないため、bookIdではなく単一スロットで保持する。
+ */
+export interface BookRegisterDraftData {
+  /** 選択中の検索結果（登録ビューを復元するために保持） */
+  item: SearchResult
+  /** フォームの入力値 */
+  book: Record<string, unknown>
+  /** 保存先シート */
+  sheet?: { id: number | null; name: string | null }
+  timestamp: number // 保存日時
+}
+
+/**
+ * ローカルストレージから本登録の下書きデータを取得
+ */
+export const getBookRegisterDraft = (): BookRegisterDraftData | null => {
+  if (typeof window === 'undefined') return null
+
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.BOOK_REGISTER_DRAFT)
+    if (!data) return null
+
+    const draft: BookRegisterDraftData = JSON.parse(data)
+
+    // 24時間以上経過した下書きは削除
+    if (draft && Date.now() - draft.timestamp > 24 * 60 * 60 * 1000) {
+      removeBookRegisterDraft()
+      return null
+    }
+
+    return draft || null
+  } catch (error) {
+    console.error('Failed to get book register draft from localStorage:', error)
+    return null
+  }
+}
+
+/**
+ * ローカルストレージに本登録の下書きデータを保存
+ */
+export const saveBookRegisterDraft = (
+  draft: Omit<BookRegisterDraftData, 'timestamp'>
+): void => {
+  if (typeof window === 'undefined') return
+
+  try {
+    localStorage.setItem(
+      STORAGE_KEYS.BOOK_REGISTER_DRAFT,
+      JSON.stringify({ ...draft, timestamp: Date.now() })
+    )
+  } catch (error) {
+    console.error('Failed to save book register draft to localStorage:', error)
+  }
+}
+
+/**
+ * ローカルストレージから本登録の下書きデータを削除
+ */
+export const removeBookRegisterDraft = (): void => {
+  if (typeof window === 'undefined') return
+
+  try {
+    localStorage.removeItem(STORAGE_KEYS.BOOK_REGISTER_DRAFT)
+  } catch (error) {
+    console.error(
+      'Failed to remove book register draft from localStorage:',
+      error
+    )
   }
 }
