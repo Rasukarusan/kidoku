@@ -9,6 +9,7 @@ import { useIsBookOwner } from '@/hooks/useIsBookOwner'
 import apolloClient from '@/libs/apollo'
 import { getBookQuery } from '@/features/books/api/queries'
 import { NextSeo } from 'next-seo'
+import { JsonLd } from '@/components/seo/JsonLd'
 
 interface BookPageProps {
   book: Book | null
@@ -82,8 +83,32 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
   const ogImage = `${host}/api/og?type=book&user=${encodeURIComponent(book.user?.name ?? 'kidoku user')}&title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}&category=${encodeURIComponent(book.category)}${coverImageParam}`
   const pageUrl = `${host}/books/${book.id}`
 
+  // 構造化データ: Book(+公開メモがあればReview)
+  const bookJsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: book.title,
+    author: { '@type': 'Person', name: book.author },
+    url: pageUrl,
+    ...(book.image && /^https?:\/\//.test(book.image)
+      ? { image: book.image }
+      : {}),
+    ...(book.category ? { genre: book.category } : {}),
+  }
+  if (book.isPublicMemo && book.memo) {
+    bookJsonLd.review = {
+      '@type': 'Review',
+      reviewBody: book.memo,
+      ...(book.user?.name
+        ? { author: { '@type': 'Person', name: book.user.name } }
+        : {}),
+      itemReviewed: { '@type': 'Book', name: book.title },
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <JsonLd data={bookJsonLd} />
       <NextSeo
         title={`${book.title} | kidoku`}
         description={`${book.author} / ${book.category} の読書メモ`}
