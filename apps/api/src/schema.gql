@@ -132,6 +132,65 @@ type TemplateBookResponse {
   updated: DateTime!
 }
 
+type FollowInfoResponse {
+  followers: Int!
+  following: Int!
+  isFollowing: Boolean!
+}
+
+type FeedBookItem {
+  id: ID!
+  title: String!
+  author: String!
+  memo: String!
+  image: String!
+  updated: DateTime!
+  username: String!
+  userImage: String
+  sheet: String!
+  likeCount: Int!
+}
+
+type FeedResponse {
+  total: Float!
+  hasMore: Boolean!
+  books: [FeedBookItem!]!
+}
+
+type NotificationItemDto {
+  id: ID!
+  type: String!
+  bookId: Int
+  read: Boolean!
+  created: DateTime!
+  actorName: String!
+  actorImage: String
+  bookTitle: String
+}
+
+type NotificationResponse {
+  total: Float!
+  hasMore: Boolean!
+  notifications: [NotificationItemDto!]!
+}
+
+type PopularBookItem {
+  id: ID!
+  title: String!
+  author: String!
+  image: String!
+  username: String!
+  userImage: String
+  sheet: String!
+  likeCount: Int!
+}
+
+type TopReaderItem {
+  name: String!
+  image: String
+  bookCount: Int!
+}
+
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
@@ -149,6 +208,13 @@ type Query {
   isNameAvailable(input: CheckNameAvailableInput!): Boolean!
   aiSummaryUsage: Int!
   templateBooks: [TemplateBookResponse!]!
+  followInfo(input: GetFollowInfoInput!): FollowInfoResponse!
+  feed(input: GetFeedInput!): FeedResponse!
+  myLikedBookIds: [Int!]!
+  notifications(input: GetNotificationsInput!): NotificationResponse!
+  unreadNotificationCount: Int!
+  popularBooks(limit: Int): [PopularBookItem!]!
+  topReaders(limit: Int): [TopReaderItem!]!
 }
 
 input GetCommentsInput {
@@ -191,6 +257,20 @@ input CheckNameAvailableInput {
   name: String!
 }
 
+input GetFollowInfoInput {
+  name: String!
+}
+
+input GetFeedInput {
+  limit: Int!
+  offset: Int!
+}
+
+input GetNotificationsInput {
+  limit: Int!
+  offset: Int!
+}
+
 type Mutation {
   createSheet(input: CreateSheetInput!): SheetResponse!
   updateSheet(input: UpdateSheetInput!): SheetResponse!
@@ -208,6 +288,11 @@ type Mutation {
   deleteAiSummary(input: DeleteAiSummaryInput!): DeleteAiSummaryResponse!
   createTemplateBook(input: CreateTemplateBookInput!): TemplateBookResponse!
   deleteTemplateBook(input: DeleteTemplateBookInput!): Boolean!
+  followUser(input: FollowUserInput!): Boolean!
+  unfollowUser(input: FollowUserInput!): Boolean!
+  likeBook(input: LikeBookInput!): Int!
+  unlikeBook(input: LikeBookInput!): Int!
+  markNotificationsRead: Boolean!
 }
 
 input CreateSheetInput {
@@ -302,4 +387,12 @@ input CreateTemplateBookInput {
 
 input DeleteTemplateBookInput {
   id: Int!
+}
+
+input FollowUserInput {
+  userId: ID!
+}
+
+input LikeBookInput {
+  bookId: Int!
 }
