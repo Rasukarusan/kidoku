@@ -25,7 +25,10 @@ describe('LikeBookUseCase', () => {
   });
 
   it('新規いいねで本の所有者に通知が作成され、いいね数を返す', async () => {
-    mockLikeRepo.like.mockResolvedValue({ created: true, bookOwnerId: 'owner' });
+    mockLikeRepo.like.mockResolvedValue({
+      created: true,
+      bookOwnerId: 'owner',
+    });
     mockLikeRepo.countByBook.mockResolvedValue(3);
 
     const count = await useCase.execute('liker', 1);
