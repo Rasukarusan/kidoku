@@ -9,6 +9,8 @@ import {
   AiOutlineBook,
   AiOutlineSetting,
   AiOutlineClose,
+  AiOutlineCompass,
+  AiOutlineBell,
 } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
@@ -114,6 +116,18 @@ export const Sidebar: React.FC = () => {
         href: readingRecordsUrl,
         icon: AiOutlineBook,
         isActive: isSheetsPage,
+      },
+      {
+        name: '発見',
+        href: '/discover',
+        icon: AiOutlineCompass,
+        isActive: router.pathname.includes('/discover'),
+      },
+      {
+        name: 'お知らせ',
+        href: '/notifications',
+        icon: AiOutlineBell,
+        isActive: router.pathname.includes('/notifications'),
       },
       {
         name: '設定',

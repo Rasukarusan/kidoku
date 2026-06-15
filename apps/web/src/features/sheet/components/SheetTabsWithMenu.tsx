@@ -1,5 +1,6 @@
 import { Tabs } from './Tabs'
 import { Menu } from './Menu'
+import { FollowButton } from '@/features/social/components/FollowButton'
 
 interface Props {
   sheets: Array<{ id: string; name: string; order: number }>
@@ -40,6 +41,7 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
         userId={userId}
         activate={menuActivate}
       />
+      <FollowButton name={username} userId={userId} />
     </div>
   )
 }
