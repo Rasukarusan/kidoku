@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /settings/
+Disallow: /auth/
+
+Sitemap: https://kidoku.net/sitemap.xml
