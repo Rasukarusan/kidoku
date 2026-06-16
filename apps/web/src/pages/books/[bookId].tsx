@@ -44,8 +44,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     })
 
     if (!book) {
+      // notFoundをrevalidateなしで返すとISRが404を恒久的にキャッシュしてしまう。
+      // 作成直後でまだ参照できないケースに備え、revalidateを付与して自己回復させる。
       return {
         notFound: true,
+        revalidate: 10,
       }
     }
 
@@ -79,8 +82,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     }
   } catch (error) {
     console.error('Error fetching book:', error)
+    // 一時的なDBエラー等で404を恒久キャッシュしないよう、revalidateを付与する。
     return {
       notFound: true,
+      revalidate: 10,
     }
   }
 }
