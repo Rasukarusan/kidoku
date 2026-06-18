@@ -55,10 +55,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
             <button
               className="rounded-full bg-slate-800 p-2 text-white hover:bg-slate-700"
               onClick={() =>
-                shareToSns(
-                  `『${book.title}』を読了しました📚 #kidoku`,
-                  shareUrl
-                )
+                shareToSns(`『${book.title}』の感想📚 #kidoku`, shareUrl)
               }
               data-tooltip-id="book-sns-share"
               data-tooltip-content="SNSで共有"
