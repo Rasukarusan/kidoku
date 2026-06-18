@@ -61,9 +61,9 @@ export const FollowButton: React.FC<Props> = ({ name, userId }) => {
   }
 
   return (
-    <div className="ml-auto flex items-center gap-3 pr-1">
+    <div className="ml-auto flex shrink-0 items-center gap-3 pl-2 pr-1">
       {data?.followInfo && (
-        <span className="hidden text-xs text-gray-500 sm:inline">
+        <span className="hidden whitespace-nowrap text-xs text-gray-500 sm:inline">
           フォロワー {data.followInfo.followers}
         </span>
       )}
@@ -72,8 +72,8 @@ export const FollowButton: React.FC<Props> = ({ name, userId }) => {
         disabled={busy}
         className={
           following
-            ? 'rounded-full border border-gray-300 px-4 py-1 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-60'
-            : 'rounded-full bg-gray-900 px-4 py-1 text-sm font-bold text-white transition-colors hover:bg-gray-700 disabled:opacity-60'
+            ? 'whitespace-nowrap rounded-full border border-gray-300 px-4 py-1 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-60'
+            : 'whitespace-nowrap rounded-full bg-gray-900 px-4 py-1 text-sm font-bold text-white transition-colors hover:bg-gray-700 disabled:opacity-60'
         }
       >
         {following ? 'フォロー中' : 'フォロー'}
