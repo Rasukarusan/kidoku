@@ -10,15 +10,11 @@ import {
   AiFillPlusCircle,
   AiOutlineCompass,
   AiFillCompass,
-  AiOutlineBell,
-  AiFillBell,
 } from 'react-icons/ai'
 import { useAtom } from 'jotai'
-import { useQuery } from '@apollo/client'
 import { useCachedSession } from '@/hooks/useCachedSession'
 import { useReadingRecordsUrl } from '@/hooks/useReadingRecordsUrl'
 import { openSearchModalAtom } from '@/store/modal/atom'
-import { unreadNotificationCountQuery } from '@/features/social/api'
 
 export const BottomNav: React.FC = () => {
   const router = useRouter()
@@ -26,17 +22,10 @@ export const BottomNav: React.FC = () => {
   const readingRecordsUrl = useReadingRecordsUrl()
   const [, setOpenSearchModal] = useAtom(openSearchModalAtom)
 
-  const { data: unreadData } = useQuery(unreadNotificationCountQuery, {
-    skip: status !== 'authenticated',
-    pollInterval: 60000,
-  })
-  const unread: number = unreadData?.unreadNotificationCount ?? 0
-
   const navigationItems = useMemo(() => {
     const isHomePage = router.pathname === '/'
     const isSheetsPage = router.pathname.includes('/sheets')
     const isDiscoverPage = router.pathname.includes('/discover')
-    const isNotificationsPage = router.pathname.includes('/notifications')
 
     return [
       {
@@ -45,7 +34,6 @@ export const BottomNav: React.FC = () => {
         icon: AiOutlineHome,
         activeIcon: AiFillHome,
         isActive: isHomePage,
-        badge: 0,
       },
       {
         name: '読書記録',
@@ -53,7 +41,6 @@ export const BottomNav: React.FC = () => {
         icon: AiOutlineBook,
         activeIcon: AiFillBook,
         isActive: isSheetsPage,
-        badge: 0,
       },
       {
         name: '本を登録',
@@ -61,7 +48,6 @@ export const BottomNav: React.FC = () => {
         activeIcon: AiFillPlusCircle,
         isActive: false,
         onClick: () => setOpenSearchModal(true),
-        badge: 0,
       },
       {
         name: '発見',
@@ -69,18 +55,9 @@ export const BottomNav: React.FC = () => {
         icon: AiOutlineCompass,
         activeIcon: AiFillCompass,
         isActive: isDiscoverPage,
-        badge: 0,
-      },
-      {
-        name: 'お知らせ',
-        href: '/notifications',
-        icon: AiOutlineBell,
-        activeIcon: AiFillBell,
-        isActive: isNotificationsPage,
-        badge: unread,
       },
     ]
-  }, [readingRecordsUrl, router.pathname, setOpenSearchModal, unread])
+  }, [readingRecordsUrl, router.pathname, setOpenSearchModal])
 
   if (status !== 'authenticated' || !session) {
     return null
@@ -104,17 +81,6 @@ export const BottomNav: React.FC = () => {
               : 'text-gray-500 hover:text-gray-700'
           }`
 
-          const iconWithBadge = (
-            <span className="relative">
-              <Icon className="h-5 w-5" aria-hidden="true" />
-              {item.badge > 0 && (
-                <span className="absolute -right-2 -top-1.5 flex min-w-[16px] items-center justify-center rounded-full bg-pink-500 px-1 text-[10px] font-bold leading-4 text-white">
-                  {item.badge > 99 ? '99+' : item.badge}
-                </span>
-              )}
-            </span>
-          )
-
           if (item.onClick) {
             return (
               <button
@@ -123,7 +89,7 @@ export const BottomNav: React.FC = () => {
                 className={classes}
                 onClick={item.onClick}
               >
-                {iconWithBadge}
+                <Icon className="h-5 w-5" aria-hidden="true" />
                 <span>{item.name}</span>
               </button>
             )
@@ -136,7 +102,7 @@ export const BottomNav: React.FC = () => {
               className={classes}
               aria-current={item.isActive ? 'page' : undefined}
             >
-              {iconWithBadge}
+              <Icon className="h-5 w-5" aria-hidden="true" />
               <span>{item.name}</span>
             </Link>
           )
