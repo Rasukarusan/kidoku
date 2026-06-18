@@ -1,4 +1,6 @@
 import ReactMarkdown from 'react-markdown'
+import remarkBreaks from 'remark-breaks'
+import { expandBlankLines } from '@/utils/markdown'
 
 interface MemoProps {
   memo: string | null | undefined
@@ -92,6 +94,7 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
         }
       `}</style>
       <ReactMarkdown
+        remarkPlugins={[remarkBreaks]}
         components={{
           a: ({ href, children }) => (
             <a href={href} target="_blank" rel="noopener noreferrer">
@@ -100,7 +103,7 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
           ),
         }}
       >
-        {memo}
+        {expandBlankLines(memo)}
       </ReactMarkdown>
     </div>
   )
