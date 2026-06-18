@@ -298,7 +298,7 @@ export const SheetPage: React.FC<Props> = ({
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
         {isMine && (
-          <div className="mt-4 flex justify-center">
+          <div className="mt-6 flex justify-center">
             <button
               onClick={() => shareToSns(wrappedShareText, shareUrl)}
               className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
@@ -310,7 +310,7 @@ export const SheetPage: React.FC<Props> = ({
         )}
       </div>
 
-      <div className="mb-10">
+      <div className="mb-10 mt-12">
         <AiSummaries
           aiSummaries={aiSummaries}
           username={username}
