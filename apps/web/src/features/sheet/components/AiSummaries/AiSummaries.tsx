@@ -116,20 +116,22 @@ export const AiSummaries: React.FC<Props> = ({
               <p className="text-xl font-bold leading-relaxed text-gray-800">
                 {json.character_summary}
               </p>
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() =>
-                    shareToSns(
-                      `私の読書性格は「${json.character_summary}」でした📚✨\n#kidoku のAI読書分析`,
-                      shareUrl
-                    )
-                  }
-                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
-                >
-                  <FiShare2 size={16} />
-                  診断結果をシェア
-                </button>
-              </div>
+              {isMine && (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={() =>
+                      shareToSns(
+                        `私の読書性格は「${json.character_summary}」でした📚✨\n#kidoku のAI読書分析`,
+                        shareUrl
+                      )
+                    }
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
+                  >
+                    <FiShare2 size={16} />
+                    診断結果をシェア
+                  </button>
+                </div>
+              )}
             </div>
           )}
           <div className="mb-1 grid grid-cols-1 gap-4 md:grid-cols-2">
