@@ -297,15 +297,17 @@ export const SheetPage: React.FC<Props> = ({
       <div className="mt-32 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
-        <div className="mt-4 flex justify-center">
-          <button
-            onClick={() => shareToSns(wrappedShareText, shareUrl)}
-            className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
-          >
-            <FiShare2 size={16} />
-            {year}の読書まとめをシェア
-          </button>
-        </div>
+        {isMine && (
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => shareToSns(wrappedShareText, shareUrl)}
+              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
+            >
+              <FiShare2 size={16} />
+              {year}の読書まとめをシェア
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="mb-10">
