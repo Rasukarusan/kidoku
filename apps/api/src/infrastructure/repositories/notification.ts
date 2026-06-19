@@ -14,13 +14,26 @@ export class NotificationRepository implements INotificationRepository {
   async create(params: CreateNotificationParams): Promise<void> {
     // 自分自身の操作では通知しない
     if (params.userId === params.actorId) return;
+
+    const { userId, actorId, type } = params;
+
+    // 本に紐づく通知（いいね等）は (受信者・操作者・種別・本) ごとに1件に集約する。
+    // いいね→いいね解除→再いいねを繰り返しても通知が重複作成されないようにし、
+    // 再操作時は既存通知を最新化（未読に戻す）する。
+    if (params.bookId != null) {
+      const bookId = params.bookId;
+      await this.prisma.notification.upsert({
+        where: {
+          userId_actorId_type_bookId: { userId, actorId, type, bookId },
+        },
+        create: { userId, actorId, type, bookId },
+        update: { read: false, created: new Date() },
+      });
+      return;
+    }
+
     await this.prisma.notification.create({
-      data: {
-        userId: params.userId,
-        actorId: params.actorId,
-        type: params.type,
-        bookId: params.bookId ?? null,
-      },
+      data: { userId, actorId, type, bookId: null },
     });
   }
 
