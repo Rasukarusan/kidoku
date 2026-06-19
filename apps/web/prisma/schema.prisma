@@ -40,6 +40,7 @@ model books {
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   yearly_top_books YearlyTopBook[]
   likes            Like[]
+  purchases        Purchase[]
 }
 
 model Account {
@@ -90,6 +91,7 @@ model User {
   likes              Like[]
   notifications      Notification[] @relation("notificationUser")
   actorNotifications Notification[] @relation("notificationActor")
+  purchases          Purchase[]
 
   @@map("users")
 }
@@ -155,6 +157,24 @@ model Like {
   @@unique([userId, bookId], map: "uniq_user_book")
   @@index([bookId])
   @@map("likes")
+}
+
+model Purchase {
+  id               Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId           String   @map("user_id")
+  bookId           Int      @map("book_id")
+  txDigest         String   @unique @map("tx_digest") @db.VarChar(120)
+  network          String   @default("testnet") @db.VarChar(20)
+  amount           String   @db.VarChar(40)
+  senderAddress    String   @map("sender_address") @db.VarChar(80)
+  recipientAddress String   @map("recipient_address") @db.VarChar(80)
+  created          DateTime @default(now()) @db.DateTime(0)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book             books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId], map: "uniq_user_book_purchase")
+  @@index([bookId])
+  @@map("purchases")
 }
 
 model Notification {

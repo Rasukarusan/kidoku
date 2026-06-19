@@ -191,6 +191,17 @@ type TopReaderItem {
   bookCount: Int!
 }
 
+type PurchaseResponse {
+  id: ID!
+  bookId: Int!
+  txDigest: String!
+  network: String!
+  amount: String!
+  senderAddress: String!
+  recipientAddress: String!
+  created: DateTime!
+}
+
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
@@ -216,6 +227,8 @@ type Query {
   unreadNotificationCount: Int!
   popularBooks(limit: Int): [PopularBookItem!]!
   topReaders(limit: Int): [TopReaderItem!]!
+  myPurchasedBookIds: [Int!]!
+  purchasedBookMemo(input: GetPurchasedBookMemoInput!): String
 }
 
 input GetCommentsInput {
@@ -272,6 +285,10 @@ input GetNotificationsInput {
   offset: Int!
 }
 
+input GetPurchasedBookMemoInput {
+  bookId: Int!
+}
+
 type Mutation {
   createSheet(input: CreateSheetInput!): SheetResponse!
   updateSheet(input: UpdateSheetInput!): SheetResponse!
@@ -294,6 +311,7 @@ type Mutation {
   likeBook(input: LikeBookInput!): Int!
   unlikeBook(input: LikeBookInput!): Int!
   markNotificationsRead: Boolean!
+  createPurchase(input: CreatePurchaseInput!): PurchaseResponse!
 }
 
 input CreateSheetInput {
@@ -396,4 +414,11 @@ input FollowUserInput {
 
 input LikeBookInput {
   bookId: Int!
+}
+
+input CreatePurchaseInput {
+  bookId: Int!
+  txDigest: String!
+  senderAddress: String!
+  network: String!
 }

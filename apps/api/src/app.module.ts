@@ -17,6 +17,7 @@ import { FollowModule } from './presentation/modules/follow';
 import { LikeModule } from './presentation/modules/like';
 import { NotificationModule } from './presentation/modules/notification';
 import { DiscoveryModule } from './presentation/modules/discovery';
+import { PurchaseModule } from './presentation/modules/purchase';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { DiscoveryModule } from './presentation/modules/discovery';
     LikeModule,
     NotificationModule,
     DiscoveryModule,
+    PurchaseModule,
   ],
 })
 export class AppModule {}
