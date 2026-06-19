@@ -168,6 +168,7 @@ model Notification {
   user    User     @relation("notificationUser", fields: [userId], references: [id], onDelete: Cascade)
   actor   User     @relation("notificationActor", fields: [actorId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, actorId, type, bookId], map: "uniq_user_actor_type_book")
   @@index([userId])
   @@index([actorId])
   @@map("notifications")
