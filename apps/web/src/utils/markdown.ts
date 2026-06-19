@@ -28,3 +28,30 @@ export const expandBlankLines = (markdown: string): string => {
     return '\n\n' + `${NBSP}\n\n`.repeat(extraBlankLines)
   })
 }
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/**
+ * tiptap-markdown用のParagraph直列化関数。
+ *
+ * prosemirror-markdownの標準実装は空段落（ユーザーがEnterで空けた行）を
+ * serialize時に黙って削除してしまう。空段落をNBSPのみの段落として出力する
+ * ことで、保存後も空行が保持されるようにする。
+ *
+ * @param state tiptap-markdownのMarkdownSerializerState
+ * @param node ProseMirrorのparagraphノード
+ */
+export const serializeParagraphPreservingBlank = (
+  state: any,
+  node: any
+): void => {
+  if (node.childCount === 0) {
+    // 空段落はNBSPを書き出してブロックとして残す（消されないように）
+    state.write(NBSP)
+  } else {
+    state.renderInline(node)
+  }
+  state.closeBlock(node)
+}
+
+/* eslint-enable @typescript-eslint/no-explicit-any */

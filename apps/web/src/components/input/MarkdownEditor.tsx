@@ -22,6 +22,8 @@ import {
   createSuggestionItems,
   MarkdownExtension,
 } from 'novel/extensions'
+import Paragraph from '@tiptap/extension-paragraph'
+import { serializeParagraphPreservingBlank } from '@/utils/markdown'
 import {
   Bold,
   Italic,
@@ -161,6 +163,27 @@ const slashCommand = Command.configure({
   },
 })
 
+/**
+ * 空段落（ユーザーがEnterで空けた行）を保持するParagraph拡張。
+ *
+ * tiptap-markdownの基盤であるprosemirror-markdownは、空段落をserialize時に
+ * 黙って削除してしまう（closeBlockがthis.closedを上書きするだけで、空段落は
+ * write()を呼ばないため）。その結果、感想の空行が保存時点で失われていた。
+ *
+ * ここでParagraphノードのmarkdown serializeを上書きし、空段落をNBSPのみの
+ * 段落として出力することで、保存後も空行が保持されるようにする。
+ */
+const ParagraphWithBlankLine = Paragraph.extend({
+  addStorage() {
+    return {
+      markdown: {
+        serialize: serializeParagraphPreservingBlank,
+        parse: {},
+      },
+    }
+  },
+})
+
 interface MarkdownEditorProps {
   value: string
   onChange: (value: string) => void
@@ -180,6 +203,9 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const extensions = useMemo(
     () => [
       StarterKit.configure({
+        // 空段落を保持するため、StarterKit標準のparagraphを無効化し
+        // ParagraphWithBlankLineで置き換える
+        paragraph: false,
         bulletList: {
           HTMLAttributes: {
             class: 'list-disc list-outside ml-4',
@@ -209,6 +235,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           },
         },
       }),
+      ParagraphWithBlankLine,
       TiptapLink.configure({
         HTMLAttributes: {
           class: 'text-blue-500 underline cursor-pointer',

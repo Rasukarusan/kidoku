@@ -1,4 +1,4 @@
-import { expandBlankLines } from './markdown'
+import { expandBlankLines, serializeParagraphPreservingBlank } from './markdown'
 
 const NBSP = String.fromCharCode(0xa0)
 
@@ -30,5 +30,30 @@ describe('expandBlankLines()', () => {
 
   it('空文字の場合は空文字が返ること', () => {
     expect(expandBlankLines('')).toBe('')
+  })
+})
+
+describe('serializeParagraphPreservingBlank()', () => {
+  // tiptap-markdown の MarkdownSerializerState を模したフェイク
+  const createFakeState = () => {
+    const calls: string[] = []
+    return {
+      calls,
+      write: (content: string) => calls.push(`write:${content}`),
+      renderInline: () => calls.push('renderInline'),
+      closeBlock: () => calls.push('closeBlock'),
+    }
+  }
+
+  it('空段落(childCount=0)はNBSPを書き出してブロックを閉じること', () => {
+    const state = createFakeState()
+    serializeParagraphPreservingBlank(state, { childCount: 0 })
+    expect(state.calls).toEqual([`write:${NBSP}`, 'closeBlock'])
+  })
+
+  it('中身のある段落はrenderInlineしてブロックを閉じること', () => {
+    const state = createFakeState()
+    serializeParagraphPreservingBlank(state, { childCount: 1 })
+    expect(state.calls).toEqual(['renderInline', 'closeBlock'])
   })
 })
