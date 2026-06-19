@@ -12,6 +12,14 @@ const CheckoutModal = dynamic(
     import('@/components/form/CheckoutModal').then((mod) => mod.CheckoutModal),
   { ssr: false }
 )
+// Sui決済モーダル（ウォレット連携を含むため動的読み込み）
+const SuiCheckoutModal = dynamic(
+  () =>
+    import('@/components/form/SuiCheckoutModal').then(
+      (mod) => mod.SuiCheckoutModal
+    ),
+  { ssr: false }
+)
 import { Loading } from '@/components/icon/Loading'
 import { Tooltip } from 'react-tooltip'
 import { Memo } from './Memo'
@@ -22,6 +30,8 @@ import { useQuery } from '@apollo/client'
 import { myLikedBookIdsQuery } from '@/features/social/api'
 import { LikeButton } from '@/features/social/components/LikeButton'
 import { useCachedSession } from '@/hooks/useCachedSession'
+import { isSuiPaymentEnabled, suiPaymentAmountLabel } from '@/libs/sui/config'
+import { purchasedBookMemoQuery } from '@/features/purchase/api'
 
 interface Props {
   book: Book
@@ -33,6 +43,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
   const isMine = useIsBookOwner(book)
   const { status } = useCachedSession()
   const [open, setOpen] = useState(false)
+  const [suiOpen, setSuiOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   // ログイン中はいいね済みの本IDを取得し、初期状態を反映する
@@ -40,6 +51,17 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
     skip: status !== 'authenticated',
   })
   const likedBookIds: number[] = likedData?.myLikedBookIds ?? []
+
+  // 購入済みの場合は解放されたメモ本文を取得する（非所有者・非公開・購入可能なときのみ）
+  const canPurchase = !isMine && !book.isPublicMemo && book.isPurchasable
+  const { data: memoData, refetch: refetchMemo } = useQuery(
+    purchasedBookMemoQuery,
+    {
+      variables: { input: { bookId: Number(book.id) } },
+      skip: status !== 'authenticated' || !canPurchase,
+    }
+  )
+  const unlockedMemo: string | null | undefined = memoData?.purchasedBookMemo
 
   const returnUrl = () => {
     return `${process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'}/books/${book.id}`
@@ -163,23 +185,44 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
               </div>
             )}
 
-            {!isMine && !book.isPublicMemo && (
-              <div className="rounded-lg bg-gray-100 p-8 text-center">
-                <AiFillLock className="mx-auto mb-2 text-gray-400" size={24} />
-                <p className="text-gray-600">
-                  このメモは非公開に設定されています
-                </p>
-                {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
-                  book.isPurchasable && (
-                    <button
-                      className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                      onClick={() => setOpen(true)}
-                    >
-                      メモを見る（有料）
-                    </button>
-                  )}
-              </div>
-            )}
+            {!isMine &&
+              !book.isPublicMemo &&
+              (unlockedMemo !== null && unlockedMemo !== undefined ? (
+                <div className="rounded-lg bg-gray-50 p-4">
+                  <Memo memo={unlockedMemo} />
+                </div>
+              ) : (
+                <div className="rounded-lg bg-gray-100 p-8 text-center">
+                  <AiFillLock
+                    className="mx-auto mb-2 text-gray-400"
+                    size={24}
+                  />
+                  <p className="text-gray-600">
+                    このメモは非公開に設定されています
+                  </p>
+                  {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
+                    book.isPurchasable && (
+                      <div className="mt-4 flex flex-col items-center gap-2">
+                        {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+                          <button
+                            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                            onClick={() => setOpen(true)}
+                          >
+                            メモを見る（カード決済）
+                          </button>
+                        )}
+                        {isSuiPaymentEnabled && (
+                          <button
+                            className="rounded bg-sky-600 px-4 py-2 text-white hover:bg-sky-700"
+                            onClick={() => setSuiOpen(true)}
+                          >
+                            Suiで購入（{suiPaymentAmountLabel}）
+                          </button>
+                        )}
+                      </div>
+                    )}
+                </div>
+              ))}
           </div>
         </div>
       </div>
@@ -190,6 +233,18 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
           onClose={() => setOpen(false)}
           returnUrl={returnUrl()}
           purchaseText="書籍を購入"
+        />
+      )}
+
+      {isSuiPaymentEnabled && (
+        <SuiCheckoutModal
+          open={suiOpen}
+          onClose={() => setSuiOpen(false)}
+          bookId={Number(book.id)}
+          onPurchased={() => {
+            refetchMemo()
+            setSuiOpen(false)
+          }}
         />
       )}
     </div>
