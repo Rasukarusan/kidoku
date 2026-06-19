@@ -16,6 +16,11 @@ export class LikeRepository implements ILikeRepository {
     });
     if (!book) return { created: false, bookOwnerId: null };
 
+    // 自分の本にはいいねできない
+    if (book.userId === userId) {
+      return { created: false, bookOwnerId: book.userId };
+    }
+
     const existing = await this.prisma.like.findUnique({
       where: { userId_bookId: { userId, bookId } },
     });
