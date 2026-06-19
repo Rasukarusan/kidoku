@@ -24,11 +24,25 @@ import { twMerge } from 'tailwind-merge'
 import { useQuery } from '@apollo/client'
 import { getBooksQuery } from '@/features/books/api'
 import dayjs from 'dayjs'
+import { FiShare2 } from 'react-icons/fi'
+import { shareToSns } from '@/utils/socialShare'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
   { ssr: false }
 )
+
+// impressionの値を数値にマッピング
+const getImpressionValue = (impression: string): number => {
+  const map: { [key: string]: number } = {
+    '◎': 4,
+    '◯': 3,
+    '△': 2,
+    '✗': 1,
+    '-': 0,
+  }
+  return map[impression] ?? 0
+}
 
 interface Props {
   data: Book[]
@@ -127,7 +141,63 @@ export const SheetPage: React.FC<Props> = ({
     const [month, count] = entries[0]
     return `${year}は合計${data.length}冊。最も読んだのは${month}で${count}冊でした。`
   }, [data, year])
-  const ogImage = `${host}/api/og?type=year&user=${encodeURIComponent(username)}&title=${encodeURIComponent(`${year}年の読書まとめ`)}&subtitle=${encodeURIComponent('今年読んだ冊数')}&count=${data.length}`
+  // 最もよく読んだジャンル
+  const topCategory = useMemo(() => {
+    const counts = data.reduce(
+      (acc, book) => {
+        if (book.category) acc[book.category] = (acc[book.category] ?? 0) + 1
+        return acc
+      },
+      {} as Record<string, number>
+    )
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1])
+    return entries[0]?.[0] ?? ''
+  }, [data])
+
+  // ベストブック（年間ベスト指定があれば優先、なければ最高評価の本）
+  const bestBook = useMemo(() => {
+    if (yearlyTopBooks?.[0]?.book) {
+      return {
+        title: yearlyTopBooks[0].book.title,
+        image: yearlyTopBooks[0].book.image,
+      }
+    }
+    const ranked = [...data].sort(
+      (a, b) =>
+        getImpressionValue(b.impression) - getImpressionValue(a.impression)
+    )
+    return ranked[0] ? { title: ranked[0].title, image: ranked[0].image } : null
+  }, [data, yearlyTopBooks])
+
+  // AI診断結果（あれば最優先のシェア素材）
+  const latestAiSummary = useMemo(
+    () => aiSummaries?.find((s) => s?.character_summary) ?? null,
+    [aiSummaries]
+  )
+
+  const wrappedOgImage = `${host}/api/og?type=wrapped&user=${encodeURIComponent(
+    username
+  )}&year=${encodeURIComponent(year)}&count=${data.length}&category=${encodeURIComponent(
+    topCategory
+  )}&book=${encodeURIComponent(bestBook?.title ?? '')}${
+    bestBook?.image && /^https?:\/\//.test(bestBook.image)
+      ? `&image=${encodeURIComponent(bestBook.image)}`
+      : ''
+  }`
+  const aiOgImage = latestAiSummary
+    ? `${host}/api/og?type=ai&user=${encodeURIComponent(
+        username
+      )}&summary=${encodeURIComponent(
+        latestAiSummary.character_summary
+      )}&sub=${encodeURIComponent(latestAiSummary.overall_feedback ?? '')}`
+    : ''
+  // AI診断があればそれを、なければ年間まとめ（Wrapped）をOGに使う
+  const ogImage = latestAiSummary ? aiOgImage : wrappedOgImage
+
+  const shareUrl = `${host}/${encodeURIComponent(username)}/sheets/${encodeURIComponent(year)}`
+  const wrappedShareText = `${year}の読書まとめ📚\n${data.length}冊読みました${
+    topCategory ? `（よく読んだジャンル: ${topCategory}）` : ''
+  }\n#kidoku`
 
   // シート切り替え時にステートをリセット
   useEffect(() => {
@@ -153,18 +223,6 @@ export const SheetPage: React.FC<Props> = ({
 
   const handleChange = (newMode: 'row' | 'grid') => {
     setMode(newMode)
-  }
-
-  // impressionの値を数値にマッピング
-  const getImpressionValue = (impression: string): number => {
-    const map: { [key: string]: number } = {
-      '◎': 4,
-      '◯': 3,
-      '△': 2,
-      '✗': 1,
-      '-': 0,
-    }
-    return map[impression] ?? 0
   }
 
   // ソート処理
@@ -239,9 +297,20 @@ export const SheetPage: React.FC<Props> = ({
       <div className="mt-32 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
+        {isMine && (
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => shareToSns(wrappedShareText, shareUrl)}
+              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
+            >
+              <FiShare2 size={16} />
+              {year}の読書まとめをシェア
+            </button>
+          </div>
+        )}
       </div>
 
-      <div className="mb-10">
+      <div className="mb-10 mt-12">
         <AiSummaries
           aiSummaries={aiSummaries}
           username={username}

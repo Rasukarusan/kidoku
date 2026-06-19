@@ -40,6 +40,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
             name: true,
           },
         },
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
       },
     })
 
@@ -76,6 +81,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
           month,
           sheetId: book.sheetId,
           sheet: book.sheet?.name ?? null,
+          likeCount: book._count?.likes ?? 0,
         }),
       },
       revalidate: 60,

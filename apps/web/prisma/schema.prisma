@@ -39,6 +39,7 @@ model books {
   sheet            sheets          @relation(fields: [sheetId], references: [id], onDelete: Cascade)
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   yearly_top_books YearlyTopBook[]
+  likes            Like[]
 }
 
 model Account {
@@ -84,6 +85,11 @@ model User {
   books            books[]
   AiSummaries      AiSummaries[]
   template_books   template_books[]
+  following          Follow[]       @relation("following")
+  followers          Follow[]       @relation("followers")
+  likes              Like[]
+  notifications      Notification[] @relation("notificationUser")
+  actorNotifications Notification[] @relation("notificationActor")
 
   @@map("users")
 }
@@ -123,6 +129,48 @@ model AiSummaries {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_summaries")
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  followerId  String   @map("follower_id")
+  followingId String   @map("following_id")
+  created     DateTime @default(now()) @db.DateTime(0)
+  follower    User     @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId], map: "uniq_follower_following")
+  @@index([followingId])
+  @@map("follows")
+}
+
+model Like {
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId  String   @map("user_id")
+  bookId  Int      @map("book_id")
+  created DateTime @default(now()) @db.DateTime(0)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId], map: "uniq_user_book")
+  @@index([bookId])
+  @@map("likes")
+}
+
+model Notification {
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId  String   @map("user_id")
+  actorId String   @map("actor_id")
+  type    String   @db.VarChar(20)
+  bookId  Int?     @map("book_id")
+  read    Boolean  @default(false)
+  created DateTime @default(now()) @db.DateTime(0)
+  user    User     @relation("notificationUser", fields: [userId], references: [id], onDelete: Cascade)
+  actor   User     @relation("notificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([actorId])
+  @@map("notifications")
 }
 
 model template_books {

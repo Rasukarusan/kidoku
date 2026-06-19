@@ -18,6 +18,10 @@ import { Memo } from './Memo'
 import { FaLink } from 'react-icons/fa'
 import { FiShare2 } from 'react-icons/fi'
 import { shareToSns } from '@/utils/socialShare'
+import { useQuery } from '@apollo/client'
+import { myLikedBookIdsQuery } from '@/features/social/api'
+import { LikeButton } from '@/features/social/components/LikeButton'
+import { useCachedSession } from '@/hooks/useCachedSession'
 
 interface Props {
   book: Book
@@ -27,8 +31,15 @@ interface Props {
 
 export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
   const isMine = useIsBookOwner(book)
+  const { status } = useCachedSession()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+
+  // ログイン中はいいね済みの本IDを取得し、初期状態を反映する
+  const { data: likedData } = useQuery(myLikedBookIdsQuery, {
+    skip: status !== 'authenticated',
+  })
+  const likedBookIds: number[] = likedData?.myLikedBookIds ?? []
 
   const returnUrl = () => {
     return `${process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'}/books/${book.id}`
@@ -40,6 +51,16 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
       <div className="flex-1">
         <div className="flex justify-end p-4">
           <div className="flex items-center space-x-2">
+            {!isMine && (
+              <div className="mr-1">
+                <LikeButton
+                  key={book.id}
+                  bookId={book.id}
+                  count={book.likeCount ?? 0}
+                  liked={likedBookIds.includes(Number(book.id))}
+                />
+              </div>
+            )}
             <button
               className="rounded-full bg-gray-200 p-2 hover:brightness-95"
               onClick={() => {
@@ -55,10 +76,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
             <button
               className="rounded-full bg-slate-800 p-2 text-white hover:bg-slate-700"
               onClick={() =>
-                shareToSns(
-                  `『${book.title}』を読了しました📚 #kidoku`,
-                  shareUrl
-                )
+                shareToSns(`『${book.title}』の感想📚 #kidoku`, shareUrl)
               }
               data-tooltip-id="book-sns-share"
               data-tooltip-content="SNSで共有"

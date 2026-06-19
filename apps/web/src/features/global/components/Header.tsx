@@ -7,6 +7,7 @@ import { openNavSidebarAtom, openLoginModalAtom } from '@/store/modal/atom'
 import { Logo } from '@/components/icon/Logo'
 import Link from 'next/link'
 import { useCachedSession } from '@/hooks/useCachedSession'
+import { NotificationBell } from '@/features/social/components/NotificationBell'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -30,16 +31,19 @@ export const Header = () => {
             <SearchBox />
           </div>
           {session ? (
-            <button
-              className="mr-2 truncate text-base font-bold text-black sm:mr-4"
-              onClick={() => setOpenSidebar(true)}
-            >
-              <img
-                className="h-10 w-10 rounded-full ring-2 ring-white"
-                src={session.user.image || ''}
-                alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
-              />
-            </button>
+            <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
+              <NotificationBell />
+              <button
+                className="mr-2 truncate text-base font-bold text-black sm:mr-4"
+                onClick={() => setOpenSidebar(true)}
+              >
+                <img
+                  className="h-10 w-10 rounded-full ring-2 ring-white"
+                  src={session.user.image || ''}
+                  alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
+                />
+              </button>
+            </div>
           ) : (
             status !== 'loading' && (
               <button

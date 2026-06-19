@@ -8,8 +8,8 @@ import {
   AiFillBook,
   AiOutlinePlusCircle,
   AiFillPlusCircle,
-  AiOutlineSetting,
-  AiFillSetting,
+  AiOutlineCompass,
+  AiFillCompass,
 } from 'react-icons/ai'
 import { useAtom } from 'jotai'
 import { useCachedSession } from '@/hooks/useCachedSession'
@@ -25,7 +25,7 @@ export const BottomNav: React.FC = () => {
   const navigationItems = useMemo(() => {
     const isHomePage = router.pathname === '/'
     const isSheetsPage = router.pathname.includes('/sheets')
-    const isSettingsPage = router.pathname.includes('/settings')
+    const isDiscoverPage = router.pathname.includes('/discover')
 
     return [
       {
@@ -50,11 +50,11 @@ export const BottomNav: React.FC = () => {
         onClick: () => setOpenSearchModal(true),
       },
       {
-        name: '設定',
-        href: '/settings/profile',
-        icon: AiOutlineSetting,
-        activeIcon: AiFillSetting,
-        isActive: isSettingsPage,
+        name: '発見',
+        href: '/discover',
+        icon: AiOutlineCompass,
+        activeIcon: AiFillCompass,
+        isActive: isDiscoverPage,
       },
     ]
   }, [readingRecordsUrl, router.pathname, setOpenSearchModal])

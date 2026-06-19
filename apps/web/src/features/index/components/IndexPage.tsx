@@ -1,12 +1,27 @@
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { useAtom } from 'jotai'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
+import { openSearchModalAtom } from '@/store/modal/atom'
 
 interface Props {
   comments: Comment[]
 }
 
 export const IndexPage: React.FC<Props> = ({ comments }) => {
+  const router = useRouter()
+  const [, setOpenSearchModal] = useAtom(openSearchModalAtom)
+
+  // オンボーディング直後（?start=1）は最初の1冊登録モーダルを自動で開く
+  useEffect(() => {
+    if (router.query.start === '1') {
+      setOpenSearchModal(true)
+      router.replace('/', undefined, { shallow: true })
+    }
+  }, [router, setOpenSearchModal])
+
   return (
     <Container className="p-6">
       <section>
