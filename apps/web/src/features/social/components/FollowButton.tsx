@@ -14,9 +14,11 @@ interface Props {
   name: string
   /** プロフィール所有者のユーザーID */
   userId: string
+  /** フォロー状態が変わったときに呼ばれる（フォロワー数の即時更新などに使用） */
+  onChanged?: (following: boolean) => void
 }
 
-export const FollowButton: React.FC<Props> = ({ name, userId }) => {
+export const FollowButton: React.FC<Props> = ({ name, userId, onChanged }) => {
   const { session, status } = useCachedSession()
   const [, setOpenLogin] = useAtom(openLoginModalAtom)
   const isSelf = status === 'authenticated' && session?.user?.id === userId
@@ -46,6 +48,7 @@ export const FollowButton: React.FC<Props> = ({ name, userId }) => {
     setBusy(true)
     const next = !following
     setFollowing(next)
+    onChanged?.(next)
     try {
       const input = { userId }
       if (next) {
@@ -55,29 +58,23 @@ export const FollowButton: React.FC<Props> = ({ name, userId }) => {
       }
     } catch {
       setFollowing(!next)
+      onChanged?.(!next)
     } finally {
       setBusy(false)
     }
   }
 
   return (
-    <div className="ml-auto flex shrink-0 items-center gap-3 pl-2 pr-1">
-      {data?.followInfo && (
-        <span className="hidden whitespace-nowrap text-xs text-gray-500 sm:inline">
-          フォロワー {data.followInfo.followers}
-        </span>
-      )}
-      <button
-        onClick={handleClick}
-        disabled={busy}
-        className={
-          following
-            ? 'whitespace-nowrap rounded-full border border-gray-300 px-4 py-1 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-60'
-            : 'whitespace-nowrap rounded-full bg-gray-900 px-4 py-1 text-sm font-bold text-white transition-colors hover:bg-gray-700 disabled:opacity-60'
-        }
-      >
-        {following ? 'フォロー中' : 'フォロー'}
-      </button>
-    </div>
+    <button
+      onClick={handleClick}
+      disabled={busy}
+      className={
+        following
+          ? 'whitespace-nowrap rounded-full border border-gray-300 px-5 py-1.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-60'
+          : 'whitespace-nowrap rounded-full bg-gray-900 px-5 py-1.5 text-sm font-bold text-white transition-colors hover:bg-gray-700 disabled:opacity-60'
+      }
+    >
+      {following ? 'フォロー中' : 'フォロー'}
+    </button>
   )
 }

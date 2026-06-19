@@ -41,6 +41,15 @@ export const followInfoQuery = gql`
   }
 `
 
+export const followCountsQuery = gql`
+  query FollowCounts($input: GetFollowInfoInput!) {
+    followCounts(input: $input) {
+      followers
+      following
+    }
+  }
+`
+
 export const feedQuery = gql`
   query Feed($input: GetFeedInput!) {
     feed(input: $input) {

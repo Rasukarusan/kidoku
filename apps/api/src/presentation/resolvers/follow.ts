@@ -51,6 +51,14 @@ export class FollowResolver {
     return this.getFollowInfoUseCase.execute(input.name, user.id);
   }
 
+  /** 公開用のフォロー数取得（未ログインでも閲覧可。isFollowingは常にfalse） */
+  @Query(() => FollowInfoResponse)
+  async followCounts(
+    @Args('input') input: GetFollowInfoInput,
+  ): Promise<FollowInfoResponse> {
+    return this.getFollowInfoUseCase.execute(input.name);
+  }
+
   @Query(() => FeedResponse)
   @UseGuards(GqlAuthGuard)
   async feed(

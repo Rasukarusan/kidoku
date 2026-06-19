@@ -209,6 +209,7 @@ type Query {
   aiSummaryUsage: Int!
   templateBooks: [TemplateBookResponse!]!
   followInfo(input: GetFollowInfoInput!): FollowInfoResponse!
+  followCounts(input: GetFollowInfoInput!): FollowInfoResponse!
   feed(input: GetFeedInput!): FeedResponse!
   myLikedBookIds: [Int!]!
   notifications(input: GetNotificationsInput!): NotificationResponse!

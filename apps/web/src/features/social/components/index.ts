@@ -1,5 +1,6 @@
 export * from './LikeButton'
 export * from './FollowButton'
 export * from './NotificationBell'
+export * from './ProfileHeader'
 export * from './DiscoverPage'
 export * from './NotificationsPage'
