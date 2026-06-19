@@ -2,153 +2,155 @@
 
 # Kidoku
 
-**Your Personal Reading Tracker & Analytics**
+**あなたのための読書記録 & 分析アプリ**
 
-AI-powered reading habit analysis with barcode scanning, full-text search, and beautiful statistics.
+バーコードスキャン、全文検索、美しい統計を備えた、AIによる読書傾向の分析。
 
-[Demo](https://kidoku.net/) | [Contributing](./CONTRIBUTING.md) | [Documentation](./docs/)
+[デモ](https://kidoku.net/) | [コントリビュート](./CONTRIBUTING.md) | [ドキュメント](./docs/)
 
 [![CI](https://github.com/Rasukarusan/kidoku/actions/workflows/ci.yml/badge.svg)](https://github.com/Rasukarusan/kidoku/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 </div>
 
-<img width="1247" alt="Kidoku - Reading record management" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
-<img width="1059" alt="Kidoku - Reading statistics" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
+<img width="1247" alt="Kidoku - 読書記録管理" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
+<img width="1059" alt="Kidoku - 読書統計" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
 
 ---
 
-## Features
+## 機能
 
-- **Book Registration** - Search by title or scan a barcode to add books instantly
-- **Yearly Reading Sheets** - Organize your reading history by year with visual cards
-- **AI Reading Analysis** - Discover your reading tendencies with Cohere-powered insights
-- **Reading Statistics** - Monthly reading counts, category breakdowns, and trends
-- **Full-Text Search** - Lightning-fast Japanese full-text search powered by MeiliSearch
+- **本の登録** - タイトル検索またはバーコードスキャンで、本をすぐに追加
+- **年別読書シート** - 読書履歴を年ごとにビジュアルなカードで整理
+- **AI読書分析** - Cohere による分析であなたの読書傾向を発見
+- **読書統計** - 月別の読書数、カテゴリ別の内訳、トレンドを可視化
+- **全文検索** - MeiliSearch による高速な日本語全文検索
 
-## Tech Stack
+## 技術スタック
 
-| Layer | Technology |
+| レイヤー | 技術 |
 |-------|------------|
-| Monorepo | Turborepo + pnpm workspaces |
-| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS |
-| Backend | NestJS 11, GraphQL, DDD architecture |
-| Database | MySQL 9.3 + Prisma ORM |
-| Auth | NextAuth.js (Google OAuth) |
-| Search | MeiliSearch (Japanese-optimized build) |
+| モノレポ | Turborepo + pnpm workspaces |
+| フロントエンド | Next.js 14, React 18, TypeScript, Tailwind CSS |
+| バックエンド | NestJS 11, GraphQL, DDDアーキテクチャ |
+| データベース | MySQL 9.3 + Prisma ORM |
+| 認証 | NextAuth.js (Google OAuth) |
+| 検索 | MeiliSearch (日本語最適化ビルド) |
 | AI | Cohere |
-| Payments | Stripe |
+| 決済 | Stripe |
 
-## Project Structure
+## プロジェクト構成
 
 ```
 kidoku/
 ├── apps/
-│   ├── web/          # Next.js frontend
+│   ├── web/          # Next.js フロントエンド
 │   └── api/          # NestJS GraphQL API (DDD)
 ├── packages/
-│   └── eslint-config # Shared ESLint configuration
-├── docker/           # MeiliSearch & MySQL containers
-├── docs/             # Architecture & deployment docs
-└── scripts/          # Development automation scripts
+│   └── eslint-config # 共通 ESLint 設定
+├── docker/           # MeiliSearch & MySQL コンテナ
+├── docs/             # アーキテクチャ・デプロイ関連ドキュメント
+└── scripts/          # 開発自動化スクリプト
 ```
 
-## Getting Started
+## はじめに
 
-### Prerequisites
+### 前提条件
 
 - Node.js >= 22
 - pnpm >= 10.5.2
 - Docker & Docker Compose
 
-### Setup
+### セットアップ
 
 ```bash
-# Install dependencies
+# 依存関係のインストール
 pnpm install
 
-# Configure environment variables
+# 環境変数の設定
 cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
 
-# Start Docker services (MySQL, MeiliSearch)
+# Docker サービス起動 (MySQL, MeiliSearch)
 docker-compose up -d
 
-# Set up database
+# データベースのセットアップ
 pnpm --filter web db:push
 pnpm --filter web prisma generate
 pnpm --filter api db:push
 
-# Start all dev servers
+# 全ての開発サーバーを起動
 pnpm dev
 ```
 
-### Access URLs
+### アクセスURL
 
-| Service | URL |
+| サービス | URL |
 |---------|-----|
-| Web App | http://localhost:3000 |
+| Webアプリ | http://localhost:3000 |
 | GraphQL API | http://localhost:4000/graphql |
 | MeiliSearch | http://localhost:7700 |
 
-### Search Setup (MeiliSearch)
+### 検索のセットアップ (MeiliSearch)
 
 ```bash
 docker-compose up --build
 
-# Register documents in MeiliSearch
+# MeiliSearch にドキュメントを登録
 curl -XPOST -H "Authorization: Bearer ${ADMIN_AUTH_TOKEN}" \
   http://localhost:3000/api/batch/meilisearch
 ```
 
-## Development
+## 開発
 
 ```bash
-pnpm dev              # Start all services
-pnpm build            # Build all packages
-pnpm lint             # Run linter
-pnpm lint:fix         # Auto-fix lint issues
-pnpm format           # Format code with Prettier
-pnpm check-types      # Type checking
-pnpm validate         # Run lint + type check + tests (all-in-one)
+pnpm dev              # 全サービス起動
+pnpm build            # 全パッケージのビルド
+pnpm lint             # リント実行
+pnpm lint:fix         # リントの自動修正
+pnpm format           # Prettier でフォーマット
+pnpm check-types      # 型チェック
+pnpm validate         # lint + 型チェック + テストを一括実行
 ```
 
-### Testing
+### テスト
 
 ```bash
-# Frontend
-pnpm --filter web test          # Unit tests
-pnpm --filter web test:c        # With coverage
+# フロントエンド
+pnpm --filter web test          # 単体テスト
+pnpm --filter web test:c        # カバレッジ付き
 
-# Backend
-pnpm --filter api test          # Unit tests
-pnpm --filter api test:e2e      # E2E tests
+# バックエンド
+pnpm --filter api test          # 単体テスト
+pnpm --filter api test:e2e      # E2Eテスト
 ```
 
-## Architecture
+## アーキテクチャ
 
-The backend API follows **Domain-Driven Design (DDD)** with a layered architecture:
+バックエンドAPIは **ドメイン駆動設計 (DDD)** によるレイヤードアーキテクチャを採用しています。
 
 ```
 apps/api/src/
-├── domain/           # Core business logic (entities, repository interfaces)
-├── application/      # Use cases
-├── infrastructure/   # External integrations (DB, auth)
-├── presentation/     # GraphQL resolvers, DTOs, modules
-└── shared/           # Cross-cutting concerns
+├── domain/           # ビジネスロジックの中核 (エンティティ、リポジトリインターフェース)
+├── application/      # ユースケース
+├── infrastructure/   # 外部連携 (DB, 認証)
+├── presentation/     # GraphQLリゾルバー、DTO、モジュール
+└── shared/           # 横断的関心事
 ```
 
-**Dependency rules**: `domain` has no dependencies. `application` depends only on `domain`. `infrastructure` implements `domain` interfaces. `presentation` orchestrates via `application`.
+**依存ルール**: `domain` は他層に依存しません。`application` は `domain` のみに依存します。`infrastructure` は `domain` のインターフェースを実装します。`presentation` は `application` を通して処理を実行します。
 
-For detailed architecture documentation, see:
-- [Security & Authentication](./docs/SECURITY.md)
-- [Admin API & Batch Processing](./docs/ADMIN_API.md)
-- [Deployment Guide](./docs/DEPLOYMENT.md)
+詳細なアーキテクチャドキュメントは以下を参照してください。
+- [セキュリティ & 認証](./docs/SECURITY.md)
+- [管理者API & バッチ処理](./docs/ADMIN_API.md)
+- [デプロイガイド](./docs/DEPLOYMENT.md)
 
-## Contributing
+## コントリビュート
 
-Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+コントリビュートを歓迎します！ガイドラインは [CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
 
-## License
+## ライセンス
 
 [MIT](./LICENSE) - Naoto Tanaka
+</content>
+</invoke>
