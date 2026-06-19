@@ -44,9 +44,7 @@ export const ProfileHeader: React.FC<Props> = ({ username, userId }) => {
       <div className="min-w-0 flex-1">
         <div className="truncate text-lg font-bold">{username}</div>
         <div className="mt-0.5 text-sm text-gray-500">
-          <span className="font-semibold text-gray-700">
-            {followers ?? '–'}
-          </span>{' '}
+          <span className="font-semibold text-gray-700">{followers ?? 0}</span>{' '}
           フォロワー
           <span className="mx-1.5">・</span>
           <span className="font-semibold text-gray-700">{following}</span>{' '}
