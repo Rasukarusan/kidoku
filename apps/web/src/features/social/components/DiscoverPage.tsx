@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { useQuery } from '@apollo/client'
 import { NextSeo } from 'next-seo'
+import { FaRegHeart } from 'react-icons/fa'
 import { Container } from '@/components/layout/Container'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { useCachedSession } from '@/hooks/useCachedSession'
@@ -43,8 +44,9 @@ interface FeedBook {
 }
 
 export const DiscoverPage: React.FC = () => {
-  const { status } = useCachedSession()
+  const { session, status } = useCachedSession()
   const isAuthed = status === 'authenticated'
+  const currentUsername = session?.user?.name ?? null
 
   const { data: popularData } = useQuery(popularBooksQuery, {
     variables: { limit: 12 },
@@ -88,6 +90,7 @@ export const DiscoverPage: React.FC = () => {
                 sheet={book.sheet}
                 likeCount={book.likeCount}
                 liked={likedSet.has(Number(book.id))}
+                isMine={!!currentUsername && book.username === currentUsername}
               />
             ))}
           </div>
@@ -112,6 +115,7 @@ export const DiscoverPage: React.FC = () => {
                 sheet={book.sheet}
                 likeCount={book.likeCount}
                 liked={likedSet.has(Number(book.id))}
+                isMine={!!currentUsername && book.username === currentUsername}
               />
             ))}
           </div>
@@ -165,6 +169,8 @@ interface BookCardProps {
   sheet: string
   likeCount: number
   liked: boolean
+  /** 自分の本かどうか（自分の本にはいいねボタンを表示しない） */
+  isMine?: boolean
 }
 
 const BookCard: React.FC<BookCardProps> = ({
@@ -175,6 +181,7 @@ const BookCard: React.FC<BookCardProps> = ({
   sheet,
   likeCount,
   liked,
+  isMine = false,
 }) => (
   <div className="flex flex-col">
     <Link href={`/books/${id}`} className="mb-2">
@@ -193,7 +200,14 @@ const BookCard: React.FC<BookCardProps> = ({
       >
         {username}
       </Link>
-      <LikeButton bookId={id} count={likeCount} liked={liked} size={16} />
+      {isMine ? (
+        <span className="flex items-center gap-1 text-sm text-gray-400">
+          <FaRegHeart size={16} />
+          <span className="tabular-nums">{likeCount}</span>
+        </span>
+      ) : (
+        <LikeButton bookId={id} count={likeCount} liked={liked} size={16} />
+      )}
     </div>
   </div>
 )
