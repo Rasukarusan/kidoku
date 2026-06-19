@@ -1,0 +1,46 @@
+name: DB Push
+
+on:
+  workflow_dispatch:
+    inputs:
+      accept_data_loss:
+        description: 'データ損失を許容して push する（--accept-data-loss）'
+        required: false
+        default: false
+        type: boolean
+
+# 同時に複数の db push が走らないように直列化する
+concurrency:
+  group: db-push
+  cancel-in-progress: false
+
+jobs:
+  db-push:
+    runs-on: ubuntu-latest
+    # DATABASE_URL などの保護されたシークレットを使うため Production environment を指定
+    environment: Production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma clients
+        run: |
+          pnpm --filter web exec prisma generate
+          pnpm --filter api exec prisma generate
+
+      - name: Push schema to database
+        run: |
+          ARGS="--skip-generate"
+          if [ "${{ inputs.accept_data_loss }}" = "true" ]; then
+            ARGS="$ARGS --accept-data-loss"
+          fi
+          echo "prisma db push $ARGS"
+          pnpm --filter web db:push -- $ARGS
+          pnpm --filter api db:push -- $ARGS
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

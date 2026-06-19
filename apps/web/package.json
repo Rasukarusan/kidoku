@@ -11,6 +11,7 @@
     "analyze": "ANALYZE=true next build",
     "lighthouse": "lighthouse http://localhost:3000",
     "prisma:generate": "prisma generate",
+    "db:push": "prisma db push",
     "prisma:pull": "prisma db pull",
     "prisma:format": "prisma format",
     "deploy": "fly deploy --local-only",
