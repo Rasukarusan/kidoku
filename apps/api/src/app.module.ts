@@ -13,6 +13,10 @@ import { YearlyTopBookModule } from './presentation/modules/yearly-top-book';
 import { UserModule } from './presentation/modules/user';
 import { AiSummaryModule } from './presentation/modules/ai-summary';
 import { TemplateBookModule } from './presentation/modules/template-book';
+import { FollowModule } from './presentation/modules/follow';
+import { LikeModule } from './presentation/modules/like';
+import { NotificationModule } from './presentation/modules/notification';
+import { DiscoveryModule } from './presentation/modules/discovery';
 
 @Module({
   imports: [
@@ -42,6 +46,10 @@ import { TemplateBookModule } from './presentation/modules/template-book';
     UserModule,
     AiSummaryModule,
     TemplateBookModule,
+    FollowModule,
+    LikeModule,
+    NotificationModule,
+    DiscoveryModule,
   ],
 })
 export class AppModule {}

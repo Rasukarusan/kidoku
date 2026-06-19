@@ -16,6 +16,7 @@ export interface Book {
   isPurchasable: boolean
   sheetId?: number
   sheet?: string
+  likeCount?: number
   user?: {
     id: string
     name: string
