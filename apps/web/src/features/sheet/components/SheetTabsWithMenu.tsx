@@ -1,6 +1,6 @@
 import { Tabs } from './Tabs'
 import { Menu } from './Menu'
-import { FollowButton } from '@/features/social/components/FollowButton'
+import { ProfileHeader } from '@/features/social/components/ProfileHeader'
 
 interface Props {
   sheets: Array<{ id: string; name: string; order: number }>
@@ -27,21 +27,23 @@ export const SheetTabsWithMenu: React.FC<Props> = ({
   const currentSheetId = sheets.find((s) => s.name === currentSheet)?.id
 
   return (
-    <div className={containerClass}>
-      <Tabs
-        sheets={sheets}
-        value={currentSheet}
-        username={username}
-        userId={userId}
-      />
-      <Menu
-        currentSheet={currentSheet}
-        currentSheetId={currentSheetId}
-        username={username}
-        userId={userId}
-        activate={menuActivate}
-      />
-      <FollowButton name={username} userId={userId} />
-    </div>
+    <>
+      <ProfileHeader username={username} userId={userId} />
+      <div className={containerClass}>
+        <Tabs
+          sheets={sheets}
+          value={currentSheet}
+          username={username}
+          userId={userId}
+        />
+        <Menu
+          currentSheet={currentSheet}
+          currentSheetId={currentSheetId}
+          username={username}
+          userId={userId}
+          activate={menuActivate}
+        />
+      </div>
+    </>
   )
 }
