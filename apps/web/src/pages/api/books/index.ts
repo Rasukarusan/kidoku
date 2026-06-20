@@ -118,6 +118,7 @@ export default async (req, res) => {
             memo: body.memo,
             isPublicMemo: body.isPublicMemo,
             isPurchasable: body.isPurchasable,
+            price: body.price ?? null,
             finished: body.finished ? new Date(body.finished) : null,
             sheetId: body.sheetId ? Number(body.sheetId) : undefined,
           },

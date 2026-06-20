@@ -14,6 +14,7 @@ export const createBookMutation = gql`
       memo
       isPublicMemo
       isPurchasable
+      price
       finished
       created
       updated
@@ -35,6 +36,7 @@ export const updateBookMutation = gql`
       memo
       isPublicMemo
       isPurchasable
+      price
       finished
       created
       updated

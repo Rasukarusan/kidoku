@@ -11,6 +11,7 @@ export class Book {
     private _memo: string,
     private _isPublicMemo: boolean,
     private _isPurchasable: boolean,
+    private _price: string | null,
     private _finished: Date | null,
     private readonly _created: Date,
     private _updated: Date,
@@ -49,6 +50,10 @@ export class Book {
   get isPurchasable(): boolean {
     return this._isPurchasable;
   }
+  /** 購入価格（MIST単位の文字列）。null の場合はグローバル既定額を用いる */
+  get price(): string | null {
+    return this._price;
+  }
   get finished(): Date | null {
     return this._finished;
   }
@@ -68,6 +73,7 @@ export class Book {
     memo?: string;
     isPublicMemo?: boolean;
     isPurchasable?: boolean;
+    price?: string | null;
     finished?: Date | null;
     sheetId?: number;
   }): void {
@@ -91,6 +97,8 @@ export class Book {
       this._isPublicMemo = params.isPublicMemo;
     if (params.isPurchasable !== undefined)
       this._isPurchasable = params.isPurchasable;
+    if (params.price !== undefined)
+      this._price = Book.normalizePrice(params.price);
     if (params.finished !== undefined) this._finished = params.finished;
     if (params.sheetId !== undefined) this._sheetId = params.sheetId;
     this._updated = new Date();
@@ -128,6 +136,29 @@ export class Book {
 
   private static readonly MAX_TITLE_LENGTH = 100;
 
+  /**
+   * 価格（MIST単位）を正規化する。
+   * null/空文字は「未設定（既定額を使用）」として null を返す。
+   * 非負整数の文字列でなければエラー。
+   */
+  private static normalizePrice(
+    price: string | null | undefined,
+  ): string | null {
+    if (price === null || price === undefined || price === '') {
+      return null;
+    }
+    const trimmed = String(price).trim();
+    if (!/^\d+$/.test(trimmed)) {
+      throw new Error('価格はMIST単位の非負整数で指定してください');
+    }
+    // 先頭ゼロを正規化（"007" -> "7", "0" -> "0"）
+    const normalized = BigInt(trimmed).toString();
+    if (BigInt(normalized) <= 0n) {
+      throw new Error('価格は0より大きい値を指定してください');
+    }
+    return normalized;
+  }
+
   static create(params: {
     userId: string;
     sheetId: number;
@@ -139,6 +170,7 @@ export class Book {
     memo: string;
     isPublicMemo: boolean;
     isPurchasable?: boolean;
+    price?: string | null;
     finished: Date | null;
   }): Book {
     if (!params.title || params.title.trim().length === 0) {
@@ -162,6 +194,7 @@ export class Book {
       params.memo || '',
       params.isPublicMemo,
       params.isPurchasable ?? false,
+      Book.normalizePrice(params.price),
       params.finished,
       now,
       now,
@@ -183,6 +216,7 @@ export class Book {
     finished: Date | null,
     created: Date,
     updated: Date,
+    price: string | null = null,
   ): Book {
     return new Book(
       id,
@@ -196,6 +230,7 @@ export class Book {
       memo,
       isPublicMemo,
       isPurchasable,
+      price,
       finished,
       created,
       updated,

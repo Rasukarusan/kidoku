@@ -48,6 +48,8 @@ export const BookDetailEditPage: React.FC<Props> = ({
         title: draft.title ?? prev.title,
         author: draft.author ?? prev.author,
         isPublicMemo: draft.isPublicMemo ?? prev.isPublicMemo,
+        isPurchasable: draft.isPurchasable ?? prev.isPurchasable,
+        price: draft.price ?? prev.price,
       }))
       setHasDraft(true)
     }
@@ -66,6 +68,8 @@ export const BookDetailEditPage: React.FC<Props> = ({
         title: book.title,
         author: book.author,
         isPublicMemo: book.isPublicMemo,
+        isPurchasable: book.isPurchasable,
+        price: book.price,
       })
     }, 500) // 500msのデバウンス
 
@@ -79,6 +83,8 @@ export const BookDetailEditPage: React.FC<Props> = ({
     book.title,
     book.author,
     book.isPublicMemo,
+    book.isPurchasable,
+    book.price,
   ])
 
   const handleSave = async () => {

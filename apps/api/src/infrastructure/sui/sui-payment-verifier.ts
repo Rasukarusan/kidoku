@@ -33,9 +33,10 @@ export class SuiPaymentVerifier implements IPaymentVerifier {
   ): Promise<PaymentVerificationResult> {
     const expectedNetwork = process.env.SUI_NETWORK || 'testnet';
     const expectedRecipient = params.expectedRecipient;
-    const expectedAmount = BigInt(
-      process.env.SUI_PAYMENT_AMOUNT_MIST || DEFAULT_AMOUNT_MIST,
-    );
+    // 本ごとに価格が設定されていればそれを、なければグローバル既定額を用いる
+    const expectedAmount =
+      params.expectedAmount ??
+      BigInt(process.env.SUI_PAYMENT_AMOUNT_MIST || DEFAULT_AMOUNT_MIST);
 
     if (!expectedRecipient) {
       return { valid: false, reason: '送金先アドレスが未設定です' };

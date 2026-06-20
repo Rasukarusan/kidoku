@@ -103,6 +103,96 @@ describe('Book', () => {
       expect(book.created).toBe(created);
       expect(book.updated).toBe(updated);
     });
+
+    it('priceを省略するとnullになる', () => {
+      const book = Book.fromDatabase(
+        '1',
+        'user-1',
+        1,
+        'タイトル',
+        '著者',
+        'カテゴリ',
+        'image.jpg',
+        '★',
+        'メモ',
+        true,
+        true,
+        null,
+        new Date(),
+        new Date(),
+      );
+      expect(book.price).toBeNull();
+    });
+
+    it('priceを復元できる', () => {
+      const book = Book.fromDatabase(
+        '1',
+        'user-1',
+        1,
+        'タイトル',
+        '著者',
+        'カテゴリ',
+        'image.jpg',
+        '★',
+        'メモ',
+        true,
+        true,
+        null,
+        new Date(),
+        new Date(),
+        '50000000',
+      );
+      expect(book.price).toBe('50000000');
+    });
+  });
+
+  describe('price', () => {
+    it('priceのデフォルトはnull（既定額を使用）', () => {
+      const book = Book.create(validParams);
+      expect(book.price).toBeNull();
+    });
+
+    it('有効なprice（MIST文字列）を指定できる', () => {
+      const book = Book.create({ ...validParams, price: '50000000' });
+      expect(book.price).toBe('50000000');
+    });
+
+    it('priceの先頭ゼロは正規化される', () => {
+      const book = Book.create({ ...validParams, price: '0050000000' });
+      expect(book.price).toBe('50000000');
+    });
+
+    it('空文字のpriceはnullになる', () => {
+      const book = Book.create({ ...validParams, price: '' });
+      expect(book.price).toBeNull();
+    });
+
+    it('数値以外のpriceはエラーになる', () => {
+      expect(() => Book.create({ ...validParams, price: '0.05' })).toThrow(
+        '価格はMIST単位の非負整数で指定してください',
+      );
+      expect(() => Book.create({ ...validParams, price: 'abc' })).toThrow(
+        '価格はMIST単位の非負整数で指定してください',
+      );
+    });
+
+    it('0のpriceはエラーになる', () => {
+      expect(() => Book.create({ ...validParams, price: '0' })).toThrow(
+        '価格は0より大きい値を指定してください',
+      );
+    });
+
+    it('update()でpriceを設定・変更できる', () => {
+      const book = Book.create(validParams);
+      book.update({ price: '12000000' });
+      expect(book.price).toBe('12000000');
+    });
+
+    it('update()でpriceをnullに戻せる（既定額に戻す）', () => {
+      const book = Book.create({ ...validParams, price: '50000000' });
+      book.update({ price: null });
+      expect(book.price).toBeNull();
+    });
   });
 
   describe('update', () => {

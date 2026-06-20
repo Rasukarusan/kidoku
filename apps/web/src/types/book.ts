@@ -14,6 +14,8 @@ export interface Book {
   finished: string
   isPublicMemo: boolean
   isPurchasable: boolean
+  /** 購入価格（MIST単位の文字列）。null/未設定の場合はグローバル既定額を用いる */
+  price?: string | null
   sheetId?: number
   sheet?: string
   likeCount?: number
