@@ -106,6 +106,12 @@ export const Sidebar: React.FC = () => {
 
     return [
       {
+        name: '設定',
+        href: '/settings/profile',
+        icon: AiOutlineSetting,
+        isActive: isSettingsPage,
+      },
+      {
         name: 'ホーム',
         href: '/',
         icon: AiOutlineHome,
@@ -128,12 +134,6 @@ export const Sidebar: React.FC = () => {
         href: '/notifications',
         icon: AiOutlineBell,
         isActive: router.pathname.includes('/notifications'),
-      },
-      {
-        name: '設定',
-        href: '/settings/profile',
-        icon: AiOutlineSetting,
-        isActive: isSettingsPage,
       },
     ]
   }, [readingRecordsUrl, router.pathname])
