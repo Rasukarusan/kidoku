@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Container } from '@/components/layout/Container'
-import { BuiltInProviderType } from 'next-auth/providers'
+import { BuiltInProviderType } from 'next-auth/providers/index'
 import { ClientSafeProvider, LiteralUnion } from 'next-auth/react'
 import { NextSeo } from 'next-seo'
 import { FaBookOpen, FaRobot, FaShareAlt } from 'react-icons/fa'

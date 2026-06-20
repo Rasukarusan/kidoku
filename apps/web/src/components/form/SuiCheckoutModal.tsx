@@ -8,7 +8,7 @@ import {
   useCurrentAccount,
   useSignAndExecuteTransaction,
 } from '@mysten/dapp-kit'
-import { getFullnodeUrl } from '@mysten/sui/client'
+import { getJsonRpcFullnodeUrl } from '@mysten/sui/jsonRpc'
 import { Transaction } from '@mysten/sui/transactions'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@mysten/dapp-kit/dist/index.css'
@@ -24,10 +24,10 @@ import { SuiLogo } from '@/components/icon/SuiLogo'
 const queryClient = new QueryClient()
 
 const networks = {
-  mainnet: { url: getFullnodeUrl('mainnet') },
-  testnet: { url: getFullnodeUrl('testnet') },
-  devnet: { url: getFullnodeUrl('devnet') },
-  localnet: { url: getFullnodeUrl('localnet') },
+  mainnet: { url: getJsonRpcFullnodeUrl('mainnet'), network: 'mainnet' },
+  testnet: { url: getJsonRpcFullnodeUrl('testnet'), network: 'testnet' },
+  devnet: { url: getJsonRpcFullnodeUrl('devnet'), network: 'devnet' },
+  localnet: { url: getJsonRpcFullnodeUrl('localnet'), network: 'localnet' },
 }
 
 interface Props {
@@ -51,7 +51,7 @@ export const SuiCheckoutModal: React.FC<Props> = ({
     <Modal open={open} onClose={onClose} className="min-w-1/2 bg-white p-6">
       <QueryClientProvider client={queryClient}>
         <SuiClientProvider networks={networks} defaultNetwork={suiNetwork}>
-          <WalletProvider autoConnect>
+          <WalletProvider autoConnect slushWallet={{ name: 'Kidoku' }}>
             <SuiCheckoutForm
               bookId={bookId}
               recipientAddress={recipientAddress}
