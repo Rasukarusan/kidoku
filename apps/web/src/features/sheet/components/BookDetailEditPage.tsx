@@ -137,7 +137,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
   }
 
   return (
-    <div className="mx-auto max-w-xl rounded-md bg-white">
+    <div className="mx-auto max-w-3xl rounded-md bg-white">
       {hasDraft && (
         <div className="mx-4 mt-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800">
           💾 下書きが復元されました
