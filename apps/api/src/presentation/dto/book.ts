@@ -43,6 +43,9 @@ export class CreateBookInput {
   @Field({ nullable: true })
   isPurchasable?: boolean;
 
+  @Field({ nullable: true })
+  price?: string;
+
   @Field(() => GraphQLISODateTime, { nullable: true })
   finished?: Date;
 }
@@ -79,6 +82,9 @@ export class UpdateBookInput {
 
   @Field({ nullable: true })
   isPurchasable?: boolean;
+
+  @Field({ nullable: true })
+  price?: string;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   finished?: Date;
@@ -142,6 +148,9 @@ export class BookResponse {
 
   @Field()
   isPurchasable: boolean;
+
+  @Field({ nullable: true })
+  price?: string;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   finished?: Date;

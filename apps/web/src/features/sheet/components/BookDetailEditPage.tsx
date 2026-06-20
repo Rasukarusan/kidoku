@@ -20,6 +20,7 @@ import {
   cleanupOldDrafts,
 } from '@/utils/localStorage'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
+import { SuiPriceInput } from '@/components/input/SuiPriceInput'
 import { getBookCategoriesQuery } from '@/features/books/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
@@ -77,6 +78,8 @@ export const BookDetailEditPage: React.FC<Props> = ({
         title: draft.title ?? prev.title,
         author: draft.author ?? prev.author,
         isPublicMemo: draft.isPublicMemo ?? prev.isPublicMemo,
+        isPurchasable: draft.isPurchasable ?? prev.isPurchasable,
+        price: draft.price ?? prev.price,
       }))
       setHasDraft(true)
     }
@@ -95,6 +98,8 @@ export const BookDetailEditPage: React.FC<Props> = ({
         title: book.title,
         author: book.author,
         isPublicMemo: book.isPublicMemo,
+        isPurchasable: book.isPurchasable,
+        price: book.price,
       })
     }, 500) // 500msのデバウンス
 
@@ -108,6 +113,8 @@ export const BookDetailEditPage: React.FC<Props> = ({
     book.title,
     book.author,
     book.isPublicMemo,
+    book.isPurchasable,
+    book.price,
   ])
 
   // カテゴリ一覧（GraphQL）
@@ -344,6 +351,46 @@ export const BookDetailEditPage: React.FC<Props> = ({
                 </Tooltip>
               </div>
             </div>
+
+            {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
+              <div className="mb-2 flex flex-col items-end gap-2">
+                <div className="flex items-center">
+                  <ToggleButton
+                    label="課金によるメモの解放を許可する"
+                    checked={book?.isPurchasable || false}
+                    onChange={() =>
+                      setBook({
+                        ...book,
+                        isPurchasable: !(book.isPurchasable || false),
+                      })
+                    }
+                    disabled={book.isPublicMemo}
+                    className="mr-1"
+                  />
+                  <div data-tooltip-id="purchasable-memo-hint">
+                    <HintIcon />
+                  </div>
+                  <Tooltip
+                    id="purchasable-memo-hint"
+                    className="!sm:w-[400px] !w-[350px] text-xs"
+                  >
+                    「ON」に設定することで、他のユーザーが課金することにより、非公開のメモを閲覧できます。公開されるのは課金したユーザーのみで、また、他の非公開メモは解放されません。
+                  </Tooltip>
+                </div>
+                {book.isPurchasable && !book.isPublicMemo && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-gray-500">
+                      価格
+                    </span>
+                    <SuiPriceInput
+                      key={book.id}
+                      valueMist={book.price}
+                      onChange={(price) => setBook({ ...book, price })}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             <MarkdownEditor
               value={book?.memo || ''}

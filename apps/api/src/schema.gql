@@ -62,6 +62,7 @@ type BookResponse {
   memo: String
   isPublicMemo: Boolean!
   isPurchasable: Boolean!
+  price: String
   finished: DateTime
   created: DateTime!
   updated: DateTime!
@@ -354,6 +355,7 @@ input CreateBookInput {
   memo: String!
   isPublicMemo: Boolean!
   isPurchasable: Boolean
+  price: String
   finished: DateTime
 }
 
@@ -367,6 +369,7 @@ input UpdateBookInput {
   memo: String
   isPublicMemo: Boolean
   isPurchasable: Boolean
+  price: String
   finished: DateTime
   sheetId: Int
 }

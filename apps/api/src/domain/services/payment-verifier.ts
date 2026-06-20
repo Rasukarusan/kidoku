@@ -4,6 +4,11 @@ export interface PaymentVerificationParams {
   network: string;
   /** 期待する送金先（本の所有者の受取アドレス） */
   expectedRecipient: string;
+  /**
+   * 期待する最低送金額（MIST単位）。本ごとに価格を設定している場合に指定する。
+   * 未指定の場合は実装側のグローバル既定額を用いる。
+   */
+  expectedAmount?: bigint;
 }
 
 export interface PaymentVerificationResult {

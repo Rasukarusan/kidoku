@@ -101,6 +101,61 @@ describe('CreatePurchaseUseCase', () => {
     expect(purchaseRepository.create).toHaveBeenCalledTimes(1);
   });
 
+  it('本ごとに価格が設定されている場合、その額を期待送金額として検証する', async () => {
+    const pricedBook = Book.fromDatabase(
+      '1',
+      'owner-1',
+      1,
+      'タイトル',
+      '著者',
+      'カテゴリ',
+      'image.jpg',
+      '★',
+      '秘密のメモ',
+      false,
+      true, // isPurchasable
+      null,
+      new Date(),
+      new Date(),
+      '50000000', // price (0.05 SUI)
+    );
+    bookRepository.findById.mockResolvedValue(pricedBook);
+    purchaseRepository.findByUserAndBook.mockResolvedValue(null);
+    purchaseRepository.findByTxDigest.mockResolvedValue(null);
+    paymentVerifier.verify.mockResolvedValue({
+      valid: true,
+      amountReceived: 50000000n,
+      recipient: '0xcafe',
+      sender: '0xbeef',
+    });
+    purchaseRepository.create.mockImplementation((p) => Promise.resolve(p));
+
+    await useCase.execute(baseParams);
+
+    expect(paymentVerifier.verify).toHaveBeenCalledWith(
+      expect.objectContaining({ expectedAmount: 50000000n }),
+    );
+  });
+
+  it('価格未設定の場合、expectedAmountは渡さない（既定額を使用）', async () => {
+    bookRepository.findById.mockResolvedValue(purchasableBook);
+    purchaseRepository.findByUserAndBook.mockResolvedValue(null);
+    purchaseRepository.findByTxDigest.mockResolvedValue(null);
+    paymentVerifier.verify.mockResolvedValue({
+      valid: true,
+      amountReceived: 10000000n,
+      recipient: '0xcafe',
+      sender: '0xbeef',
+    });
+    purchaseRepository.create.mockImplementation((p) => Promise.resolve(p));
+
+    await useCase.execute(baseParams);
+
+    expect(paymentVerifier.verify).toHaveBeenCalledWith(
+      expect.objectContaining({ expectedAmount: undefined }),
+    );
+  });
+
   it('書籍が存在しない場合エラーになる', async () => {
     bookRepository.findById.mockResolvedValue(null);
     await expect(useCase.execute(baseParams)).rejects.toThrow(

@@ -61,6 +61,8 @@ export class CreatePurchaseUseCase {
       senderAddress: params.senderAddress,
       network: params.network,
       expectedRecipient: owner.suiAddress,
+      // 本ごとに価格が設定されていれば、その額を期待送金額として検証する
+      expectedAmount: book.price ? BigInt(book.price) : undefined,
     });
     if (!result.valid) {
       throw new Error(`決済の検証に失敗しました: ${result.reason ?? '不明'}`);

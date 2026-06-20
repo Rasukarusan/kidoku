@@ -21,6 +21,7 @@ export class CreateBookUseCase {
     memo: string;
     isPublicMemo: boolean;
     isPurchasable?: boolean;
+    price?: string | null;
     finished: Date | null;
   }): Promise<Book> {
     const book = Book.create(params);
