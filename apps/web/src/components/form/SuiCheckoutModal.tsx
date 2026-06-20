@@ -19,6 +19,7 @@ import {
   suiPaymentAmountLabel,
 } from '@/libs/sui/config'
 import { createPurchaseMutation } from '@/features/purchase/api'
+import { SuiLogo } from '@/components/icon/SuiLogo'
 
 // dapp-kit が要求する react-query クライアント（このモーダル内でのみ使用）
 const queryClient = new QueryClient()
@@ -119,36 +120,57 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
   const isProcessing = status === 'paying' || status === 'recording'
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h2 className="text-lg font-bold">Sui で書籍を購入</h2>
-      <p className="text-sm text-gray-600">
-        メモの閲覧には {suiPaymentAmountLabel} の支払いが必要です
-        <br />
-        <span className="text-xs text-gray-400">
-          ネットワーク: {suiNetwork}
-        </span>
-      </p>
+    <div className="flex flex-col items-center gap-5">
+      {/* ヘッダー: グラデーション + 水滴ロゴ */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4da2ff] to-[#0571e6] shadow-lg shadow-sky-500/40 ring-1 ring-white/30">
+          <SuiLogo size={28} className="text-white" />
+        </div>
+        <h2 className="text-lg font-bold text-gray-800">Sui で書籍を購入</h2>
+      </div>
 
-      <ConnectButton />
+      {/* 金額カード */}
+      <div className="w-full rounded-xl border border-sky-100 bg-sky-50/60 px-4 py-3 text-center">
+        <p className="text-xs text-gray-500">お支払い金額</p>
+        <p className="bg-gradient-to-r from-[#4da2ff] to-[#0571e6] bg-clip-text text-2xl font-extrabold tabular-nums text-transparent">
+          {suiPaymentAmountLabel}
+        </p>
+        <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-sky-600 ring-1 ring-sky-200">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          {suiNetwork}
+        </span>
+      </div>
+
+      <div className="sui-connect-wrap w-full [&_button]:!w-full [&_button]:!justify-center [&_button]:!rounded-full">
+        <ConnectButton />
+      </div>
 
       {account && status !== 'success' && (
         <button
           onClick={handlePay}
           disabled={isProcessing}
-          className="rounded-md bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
+          className="relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-[#4da2ff] via-[#3b82f6] to-[#0571e6] px-6 py-3 font-semibold text-white shadow-lg shadow-sky-500/30 ring-1 ring-inset ring-white/25 transition-all duration-200 hover:shadow-sky-400/50 hover:brightness-110 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === 'paying'
-            ? '署名を待っています...'
-            : status === 'recording'
-              ? '購入を記録中...'
-              : `${suiPaymentAmountLabel} を支払う`}
+          {isProcessing ? (
+            <>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              {status === 'paying'
+                ? 'ウォレットで署名中...'
+                : '購入を記録中...'}
+            </>
+          ) : (
+            <>
+              <SuiLogo size={16} className="text-white" />
+              {suiPaymentAmountLabel} を支払う
+            </>
+          )}
         </button>
       )}
 
       {status === 'success' && (
         <button
           onClick={onClose}
-          className="rounded-md bg-green-600 px-6 py-2 text-white hover:bg-green-700"
+          className="inline-flex w-full items-center justify-center rounded-full bg-emerald-500 px-6 py-3 font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600"
         >
           閉じる
         </button>
@@ -156,11 +178,16 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
 
       {message && (
         <p
-          className={`text-sm ${status === 'error' ? 'text-red-500' : 'text-green-600'}`}
+          className={`text-center text-sm ${status === 'error' ? 'text-red-500' : 'text-emerald-600'}`}
         >
           {message}
         </p>
       )}
+
+      <p className="flex items-center gap-1 text-[11px] text-gray-400">
+        <SuiLogo size={11} className="text-sky-400" />
+        Powered by Sui blockchain
+      </p>
     </div>
   )
 }
