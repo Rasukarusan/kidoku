@@ -3,6 +3,11 @@ name: DB Push
 on:
   workflow_dispatch:
     inputs:
+      branch:
+        description: 'スキーマを取得するブランチ（空欄ならワークフロー実行時に選択したブランチ）'
+        required: false
+        default: ''
+        type: string
       accept_data_loss:
         description: 'データ損失を許容して push する（--accept-data-loss）'
         required: false
@@ -21,6 +26,9 @@ jobs:
     environment: Production
     steps:
       - uses: actions/checkout@v4
+        with:
+          # branch が指定されていればそのブランチを、空欄なら実行時に選択したブランチを使う
+          ref: ${{ inputs.branch || github.ref }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
