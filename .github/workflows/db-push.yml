@@ -40,7 +40,7 @@ jobs:
             ARGS="$ARGS --accept-data-loss"
           fi
           echo "prisma db push $ARGS"
-          pnpm --filter web db:push -- $ARGS
-          pnpm --filter api db:push -- $ARGS
+          pnpm --filter web exec prisma db push $ARGS
+          pnpm --filter api exec prisma db push $ARGS
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
