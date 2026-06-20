@@ -6,10 +6,12 @@ import { AiFillLock } from 'react-icons/ai'
 import { useIsBookOwner } from '@/hooks/useIsBookOwner'
 import { MdEdit } from 'react-icons/md'
 
-// Stripeが設定されている場合のみCheckoutModalを読み込む（サンドボックス環境対応）
-const CheckoutModal = dynamic(
+// Sui決済モーダル（ウォレット連携を含むため動的読み込み）
+const SuiCheckoutModal = dynamic(
   () =>
-    import('@/components/form/CheckoutModal').then((mod) => mod.CheckoutModal),
+    import('@/components/form/SuiCheckoutModal').then(
+      (mod) => mod.SuiCheckoutModal
+    ),
   { ssr: false }
 )
 import { Loading } from '@/components/icon/Loading'
@@ -22,6 +24,12 @@ import { useQuery } from '@apollo/client'
 import { myLikedBookIdsQuery } from '@/features/social/api'
 import { LikeButton } from '@/features/social/components/LikeButton'
 import { useCachedSession } from '@/hooks/useCachedSession'
+import { isSuiPaymentEnabled, suiPaymentAmountLabel } from '@/libs/sui/config'
+import {
+  purchasedBookMemoQuery,
+  bookPaymentRecipientQuery,
+} from '@/features/purchase/api'
+import { SuiLogo } from '@/components/icon/SuiLogo'
 
 interface Props {
   book: Book
@@ -32,7 +40,7 @@ interface Props {
 export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
   const isMine = useIsBookOwner(book)
   const { status } = useCachedSession()
-  const [open, setOpen] = useState(false)
+  const [suiOpen, setSuiOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   // ログイン中はいいね済みの本IDを取得し、初期状態を反映する
@@ -40,6 +48,25 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
     skip: status !== 'authenticated',
   })
   const likedBookIds: number[] = likedData?.myLikedBookIds ?? []
+
+  // 購入済みの場合は解放されたメモ本文を取得する（非所有者・非公開・購入可能なときのみ）
+  const canPurchase = !isMine && !book.isPublicMemo && book.isPurchasable
+  const { data: memoData, refetch: refetchMemo } = useQuery(
+    purchasedBookMemoQuery,
+    {
+      variables: { input: { bookId: Number(book.id) } },
+      skip: status !== 'authenticated' || !canPurchase,
+    }
+  )
+  const unlockedMemo: string | null | undefined = memoData?.purchasedBookMemo
+
+  // 本の所有者が登録した Sui 受取アドレス（未登録ならボタンを出さない）
+  const { data: recipientData } = useQuery(bookPaymentRecipientQuery, {
+    variables: { input: { bookId: Number(book.id) } },
+    skip: status !== 'authenticated' || !isSuiPaymentEnabled || !canPurchase,
+  })
+  const suiRecipient: string | null | undefined =
+    recipientData?.bookPaymentRecipient
 
   const returnUrl = () => {
     return `${process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'}/books/${book.id}`
@@ -163,33 +190,58 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
               </div>
             )}
 
-            {!isMine && !book.isPublicMemo && (
-              <div className="rounded-lg bg-gray-100 p-8 text-center">
-                <AiFillLock className="mx-auto mb-2 text-gray-400" size={24} />
-                <p className="text-gray-600">
-                  このメモは非公開に設定されています
-                </p>
-                {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
-                  book.isPurchasable && (
-                    <button
-                      className="mt-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                      onClick={() => setOpen(true)}
-                    >
-                      メモを見る（有料）
-                    </button>
-                  )}
-              </div>
-            )}
+            {!isMine &&
+              !book.isPublicMemo &&
+              (unlockedMemo !== null && unlockedMemo !== undefined ? (
+                <div className="rounded-lg bg-gray-50 p-4">
+                  <Memo memo={unlockedMemo} />
+                </div>
+              ) : (
+                <div className="rounded-lg bg-gray-100 p-8 text-center">
+                  <AiFillLock
+                    className="mx-auto mb-2 text-gray-400"
+                    size={24}
+                  />
+                  <p className="text-gray-600">
+                    このメモは非公開に設定されています
+                  </p>
+                  {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
+                    book.isPurchasable && (
+                      <div className="mt-4 flex flex-col items-center gap-2">
+                        {isSuiPaymentEnabled && suiRecipient && (
+                          <button
+                            onClick={() => setSuiOpen(true)}
+                            className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-r from-[#4da2ff] via-[#3b82f6] to-[#0571e6] px-5 py-2.5 font-semibold text-white shadow-lg shadow-sky-500/30 ring-1 ring-inset ring-white/25 transition-all duration-200 hover:shadow-sky-400/50 hover:brightness-110 active:scale-[0.98]"
+                          >
+                            {/* ホバー時に走る光沢 */}
+                            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30">
+                              <SuiLogo size={13} className="text-white" />
+                            </span>
+                            <span>Suiで購入</span>
+                            <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold tabular-nums ring-1 ring-white/20">
+                              {suiPaymentAmountLabel}
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+                </div>
+              ))}
           </div>
         </div>
       </div>
 
-      {process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
-        <CheckoutModal
-          open={open}
-          onClose={() => setOpen(false)}
-          returnUrl={returnUrl()}
-          purchaseText="書籍を購入"
+      {isSuiPaymentEnabled && suiRecipient && (
+        <SuiCheckoutModal
+          open={suiOpen}
+          onClose={() => setSuiOpen(false)}
+          bookId={Number(book.id)}
+          recipientAddress={suiRecipient}
+          onPurchased={() => {
+            refetchMemo()
+            setSuiOpen(false)
+          }}
         />
       )}
     </div>

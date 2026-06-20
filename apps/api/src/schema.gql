@@ -113,6 +113,7 @@ type YearlyTopBookResponse {
 
 type UserResponse {
   name: String!
+  suiAddress: String
 }
 
 type DeleteAiSummaryResponse {
@@ -191,6 +192,17 @@ type TopReaderItem {
   bookCount: Int!
 }
 
+type PurchaseResponse {
+  id: ID!
+  bookId: Int!
+  txDigest: String!
+  network: String!
+  amount: String!
+  senderAddress: String!
+  recipientAddress: String!
+  created: DateTime!
+}
+
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
@@ -206,6 +218,7 @@ type Query {
   yearlyTopBooks(input: GetYearlyTopBooksInput!): [YearlyTopBookResponse!]!
   userImage(input: GetUserImageInput!): String!
   isNameAvailable(input: CheckNameAvailableInput!): Boolean!
+  mySuiAddress: String
   aiSummaryUsage: Int!
   templateBooks: [TemplateBookResponse!]!
   followInfo(input: GetFollowInfoInput!): FollowInfoResponse!
@@ -216,6 +229,9 @@ type Query {
   unreadNotificationCount: Int!
   popularBooks(limit: Int): [PopularBookItem!]!
   topReaders(limit: Int): [TopReaderItem!]!
+  myPurchasedBookIds: [Int!]!
+  purchasedBookMemo(input: GetPurchasedBookMemoInput!): String
+  bookPaymentRecipient(input: GetBookPaymentRecipientInput!): String
 }
 
 input GetCommentsInput {
@@ -272,6 +288,14 @@ input GetNotificationsInput {
   offset: Int!
 }
 
+input GetPurchasedBookMemoInput {
+  bookId: Int!
+}
+
+input GetBookPaymentRecipientInput {
+  bookId: Int!
+}
+
 type Mutation {
   createSheet(input: CreateSheetInput!): SheetResponse!
   updateSheet(input: UpdateSheetInput!): SheetResponse!
@@ -284,6 +308,7 @@ type Mutation {
   upsertYearlyTopBook(input: UpsertYearlyTopBookInput!): Boolean!
   deleteYearlyTopBook(input: DeleteYearlyTopBookInput!): Boolean!
   updateUserName(input: UpdateUserNameInput!): UserResponse!
+  updateSuiAddress(input: UpdateSuiAddressInput!): UserResponse!
   deleteUser: Boolean!
   saveAiSummary(input: SaveAiSummaryInput!): Boolean!
   deleteAiSummary(input: DeleteAiSummaryInput!): DeleteAiSummaryResponse!
@@ -294,6 +319,7 @@ type Mutation {
   likeBook(input: LikeBookInput!): Int!
   unlikeBook(input: LikeBookInput!): Int!
   markNotificationsRead: Boolean!
+  createPurchase(input: CreatePurchaseInput!): PurchaseResponse!
 }
 
 input CreateSheetInput {
@@ -364,6 +390,10 @@ input UpdateUserNameInput {
   name: String!
 }
 
+input UpdateSuiAddressInput {
+  suiAddress: String!
+}
+
 input SaveAiSummaryInput {
   sheetName: String!
   analysis: JSON!
@@ -396,4 +426,11 @@ input FollowUserInput {
 
 input LikeBookInput {
   bookId: Int!
+}
+
+input CreatePurchaseInput {
+  bookId: Int!
+  txDigest: String!
+  senderAddress: String!
+  network: String!
 }

@@ -11,3 +11,9 @@ export const isNameAvailableQuery = gql`
     isNameAvailable(input: $input)
   }
 `
+
+export const mySuiAddressQuery = gql`
+  query MySuiAddress {
+    mySuiAddress
+  }
+`
