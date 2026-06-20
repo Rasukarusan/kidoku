@@ -32,16 +32,6 @@ export const UserMenu: React.FC<Props> = ({ open, setOpen, url }) => {
           className="absolute right-4 z-[1000] m-0 min-w-max list-none overflow-hidden rounded-lg border bg-white bg-clip-padding text-left text-base shadow-lg"
         >
           <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
-            <AiOutlineBook className="mr-2 h-[24px] w-[24px] text-slate-300" />
-            <Link
-              className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
-              href={url}
-              onClick={() => setOpen(false)}
-            >
-              読書記録
-            </Link>
-          </li>
-          <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
             <AiOutlineSetting className="mr-2 h-[24px] w-[24px] text-slate-300" />
             <Link
               className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
@@ -49,6 +39,16 @@ export const UserMenu: React.FC<Props> = ({ open, setOpen, url }) => {
               onClick={() => setOpen(false)}
             >
               アカウント設定
+            </Link>
+          </li>
+          <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
+            <AiOutlineBook className="mr-2 h-[24px] w-[24px] text-slate-300" />
+            <Link
+              className="block w-full whitespace-nowrap bg-transparent text-sm text-gray-600"
+              href={url}
+              onClick={() => setOpen(false)}
+            >
+              読書記録
             </Link>
           </li>
           <li className="border-bottom-1 flex items-center border px-4 py-2 hover:bg-neutral-100">
