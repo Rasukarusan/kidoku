@@ -12,7 +12,13 @@ import { getJsonRpcFullnodeUrl } from '@mysten/sui/jsonRpc'
 import { Transaction } from '@mysten/sui/transactions'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@mysten/dapp-kit/dist/index.css'
-import { suiNetwork, mistToSui, resolveBookPriceMist } from '@/libs/sui/config'
+import {
+  suiNetwork,
+  mistToSui,
+  resolveBookPriceMist,
+  buildSlushBrowseLink,
+  isMobileDevice,
+} from '@/libs/sui/config'
 import { createPurchaseMutation } from '@/features/purchase/api'
 import { SuiLogo } from '@/components/icon/SuiLogo'
 
@@ -130,6 +136,16 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
 
   const isProcessing = status === 'paying' || status === 'recording'
 
+  // 通常のモバイルブラウザではネイティブ Slush アプリが Wallet Standard に
+  // 注入されないため、dapp-kit からは Web ウォレットしか選べず端末アプリが起動しない。
+  // 未接続のモバイル端末では Slush アプリの dApp ブラウザを開くディープリンク導線を出す。
+  const showSlushAppLink = !account && isMobileDevice()
+
+  const handleOpenSlushApp = () => {
+    if (typeof window === 'undefined') return
+    window.location.href = buildSlushBrowseLink(window.location.href)
+  }
+
   return (
     <div className="flex flex-col items-center gap-5">
       {/* ヘッダー: グラデーション + 水滴ロゴ */}
@@ -151,6 +167,26 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
           {suiNetwork}
         </span>
       </div>
+
+      {showSlushAppLink && (
+        <div className="w-full">
+          <button
+            onClick={handleOpenSlushApp}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#4da2ff] to-[#0571e6] px-6 py-3 font-semibold text-white shadow-lg shadow-sky-500/30 ring-1 ring-inset ring-white/25 transition hover:brightness-110 active:scale-[0.99]"
+          >
+            <SuiLogo size={16} className="text-white" />
+            Slush アプリで開く
+          </button>
+          <p className="mt-2 text-center text-[11px] text-gray-400">
+            アプリ未インストールの場合は Web ウォレットが開きます
+          </p>
+          <div className="my-3 flex items-center gap-3 text-[11px] text-gray-300">
+            <span className="h-px flex-1 bg-gray-200" />
+            または
+            <span className="h-px flex-1 bg-gray-200" />
+          </div>
+        </div>
+      )}
 
       <div className="sui-connect-wrap w-full [&_button]:!w-full [&_button]:!justify-center [&_button]:!rounded-full">
         <ConnectButton />

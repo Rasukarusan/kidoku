@@ -3,6 +3,8 @@ import {
   suiToMist,
   resolveBookPriceMist,
   suiPaymentAmountMist,
+  buildSlushBrowseLink,
+  isMobileDevice,
 } from './config'
 
 describe('sui config', () => {
@@ -55,6 +57,53 @@ describe('sui config', () => {
     })
     it('不正な文字列なら既定額にフォールバックする', () => {
       expect(resolveBookPriceMist('abc')).toBe(suiPaymentAmountMist)
+    })
+  })
+
+  describe('buildSlushBrowseLink', () => {
+    it('Slush の dApp ブラウザ用ディープリンクを生成する', () => {
+      expect(buildSlushBrowseLink('https://kidoku.app/user/sheets/本棚')).toBe(
+        'https://my.slush.app/browse/https://kidoku.app/user/sheets/本棚'
+      )
+    })
+  })
+
+  describe('isMobileDevice', () => {
+    const originalUserAgent = Object.getOwnPropertyDescriptor(
+      window.navigator,
+      'userAgent'
+    )
+
+    const setUserAgent = (ua: string) => {
+      Object.defineProperty(window.navigator, 'userAgent', {
+        value: ua,
+        configurable: true,
+      })
+    }
+
+    afterEach(() => {
+      if (originalUserAgent) {
+        Object.defineProperty(window.navigator, 'userAgent', originalUserAgent)
+      }
+    })
+
+    it('iPhone はモバイルと判定する', () => {
+      setUserAgent(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15'
+      )
+      expect(isMobileDevice()).toBe(true)
+    })
+
+    it('Android はモバイルと判定する', () => {
+      setUserAgent('Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36')
+      expect(isMobileDevice()).toBe(true)
+    })
+
+    it('PC ブラウザはモバイルと判定しない', () => {
+      setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+      )
+      expect(isMobileDevice()).toBe(false)
     })
   })
 })

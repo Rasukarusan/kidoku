@@ -6,6 +6,25 @@ export const SUI_DECIMALS = 9
 export const suiNetwork: SuiNetwork =
   (process.env.NEXT_PUBLIC_SUI_NETWORK as SuiNetwork) || 'testnet'
 
+/**
+ * Slush アプリの dApp ブラウザで指定 URL を開くディープリンクを生成する。
+ * 通常のモバイルブラウザから端末のネイティブ Slush アプリを起動するための正攻法。
+ * Universal Link 形式（my.slush.app）はアプリ未インストール時も Web にフォールバックする。
+ * @see https://sdk.mystenlabs.com/slush-wallet/deep-linking
+ */
+export const buildSlushBrowseLink = (url: string): string =>
+  `https://my.slush.app/browse/${url}`
+
+/**
+ * モバイル端末（iOS / Android）かどうかを UserAgent から判定する。
+ * Slush ネイティブアプリへのディープリンク導線を出すかの判定に使う。
+ * SSR 時は false を返す。
+ */
+export const isMobileDevice = (): boolean => {
+  if (typeof navigator === 'undefined') return false
+  return /iphone|ipad|ipod|android/i.test(navigator.userAgent)
+}
+
 /** 決済金額（MIST単位。1 SUI = 1_000_000_000 MIST。既定: 0.01 SUI） */
 export const suiPaymentAmountMist = BigInt(
   process.env.NEXT_PUBLIC_SUI_PAYMENT_AMOUNT_MIST || '10000000'
