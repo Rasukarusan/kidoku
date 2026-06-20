@@ -5,10 +5,12 @@ import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
 import { CreatePurchaseUseCase } from '../../application/usecases/purchases/create-purchase';
 import { GetMyPurchasedBookIdsUseCase } from '../../application/usecases/purchases/get-my-purchased-book-ids';
 import { GetPurchasedBookMemoUseCase } from '../../application/usecases/purchases/get-purchased-book-memo';
+import { GetBookPaymentRecipientUseCase } from '../../application/usecases/purchases/get-book-payment-recipient';
 import { Purchase } from '../../domain/models/purchase';
 import {
   CreatePurchaseInput,
   GetPurchasedBookMemoInput,
+  GetBookPaymentRecipientInput,
   PurchaseResponse,
 } from '../dto/purchase';
 
@@ -19,6 +21,7 @@ export class PurchaseResolver {
     private readonly createPurchaseUseCase: CreatePurchaseUseCase,
     private readonly getMyPurchasedBookIdsUseCase: GetMyPurchasedBookIdsUseCase,
     private readonly getPurchasedBookMemoUseCase: GetPurchasedBookMemoUseCase,
+    private readonly getBookPaymentRecipientUseCase: GetBookPaymentRecipientUseCase,
   ) {}
 
   @Mutation(() => PurchaseResponse)
@@ -49,6 +52,14 @@ export class PurchaseResolver {
     @Args('input') input: GetPurchasedBookMemoInput,
   ): Promise<string | null> {
     return this.getPurchasedBookMemoUseCase.execute(user.id, input.bookId);
+  }
+
+  // 本の支払い先（所有者の Sui 受取アドレス）。未登録なら null
+  @Query(() => String, { nullable: true })
+  async bookPaymentRecipient(
+    @Args('input') input: GetBookPaymentRecipientInput,
+  ): Promise<string | null> {
+    return this.getBookPaymentRecipientUseCase.execute(input.bookId);
   }
 
   private toResponse(purchase: Purchase): PurchaseResponse {

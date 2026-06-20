@@ -12,7 +12,14 @@ export class UserRepository implements IUserRepository {
       where: { id },
     });
     if (!row) return null;
-    return User.fromDatabase(row.id, row.name, row.email, row.image, row.admin);
+    return User.fromDatabase(
+      row.id,
+      row.name,
+      row.email,
+      row.image,
+      row.admin,
+      row.suiAddress,
+    );
   }
 
   async findByName(name: string): Promise<User | null> {
@@ -20,7 +27,14 @@ export class UserRepository implements IUserRepository {
       where: { name },
     });
     if (!row) return null;
-    return User.fromDatabase(row.id, row.name, row.email, row.image, row.admin);
+    return User.fromDatabase(
+      row.id,
+      row.name,
+      row.email,
+      row.image,
+      row.admin,
+      row.suiAddress,
+    );
   }
 
   async updateName(id: string, name: string): Promise<User> {
@@ -28,7 +42,29 @@ export class UserRepository implements IUserRepository {
       where: { id },
       data: { name },
     });
-    return User.fromDatabase(row.id, row.name, row.email, row.image, row.admin);
+    return User.fromDatabase(
+      row.id,
+      row.name,
+      row.email,
+      row.image,
+      row.admin,
+      row.suiAddress,
+    );
+  }
+
+  async updateSuiAddress(id: string, address: string | null): Promise<User> {
+    const row = await this.prisma.user.update({
+      where: { id },
+      data: { suiAddress: address },
+    });
+    return User.fromDatabase(
+      row.id,
+      row.name,
+      row.email,
+      row.image,
+      row.admin,
+      row.suiAddress,
+    );
   }
 
   async delete(id: string): Promise<void> {

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Purchase } from '../../../domain/models/purchase';
 import { IPurchaseRepository } from '../../../domain/repositories/purchase';
 import { IBookRepository } from '../../../domain/repositories/book';
+import { IUserRepository } from '../../../domain/repositories/user';
 import { IPaymentVerifier } from '../../../domain/services/payment-verifier';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class CreatePurchaseUseCase {
   constructor(
     private readonly purchaseRepository: IPurchaseRepository,
     private readonly bookRepository: IBookRepository,
+    private readonly userRepository: IUserRepository,
     private readonly paymentVerifier: IPaymentVerifier,
   ) {}
 
@@ -28,6 +30,12 @@ export class CreatePurchaseUseCase {
     }
     if (book.userId === params.userId) {
       throw new Error('自分の書籍は購入できません');
+    }
+
+    // 送金先は本の所有者の受取アドレス。未登録なら購入不可
+    const owner = await this.userRepository.findById(book.userId);
+    if (!owner?.suiAddress) {
+      throw new Error('出品者が受取アドレスを設定していないため購入できません');
     }
 
     // すでに購入済みなら冪等にそのまま返す
@@ -52,6 +60,7 @@ export class CreatePurchaseUseCase {
       txDigest: params.txDigest,
       senderAddress: params.senderAddress,
       network: params.network,
+      expectedRecipient: owner.suiAddress,
     });
     if (!result.valid) {
       throw new Error(`決済の検証に失敗しました: ${result.reason ?? '不明'}`);

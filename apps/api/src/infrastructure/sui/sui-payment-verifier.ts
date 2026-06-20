@@ -15,9 +15,11 @@ type SuiNetwork = 'mainnet' | 'testnet' | 'devnet' | 'localnet';
 /**
  * Sui ブロックチェーン上の SUI 送金トランザクションを検証する。
  *
+ * 送金先（受取）アドレスは本の所有者ごとに異なるため、呼び出し側から
+ * params.expectedRecipient で受け取る。
+ *
  * 環境変数:
  * - SUI_NETWORK            検証対象ネットワーク（既定: testnet）
- * - SUI_RECIPIENT_ADDRESS  送金先（受取）アドレス
  * - SUI_PAYMENT_AMOUNT_MIST 必要な金額（MIST, 既定: 10000000 = 0.01 SUI）
  * - SUI_FULLNODE_URL       任意。フルノードのURLを上書きする
  * - SUI_PAYMENT_VERIFY     'false' でオンチェーン検証をスキップ（プレビュー/サンドボックス用）
@@ -30,7 +32,7 @@ export class SuiPaymentVerifier implements IPaymentVerifier {
     params: PaymentVerificationParams,
   ): Promise<PaymentVerificationResult> {
     const expectedNetwork = process.env.SUI_NETWORK || 'testnet';
-    const expectedRecipient = process.env.SUI_RECIPIENT_ADDRESS;
+    const expectedRecipient = params.expectedRecipient;
     const expectedAmount = BigInt(
       process.env.SUI_PAYMENT_AMOUNT_MIST || DEFAULT_AMOUNT_MIST,
     );

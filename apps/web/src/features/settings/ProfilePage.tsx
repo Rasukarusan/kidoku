@@ -1,12 +1,15 @@
 import { useRef, useState } from 'react'
 import { Container } from '@/components/layout/Container'
 import { NextSeo } from 'next-seo'
-import { useLazyQuery, useMutation } from '@apollo/client'
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import {
   isNameAvailableQuery,
   updateUserNameMutation,
   deleteUserMutation,
+  mySuiAddressQuery,
+  updateSuiAddressMutation,
 } from '@/features/user/api'
+import { SuiLogo } from '@/components/icon/SuiLogo'
 
 interface Props {
   name: string
@@ -21,6 +24,38 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
   const [checkNameAvailable] = useLazyQuery(isNameAvailableQuery)
   const [updateUserName] = useMutation(updateUserNameMutation)
   const [deleteUser] = useMutation(deleteUserMutation)
+
+  // Sui 受取アドレス
+  const [suiAddress, setSuiAddress] = useState('')
+  const [suiError, setSuiError] = useState('')
+  const [suiSaved, setSuiSaved] = useState(false)
+  const savedSuiRef = useRef('')
+  useQuery(mySuiAddressQuery, {
+    fetchPolicy: 'network-only',
+    onCompleted: (data) => {
+      const addr = data?.mySuiAddress ?? ''
+      setSuiAddress(addr)
+      savedSuiRef.current = addr
+    },
+  })
+  const [updateSuiAddress] = useMutation(updateSuiAddressMutation)
+
+  const onChangeSui = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim()
+    setSuiAddress(value)
+    setSuiSaved(false)
+    setSuiError(
+      value === '' || /^0x[0-9a-fA-F]{1,64}$/.test(value)
+        ? ''
+        : '0x で始まる正しい Sui アドレスを入力してください'
+    )
+  }
+  const onBlurSui = async () => {
+    if (suiError || suiAddress === savedSuiRef.current) return
+    await updateSuiAddress({ variables: { input: { suiAddress } } })
+    savedSuiRef.current = suiAddress
+    setSuiSaved(true)
+  }
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
@@ -86,6 +121,30 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
               {saved && <span className="text-green-600">保存しました</span>}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Sui 受取アドレス */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <div className="mb-1 flex items-center gap-2">
+          <SuiLogo size={16} className="text-sky-500" />
+          <h3 className="text-sm font-bold text-gray-700">Sui 受取アドレス</h3>
+        </div>
+        <p className="mb-4 text-xs text-gray-500">
+          有料メモが購入されたときに SUI を受け取るウォレットアドレスです。
+          未設定の場合、あなたの本は Sui で購入できません。
+        </p>
+        <input
+          value={suiAddress}
+          placeholder="0x..."
+          spellCheck={false}
+          className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 font-mono text-sm outline-none transition focus:border-slate-400 focus:bg-white"
+          onChange={onChangeSui}
+          onBlur={onBlurSui}
+        />
+        <div className="mt-1 h-4 text-xs">
+          {suiError && <span className="text-red-600">{suiError}</span>}
+          {suiSaved && <span className="text-green-600">保存しました</span>}
         </div>
       </section>
 

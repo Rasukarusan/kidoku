@@ -14,7 +14,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@mysten/dapp-kit/dist/index.css'
 import {
   suiNetwork,
-  suiRecipientAddress,
   suiPaymentAmountMist,
   suiPaymentAmountLabel,
 } from '@/libs/sui/config'
@@ -35,6 +34,8 @@ interface Props {
   open: boolean
   onClose: () => void
   bookId: number
+  /** 送金先（本の所有者の受取アドレス） */
+  recipientAddress: string
   onPurchased?: () => void
 }
 
@@ -42,6 +43,7 @@ export const SuiCheckoutModal: React.FC<Props> = ({
   open,
   onClose,
   bookId,
+  recipientAddress,
   onPurchased,
 }) => {
   if (!open) return null
@@ -52,6 +54,7 @@ export const SuiCheckoutModal: React.FC<Props> = ({
           <WalletProvider autoConnect>
             <SuiCheckoutForm
               bookId={bookId}
+              recipientAddress={recipientAddress}
               onPurchased={onPurchased}
               onClose={onClose}
             />
@@ -66,12 +69,14 @@ type PaymentStatus = 'idle' | 'paying' | 'recording' | 'success' | 'error'
 
 interface FormProps {
   bookId: number
+  recipientAddress: string
   onPurchased?: () => void
   onClose: () => void
 }
 
 const SuiCheckoutForm: React.FC<FormProps> = ({
   bookId,
+  recipientAddress,
   onPurchased,
   onClose,
 }) => {
@@ -89,7 +94,7 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
       setStatus('paying')
       const tx = new Transaction()
       const [coin] = tx.splitCoins(tx.gas, [suiPaymentAmountMist])
-      tx.transferObjects([coin], suiRecipientAddress)
+      tx.transferObjects([coin], recipientAddress)
 
       const result = await signAndExecute({ transaction: tx })
 
