@@ -24,3 +24,9 @@ export const purchasedBookMemoQuery = gql`
     purchasedBookMemo(input: $input)
   }
 `
+
+export const bookPaymentRecipientQuery = gql`
+  query BookPaymentRecipient($input: GetBookPaymentRecipientInput!) {
+    bookPaymentRecipient(input: $input)
+  }
+`

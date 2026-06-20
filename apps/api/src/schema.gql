@@ -113,6 +113,7 @@ type YearlyTopBookResponse {
 
 type UserResponse {
   name: String!
+  suiAddress: String
 }
 
 type DeleteAiSummaryResponse {
@@ -217,6 +218,7 @@ type Query {
   yearlyTopBooks(input: GetYearlyTopBooksInput!): [YearlyTopBookResponse!]!
   userImage(input: GetUserImageInput!): String!
   isNameAvailable(input: CheckNameAvailableInput!): Boolean!
+  mySuiAddress: String
   aiSummaryUsage: Int!
   templateBooks: [TemplateBookResponse!]!
   followInfo(input: GetFollowInfoInput!): FollowInfoResponse!
@@ -229,6 +231,7 @@ type Query {
   topReaders(limit: Int): [TopReaderItem!]!
   myPurchasedBookIds: [Int!]!
   purchasedBookMemo(input: GetPurchasedBookMemoInput!): String
+  bookPaymentRecipient(input: GetBookPaymentRecipientInput!): String
 }
 
 input GetCommentsInput {
@@ -289,6 +292,10 @@ input GetPurchasedBookMemoInput {
   bookId: Int!
 }
 
+input GetBookPaymentRecipientInput {
+  bookId: Int!
+}
+
 type Mutation {
   createSheet(input: CreateSheetInput!): SheetResponse!
   updateSheet(input: UpdateSheetInput!): SheetResponse!
@@ -301,6 +308,7 @@ type Mutation {
   upsertYearlyTopBook(input: UpsertYearlyTopBookInput!): Boolean!
   deleteYearlyTopBook(input: DeleteYearlyTopBookInput!): Boolean!
   updateUserName(input: UpdateUserNameInput!): UserResponse!
+  updateSuiAddress(input: UpdateSuiAddressInput!): UserResponse!
   deleteUser: Boolean!
   saveAiSummary(input: SaveAiSummaryInput!): Boolean!
   deleteAiSummary(input: DeleteAiSummaryInput!): DeleteAiSummaryResponse!
@@ -380,6 +388,10 @@ input DeleteYearlyTopBookInput {
 
 input UpdateUserNameInput {
   name: String!
+}
+
+input UpdateSuiAddressInput {
+  suiAddress: String!
 }
 
 input SaveAiSummaryInput {

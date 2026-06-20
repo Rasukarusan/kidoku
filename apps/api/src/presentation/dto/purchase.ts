@@ -32,6 +32,12 @@ export class GetPurchasedBookMemoInput {
   bookId: number;
 }
 
+@InputType()
+export class GetBookPaymentRecipientInput {
+  @Field(() => Int)
+  bookId: number;
+}
+
 @ObjectType()
 export class PurchaseResponse {
   @Field(() => ID)

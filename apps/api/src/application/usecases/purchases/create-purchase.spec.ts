@@ -1,15 +1,27 @@
 import { CreatePurchaseUseCase } from './create-purchase';
 import { IPurchaseRepository } from '../../../domain/repositories/purchase';
 import { IBookRepository } from '../../../domain/repositories/book';
+import { IUserRepository } from '../../../domain/repositories/user';
 import { IPaymentVerifier } from '../../../domain/services/payment-verifier';
 import { Book } from '../../../domain/models/book';
 import { Purchase } from '../../../domain/models/purchase';
+import { User } from '../../../domain/models/user';
 
 describe('CreatePurchaseUseCase', () => {
   let useCase: CreatePurchaseUseCase;
   let purchaseRepository: jest.Mocked<IPurchaseRepository>;
   let bookRepository: jest.Mocked<IBookRepository>;
+  let userRepository: jest.Mocked<IUserRepository>;
   let paymentVerifier: jest.Mocked<IPaymentVerifier>;
+
+  const owner = User.fromDatabase(
+    'owner-1',
+    '出品者',
+    'owner@example.com',
+    null,
+    false,
+    '0xcafe',
+  );
 
   const purchasableBook = Book.fromDatabase(
     '1',
@@ -46,12 +58,18 @@ describe('CreatePurchaseUseCase', () => {
     bookRepository = {
       findById: jest.fn(),
     } as unknown as jest.Mocked<IBookRepository>;
+    userRepository = {
+      findById: jest.fn(),
+    } as unknown as jest.Mocked<IUserRepository>;
     paymentVerifier = {
       verify: jest.fn(),
     };
+    // 既定で所有者は受取アドレス登録済み
+    userRepository.findById.mockResolvedValue(owner);
     useCase = new CreatePurchaseUseCase(
       purchaseRepository,
       bookRepository,
+      userRepository,
       paymentVerifier,
     );
   });
@@ -118,6 +136,16 @@ describe('CreatePurchaseUseCase', () => {
     await expect(
       useCase.execute({ ...baseParams, userId: 'owner-1' }),
     ).rejects.toThrow('自分の書籍は購入できません');
+  });
+
+  it('出品者が受取アドレス未登録の場合エラーになる', async () => {
+    bookRepository.findById.mockResolvedValue(purchasableBook);
+    userRepository.findById.mockResolvedValue(
+      User.fromDatabase('owner-1', '出品者', null, null, false, null),
+    );
+    await expect(useCase.execute(baseParams)).rejects.toThrow(
+      '出品者が受取アドレスを設定していないため購入できません',
+    );
   });
 
   it('購入済みの場合は既存の購入を返す（冪等）', async () => {

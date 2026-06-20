@@ -6,22 +6,17 @@ export const SUI_DECIMALS = 9
 export const suiNetwork: SuiNetwork =
   (process.env.NEXT_PUBLIC_SUI_NETWORK as SuiNetwork) || 'testnet'
 
-/** 送金先（受取）アドレス */
-export const suiRecipientAddress =
-  process.env.NEXT_PUBLIC_SUI_RECIPIENT_ADDRESS || ''
-
 /** 決済金額（MIST単位。1 SUI = 1_000_000_000 MIST。既定: 0.01 SUI） */
 export const suiPaymentAmountMist = BigInt(
   process.env.NEXT_PUBLIC_SUI_PAYMENT_AMOUNT_MIST || '10000000'
 )
 
 /**
- * Sui決済が利用可能かどうか。
- * フラグが有効かつ送金先アドレスが設定されている場合のみ有効。
+ * Sui決済機能が有効かどうか（機能フラグ）。
+ * 実際の送金先は本の所有者ごとの受取アドレスを別途取得する。
  */
 export const isSuiPaymentEnabled =
-  process.env.NEXT_PUBLIC_ENABLE_SUI_PAYMENT === 'true' &&
-  suiRecipientAddress.length > 0
+  process.env.NEXT_PUBLIC_ENABLE_SUI_PAYMENT === 'true'
 
 /** MIST を SUI 表記の文字列に変換する */
 export const mistToSui = (mist: bigint): string => {

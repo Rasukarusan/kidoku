@@ -2,6 +2,8 @@ export interface PaymentVerificationParams {
   txDigest: string;
   senderAddress: string;
   network: string;
+  /** 期待する送金先（本の所有者の受取アドレス） */
+  expectedRecipient: string;
 }
 
 export interface PaymentVerificationResult {

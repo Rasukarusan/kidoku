@@ -25,7 +25,10 @@ import { myLikedBookIdsQuery } from '@/features/social/api'
 import { LikeButton } from '@/features/social/components/LikeButton'
 import { useCachedSession } from '@/hooks/useCachedSession'
 import { isSuiPaymentEnabled, suiPaymentAmountLabel } from '@/libs/sui/config'
-import { purchasedBookMemoQuery } from '@/features/purchase/api'
+import {
+  purchasedBookMemoQuery,
+  bookPaymentRecipientQuery,
+} from '@/features/purchase/api'
 import { SuiLogo } from '@/components/icon/SuiLogo'
 
 interface Props {
@@ -56,6 +59,14 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
     }
   )
   const unlockedMemo: string | null | undefined = memoData?.purchasedBookMemo
+
+  // 本の所有者が登録した Sui 受取アドレス（未登録ならボタンを出さない）
+  const { data: recipientData } = useQuery(bookPaymentRecipientQuery, {
+    variables: { input: { bookId: Number(book.id) } },
+    skip: status !== 'authenticated' || !isSuiPaymentEnabled || !canPurchase,
+  })
+  const suiRecipient: string | null | undefined =
+    recipientData?.bookPaymentRecipient
 
   const returnUrl = () => {
     return `${process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'}/books/${book.id}`
@@ -197,7 +208,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
                   {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' &&
                     book.isPurchasable && (
                       <div className="mt-4 flex flex-col items-center gap-2">
-                        {isSuiPaymentEnabled && (
+                        {isSuiPaymentEnabled && suiRecipient && (
                           <button
                             onClick={() => setSuiOpen(true)}
                             className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-r from-[#4da2ff] via-[#3b82f6] to-[#0571e6] px-5 py-2.5 font-semibold text-white shadow-lg shadow-sky-500/30 ring-1 ring-inset ring-white/25 transition-all duration-200 hover:shadow-sky-400/50 hover:brightness-110 active:scale-[0.98]"
@@ -221,11 +232,12 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
         </div>
       </div>
 
-      {isSuiPaymentEnabled && (
+      {isSuiPaymentEnabled && suiRecipient && (
         <SuiCheckoutModal
           open={suiOpen}
           onClose={() => setSuiOpen(false)}
           bookId={Number(book.id)}
+          recipientAddress={suiRecipient}
           onPurchased={() => {
             refetchMemo()
             setSuiOpen(false)

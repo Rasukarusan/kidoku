@@ -79,6 +79,7 @@ model User {
   emailVerified    DateTime?        @map("email_verified")
   image            String?
   admin            Boolean          @default(false)
+  suiAddress       String?          @map("sui_address") @db.VarChar(80)
   accounts         Account[]
   sessions         Session[]
   sheets           sheets[]
