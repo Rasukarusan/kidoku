@@ -74,6 +74,7 @@ export class BookRepository implements IBookRepository {
           memo: book.memo,
           isPublicMemo: book.isPublicMemo,
           isPurchasable: book.isPurchasable,
+          price: book.price,
           finished: book.finished,
           created: book.created,
           updated: book.updated,
@@ -95,6 +96,7 @@ export class BookRepository implements IBookRepository {
         book.finished,
         book.created,
         book.updated,
+        book.price,
       );
     } else {
       const bookId = parseInt(book.id, 10);
@@ -114,6 +116,7 @@ export class BookRepository implements IBookRepository {
           memo: book.memo,
           isPublicMemo: book.isPublicMemo,
           isPurchasable: book.isPurchasable,
+          price: book.price,
           finished: book.finished,
           updated: book.updated,
         },
@@ -240,6 +243,7 @@ export class BookRepository implements IBookRepository {
     memo: string;
     isPublicMemo: boolean;
     isPurchasable: boolean;
+    price: string | null;
     finished: Date | null;
     created: Date;
     updated: Date;
@@ -259,6 +263,7 @@ export class BookRepository implements IBookRepository {
       row.finished ?? null,
       row.created ?? new Date(),
       row.updated ?? new Date(),
+      row.price ?? null,
     );
   }
 }

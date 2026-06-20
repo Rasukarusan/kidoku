@@ -12,11 +12,7 @@ import { getJsonRpcFullnodeUrl } from '@mysten/sui/jsonRpc'
 import { Transaction } from '@mysten/sui/transactions'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@mysten/dapp-kit/dist/index.css'
-import {
-  suiNetwork,
-  suiPaymentAmountMist,
-  suiPaymentAmountLabel,
-} from '@/libs/sui/config'
+import { suiNetwork, mistToSui, resolveBookPriceMist } from '@/libs/sui/config'
 import { createPurchaseMutation } from '@/features/purchase/api'
 import { SuiLogo } from '@/components/icon/SuiLogo'
 
@@ -36,6 +32,8 @@ interface Props {
   bookId: number
   /** 送金先（本の所有者の受取アドレス） */
   recipientAddress: string
+  /** 本ごとの価格（MIST単位の文字列）。未指定ならグローバル既定額 */
+  priceMist?: string | null
   onPurchased?: () => void
 }
 
@@ -44,6 +42,7 @@ export const SuiCheckoutModal: React.FC<Props> = ({
   onClose,
   bookId,
   recipientAddress,
+  priceMist,
   onPurchased,
 }) => {
   if (!open) return null
@@ -55,6 +54,7 @@ export const SuiCheckoutModal: React.FC<Props> = ({
             <SuiCheckoutForm
               bookId={bookId}
               recipientAddress={recipientAddress}
+              priceMist={priceMist}
               onPurchased={onPurchased}
               onClose={onClose}
             />
@@ -70,6 +70,7 @@ type PaymentStatus = 'idle' | 'paying' | 'recording' | 'success' | 'error'
 interface FormProps {
   bookId: number
   recipientAddress: string
+  priceMist?: string | null
   onPurchased?: () => void
   onClose: () => void
 }
@@ -77,6 +78,7 @@ interface FormProps {
 const SuiCheckoutForm: React.FC<FormProps> = ({
   bookId,
   recipientAddress,
+  priceMist,
   onPurchased,
   onClose,
 }) => {
@@ -86,6 +88,10 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
   const [status, setStatus] = useState<PaymentStatus>('idle')
   const [message, setMessage] = useState('')
 
+  // 本ごとの価格（未設定ならグローバル既定額）
+  const amountMist = resolveBookPriceMist(priceMist)
+  const amountLabel = `${mistToSui(amountMist)} SUI`
+
   const handlePay = async () => {
     if (!account) return
     setMessage('')
@@ -93,7 +99,7 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
       // SUI を送金先へ転送するトランザクションを構築
       setStatus('paying')
       const tx = new Transaction()
-      const [coin] = tx.splitCoins(tx.gas, [suiPaymentAmountMist])
+      const [coin] = tx.splitCoins(tx.gas, [amountMist])
       tx.transferObjects([coin], recipientAddress)
 
       const result = await signAndExecute({ transaction: tx })
@@ -138,7 +144,7 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
       <div className="w-full rounded-xl border border-sky-100 bg-sky-50/60 px-4 py-3 text-center">
         <p className="text-xs text-gray-500">お支払い金額</p>
         <p className="bg-gradient-to-r from-[#4da2ff] to-[#0571e6] bg-clip-text text-2xl font-extrabold tabular-nums text-transparent">
-          {suiPaymentAmountLabel}
+          {amountLabel}
         </p>
         <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-white px-2 py-0.5 text-[11px] font-medium text-sky-600 ring-1 ring-sky-200">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -166,7 +172,7 @@ const SuiCheckoutForm: React.FC<FormProps> = ({
           ) : (
             <>
               <SuiLogo size={16} className="text-white" />
-              {suiPaymentAmountLabel} を支払う
+              {amountLabel} を支払う
             </>
           )}
         </button>

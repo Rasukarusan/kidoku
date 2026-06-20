@@ -14,6 +14,7 @@ export const getBookQuery = gql`
       memo
       isPublicMemo
       isPurchasable
+      price
       finished
       created
       updated
@@ -35,6 +36,7 @@ export const getBooksQuery = gql`
       memo
       isPublicMemo
       isPurchasable
+      price
       finished
       created
       updated

@@ -28,5 +28,38 @@ export const mistToSui = (mist: bigint): string => {
   return `${whole.toString()}.${fracStr}`
 }
 
+/**
+ * SUI 表記の文字列（例: "0.05"）を MIST(bigint) に変換する。
+ * 不正な値の場合は null を返す。
+ */
+export const suiToMist = (sui: string): bigint | null => {
+  const trimmed = sui.trim()
+  if (!/^\d*\.?\d*$/.test(trimmed) || trimmed === '' || trimmed === '.') {
+    return null
+  }
+  const [whole = '0', frac = ''] = trimmed.split('.')
+  if (frac.length > SUI_DECIMALS) {
+    // 小数点以下が MIST の精度を超える場合は無効
+    return null
+  }
+  const paddedFrac = frac.padEnd(SUI_DECIMALS, '0')
+  const base = BigInt(10) ** BigInt(SUI_DECIMALS)
+  return BigInt(whole) * base + BigInt(paddedFrac || '0')
+}
+
+/** MIST文字列を "0.01 SUI" 形式のラベルにする */
+export const mistToSuiLabel = (mist: string): string =>
+  `${mistToSui(BigInt(mist))} SUI`
+
+/**
+ * 本ごとの価格(MIST文字列)を解決する。未設定ならグローバル既定額にフォールバック。
+ */
+export const resolveBookPriceMist = (price?: string | null): bigint => {
+  if (price && /^\d+$/.test(price)) {
+    return BigInt(price)
+  }
+  return suiPaymentAmountMist
+}
+
 /** 表示用の決済金額ラベル（例: "0.01 SUI"） */
 export const suiPaymentAmountLabel = `${mistToSui(suiPaymentAmountMist)} SUI`

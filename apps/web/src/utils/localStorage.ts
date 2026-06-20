@@ -20,6 +20,8 @@ export interface BookDraftData {
   title?: string
   author?: string
   isPublicMemo?: boolean
+  isPurchasable?: boolean
+  price?: string | null
   timestamp: number // 保存日時
 }
 

@@ -42,6 +42,8 @@ export async function getStaticProps(context) {
       impression: true,
       memo: true,
       isPublicMemo: true,
+      isPurchasable: true,
+      price: true,
       finished: true,
       created: false,
       updated: false,
