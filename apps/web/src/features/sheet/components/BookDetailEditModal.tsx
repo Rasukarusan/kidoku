@@ -15,6 +15,7 @@ import { Label } from '@/components/input/Label'
 import { HintIcon } from '@/components/icon/HintIcon'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
+import { SuiPriceInput } from '@/components/input/SuiPriceInput'
 import { getBookCategoriesQuery } from '@/features/books/api'
 
 // SSRを無効にしてクライアントサイドのみでロード
@@ -181,30 +182,44 @@ export const BookDetailEditModal: React.FC<Props> = ({
             className="mb-2"
           />
           {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
-            <div className="mb-2 flex items-center">
-              <ToggleButton
-                label="課金によるメモの解放を許可する"
-                checked={book.isPurchasable}
-                onChange={() => {
-                  setBook({
-                    ...book,
-                    isPurchasable: !book.isPurchasable,
-                  })
-                }}
-                disabled={book.isPublicMemo}
-                className="mr-1"
-              />
-              <div data-tooltip-id="toggle-purchase-tooltip">
-                <HintIcon />
+            <>
+              <div className="mb-2 flex items-center">
+                <ToggleButton
+                  label="課金によるメモの解放を許可する"
+                  checked={book.isPurchasable}
+                  onChange={() => {
+                    setBook({
+                      ...book,
+                      isPurchasable: !book.isPurchasable,
+                    })
+                  }}
+                  disabled={book.isPublicMemo}
+                  className="mr-1"
+                />
+                <div data-tooltip-id="toggle-purchase-tooltip">
+                  <HintIcon />
+                </div>
+                <Tooltip
+                  id="toggle-purchase-tooltip"
+                  className="!sm:w-[400px] !w-[350px] text-xs"
+                >
+                  「ON」に設定することで、他のユーザーが課金することにより、
+                  非公開のメモを閲覧できます。公開されるのは課金したユーザーのみで、また、他の非公開メモは解放されません。
+                </Tooltip>
               </div>
-              <Tooltip
-                id="toggle-purchase-tooltip"
-                className="!sm:w-[400px] !w-[350px] text-xs"
-              >
-                「ON」に設定することで、他のユーザーが課金することにより、
-                非公開のメモを閲覧できます。公開されるのは課金したユーザーのみで、また、他の非公開メモは解放されません。
-              </Tooltip>
-            </div>
+              {book.isPurchasable && !book.isPublicMemo && (
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-xs font-semibold text-gray-500">
+                    価格
+                  </span>
+                  <SuiPriceInput
+                    key={book.id}
+                    valueMist={book.price}
+                    onChange={(price) => setBook({ ...book, price })}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

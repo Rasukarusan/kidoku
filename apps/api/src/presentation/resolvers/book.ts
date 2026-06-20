@@ -78,6 +78,7 @@ export class BookResolver {
       memo: input.memo,
       isPublicMemo: input.isPublicMemo,
       isPurchasable: input.isPurchasable,
+      price: input.price,
       finished: input.finished || null,
     });
 
@@ -98,6 +99,7 @@ export class BookResolver {
       memo: input.memo,
       isPublicMemo: input.isPublicMemo,
       isPurchasable: input.isPurchasable,
+      price: input.price,
       finished: input.finished,
       sheetId: input.sheetId,
     });
@@ -127,6 +129,7 @@ export class BookResolver {
       memo: book.getSanitizedMemo(isOwner) ?? undefined,
       isPublicMemo: book.isPublicMemo,
       isPurchasable: book.isPurchasable,
+      price: book.price ?? undefined,
       finished: book.finished ?? undefined,
       created: book.created,
       updated: book.updated,

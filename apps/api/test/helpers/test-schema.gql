@@ -14,6 +14,7 @@ type BookResponse {
   memo: String
   isPublicMemo: Boolean!
   isPurchasable: Boolean!
+  price: String
   finished: DateTime
   created: DateTime!
   updated: DateTime!
@@ -52,6 +53,7 @@ type CommentResponse {
 
 type UserResponse {
   name: String!
+  suiAddress: String
 }
 
 type Query {
@@ -62,6 +64,7 @@ type Query {
   comments(input: GetCommentsInput!): CommentResponse!
   userImage(input: GetUserImageInput!): String!
   isNameAvailable(input: CheckNameAvailableInput!): Boolean!
+  mySuiAddress: String
 }
 
 input GetBookInput {
@@ -95,6 +98,7 @@ type Mutation {
   deleteSheet(input: DeleteSheetInput!): Boolean!
   updateSheetOrders(input: UpdateSheetOrdersInput!): Boolean!
   updateUserName(input: UpdateUserNameInput!): UserResponse!
+  updateSuiAddress(input: UpdateSuiAddressInput!): UserResponse!
   deleteUser: Boolean!
 }
 
@@ -108,6 +112,7 @@ input CreateBookInput {
   memo: String!
   isPublicMemo: Boolean!
   isPurchasable: Boolean
+  price: String
   finished: DateTime
 }
 
@@ -121,6 +126,7 @@ input UpdateBookInput {
   memo: String
   isPublicMemo: Boolean
   isPurchasable: Boolean
+  price: String
   finished: DateTime
   sheetId: Int
 }
@@ -153,4 +159,8 @@ input SheetOrderItem {
 
 input UpdateUserNameInput {
   name: String!
+}
+
+input UpdateSuiAddressInput {
+  suiAddress: String!
 }

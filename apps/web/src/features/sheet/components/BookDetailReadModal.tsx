@@ -24,7 +24,11 @@ import { useQuery } from '@apollo/client'
 import { myLikedBookIdsQuery } from '@/features/social/api'
 import { LikeButton } from '@/features/social/components/LikeButton'
 import { useCachedSession } from '@/hooks/useCachedSession'
-import { isSuiPaymentEnabled, suiPaymentAmountLabel } from '@/libs/sui/config'
+import {
+  isSuiPaymentEnabled,
+  mistToSui,
+  resolveBookPriceMist,
+} from '@/libs/sui/config'
 import {
   purchasedBookMemoQuery,
   bookPaymentRecipientQuery,
@@ -67,6 +71,9 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
   })
   const suiRecipient: string | null | undefined =
     recipientData?.bookPaymentRecipient
+
+  // 本ごとの価格ラベル（未設定ならグローバル既定額）
+  const priceLabel = `${mistToSui(resolveBookPriceMist(book.price))} SUI`
 
   const returnUrl = () => {
     return `${process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'}/books/${book.id}`
@@ -220,7 +227,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
                             </span>
                             <span>Suiで購入</span>
                             <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold tabular-nums ring-1 ring-white/20">
-                              {suiPaymentAmountLabel}
+                              {priceLabel}
                             </span>
                           </button>
                         )}
@@ -238,6 +245,7 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
           onClose={() => setSuiOpen(false)}
           bookId={Number(book.id)}
           recipientAddress={suiRecipient}
+          priceMist={book.price}
           onPurchased={() => {
             refetchMemo()
             setSuiOpen(false)
