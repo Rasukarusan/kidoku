@@ -37,6 +37,7 @@ export class CreateBookUseCase {
           id: searchData.id,
           title: searchData.title,
           author: searchData.author,
+          category: searchData.category,
           image: searchData.image,
           memo: searchData.isPublicMemo ? searchData.memo : '',
           username: searchData.userName,

@@ -206,7 +206,11 @@ export const SearchModal: React.FC = () => {
                       <div className="px-4 pt-3 text-xs font-medium text-gray-400">
                         ユーザー本棚
                       </div>
-                      <UserBooks input={inputValue} onClose={onClose} />
+                      <UserBooks
+                        input={inputValue}
+                        onClose={onClose}
+                        onSelectBook={handleSelectBook}
+                      />
                     </div>
                   </>
                 )

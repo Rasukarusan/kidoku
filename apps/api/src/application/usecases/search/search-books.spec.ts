@@ -23,6 +23,7 @@ describe('SearchBooksUseCase', () => {
           id: '1',
           title: 'テスト書籍',
           author: '著者',
+          category: 'カテゴリ',
           image: 'img.jpg',
           memo: '',
           username: 'user',

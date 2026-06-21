@@ -142,6 +142,7 @@ export class BookRepository implements IBookRepository {
       id: string;
       title: string;
       author: string;
+      category: string;
       image: string;
       memo: string;
       isPublicMemo: boolean;
@@ -155,6 +156,7 @@ export class BookRepository implements IBookRepository {
         id: true,
         title: true,
         author: true,
+        category: true,
         image: true,
         memo: true,
         isPublicMemo: true,
@@ -167,6 +169,7 @@ export class BookRepository implements IBookRepository {
       id: row.id.toString(),
       title: row.title,
       author: row.author,
+      category: row.category,
       image: row.image,
       memo: row.isPublicMemo ? row.memo : '',
       isPublicMemo: row.isPublicMemo,
@@ -180,6 +183,7 @@ export class BookRepository implements IBookRepository {
     id: string;
     title: string;
     author: string;
+    category: string;
     image: string;
     memo: string;
     isPublicMemo: boolean;
@@ -198,6 +202,7 @@ export class BookRepository implements IBookRepository {
         id: true,
         title: true,
         author: true,
+        category: true,
         image: true,
         memo: true,
         isPublicMemo: true,
@@ -212,6 +217,7 @@ export class BookRepository implements IBookRepository {
       id: row.id.toString(),
       title: row.title,
       author: row.author,
+      category: row.category,
       image: row.image,
       memo: row.isPublicMemo ? row.memo : '',
       isPublicMemo: row.isPublicMemo,
