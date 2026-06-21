@@ -48,5 +48,30 @@
       "Bash(cp apps/web/.env.example apps/web/.env)",
       "Bash(cp apps/api/.env.example apps/api/.env)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/sandbox-setup.sh 2>&1 | tail -30",
+            "timeout": 600
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/pre-tool-use.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }

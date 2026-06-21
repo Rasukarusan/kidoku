@@ -43,6 +43,19 @@ fi
 green "依存パッケージのインストール完了"
 
 # ==============================================================================
+# 2.5. Prisma クライアント生成（型チェックの前提）
+# ==============================================================================
+# クライアント生成は DB 接続を必要としないため、Docker 起動より前に実行する。
+# こうすることで、後続ステップ（Docker pull や seed）が遅延・タイムアウトしても
+# @prisma/client の型が必ず生成され、check-types / validate が通る状態になる。
+# （これを Docker 起動後に置くと、SessionStart hook のタイムアウト時に
+#  生成が走らず API の型エラーが毎回発生する原因になっていた）
+yellow "Prisma クライアントを生成中..."
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web exec prisma generate 2>"$LOG_DIR/prisma-gen-web.log"
+PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api exec prisma generate 2>"$LOG_DIR/prisma-gen-api.log"
+green "Prisma クライアント生成完了"
+
+# ==============================================================================
 # 3. Docker デーモン起動（プロキシ設定付き）
 # ==============================================================================
 if ! docker info &>/dev/null; then
@@ -145,16 +158,11 @@ sed -i "s|^DATABASE_URL=.*|DATABASE_URL=\"$DB_URL\"|" "$PROJECT_ROOT/apps/api/.e
 sed -i 's|^MEILI_HOST=.*|MEILI_HOST=http://localhost:7700|' "$PROJECT_ROOT/apps/api/.env"
 
 # ==============================================================================
-# 6. Prisma スキーマ反映 + クライアント生成
+# 6. Prisma スキーマを DB に反映（クライアント生成は Step 2.5 で実施済み）
 # ==============================================================================
 yellow "Prisma スキーマを DB に反映中..."
 DATABASE_URL="$DB_URL" pnpm --filter web exec prisma db push --skip-generate 2>"$LOG_DIR/prisma-push.log"
 green "Prisma db push 完了"
-
-yellow "Prisma クライアントを生成中..."
-PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web exec prisma generate 2>"$LOG_DIR/prisma-gen-web.log"
-PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api exec prisma generate 2>"$LOG_DIR/prisma-gen-api.log"
-green "Prisma クライアント生成完了"
 
 # ==============================================================================
 # 7. シードデータ投入
