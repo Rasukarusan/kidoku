@@ -12,10 +12,43 @@ export class NotificationRepository implements INotificationRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(params: CreateNotificationParams): Promise<void> {
-    // 自分自身の操作では通知しない
-    if (params.userId === params.actorId) return;
+    // 自分自身の操作では通知しない（ログインユーザーのみ該当）
+    if (params.actorId && params.userId === params.actorId) return;
 
-    const { userId, actorId, type } = params;
+    const { userId, actorId = null, actorAnonymousId = null, type } = params;
+
+    // 匿名操作者の通知。
+    // (受信者・匿名操作者・種別・本) で集約するが、ユニーク制約は actorId(NULL) を
+    // 含むため MySQL では NULL 同士が別物扱いとなり upsert で集約できない。
+    // そのため明示的に検索→更新／作成して重複作成を防ぐ。
+    if (actorAnonymousId) {
+      if (params.bookId != null) {
+        const existing = await this.prisma.notification.findFirst({
+          where: { userId, actorAnonymousId, type, bookId: params.bookId },
+          select: { id: true },
+        });
+        if (existing) {
+          await this.prisma.notification.update({
+            where: { id: existing.id },
+            data: { read: false, created: new Date() },
+          });
+          return;
+        }
+      }
+      await this.prisma.notification.create({
+        data: {
+          userId,
+          actorId: null,
+          actorAnonymousId,
+          type,
+          bookId: params.bookId ?? null,
+        },
+      });
+      return;
+    }
+
+    // 操作者を特定できない通知は作成しない
+    if (!actorId) return;
 
     // 本に紐づく通知（いいね等）は (受信者・操作者・種別・本) ごとに1件に集約する。
     // いいね→いいね解除→再いいねを繰り返しても通知が重複作成されないようにし、
@@ -84,8 +117,9 @@ export class NotificationRepository implements INotificationRepository {
       bookId: n.bookId,
       read: n.read,
       created: n.created,
-      actorName: n.actor.name || '',
-      actorImage: n.actor.image || null,
+      // actor が null の通知は未ログインユーザーによる操作（匿名）
+      actorName: n.actor?.name || '匿名ユーザー',
+      actorImage: n.actor?.image || null,
       bookTitle: n.bookId ? (titleMap.get(n.bookId) ?? null) : null,
     }));
 

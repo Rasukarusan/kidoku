@@ -5,6 +5,7 @@ import { FaRegHeart } from 'react-icons/fa'
 import { Container } from '@/components/layout/Container'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { useCachedSession } from '@/hooks/useCachedSession'
+import { useAnonymousId } from '@/hooks/useAnonymousId'
 import { NO_IMAGE } from '@/libs/constants'
 import {
   popularBooksQuery,
@@ -47,6 +48,7 @@ export const DiscoverPage: React.FC = () => {
   const { session, status } = useCachedSession()
   const isAuthed = status === 'authenticated'
   const currentUsername = session?.user?.name ?? null
+  const anonymousId = useAnonymousId()
 
   const { data: popularData } = useQuery(popularBooksQuery, {
     variables: { limit: 12 },
@@ -54,8 +56,10 @@ export const DiscoverPage: React.FC = () => {
   const { data: readersData } = useQuery(topReadersQuery, {
     variables: { limit: 10 },
   })
+  // ログイン中はユーザーの、未ログイン中は匿名IDのいいね済み本を取得する
   const { data: likedData } = useQuery(myLikedBookIdsQuery, {
-    skip: !isAuthed,
+    variables: { anonymousId: isAuthed ? undefined : anonymousId },
+    skip: !isAuthed && !anonymousId,
   })
   const { data: feedData } = useQuery(feedQuery, {
     variables: { input: { limit: 12, offset: 0 } },
