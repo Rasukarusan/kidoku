@@ -3,7 +3,10 @@ import { NotificationItem } from '../types/social';
 
 export interface CreateNotificationParams {
   userId: string;
-  actorId: string;
+  /** ログインユーザーの操作者ID。匿名操作の場合は null */
+  actorId?: string | null;
+  /** 匿名（未ログイン）操作者の識別子。ログインユーザーの場合は null */
+  actorAnonymousId?: string | null;
   type: 'follow' | 'like';
   bookId?: number | null;
 }

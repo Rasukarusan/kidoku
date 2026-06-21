@@ -31,12 +31,35 @@ describe('LikeBookUseCase', () => {
     });
     mockLikeRepo.countByBook.mockResolvedValue(3);
 
-    const count = await useCase.execute('liker', 1);
+    const count = await useCase.execute({ kind: 'user', userId: 'liker' }, 1);
 
     expect(count).toBe(3);
     expect(mockNotificationRepo.create).toHaveBeenCalledWith({
       userId: 'owner',
       actorId: 'liker',
+      actorAnonymousId: null,
+      type: 'like',
+      bookId: 1,
+    });
+  });
+
+  it('匿名ユーザーのいいねで匿名として通知が作成される', async () => {
+    mockLikeRepo.like.mockResolvedValue({
+      created: true,
+      bookOwnerId: 'owner',
+    });
+    mockLikeRepo.countByBook.mockResolvedValue(5);
+
+    const count = await useCase.execute(
+      { kind: 'anonymous', anonymousId: 'anon-123' },
+      1,
+    );
+
+    expect(count).toBe(5);
+    expect(mockNotificationRepo.create).toHaveBeenCalledWith({
+      userId: 'owner',
+      actorId: null,
+      actorAnonymousId: 'anon-123',
       type: 'like',
       bookId: 1,
     });
@@ -49,7 +72,7 @@ describe('LikeBookUseCase', () => {
     });
     mockLikeRepo.countByBook.mockResolvedValue(3);
 
-    await useCase.execute('liker', 1);
+    await useCase.execute({ kind: 'user', userId: 'liker' }, 1);
 
     expect(mockNotificationRepo.create).not.toHaveBeenCalled();
   });
