@@ -26,8 +26,8 @@ export const topReadersQuery = gql`
 `
 
 export const myLikedBookIdsQuery = gql`
-  query MyLikedBookIds {
-    myLikedBookIds
+  query MyLikedBookIds($anonymousId: String) {
+    myLikedBookIds(anonymousId: $anonymousId)
   }
 `
 
