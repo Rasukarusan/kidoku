@@ -3,6 +3,14 @@ name: DB Push
 on:
   workflow_dispatch:
     inputs:
+      environment:
+        description: 'プッシュ先のデータベース環境'
+        required: true
+        default: 'Production'
+        type: choice
+        options:
+          - Production
+          - Preview
       branch:
         description: 'スキーマを取得するブランチ（空欄ならワークフロー実行時に選択したブランチ）'
         required: false
@@ -22,8 +30,7 @@ concurrency:
 jobs:
   db-push:
     runs-on: ubuntu-latest
-    # DATABASE_URL などの保護されたシークレットを使うため Production environment を指定
-    environment: Production
+    environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v4
         with:
