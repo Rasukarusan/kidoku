@@ -106,15 +106,3 @@ export function migrateAnalysis(
 
   return migrated as AiSummariesJson
 }
-
-/**
- * 複数のAI分析データをバッチでマイグレーションする
- *
- * @param analyses - マイグレーション対象のAI分析データの配列
- * @returns 最新スキーマバージョンに変換されたデータの配列
- */
-export function migrateAnalyses(
-  analyses: Record<string, unknown>[]
-): AiSummariesJson[] {
-  return analyses.map(migrateAnalysis)
-}

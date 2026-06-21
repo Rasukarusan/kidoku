@@ -13,12 +13,6 @@ export const createPurchaseMutation = gql`
   }
 `
 
-export const myPurchasedBookIdsQuery = gql`
-  query MyPurchasedBookIds {
-    myPurchasedBookIds
-  }
-`
-
 export const purchasedBookMemoQuery = gql`
   query PurchasedBookMemo($input: GetPurchasedBookMemoInput!) {
     purchasedBookMemo(input: $input)

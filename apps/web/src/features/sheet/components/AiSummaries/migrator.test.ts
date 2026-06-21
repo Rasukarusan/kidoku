@@ -1,4 +1,4 @@
-import { migrateAnalysis, migrateAnalyses } from './migrator'
+import { migrateAnalysis } from './migrator'
 
 describe('migrateAnalysis()', () => {
   describe('バージョン1からバージョン2へのマイグレーション', () => {
@@ -107,42 +107,5 @@ describe('migrateAnalysis()', () => {
       expect(result.hidden_theme_discovery).toBe('テストシナリオのみ')
       expect(result).not.toHaveProperty('what_if_scenario')
     })
-  })
-})
-
-describe('migrateAnalyses()', () => {
-  it('複数のデータをバッチでマイグレーションできること', () => {
-    const analyses = [
-      {
-        character_summary: '人物1',
-        what_if_scenario: 'シナリオ1',
-        reading_trend_analysis: '傾向1',
-        sentiment_analysis: '感情1',
-        overall_feedback: '総評1',
-      },
-      {
-        _schemaVersion: 2,
-        character_summary: '人物2',
-        hidden_theme_discovery: 'テーマ2',
-        reading_trend_analysis: '傾向2',
-        sentiment_analysis: '感情2',
-        overall_feedback: '総評2',
-      },
-    ]
-
-    const results = migrateAnalyses(analyses)
-
-    expect(results).toHaveLength(2)
-    expect(results[0].hidden_theme_discovery).toBe('シナリオ1')
-    expect(results[0]._originalSchemaVersion).toBe(1)
-    expect(results[0]).not.toHaveProperty('what_if_scenario')
-    expect(results[1].hidden_theme_discovery).toBe('テーマ2')
-    expect(results[1]._originalSchemaVersion).toBeUndefined()
-  })
-
-  it('空の配列でもエラーが発生しないこと', () => {
-    const results = migrateAnalyses([])
-
-    expect(results).toEqual([])
   })
 })
