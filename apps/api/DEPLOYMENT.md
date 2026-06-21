@@ -42,17 +42,20 @@ gcloud iam service-accounts keys create key.json \
 
 ### 2. GitHub Secretsの設定
 
-以下のシークレットをGitHubリポジトリに設定:
+以下のシークレットをGitHubリポジトリ（本番は `Production`、プレビューは `Preview` Environment）に設定:
 
 - `GCP_PROJECT_ID`: Google CloudプロジェクトID
 - `GCP_SA_KEY`: サービスアカウントキー（key.jsonの内容）
-- `FRONTEND_URL`: フロントエンドのURL（例: https://kidoku.example.com）
-- `DB_HOST`: TiDBクラウドのホスト
-- `DB_PORT`: データベースポート
-- `DB_USER`: データベースユーザー
-- `DB_PASS`: データベースパスワード
-- `DB_NAME`: データベース名
-- `NEXTAUTH_SECRET`: NextAuth.jsのシークレット
+- `FRONTEND_URL`: フロントエンドのURL（CORS許可オリジン。カンマ区切りで複数指定可。例: https://kidoku.example.com）
+- `DATABASE_URL`: データベース接続文字列（例: `mysql://user:pass@host:3306/kidoku`）
+- `NEXTAUTH_SECRET`: NextAuth.jsのシークレット（フロントエンドと一致させること）
+- `MEILI_HOST`: MeiliSearchのホストURL
+- `MEILI_MASTER_KEY`: MeiliSearchのマスターキー
+- `ADMIN_API_KEY`: 管理用APIキー
+- `RAKUTEN_APPLICATION_ID`: 楽天ブックスAPIのアプリケーションID
+- `RAKUTEN_ACCESS_KEY`: 楽天ブックスAPIのアクセスキー
+
+> **Note**: APIが参照する環境変数はソースコード上 `DATABASE_URL`（Prisma接続）に統一されている。`DB_HOST` などの個別変数は使用しない。
 
 ## ローカルでのテスト
 
@@ -69,11 +72,7 @@ docker build -f docker/Dockerfile.api -t kidoku-api:local .
 docker run -p 4000:4000 \
   -e NODE_ENV=production \
   -e FRONTEND_URL=http://localhost:3000 \
-  -e DB_HOST=localhost \
-  -e DB_PORT=3306 \
-  -e DB_USER=root \
-  -e DB_PASS=password \
-  -e DB_NAME=kidoku \
+  -e DATABASE_URL="mysql://root:password@localhost:3306/kidoku" \
   -e NEXTAUTH_SECRET=your-secret \
   kidoku-api:local
 
@@ -85,7 +84,15 @@ curl http://localhost:4000/health
 
 ### 自動デプロイ（推奨）
 
-main/masterブランチに`apps/api/`配下の変更をプッシュすると、GitHub Actionsが自動的にデプロイします。
+| ワークフロー | トリガー | デプロイ先 | GitHub Environment |
+|---|---|---|---|
+| `.github/workflows/deploy-api.yml` | main/master への push（`apps/api/**` 変更時） | `kidoku-api`（本番） | `Production` |
+| `.github/workflows/deploy-api-preview.yml` | PR（main/master 宛て、`apps/api/**` 変更時） | `kidoku-api-preview`（プレビュー） | `Preview` |
+
+- 本番: main/masterブランチに`apps/api/`配下の変更をプッシュすると自動デプロイ
+- プレビュー: PR作成・更新時に全PR共通の単一サービス `kidoku-api-preview` へ自動デプロイ（最新のデプロイで上書き）。デプロイ後にPRへGraphQLエンドポイントURLがコメントされる
+
+> **Note**: `gcloud run deploy` はサービスが存在しなければ自動作成するため、プレビュー用サービスの事前作成は不要。初回ワークフロー実行時に `kidoku-api-preview` が作られる。フォークからのPRはSecretsにアクセスできないため、プレビューデプロイは同一リポジトリ内ブランチのPRでのみ動作する。
 
 ### 手動デプロイ
 
@@ -110,7 +117,15 @@ gcloud run deploy kidoku-api \
   --min-instances 0 \
   --max-instances 10 \
   --timeout 60 \
-  --set-env-vars "NODE_ENV=production,FRONTEND_URL=https://kidoku.example.com"
+  --set-env-vars "NODE_ENV=production" \
+  --set-env-vars "FRONTEND_URL=https://kidoku.example.com" \
+  --set-env-vars "DATABASE_URL=mysql://user:pass@host:3306/kidoku" \
+  --set-env-vars "NEXTAUTH_SECRET=your-secret" \
+  --set-env-vars "MEILI_HOST=https://meili.example.com" \
+  --set-env-vars "MEILI_MASTER_KEY=your-master-key" \
+  --set-env-vars "ADMIN_API_KEY=your-admin-api-key" \
+  --set-env-vars "RAKUTEN_APPLICATION_ID=your-app-id" \
+  --set-env-vars "RAKUTEN_ACCESS_KEY=your-access-key"
 ```
 
 ## 本番環境の確認
