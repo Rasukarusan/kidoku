@@ -4,7 +4,7 @@ import { NotificationItem } from '../types/social';
 export interface CreateNotificationParams {
   userId: string;
   actorId: string;
-  type: 'follow' | 'like';
+  type: 'follow' | 'like' | 'comment';
   bookId?: number | null;
 }
 

@@ -42,6 +42,7 @@ model books {
   yearly_top_books YearlyTopBook[]
   likes            Like[]
   purchases        Purchase[]
+  bookComments     BookComment[]
 }
 
 model Account {
@@ -94,6 +95,7 @@ model User {
   notifications      Notification[] @relation("notificationUser")
   actorNotifications Notification[] @relation("notificationActor")
   purchases          Purchase[]
+  bookComments       BookComment[]
 
   @@map("users")
 }
@@ -209,4 +211,19 @@ model template_books {
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BookComment {
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
+  bookId  Int      @map("book_id")
+  userId  String   @map("user_id")
+  content String   @db.Text
+  created DateTime @default(now()) @db.DateTime(0)
+  updated DateTime @default(now()) @db.DateTime(0)
+  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([bookId])
+  @@index([userId])
+  @@map("book_comments")
 }
