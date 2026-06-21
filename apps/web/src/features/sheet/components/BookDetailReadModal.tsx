@@ -34,14 +34,21 @@ import {
   bookPaymentRecipientQuery,
 } from '@/features/purchase/api'
 import { SuiLogo } from '@/components/icon/SuiLogo'
+import { CommentSection } from '@/features/books/components/CommentSection'
 
 interface Props {
   book: Book
   onClose: () => void
   onEdit?: () => void
+  /** 感想へのコメント欄を表示するか（書籍詳細ページでのみ有効化） */
+  showComments?: boolean
 }
 
-export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
+export const BookDetailReadModal: React.FC<Props> = ({
+  book,
+  onEdit,
+  showComments = false,
+}) => {
   const isMine = useIsBookOwner(book)
   const { status } = useCachedSession()
   const [suiOpen, setSuiOpen] = useState(false)
@@ -237,6 +244,10 @@ export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
               ))}
           </div>
         </div>
+
+        {showComments && (
+          <CommentSection bookId={book.id} bookOwnerId={book.user?.id} />
+        )}
       </div>
 
       {isSuiPaymentEnabled && suiRecipient && (

@@ -154,6 +154,7 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
             book={book}
             onClose={handleClose}
             onEdit={isOwner ? handleEditToggle : undefined}
+            showComments
           />
         )}
       </div>
