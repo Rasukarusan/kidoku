@@ -47,10 +47,6 @@ export const suiToMist = (sui: string): bigint | null => {
   return BigInt(whole) * base + BigInt(paddedFrac || '0')
 }
 
-/** MIST文字列を "0.01 SUI" 形式のラベルにする */
-export const mistToSuiLabel = (mist: string): string =>
-  `${mistToSui(BigInt(mist))} SUI`
-
 /**
  * 本ごとの価格(MIST文字列)を解決する。未設定ならグローバル既定額にフォールバック。
  */

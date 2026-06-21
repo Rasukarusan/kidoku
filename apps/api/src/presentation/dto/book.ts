@@ -161,18 +161,3 @@ export class BookResponse {
   @Field(() => GraphQLISODateTime)
   updated: Date;
 }
-
-@ObjectType()
-export class CreateBookResponse {
-  @Field()
-  result: boolean;
-
-  @Field()
-  bookTitle: string;
-
-  @Field()
-  sheetName: string;
-
-  @Field(() => ID)
-  bookId: string;
-}
