@@ -24,6 +24,7 @@ import { useQuery } from '@apollo/client'
 import { myLikedBookIdsQuery } from '@/features/social/api'
 import { LikeButton } from '@/features/social/components/LikeButton'
 import { useCachedSession } from '@/hooks/useCachedSession'
+import { useAnonymousId } from '@/hooks/useAnonymousId'
 import {
   isSuiPaymentEnabled,
   mistToSui,
@@ -44,12 +45,16 @@ interface Props {
 export const BookDetailReadModal: React.FC<Props> = ({ book, onEdit }) => {
   const isMine = useIsBookOwner(book)
   const { status } = useCachedSession()
+  const anonymousId = useAnonymousId()
   const [suiOpen, setSuiOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  // ログイン中はいいね済みの本IDを取得し、初期状態を反映する
+  // いいね済みの本IDを取得し初期状態を反映する。
+  // ログイン中はユーザーの、未ログイン中は匿名IDのいいね済みを取得する。
+  const isAuthed = status === 'authenticated'
   const { data: likedData } = useQuery(myLikedBookIdsQuery, {
-    skip: status !== 'authenticated',
+    variables: { anonymousId: isAuthed ? undefined : anonymousId },
+    skip: !isAuthed && !anonymousId,
   })
   const likedBookIds: number[] = likedData?.myLikedBookIds ?? []
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ILikeRepository } from '../../../domain/repositories/like';
+import { ILikeRepository, LikeActor } from '../../../domain/repositories/like';
 import { INotificationRepository } from '../../../domain/repositories/notification';
 
 @Injectable()
@@ -9,15 +9,16 @@ export class LikeBookUseCase {
     private readonly notificationRepository: INotificationRepository,
   ) {}
 
-  async execute(userId: string, bookId: number): Promise<number> {
+  async execute(actor: LikeActor, bookId: number): Promise<number> {
     const { created, bookOwnerId } = await this.likeRepository.like(
-      userId,
+      actor,
       bookId,
     );
     if (created && bookOwnerId) {
       await this.notificationRepository.create({
         userId: bookOwnerId,
-        actorId: userId,
+        actorId: actor.kind === 'user' ? actor.userId : null,
+        actorAnonymousId: actor.kind === 'anonymous' ? actor.anonymousId : null,
         type: 'like',
         bookId,
       });
