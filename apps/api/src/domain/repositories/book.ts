@@ -19,6 +19,7 @@ export abstract class IBookRepository {
       id: string;
       title: string;
       author: string;
+      category: string;
       image: string;
       memo: string;
       isPublicMemo: boolean;
@@ -31,6 +32,7 @@ export abstract class IBookRepository {
     id: string;
     title: string;
     author: string;
+    category: string;
     image: string;
     memo: string;
     isPublicMemo: boolean;

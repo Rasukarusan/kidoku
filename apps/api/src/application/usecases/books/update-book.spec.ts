@@ -89,6 +89,7 @@ describe('UpdateBookUseCase', () => {
       id: '1',
       title: '新タイトル',
       author: '著者',
+      category: 'カテゴリ',
       image: 'image.jpg',
       memo: '',
       isPublicMemo: false,

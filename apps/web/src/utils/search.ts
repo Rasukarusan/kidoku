@@ -10,6 +10,7 @@ const SEARCH_BOOKS_QUERY = gql`
         id
         title
         author
+        category
         image
         memo
         username
@@ -161,6 +162,7 @@ export const searchUserBooks = async (
       id: string
       title: string
       author: string
+      category: string
       image: string
       memo: string
       username: string
@@ -171,7 +173,7 @@ export const searchUserBooks = async (
       title: hit.title,
       author: hit.author,
       image: hit.image,
-      category: '',
+      category: hit.category ?? '',
       memo: mask(hit.memo),
       username: hit.username,
       userImage: hit.userImage,

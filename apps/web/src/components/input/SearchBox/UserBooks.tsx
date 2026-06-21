@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
+import { useSetAtom } from 'jotai'
 import { SearchResult } from '@/types/search'
-import { truncate } from '@/utils/string'
+import { truncate, stripTags } from '@/utils/string'
 import { searchUserBooks } from '@/utils/search'
+import { openLoginModalAtom } from '@/store/modal/atom'
 import Link from 'next/link'
 import { Loading } from '@/components/icon/Loading'
 // import { userBooks } from './mock'
@@ -10,10 +13,17 @@ import { Loading } from '@/components/icon/Loading'
 interface Props {
   input: string
   onClose: () => void
+  onSelectBook: (book: SearchResult) => void
 }
 
-export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
+export const UserBooks: React.FC<Props> = ({
+  input,
+  onClose,
+  onSelectBook,
+}) => {
   const router = useRouter()
+  const { data: session } = useSession()
+  const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const [books, setBooks] = useState<SearchResult[]>([])
   // const [books, setBooks] = useState<SearchResult[]>(userBooks)
   const [loading, setLoading] = useState(false)
@@ -45,6 +55,25 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
     }, 300)
     return () => clearTimeout(timer)
   }, [input])
+
+  // 他ユーザーの本棚の検索結果を流用して登録する。
+  // タイトル・著者・カテゴリ・画像はそのまま流用し、感想（メモ）は
+  // 他人のものを引き継がずテンプレートから書き始められるよう空にする。
+  const handleRegister = (item: SearchResult) => {
+    if (!session) {
+      setOpenLoginModal(true)
+      return
+    }
+    onSelectBook({
+      id: item.id,
+      // 検索結果のタイトルにはハイライト用のHTMLタグが含まれるため除去する
+      title: stripTags(item.title),
+      author: item.author,
+      category: item.category ?? '',
+      image: item.image,
+      memo: '',
+    })
+  }
 
   return (
     <>
@@ -125,6 +154,13 @@ export const UserBooks: React.FC<Props> = ({ input, onClose }) => {
                     </div>
                   </div>
                 </div>
+                <button
+                  className="mt-3 w-full rounded-md bg-blue-600 py-2 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+                  onClick={() => handleRegister(item)}
+                  title="この本の情報を流用して登録します（感想は引き継がれません）"
+                >
+                  この本を登録
+                </button>
               </div>
             )
           })}
