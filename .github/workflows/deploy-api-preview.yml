@@ -61,15 +61,14 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -f docker/Dockerfile.api -t ${{ env.IMAGE }}:${{ github.sha }} -t ${{ env.IMAGE }}:latest .
-          docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker build -f docker/Dockerfile.api -t ${{ env.IMAGE }}:latest .
           docker push ${{ env.IMAGE }}:latest
 
       - name: Deploy to Cloud Run
         id: deploy
         run: |
           gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.IMAGE }}:${{ github.sha }} \
+            --image ${{ env.IMAGE }}:latest \
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
