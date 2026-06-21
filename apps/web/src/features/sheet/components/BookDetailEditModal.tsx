@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { Book } from '@/types/book'
 import { ToggleButton } from '@/components/button/ToggleButton'
 import { Loading } from '@/components/icon/Loading'
@@ -17,6 +18,7 @@ import { MaskingHint } from '@/components/label/MaskingHint'
 import { SheetSelectBox } from '@/components/input/SheetSelectBox'
 import { SuiPriceInput } from '@/components/input/SuiPriceInput'
 import { getBookCategoriesQuery } from '@/features/books/api'
+import { mySuiAddressQuery } from '@/features/user/api/queries'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -69,6 +71,15 @@ export const BookDetailEditModal: React.FC<Props> = ({
         label: category,
       }))
     : []
+
+  // 課金機能が有効なときのみ、自分の Sui 受取アドレスの設定有無を取得する。
+  // 未設定だと購入された SUI を受け取れないため、課金トグルを無効化する。
+  const isPurchaseFeatureEnabled =
+    process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true'
+  const { data: suiAddressData, loading: suiAddressLoading } = useQuery<{
+    mySuiAddress: string | null
+  }>(mySuiAddressQuery, { skip: !isPurchaseFeatureEnabled })
+  const hasSuiAddress = !!suiAddressData?.mySuiAddress
 
   // どこが変更されたかを取得
   useEffect(() => {
@@ -181,7 +192,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
             disabled={false}
             className="mb-2"
           />
-          {process.env.NEXT_PUBLIC_FLAG_KIDOKU_1 === 'true' && (
+          {isPurchaseFeatureEnabled && (
             <>
               <div className="mb-2 flex items-center">
                 <ToggleButton
@@ -193,7 +204,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
                       isPurchasable: !book.isPurchasable,
                     })
                   }}
-                  disabled={book.isPublicMemo}
+                  disabled={book.isPublicMemo || !hasSuiAddress}
                   className="mr-1"
                 />
                 <div data-tooltip-id="toggle-purchase-tooltip">
@@ -207,6 +218,17 @@ export const BookDetailEditModal: React.FC<Props> = ({
                   非公開のメモを閲覧できます。公開されるのは課金したユーザーのみで、また、他の非公開メモは解放されません。
                 </Tooltip>
               </div>
+              {!hasSuiAddress && !suiAddressLoading && !book.isPublicMemo && (
+                <p className="mb-2 text-xs text-gray-500">
+                  課金を有効にするには Sui 受取アドレスの設定が必要です。
+                  <Link
+                    href="/settings/profile"
+                    className="ml-1 font-semibold text-blue-600 underline hover:text-blue-700"
+                  >
+                    設定ページで登録する
+                  </Link>
+                </p>
+              )}
               {book.isPurchasable && !book.isPublicMemo && (
                 <div className="mb-2 flex items-center gap-2">
                   <span className="text-xs font-semibold text-gray-500">
