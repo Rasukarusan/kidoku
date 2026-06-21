@@ -64,6 +64,8 @@ export const LoginModal: React.FC = () => {
             <form onSubmit={handleBackdoorLogin} className="space-y-3">
               <input
                 type="email"
+                name="email"
+                autoComplete="email"
                 placeholder="メールアドレス"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
