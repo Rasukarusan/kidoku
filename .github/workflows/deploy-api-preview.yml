@@ -1,0 +1,140 @@
+name: Deploy API to Cloud Run (Preview)
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'apps/api/**'
+      - 'docker/Dockerfile.api'
+      - '.github/workflows/deploy-api-preview.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'デプロイ環境'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+        - preview
+
+# 同じプレビューサービスへ複数の PR が同時にデプロイして競合しないよう直列化する
+concurrency:
+  group: deploy-api-preview
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_NAME: kidoku-api-preview
+  REGION: asia-northeast1
+  IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/kidoku-api-preview
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Preview 用の GitHub Environment（Secrets はこちらに登録する）
+    environment: Preview
+
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for GCR
+        run: |
+          gcloud auth configure-docker
+
+      - name: Build and push Docker image
+        run: |
+          docker build -f docker/Dockerfile.api -t ${{ env.IMAGE }}:${{ github.sha }} -t ${{ env.IMAGE }}:latest .
+          docker push ${{ env.IMAGE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE }}:latest
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE }}:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 4000 \
+            --memory 256Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 2 \
+            --timeout 30 \
+            --set-env-vars "NODE_ENV=production" \
+            --set-env-vars "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" \
+            --set-env-vars "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
+            --set-env-vars "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" \
+            --set-env-vars "MEILI_HOST=${{ secrets.MEILI_HOST }}" \
+            --set-env-vars "MEILI_MASTER_KEY=${{ secrets.MEILI_MASTER_KEY }}" \
+            --set-env-vars "ADMIN_API_KEY=${{ secrets.ADMIN_API_KEY }}" \
+            --set-env-vars "RAKUTEN_APPLICATION_ID=${{ secrets.RAKUTEN_APPLICATION_ID }}" \
+            --set-env-vars "RAKUTEN_ACCESS_KEY=${{ secrets.RAKUTEN_ACCESS_KEY }}"
+          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Service deployed to: $URL"
+
+      - name: Comment preview URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+        with:
+          script: |
+            const marker = '<!-- preview-api-deploy -->';
+            const url = process.env.PREVIEW_URL;
+            const body = [
+              marker,
+              '🚀 **プレビュー API サーバーをデプロイしました**',
+              '',
+              `- GraphQL エンドポイント: ${url}/graphql`,
+              `- コミット: \`${context.sha}\``,
+              '',
+              '> このプレビュー API は共有の `kidoku-api-preview` サービスです。',
+              '> 別 PR がデプロイすると最新のデプロイで上書きされます。',
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              { owner, repo, issue_number },
+            );
+            const existing = comments.find(
+              (c) => c.user.type === 'Bot' && c.body && c.body.includes(marker),
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }

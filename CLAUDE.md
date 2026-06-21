@@ -317,6 +317,19 @@ pnpm --filter web lighthouse
 - `apps/api`配下の変更でAPIデプロイトリガー
 - 環境変数はGitHub Secretsで管理
 
+#### APIデプロイワークフロー
+
+| ワークフロー | トリガー | デプロイ先 | GitHub Environment |
+|---|---|---|---|
+| `.github/workflows/deploy-api.yml` | main/master への push（`apps/api/**` 変更時） | Cloud Run サービス `kidoku-api`（本番） | `Production` |
+| `.github/workflows/deploy-api-preview.yml` | PR（main/master 宛て、`apps/api/**` 変更時） | Cloud Run サービス `kidoku-api-preview`（プレビュー） | `Preview` |
+
+- プレビュー用APIは全PR共通の単一サービス `kidoku-api-preview` にデプロイされ、最新のデプロイで上書きされる
+- プレビューデプロイ完了後、PRに GraphQL エンドポイントURLがコメントされる
+- プレビュー用の Secrets（`DATABASE_URL`, `NEXTAUTH_SECRET`, `FRONTEND_URL` 等）は GitHub の `Preview` Environment に登録する
+- プレビューDBへのスキーマ反映は `db-push.yml` を `Preview` 環境指定で手動実行する
+- フォークからのPRはSecretsにアクセスできないため、プレビューデプロイは同一リポジトリ内のブランチPRでのみ動作する
+
 ## サンドボックス環境での開発
 
 詳細は [docs/SANDBOX_SETUP.md](./docs/SANDBOX_SETUP.md) を参照。
