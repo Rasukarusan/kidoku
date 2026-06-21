@@ -60,4 +60,3 @@ const getApolloClient = () => {
 }
 
 export default getApolloClient()
-export { createApolloClient, getApolloClient }
