@@ -21,6 +21,9 @@ export class SearchHitResponse {
   author: string;
 
   @Field()
+  category: string;
+
+  @Field()
   image: string;
 
   @Field()

@@ -72,6 +72,7 @@ type SearchHitResponse {
   id: String!
   title: String!
   author: String!
+  category: String!
   image: String!
   memo: String!
   username: String!

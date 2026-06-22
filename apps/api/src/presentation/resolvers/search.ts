@@ -35,6 +35,7 @@ export class SearchResolver {
       id: hit.id,
       title: hit.title,
       author: hit.author,
+      category: hit.category,
       image: hit.image,
       memo: hit.memo,
       username: hit.username,

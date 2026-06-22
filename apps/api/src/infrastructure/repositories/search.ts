@@ -44,6 +44,7 @@ export class SearchRepository implements ISearchRepository {
         id: String(hit.id),
         title: formatted?.title || String(hit.title || ''),
         author: String(hit.author || ''),
+        category: String(hit.category || ''),
         image: String(hit.image || ''),
         memo: this.maskMemo(formatted?.memo || String(hit.memo || '')),
         username: String(hit.username || ''),
