@@ -50,6 +50,23 @@ type CommentResponse {
   comments: [CommentItem!]!
 }
 
+type BookCommentItem {
+  id: ID!
+  bookId: Int!
+  userId: String!
+  content: String!
+  created: DateTime!
+  updated: DateTime!
+  username: String!
+  userImage: String
+}
+
+type BookCommentsResponse {
+  total: Float!
+  hasMore: Boolean!
+  comments: [BookCommentItem!]!
+}
+
 type BookResponse {
   id: ID!
   userId: ID!
@@ -208,6 +225,7 @@ type PurchaseResponse {
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
+  bookComments(input: GetBookCommentsInput!): BookCommentsResponse!
   latestSoftwareDesign: SoftwareDesignResponse!
   softwareDesignByMonth(year: Int!, month: Int!): SoftwareDesignResponse!
   softwareDesignByYear(input: GetSoftwareDesignInput!): SoftwareDesignListResponse!
@@ -239,6 +257,12 @@ type Query {
 input GetCommentsInput {
   limit: Int!
   offset: Int!
+}
+
+input GetBookCommentsInput {
+  bookId: Int!
+  limit: Int! = 20
+  offset: Int! = 0
 }
 
 input GetSoftwareDesignInput {
@@ -303,6 +327,8 @@ type Mutation {
   updateSheet(input: UpdateSheetInput!): SheetResponse!
   deleteSheet(input: DeleteSheetInput!): Boolean!
   updateSheetOrders(input: UpdateSheetOrdersInput!): Boolean!
+  createBookComment(input: CreateBookCommentInput!): BookCommentItem!
+  deleteBookComment(input: DeleteBookCommentInput!): Boolean!
   createBook(input: CreateBookInput!): BookResponse!
   updateBook(input: UpdateBookInput!): BookResponse!
   deleteBook(input: DeleteBookInput!): Boolean!
@@ -344,6 +370,15 @@ input UpdateSheetOrdersInput {
 input SheetOrderItem {
   id: ID!
   order: Int!
+}
+
+input CreateBookCommentInput {
+  bookId: Int!
+  content: String!
+}
+
+input DeleteBookCommentInput {
+  id: Int!
 }
 
 input CreateBookInput {

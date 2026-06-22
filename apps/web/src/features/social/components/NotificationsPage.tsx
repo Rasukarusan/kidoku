@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { useMutation, useQuery } from '@apollo/client'
 import { NextSeo } from 'next-seo'
-import { FaHeart, FaUserPlus } from 'react-icons/fa'
+import { FaHeart, FaUserPlus, FaRegComment } from 'react-icons/fa'
 import { Container } from '@/components/layout/Container'
 import { useCachedSession } from '@/hooks/useCachedSession'
 import { getLastModified } from '@/utils/string'
@@ -72,6 +72,7 @@ export const NotificationsPage: React.FC = () => {
 
 const NotificationRow: React.FC<{ item: NotificationItem }> = ({ item }) => {
   const isFollow = item.type === 'follow'
+  const isComment = item.type === 'comment'
   const href =
     isFollow || !item.bookId
       ? `/${item.actorName}/sheets`
@@ -91,16 +92,27 @@ const NotificationRow: React.FC<{ item: NotificationItem }> = ({ item }) => {
         />
         <span
           className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-white ${
-            isFollow ? 'bg-gray-700' : 'bg-pink-500'
+            isFollow ? 'bg-gray-700' : isComment ? 'bg-blue-500' : 'bg-pink-500'
           }`}
         >
-          {isFollow ? <FaUserPlus size={10} /> : <FaHeart size={10} />}
+          {isFollow ? (
+            <FaUserPlus size={10} />
+          ) : isComment ? (
+            <FaRegComment size={10} />
+          ) : (
+            <FaHeart size={10} />
+          )}
         </span>
       </div>
       <Link href={href} className="flex-1 text-sm hover:underline">
         <span className="font-bold">{item.actorName}</span>
         {isFollow ? (
           'さんがあなたをフォローしました'
+        ) : isComment ? (
+          <>
+            さんが「<span className="font-bold">{item.bookTitle}</span>
+            」にコメントしました
+          </>
         ) : (
           <>
             さんが「<span className="font-bold">{item.bookTitle}</span>

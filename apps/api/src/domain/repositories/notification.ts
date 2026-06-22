@@ -7,7 +7,7 @@ export interface CreateNotificationParams {
   actorId?: string | null;
   /** 匿名（未ログイン）操作者の識別子。ログインユーザーの場合は null */
   actorAnonymousId?: string | null;
-  type: 'follow' | 'like';
+  type: 'follow' | 'like' | 'comment';
   bookId?: number | null;
 }
 

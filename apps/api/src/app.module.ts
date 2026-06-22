@@ -7,6 +7,7 @@ import { DatabaseModule } from './infrastructure/database/database.module';
 import { SoftwareDesignModule } from './presentation/modules/software-design';
 import { SheetModule } from './presentation/modules/sheet';
 import { CommentModule } from './presentation/modules/comment';
+import { BookCommentModule } from './presentation/modules/book-comment';
 import { BookModule } from './presentation/modules/book';
 import { SearchModule } from './presentation/modules/search';
 import { YearlyTopBookModule } from './presentation/modules/yearly-top-book';
@@ -40,6 +41,7 @@ import { PurchaseModule } from './presentation/modules/purchase';
     DatabaseModule,
     SheetModule,
     CommentModule,
+    BookCommentModule,
     SoftwareDesignModule,
     BookModule,
     SearchModule,
