@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import { FaHeart, FaRegHeart } from 'react-icons/fa'
-import { useAtom } from 'jotai'
-import { openLoginModalAtom } from '@/store/modal/atom'
 import { useCachedSession } from '@/hooks/useCachedSession'
+import { getOrCreateAnonymousId } from '@/libs/anonymousId'
 import { likeBookMutation, unlikeBookMutation } from '../api'
 
 interface Props {
@@ -21,7 +20,6 @@ export const LikeButton: React.FC<Props> = ({
   size = 18,
 }) => {
   const { status } = useCachedSession()
-  const [, setOpenLogin] = useAtom(openLoginModalAtom)
   const [liked, setLiked] = useState(initialLiked)
   const [count, setCount] = useState(initialCount)
   const [busy, setBusy] = useState(false)
@@ -31,10 +29,6 @@ export const LikeButton: React.FC<Props> = ({
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (status !== 'authenticated') {
-      setOpenLogin(true)
-      return
-    }
     if (busy) return
     setBusy(true)
     const next = !liked
@@ -42,7 +36,10 @@ export const LikeButton: React.FC<Props> = ({
     setLiked(next)
     setCount((c) => Math.max(0, c + (next ? 1 : -1)))
     try {
-      const input = { bookId: Number(bookId) }
+      // 未ログインユーザーは Cookie の匿名IDでいいねする
+      const anonymousId =
+        status === 'authenticated' ? undefined : getOrCreateAnonymousId()
+      const input = { bookId: Number(bookId), anonymousId }
       if (next) {
         const res = await like({ variables: { input } })
         setCount(res.data.likeBook)

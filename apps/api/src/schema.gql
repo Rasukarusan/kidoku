@@ -243,7 +243,7 @@ type Query {
   followInfo(input: GetFollowInfoInput!): FollowInfoResponse!
   followCounts(input: GetFollowInfoInput!): FollowInfoResponse!
   feed(input: GetFeedInput!): FeedResponse!
-  myLikedBookIds: [Int!]!
+  myLikedBookIds(anonymousId: String): [Int!]!
   notifications(input: GetNotificationsInput!): NotificationResponse!
   unreadNotificationCount: Int!
   popularBooks(limit: Int): [PopularBookItem!]!
@@ -464,6 +464,7 @@ input FollowUserInput {
 
 input LikeBookInput {
   bookId: Int!
+  anonymousId: String
 }
 
 input CreatePurchaseInput {

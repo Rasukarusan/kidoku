@@ -151,14 +151,16 @@ model Follow {
 }
 
 model Like {
-  id      Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId  String   @map("user_id")
-  bookId  Int      @map("book_id")
-  created DateTime @default(now()) @db.DateTime(0)
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId      String?  @map("user_id")
+  anonymousId String?  @map("anonymous_id") @db.VarChar(64)
+  bookId      Int      @map("book_id")
+  created     DateTime @default(now()) @db.DateTime(0)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book        books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@unique([userId, bookId], map: "uniq_user_book")
+  @@unique([anonymousId, bookId], map: "uniq_anon_book")
   @@index([bookId])
   @@map("likes")
 }
@@ -182,15 +184,16 @@ model Purchase {
 }
 
 model Notification {
-  id      Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId  String   @map("user_id")
-  actorId String   @map("actor_id")
-  type    String   @db.VarChar(20)
-  bookId  Int?     @map("book_id")
-  read    Boolean  @default(false)
-  created DateTime @default(now()) @db.DateTime(0)
-  user    User     @relation("notificationUser", fields: [userId], references: [id], onDelete: Cascade)
-  actor   User     @relation("notificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  id               Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId           String   @map("user_id")
+  actorId          String?  @map("actor_id")
+  actorAnonymousId String?  @map("actor_anonymous_id") @db.VarChar(64)
+  type             String   @db.VarChar(20)
+  bookId           Int?     @map("book_id")
+  read             Boolean  @default(false)
+  created          DateTime @default(now()) @db.DateTime(0)
+  user             User     @relation("notificationUser", fields: [userId], references: [id], onDelete: Cascade)
+  actor            User?    @relation("notificationActor", fields: [actorId], references: [id], onDelete: Cascade)
 
   @@unique([userId, actorId, type, bookId], map: "uniq_user_actor_type_book")
   @@index([userId])
