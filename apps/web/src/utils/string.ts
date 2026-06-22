@@ -53,6 +53,16 @@ export const getLastModified = (updated: string) => {
   return year + '年前'
 }
 
+/**
+ * HTMLタグを取り除く
+ * 検索結果のタイトル等にはハイライト用の <span class="highlight"> が含まれるため、
+ * 値として再利用する際にタグを除去する
+ */
+export const stripTags = (text: string) => {
+  if (!text) return ''
+  return text.replace(/<[^>]*>/g, '')
+}
+
 export const randomStr = (length = 4) => {
   const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
   let string = ''

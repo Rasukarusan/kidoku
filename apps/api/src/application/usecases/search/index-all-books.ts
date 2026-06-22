@@ -19,6 +19,7 @@ export class IndexAllBooksUseCase {
       id: book.id,
       title: book.title,
       author: book.author,
+      category: book.category,
       image: book.image,
       memo: book.isPublicMemo ? book.memo : '',
       username: book.userName,

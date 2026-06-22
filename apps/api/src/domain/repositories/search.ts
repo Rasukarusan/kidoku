@@ -2,6 +2,7 @@ export interface BookSearchDocument {
   id: string;
   title: string;
   author: string;
+  category: string;
   image: string;
   memo: string;
   username: string;
@@ -13,6 +14,7 @@ export interface SearchHit {
   id: string;
   title: string;
   author: string;
+  category: string;
   image: string;
   memo: string;
   username: string;
