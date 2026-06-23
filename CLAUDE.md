@@ -325,7 +325,6 @@ pnpm --filter web lighthouse
 | `.github/workflows/deploy-api-preview.yml` | PR（main/master 宛て、`apps/api/**` 変更時） | Cloud Run サービス `kidoku-api-preview`（プレビュー） | `Preview` |
 
 - プレビュー用APIは全PR共通の単一サービス `kidoku-api-preview` にデプロイされ、最新のデプロイで上書きされる
-- プレビューデプロイ完了後、PRに GraphQL エンドポイントURLがコメントされる
 - プレビュー用の Secrets（`DATABASE_URL`, `NEXTAUTH_SECRET`, `FRONTEND_URL` 等）は GitHub の `Preview` Environment に登録する
 - プレビューDBへのスキーマ反映は `db-push.yml` を `Preview` 環境指定で手動実行する
 - フォークからのPRはSecretsにアクセスできないため、プレビューデプロイは同一リポジトリ内のブランチPRでのみ動作する
