@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { Book } from '@/types/book'
 import { BookDetailReadModal } from '@/features/sheet/components/BookDetailReadModal'
 import { BookDetailEditPage } from '@/features/sheet/components/BookDetailEditPage'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { MdChevronRight } from 'react-icons/md'
 import { useIsBookOwner } from '@/hooks/useIsBookOwner'
 import apolloClient from '@/libs/apollo'
@@ -27,25 +27,29 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
     setEditMode(false)
   }, [initialBook])
 
-  // 所有者の場合、GraphQL経由で完全なメモデータを取得
-  useEffect(() => {
-    if (!isOwner || !book) return
-    const fetchOwnerBook = async () => {
-      try {
-        const { data } = await apolloClient.query({
-          query: getBookQuery,
-          variables: { input: { id: String(book.id) } },
-          fetchPolicy: 'network-only',
-        })
-        if (data?.book?.memo !== undefined) {
-          setBook((prev) => ({ ...prev, memo: data.book.memo }))
-        }
-      } catch {
-        // フォールバック: ISRで生成されたデータをそのまま使用
+  // 所有者向けに、マスクされていない完全なメモをGraphQL経由で取得する。
+  // ISRで生成されるpropsのメモはマスク済み(*****)のため、所有者には元の
+  // メモ（[[MASK: ...]]アノテーション付き）を取得し直す必要がある。
+  const fetchOwnerMemo = useCallback(async () => {
+    if (!isOwner || !book?.id) return
+    try {
+      const { data } = await apolloClient.query({
+        query: getBookQuery,
+        variables: { input: { id: String(book.id) } },
+        fetchPolicy: 'network-only',
+      })
+      if (data?.book?.memo !== undefined) {
+        setBook((prev) => (prev ? { ...prev, memo: data.book.memo } : prev))
       }
+    } catch {
+      // フォールバック: ISRで生成されたデータをそのまま使用
     }
-    fetchOwnerBook()
   }, [isOwner, book?.id])
+
+  // 所有者の場合、ページ表示時に完全なメモデータを取得
+  useEffect(() => {
+    fetchOwnerMemo()
+  }, [fetchOwnerMemo])
 
   if (!book) {
     return (
@@ -69,8 +73,14 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
     router.back()
   }
 
-  const handleEditToggle = () => {
-    setEditMode(!editMode)
+  const handleEditToggle = async () => {
+    // 編集モードに入る際は、マスクされていない最新のメモを取得してから切り替える。
+    // ISR直後の再取得が完了する前に編集ボタンを押すと、マスク済みメモ(*****)が
+    // 編集フォームに表示されてしまうため、ここで取得完了を待つ。
+    if (!editMode) {
+      await fetchOwnerMemo()
+    }
+    setEditMode((prev) => !prev)
   }
 
   const sheetUrl =
