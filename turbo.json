@@ -22,7 +22,6 @@
         "BACKDOOR_USER_EMAIL",
         "REVALIDATE_SECRET",
         "NESTJS_GRAPHQL_ENDPOINT",
-        "COHERE_API_KEY",
         "TIKTOKEN_URL"
       ]
     },
