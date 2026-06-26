@@ -1,8 +1,6 @@
 import { useEffect } from 'react'
 import { useReward } from 'react-rewards'
 import { motion } from 'framer-motion'
-import { FiShare2 } from 'react-icons/fi'
-import { shareToSns } from '@/utils/socialShare'
 
 interface SuccessViewProps {
   bookTitle: string
@@ -85,18 +83,6 @@ export const SuccessView: React.FC<SuccessViewProps> = ({
           className="w-full rounded-lg bg-blue-600 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700"
         >
           「{sheetName}」を見る
-        </button>
-        <button
-          onClick={() =>
-            shareToSns(
-              `『${bookTitle}』を読書記録に追加しました📚 #kidoku`,
-              process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'
-            )
-          }
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-6 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50"
-        >
-          <FiShare2 size={16} />
-          シェアする
         </button>
         <button
           onClick={onClose}
