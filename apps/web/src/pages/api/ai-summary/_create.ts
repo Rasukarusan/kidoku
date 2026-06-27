@@ -46,7 +46,7 @@ export const handleCreate = async (req: Request) => {
     })
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-5.4-mini',
       messages: [
         {
           role: 'user',
