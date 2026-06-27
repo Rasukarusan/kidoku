@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAtom } from 'jotai'
-import { useSession } from 'next-auth/react'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
 import { FiArrowRight } from 'react-icons/fi'
-import { openSearchModalAtom, openLoginModalAtom } from '@/store/modal/atom'
+import { openSearchModalAtom } from '@/store/modal/atom'
 
 interface Props {
   comments: Comment[]
@@ -35,9 +34,7 @@ const FEATURES = [
 
 export const IndexPage: React.FC<Props> = ({ comments }) => {
   const router = useRouter()
-  const { status } = useSession()
   const [, setOpenSearchModal] = useAtom(openSearchModalAtom)
-  const [, setOpenLoginModal] = useAtom(openLoginModalAtom)
 
   // オンボーディング直後（?start=1）は最初の1冊登録モーダルを自動で開く
   useEffect(() => {
@@ -46,15 +43,6 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
       router.replace('/', undefined, { shallow: true })
     }
   }, [router, setOpenSearchModal])
-
-  // 未ログインならログイン、ログイン済みなら本登録モーダルを開く
-  const handlePrimaryCta = () => {
-    if (status === 'authenticated') {
-      setOpenSearchModal(true)
-    } else {
-      setOpenLoginModal(true)
-    }
-  }
 
   return (
     <>
@@ -77,13 +65,13 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
               AIがあなたの読書傾向を分析し、SNSでシェアできる読書まとめをつくります。
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <button
-                onClick={handlePrimaryCta}
+              <Link
+                href="/diagnosis"
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-3 text-base font-bold text-white shadow-md transition-transform hover:scale-105 hover:brightness-105 sm:w-auto"
               >
-                無料で読書診断を作る
+                無料で読書性格を診断する
                 <FiArrowRight size={18} />
-              </button>
+              </Link>
               <Link
                 href="/comments"
                 className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-8 py-3 text-base font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto"
