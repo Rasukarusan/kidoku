@@ -10,8 +10,12 @@ import { AI_SUMMARY_FIELDS, AiSummaryFieldKey } from './fields'
 import { CourseId } from '@/types/user'
 import { Book } from '@/types/book'
 import { FaCircleNotch, FaTrash } from 'react-icons/fa'
-import { FiShare2 } from 'react-icons/fi'
+import { FiShare2, FiArrowRight } from 'react-icons/fi'
 import { shareToSns } from '@/utils/socialShare'
+import { useRouter } from 'next/router'
+import { useSession } from 'next-auth/react'
+import { useAtom } from 'jotai'
+import { openLoginModalAtom } from '@/store/modal/atom'
 
 interface Props {
   username: string
@@ -30,6 +34,18 @@ export const AiSummaries: React.FC<Props> = ({
 }) => {
   const host = process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'
   const shareUrl = `${host}/${encodeURIComponent(username)}/sheets/${encodeURIComponent(sheet)}`
+  const router = useRouter()
+  const { status } = useSession()
+  const [, setOpenLoginModal] = useAtom(openLoginModalAtom)
+
+  // 共有先から来た訪問者向けの「あなたも診断する」導線
+  const handleDiagnoseCta = () => {
+    if (status === 'authenticated') {
+      router.push('/')
+    } else {
+      setOpenLoginModal(true)
+    }
+  }
   const {
     generateSummary,
     deleteSummary,
@@ -121,7 +137,7 @@ export const AiSummaries: React.FC<Props> = ({
                   <button
                     onClick={() =>
                       shareToSns(
-                        `私の読書性格は「${json.character_summary}」でした📚✨\n#kidoku のAI読書分析`,
+                        `私の読書性格は「${json.character_summary}」でした📚✨\n読んだ本からAIが性格診断してくれるやつ。あなたもやってみて👇\n#kidoku #読書性格診断`,
                         shareUrl
                       )
                     }
@@ -129,6 +145,17 @@ export const AiSummaries: React.FC<Props> = ({
                   >
                     <FiShare2 size={16} />
                     診断結果をシェア
+                  </button>
+                </div>
+              )}
+              {!isMine && (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={handleDiagnoseCta}
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
+                  >
+                    あなたも読書診断する
+                    <FiArrowRight size={16} />
                   </button>
                 </div>
               )}

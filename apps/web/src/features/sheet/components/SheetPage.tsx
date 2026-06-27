@@ -197,7 +197,7 @@ export const SheetPage: React.FC<Props> = ({
   const shareUrl = `${host}/${encodeURIComponent(username)}/sheets/${encodeURIComponent(year)}`
   const wrappedShareText = `${year}の読書まとめ📚\n${data.length}冊読みました${
     topCategory ? `（よく読んだジャンル: ${topCategory}）` : ''
-  }\n#kidoku`
+  }\nあなたも読書まとめ作ってみて👇\n#kidoku #読書まとめ`
 
   // シート切り替え時にステートをリセット
   useEffect(() => {
