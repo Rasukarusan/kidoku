@@ -1,7 +1,7 @@
 import prisma from '@/libs/prisma/edge'
 import dayjs from 'dayjs'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
-import cohere from '@/libs/ai/cohere'
+import openai from '@/libs/ai/openai'
 import { RequestCookies } from '@edge-runtime/cookies'
 
 export const handleCreate = async (req: Request) => {
@@ -45,55 +45,59 @@ export const handleCreate = async (req: Request) => {
       }
     })
 
-    const response = await cohere.chatStream({
-      model: 'command-r-plus',
-      message: `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`,
+    const response = await openai.chat.completions.create({
+      model: 'gpt-5.4-mini',
+      messages: [
+        {
+          role: 'user',
+          content: `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`,
+        },
+      ],
+      response_format: { type: 'json_object' },
+      stream: true,
+      stream_options: { include_usage: true },
     })
 
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
       async start(controller) {
-        for await (const event of response) {
-          if (event.eventType === 'text-generation') {
-            console.log(event.text)
-            controller.enqueue(encoder.encode(event.text))
+        let text = ''
+        let token = 0
+        for await (const chunk of response) {
+          const delta = chunk.choices[0]?.delta?.content
+          if (delta) {
+            console.log(delta)
+            text += delta
+            controller.enqueue(encoder.encode(delta))
           }
-          if (
-            event.eventType === 'stream-end' &&
-            event.finishReason === 'COMPLETE'
-          ) {
-            console.log(event.response.text)
-            console.log(event.response.meta)
-            const text = event.response.text
-            const token =
-              event.response.meta.tokens.inputTokens +
-              event.response.meta.tokens.outputTokens
-            controller.enqueue(encoder.encode(text))
-            const json = JSON.parse(text)
-            const {
+          if (chunk.usage) {
+            token = chunk.usage.total_tokens
+          }
+        }
+        console.log(text)
+        const json = JSON.parse(text)
+        const {
+          character_summary,
+          reading_trend_analysis,
+          sentiment_analysis,
+          hidden_theme_discovery,
+          overall_feedback,
+        } = json
+        await prisma.aiSummaries.create({
+          data: {
+            userId,
+            sheetId: sheet.id,
+            analysis: {
+              _schemaVersion: 2,
               character_summary,
               reading_trend_analysis,
               sentiment_analysis,
               hidden_theme_discovery,
               overall_feedback,
-            } = json
-            await prisma.aiSummaries.create({
-              data: {
-                userId,
-                sheetId: sheet.id,
-                analysis: {
-                  _schemaVersion: 2,
-                  character_summary,
-                  reading_trend_analysis,
-                  sentiment_analysis,
-                  hidden_theme_discovery,
-                  overall_feedback,
-                },
-                token,
-              },
-            })
-          }
-        }
+            },
+            token,
+          },
+        })
         controller.enqueue(encoder.encode('COMPLETE'))
         controller.close()
       },

@@ -40,7 +40,7 @@ src/
 │   ├── terms/     # 利用規約
 │   └── privacy/   # プライバシーポリシー
 ├── libs/          # 外部ライブラリ統合
-│   ├── ai/        # AI機能（Cohere）
+│   ├── ai/        # AI機能（OpenAI）
 │   ├── apollo/    # GraphQLクライアント
 │   ├── auth/      # NextAuth設定
 │   ├── meilisearch/ # 検索エンジン
@@ -114,7 +114,7 @@ MEILI_MASTER_KEY=
 RESEND_API_KEY=              # メール送信
 STRIPE_SECRET_KEY=           # 決済
 STRIPE_PUBLISHABLE_KEY=      # 決済（公開鍵）
-COHERE_API_KEY=              # AI分析
+OPENAI_API_KEY=              # AI分析
 ADMIN_AUTH_TOKEN=            # 管理者認証トークン
 ```
 
