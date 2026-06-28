@@ -107,10 +107,12 @@ export const SearchModal: React.FC = () => {
     bookTitle: string
     bookId: number
     sheetName: string
+    bookImage: string
   }) => {
     setSuccessData({
       bookTitle: response.bookTitle,
-      bookImage: selectedBook?.image || '',
+      // 登録APIが返す実際の保存画像を使う（フォームで変更した画像が反映される）
+      bookImage: response.bookImage || selectedBook?.image || '',
       sheetName: response.sheetName,
     })
     setView('success')
