@@ -1,40 +1,21 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAtom } from 'jotai'
+import { useSession } from 'next-auth/react'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
-import { FiArrowRight } from 'react-icons/fi'
-import { openSearchModalAtom } from '@/store/modal/atom'
+import { openSearchModalAtom, openLoginModalAtom } from '@/store/modal/atom'
 
 interface Props {
   comments: Comment[]
 }
 
-const FEATURES = [
-  {
-    emoji: '🤖',
-    title: 'AI読書性格診断',
-    description:
-      '読んだ本からAIがあなたの“読書性格”を分析。SNSでシェアできる診断カードに。',
-  },
-  {
-    emoji: '📊',
-    title: '年間読書まとめ',
-    description:
-      '読了数・よく読んだジャンル・今年のベスト本を1枚にまとめてふりかえり。',
-  },
-  {
-    emoji: '📚',
-    title: 'かんたん登録',
-    description:
-      'タイトル検索やバーコードスキャンで、あなたの本棚を手軽にデジタル化。',
-  },
-]
-
 export const IndexPage: React.FC<Props> = ({ comments }) => {
   const router = useRouter()
+  const { status } = useSession()
   const [, setOpenSearchModal] = useAtom(openSearchModalAtom)
+  const [, setOpenLoginModal] = useAtom(openLoginModalAtom)
 
   // オンボーディング直後（?start=1）は最初の1冊登録モーダルを自動で開く
   useEffect(() => {
@@ -44,59 +25,39 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
     }
   }, [router, setOpenSearchModal])
 
+  // ログイン済みなら本登録モーダル、未ログインならログインへ
+  const handleStart = () => {
+    if (status === 'authenticated') {
+      setOpenSearchModal(true)
+    } else {
+      setOpenLoginModal(true)
+    }
+  }
+
   return (
     <>
-      {/* ヒーロー：初見ユーザーに価値を伝えるファーストビュー */}
-      <section className="bg-gradient-to-b from-purple-50 via-pink-50 to-white">
-        <Container className="px-4 py-12 sm:py-16">
-          <div className="mx-auto max-w-2xl text-center">
-            <span className="mb-4 inline-block rounded-full bg-white/80 px-4 py-1 text-xs font-bold tracking-wide text-purple-600 shadow-sm">
-              AI × 読書記録
-            </span>
-            <h1 className="text-3xl font-bold leading-tight text-gray-800 sm:text-4xl">
-              読んだ本から、あなたの
-              <br className="sm:hidden" />
-              <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                “読書性格”
-              </span>
-              がわかる。
+      {/* ヒーロー：淡々と記録する、を伝えるミニマルなファーストビュー */}
+      <section className="border-b border-gray-100">
+        <Container className="px-4 py-20 sm:py-28">
+          <div className="mx-auto max-w-xl text-center">
+            <h1 className="text-2xl font-bold leading-relaxed tracking-wide text-gray-800 sm:text-3xl">
+              読んだ本を、ただ記録する。
             </h1>
-            <p className="mt-4 text-base leading-relaxed text-gray-600 sm:text-lg">
-              AIがあなたの読書傾向を分析し、SNSでシェアできる読書まとめをつくります。
+            <p className="mt-6 text-sm leading-loose text-gray-500 sm:text-base">
+              派手な機能も、難しい操作もいりません。
+              <br />
+              日々読み終えた本を、自分のペースで淡々と。
+              <br />
+              ずっと続けられる、シンプルな読書記録。
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/diagnosis"
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-3 text-base font-bold text-white shadow-md transition-transform hover:scale-105 hover:brightness-105 sm:w-auto"
+            <div className="mt-10">
+              <button
+                onClick={handleStart}
+                className="rounded-full border border-gray-800 px-10 py-3 text-sm font-bold text-gray-800 transition-colors hover:bg-gray-800 hover:text-white"
               >
-                無料で読書性格を診断する
-                <FiArrowRight size={18} />
-              </Link>
-              <Link
-                href="/comments"
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-8 py-3 text-base font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto"
-              >
-                みんなの読書を見る
-              </Link>
+                記録をはじめる
+              </button>
             </div>
-          </div>
-
-          {/* 主要機能の紹介 */}
-          <div className="mx-auto mt-12 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
-            {FEATURES.map((feature) => (
-              <div
-                key={feature.title}
-                className="rounded-xl bg-white/80 p-5 text-center shadow-sm"
-              >
-                <div className="text-3xl">{feature.emoji}</div>
-                <h2 className="mt-3 text-base font-bold text-gray-800">
-                  {feature.title}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-gray-600">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
           </div>
         </Container>
       </section>
