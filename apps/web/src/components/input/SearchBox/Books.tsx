@@ -56,13 +56,15 @@ export const Books: React.FC<Props> = ({ input, onSelectBook }) => {
   return (
     <>
       <div className="flex flex-col">
-        {/* 手動登録ボタン */}
-        <div className="border-b border-gray-200 p-4">
-          <ManualRegisterButton
-            helpText="検索で見つからない本を手動で登録できます"
-            onSelectBook={onSelectBook}
-          />
-        </div>
+        {/* 手動登録ボタン（ログイン時のみ） */}
+        {session && (
+          <div className="border-b border-gray-200 p-4">
+            <ManualRegisterButton
+              helpText="検索で見つからない本を手動で登録できます"
+              onSelectBook={onSelectBook}
+            />
+          </div>
+        )}
 
         {/* ローディング */}
         {loading && (

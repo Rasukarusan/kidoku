@@ -20,13 +20,15 @@ export const BarcodeScan: React.FC<Props> = ({ onSelectBook }) => {
   return (
     <>
       <div className="p-4">
-        {/* 手動登録ボタン */}
-        <div className="mb-4">
-          <ManualRegisterButton
-            helpText="バーコードが読み取れない本を手動で登録できます"
-            onSelectBook={onSelectBook}
-          />
-        </div>
+        {/* 手動登録ボタン（ログイン時のみ） */}
+        {session && (
+          <div className="mb-4">
+            <ManualRegisterButton
+              helpText="バーコードが読み取れない本を手動で登録できます"
+              onSelectBook={onSelectBook}
+            />
+          </div>
+        )}
 
         {scanError && (
           <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
