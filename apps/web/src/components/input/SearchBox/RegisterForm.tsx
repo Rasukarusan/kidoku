@@ -47,6 +47,7 @@ interface Response {
   bookTitle: string
   bookId: number
   sheetName: string
+  bookImage: string
 }
 
 interface RegisterFormProps {
