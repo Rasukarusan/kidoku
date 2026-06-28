@@ -1,11 +1,10 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useAtom } from 'jotai'
-import { useSession } from 'next-auth/react'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
-import { openSearchModalAtom, openLoginModalAtom } from '@/store/modal/atom'
+import { openSearchModalAtom } from '@/store/modal/atom'
 
 interface Props {
   comments: Comment[]
@@ -13,9 +12,7 @@ interface Props {
 
 export const IndexPage: React.FC<Props> = ({ comments }) => {
   const router = useRouter()
-  const { status } = useSession()
   const [, setOpenSearchModal] = useAtom(openSearchModalAtom)
-  const [, setOpenLoginModal] = useAtom(openLoginModalAtom)
 
   // オンボーディング直後（?start=1）は最初の1冊登録モーダルを自動で開く
   useEffect(() => {
@@ -25,13 +22,9 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
     }
   }, [router, setOpenSearchModal])
 
-  // ログイン済みなら本登録モーダル、未ログインならログインへ
+  // 本の検索モーダルを開く（登録時にログインが必要なら都度案内される）
   const handleStart = () => {
-    if (status === 'authenticated') {
-      setOpenSearchModal(true)
-    } else {
-      setOpenLoginModal(true)
-    }
+    setOpenSearchModal(true)
   }
 
   return (
