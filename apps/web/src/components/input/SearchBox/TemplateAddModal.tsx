@@ -10,6 +10,8 @@ import { SuccessAlert } from '@/components/label/SuccessAlert'
 import { BookInputField } from '../BookInputField'
 import { BookCreatableSelectBox } from '../BookCreatableSelectBox'
 import { useSession } from 'next-auth/react'
+import { useSetAtom } from 'jotai'
+import { openLoginModalAtom } from '@/store/modal/atom'
 import { motion } from 'framer-motion'
 import { NO_IMAGE } from '@/libs/constants'
 import { getBookCategoriesQuery } from '@/features/books/api'
@@ -30,6 +32,7 @@ export const TemplateAddModal: React.FC<Props> = ({
   onCreated,
 }) => {
   const { data: session } = useSession()
+  const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const [loading, setLoading] = useState(false)
   const [template, setTemplate] = useState(null)
   const [response, setResponse] = useState<Response>(null)
@@ -229,9 +232,9 @@ export const TemplateAddModal: React.FC<Props> = ({
             )}
             <button
               className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 px-4 py-1 font-bold text-white hover:bg-blue-700 disabled:bg-gray-500"
-              onClick={onClickAdd}
+              onClick={() => (session ? onClickAdd() : setOpenLoginModal(true))}
               tabIndex={6}
-              disabled={isAnimating || !session}
+              disabled={isAnimating}
             >
               {loading && (
                 <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />
