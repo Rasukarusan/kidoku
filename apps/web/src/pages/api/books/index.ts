@@ -49,7 +49,8 @@ export default async (req, res) => {
         isPublicMemo,
         finished: finished ? new Date(finished) : null,
       }
-      data['image'] = image === NO_IMAGE || image.includes('http') ? image : ''
+      let finalImage = image === NO_IMAGE || image.includes('http') ? image : ''
+      data['image'] = finalImage
       const book = await prisma.books.create({ data })
 
       // 画像選択された場合はVercel Blobにアップロードする
@@ -67,6 +68,7 @@ export default async (req, res) => {
             image: url,
           },
         })
+        finalImage = url
       }
       // ISRキャッシュを再検証
       try {
@@ -80,6 +82,7 @@ export default async (req, res) => {
         bookTitle: title,
         sheetName: sheet.name,
         bookId: book.id,
+        bookImage: finalImage,
       })
     } else if (req.method === 'PUT') {
       const body = JSON.parse(req.body)
