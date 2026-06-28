@@ -13,6 +13,8 @@ import { SheetAddModal } from '@/features/sheet/components/SheetAddModal'
 import { AiOutlineFileAdd } from 'react-icons/ai'
 import { IoArrowBack } from 'react-icons/io5'
 import { useSession } from 'next-auth/react'
+import { useSetAtom } from 'jotai'
+import { openLoginModalAtom } from '@/store/modal/atom'
 import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { getSheetsQuery } from '@/features/sheet/api'
@@ -61,6 +63,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   onSuccess,
 }) => {
   const { data: session } = useSession()
+  const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const apolloClient = useApolloClient()
   const { data: sheetsData, refetch: refetchSheets } = useQuery(
     getSheetsQuery,
@@ -325,8 +328,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           {sheets.length === 0 ? (
             <button
               className="mx-auto flex items-center justify-center whitespace-nowrap rounded-md bg-green-500 px-4 py-2 text-sm font-bold text-white disabled:bg-gray-500"
-              onClick={() => setOpenAdd(true)}
-              disabled={!session}
+              onClick={() =>
+                session ? setOpenAdd(true) : setOpenLoginModal(true)
+              }
             >
               <AiOutlineFileAdd className="mr-1 h-[24px] w-[24px] text-white" />
               {session ? 'シートを追加' : 'ログインしてください'}
@@ -367,9 +371,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       <div className="shrink-0 border-t">
         <button
           className="flex h-12 w-full items-center justify-center rounded-b-md bg-blue-600 font-bold text-white transition-colors hover:bg-blue-700 disabled:bg-gray-400"
-          onClick={onClickAdd}
+          onClick={() => (session ? onClickAdd() : setOpenLoginModal(true))}
           tabIndex={6}
-          disabled={loading || !session}
+          disabled={loading}
         >
           {loading && (
             <Loading className="mr-2 h-[18px] w-[18px] border-[3px] border-white" />

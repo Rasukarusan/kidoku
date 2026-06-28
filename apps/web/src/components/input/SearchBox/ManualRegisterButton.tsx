@@ -35,7 +35,6 @@ export const ManualRegisterButton: React.FC<ManualRegisterButtonProps> = ({
       <button
         className="w-full rounded-md bg-green-600 py-3 text-sm font-bold text-white hover:bg-green-700 disabled:bg-gray-400"
         onClick={handleManualRegister}
-        disabled={!session}
       >
         {session ? '手動で登録' : 'ログインしてください'}
       </button>
