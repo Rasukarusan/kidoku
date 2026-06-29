@@ -1,7 +1,8 @@
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
-import prisma from '@/libs/prisma'
+import prisma, { parse } from '@/libs/prisma'
 import { mask } from '@/utils/string'
+import dayjs from 'dayjs'
 
 export default SheetTotalPage
 
@@ -19,6 +20,31 @@ export const getStaticProps = async (ctx) => {
   const books = await prisma.books.findMany({
     where: { userId },
   })
+  // 全シート横断の書籍データ（カテゴリーフィルター表示用）
+  // 公開ページのため、非公開メモは表示しない（[year].tsx と同様の整形）
+  const booksData = parse(
+    books.map((book) => {
+      const month = book.finished
+        ? dayjs(book.finished).format('M') + '月'
+        : dayjs().format('M') + '月'
+      return {
+        id: book.id,
+        userId: book.userId,
+        month,
+        title: book.title,
+        author: book.author,
+        category: book.category,
+        image: book.image,
+        impression: book.impression,
+        memo: book.isPublicMemo ? mask(book.memo) : '',
+        finished: book.finished,
+        isPublicMemo: book.isPublicMemo,
+        isPurchasable: book.isPurchasable,
+        price: book.price,
+        sheetId: book.sheetId,
+      }
+    })
+  )
   // データの整形。カテゴリ名をKey, 冊数をValueとしたオブジェクトを生成
   const category_count: Record<string, number> = {}
   books.forEach((book) => {
@@ -78,6 +104,7 @@ export const getStaticProps = async (ctx) => {
   return {
     props: {
       total: books.length,
+      books: booksData,
       categories,
       years,
       sheets:
