@@ -1,17 +1,20 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Category, Year } from '../../types'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { Rankings } from './Rankings'
 import { YearsGraph } from './YearsGraph'
 import { BasePieChart, PieSlice } from '../BasePieChart'
-import { YearlyTopBook } from '@/types/book'
+import { Books } from '../Books'
+import { Book, YearlyTopBook } from '@/types/book'
 import { Container } from '@/components/layout/Container'
 import { CoutUpText } from '@/components/label/CountUpText'
 import { SheetTabsWithMenu } from '../SheetTabsWithMenu'
 import { NextSeo } from 'next-seo'
+import { IoMdCloseCircle } from 'react-icons/io'
 
 interface Props {
   total: number
+  books: Book[]
   categories: Category[]
   years: Year[]
   sheets: Array<{ id: string; name: string; order: number }>
@@ -21,6 +24,7 @@ interface Props {
 }
 export const SheetTotalPage: React.FC<Props> = ({
   total,
+  books,
   categories,
   years,
   sheets,
@@ -37,6 +41,13 @@ export const SheetTotalPage: React.FC<Props> = ({
     }))
   }, [categories])
 
+  // カテゴリーフィルター。カテゴリーを選択するとその本だけを表示する
+  const [filter, setFilter] = useState('')
+  const filteredBooks = useMemo(
+    () => (filter ? books.filter((book) => book.category === filter) : []),
+    [filter, books]
+  )
+
   return (
     <Container>
       <NextSeo title={`${username}/Total | kidoku`} />
@@ -52,8 +63,26 @@ export const SheetTotalPage: React.FC<Props> = ({
         <CoutUpText value={total} unit="冊" />
 
         <div className="m-auto mb-4 h-[300px] w-full sm:h-[400px] sm:w-3/4">
-          <BasePieChart data={categoryData} outerRadius={120} stroke="none" />
+          <BasePieChart
+            data={categoryData}
+            outerRadius={120}
+            stroke="none"
+            onSelect={(name) => setFilter(name)}
+            onDeselect={() => setFilter('')}
+          />
         </div>
+
+        {filter && (
+          <div className="mb-12">
+            <div className="mb-6 flex items-center justify-center">
+              <div className="mr-2 text-2xl font-bold">{`「${filter}」の本`}</div>
+              <button onClick={() => setFilter('')}>
+                <IoMdCloseCircle size={20} />
+              </button>
+            </div>
+            <Books books={filteredBooks} bookId="" />
+          </div>
+        )}
 
         <TitleWithLine text="年間平均読書数" />
         <CoutUpText value={average} unit="冊" />
