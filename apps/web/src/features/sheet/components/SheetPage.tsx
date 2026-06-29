@@ -24,8 +24,6 @@ import { twMerge } from 'tailwind-merge'
 import { useQuery } from '@apollo/client'
 import { getBooksQuery } from '@/features/books/api'
 import dayjs from 'dayjs'
-import { FiShare2 } from 'react-icons/fi'
-import { shareToSns } from '@/utils/socialShare'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -194,11 +192,6 @@ export const SheetPage: React.FC<Props> = ({
   // AI診断があればそれを、なければ年間まとめ（Wrapped）をOGに使う
   const ogImage = latestAiSummary ? aiOgImage : wrappedOgImage
 
-  const shareUrl = `${host}/${encodeURIComponent(username)}/sheets/${encodeURIComponent(year)}`
-  const wrappedShareText = `${year}の読書まとめ📚\n${data.length}冊読みました${
-    topCategory ? `（よく読んだジャンル: ${topCategory}）` : ''
-  }\n#kidoku`
-
   // シート切り替え時にステートをリセット
   useEffect(() => {
     setFilter('')
@@ -297,17 +290,6 @@ export const SheetPage: React.FC<Props> = ({
       <div className="mt-32 text-center">
         <TitleWithLine text="累計読書数" />
         <CoutUpText value={data.length} unit="冊" step={1} />
-        {isMine && (
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={() => shareToSns(wrappedShareText, shareUrl)}
-              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
-            >
-              <FiShare2 size={16} />
-              {year}の読書まとめをシェア
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="mb-10 mt-12">
