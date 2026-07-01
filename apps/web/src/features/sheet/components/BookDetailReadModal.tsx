@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { Book } from '@/types/book'
 import { AiFillLock } from 'react-icons/ai'
 import { useIsBookOwner } from '@/hooks/useIsBookOwner'
-import { MdEdit } from 'react-icons/md'
+import { MdEdit, MdContentCopy, MdCheck } from 'react-icons/md'
 
 // Sui決済モーダル（ウォレット連携を含むため動的読み込み）
 const SuiCheckoutModal = dynamic(
@@ -55,6 +55,7 @@ export const BookDetailReadModal: React.FC<Props> = ({
   const anonymousId = useAnonymousId()
   const [suiOpen, setSuiOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [memoCopied, setMemoCopied] = useState(false)
 
   // いいね済みの本IDを取得し初期状態を反映する。
   // ログイン中はユーザーの、未ログイン中は匿名IDのいいね済みを取得する。
@@ -91,6 +92,22 @@ export const BookDetailReadModal: React.FC<Props> = ({
     return `${process.env.NEXT_PUBLIC_HOST || 'https://kidoku.net'}/books/${book.id}`
   }
   const shareUrl = returnUrl()
+
+  // 現在表示されているメモ本文（所有者/公開メモは book.memo、購入解放時は unlockedMemo）
+  const displayedMemo =
+    isMine || book.isPublicMemo ? book.memo : (unlockedMemo ?? null)
+
+  // メモのマークダウンをそのままクリップボードへコピーする
+  const handleCopyMemo = async () => {
+    if (!displayedMemo) return
+    try {
+      await navigator.clipboard.writeText(displayedMemo)
+      setMemoCopied(true)
+      setTimeout(() => setMemoCopied(false), 2000)
+    } catch (error) {
+      console.error('メモのコピーに失敗しました:', error)
+    }
+  }
 
   return (
     <div className="flex h-full min-w-full flex-col justify-between rounded-md">
@@ -199,6 +216,27 @@ export const BookDetailReadModal: React.FC<Props> = ({
                       非公開のメモは他のユーザーには表示されません
                     </Tooltip>
                   )}
+                </>
+              )}
+              {displayedMemo && (
+                <>
+                  <button
+                    className="ml-auto rounded-full bg-gray-200 p-2 hover:brightness-95"
+                    onClick={handleCopyMemo}
+                    onMouseDown={(e) => e.preventDefault()}
+                    data-tooltip-id="memo-copy"
+                    data-tooltip-content={
+                      memoCopied ? 'コピーしました' : 'マークダウンをコピー'
+                    }
+                    aria-label="メモをマークダウンでコピー"
+                  >
+                    {memoCopied ? (
+                      <MdCheck size={18} className="text-green-600" />
+                    ) : (
+                      <MdContentCopy size={18} />
+                    )}
+                  </button>
+                  <Tooltip id="memo-copy" />
                 </>
               )}
             </div>
