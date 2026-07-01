@@ -226,9 +226,9 @@ export const BookDetailReadModal: React.FC<Props> = ({
                     onMouseDown={(e) => e.preventDefault()}
                     data-tooltip-id="memo-copy"
                     data-tooltip-content={
-                      memoCopied ? 'コピーしました' : 'マークダウンをコピー'
+                      memoCopied ? 'コピーしました' : 'コンテンツをコピー'
                     }
-                    aria-label="メモをマークダウンでコピー"
+                    aria-label="メモのコンテンツをコピー"
                   >
                     {memoCopied ? (
                       <MdCheck size={18} className="text-green-600" />
