@@ -56,7 +56,7 @@ interface RegisterFormProps {
   onSuccess: (response: Response) => void
 }
 
-const DEFAULT_MEMO = '[期待]\n\n[感想]\n'
+const DEFAULT_MEMO = '【期待】\n\n【感想】\n'
 
 export const RegisterForm: React.FC<RegisterFormProps> = ({
   item,
