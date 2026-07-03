@@ -85,9 +85,7 @@ export const LifetimeStats: React.FC<Props> = ({ books, years }) => {
         .filter((book) => book.sheet === year)
         .forEach((book) => {
           const category = book.category?.trim() || '-'
-          const key = topCategories.includes(category)
-            ? category
-            : OTHER_LABEL
+          const key = topCategories.includes(category) ? category : OTHER_LABEL
           row[key] = (row[key] as number) + 1
         })
       return row
