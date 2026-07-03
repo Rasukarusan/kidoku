@@ -96,6 +96,7 @@ model User {
   actorNotifications Notification[] @relation("notificationActor")
   purchases          Purchase[]
   bookComments       BookComment[]
+  memoTemplates      MemoTemplate[]
 
   @@map("users")
 }
@@ -214,6 +215,20 @@ model template_books {
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MemoTemplate {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId    String   @map("user_id")
+  name      String   @db.VarChar(120)
+  content   String   @db.MediumText
+  isDefault Boolean  @default(false) @map("is_default")
+  created   DateTime @default(now()) @db.DateTime(0)
+  updated   DateTime @default(now()) @db.DateTime(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("memo_templates")
 }
 
 model BookComment {
