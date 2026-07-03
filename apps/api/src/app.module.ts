@@ -18,7 +18,6 @@ import { MemoTemplateModule } from './presentation/modules/memo-template';
 import { QuoteModule } from './presentation/modules/quote';
 import { TagModule } from './presentation/modules/tag';
 import { ReReadingModule } from './presentation/modules/re-reading';
-import { RatingAxisModule } from './presentation/modules/rating-axis';
 import { FollowModule } from './presentation/modules/follow';
 import { LikeModule } from './presentation/modules/like';
 import { NotificationModule } from './presentation/modules/notification';
@@ -58,7 +57,6 @@ import { PurchaseModule } from './presentation/modules/purchase';
     QuoteModule,
     TagModule,
     ReReadingModule,
-    RatingAxisModule,
     FollowModule,
     LikeModule,
     NotificationModule,
