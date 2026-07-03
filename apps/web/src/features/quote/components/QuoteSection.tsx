@@ -15,10 +15,9 @@ interface Props {
 
 // 本詳細モーダル内の引用・抜き書きセクション（本人のみ表示）
 export const QuoteSection: React.FC<Props> = ({ bookId }) => {
-  const { data, refetch } = useQuery<{ bookQuotes: Quote[] }>(
-    bookQuotesQuery,
-    { variables: { input: { bookId } } }
-  )
+  const { data, refetch } = useQuery<{ bookQuotes: Quote[] }>(bookQuotesQuery, {
+    variables: { input: { bookId } },
+  })
   const [createQuote, { loading: creating }] = useMutation(createQuoteMutation)
   const [deleteQuote] = useMutation(deleteQuoteMutation)
   const [open, setOpen] = useState(false)
