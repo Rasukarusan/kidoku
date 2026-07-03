@@ -47,6 +47,7 @@ model books {
   quotes           Quote[]
   bookTags         BookTag[]
   reReadings       ReReading[]
+  bookRatings      BookRating[]
 }
 
 model Account {
@@ -104,6 +105,7 @@ model User {
   quotes             Quote[]
   tags               Tag[]
   reReadings         ReReading[]
+  ratingAxes         RatingAxis[]
 
   @@map("users")
 }
@@ -222,6 +224,34 @@ model template_books {
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RatingAxis {
+  id      Int          @id @default(autoincrement()) @db.UnsignedInt
+  userId  String       @map("user_id")
+  name    String       @db.VarChar(60)
+  order   Int          @default(1)
+  created DateTime     @default(now()) @db.DateTime(0)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ratings BookRating[]
+
+  @@unique([userId, name], map: "uniq_user_axis_name")
+  @@map("rating_axes")
+}
+
+model BookRating {
+  id      Int        @id @default(autoincrement()) @db.UnsignedInt
+  bookId  Int        @map("book_id")
+  axisId  Int        @map("axis_id")
+  value   Int
+  created DateTime   @default(now()) @db.DateTime(0)
+  updated DateTime   @default(now()) @db.DateTime(0)
+  book    books      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  axis    RatingAxis @relation(fields: [axisId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, axisId], map: "uniq_book_axis")
+  @@index([axisId])
+  @@map("book_ratings")
 }
 
 model ReReading {
