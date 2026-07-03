@@ -57,7 +57,7 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
         </Container>
       </section>
 
-      {/* ログインユーザー専用：最近登録した本・あの日の一冊 */}
+      {/* ログインユーザー専用：最近登録した本セクション + あの日の一冊モーダル(1日1回) */}
       <MyRecentBooks />
       <OnThisDay />
 
