@@ -46,7 +46,6 @@ model books {
   bookComments     BookComment[]
   quotes           Quote[]
   bookTags         BookTag[]
-  reReadings       ReReading[]
 }
 
 model Account {
@@ -103,7 +102,6 @@ model User {
   memoTemplates      MemoTemplate[]
   quotes             Quote[]
   tags               Tag[]
-  reReadings         ReReading[]
   personalAccessTokens PersonalAccessToken[]
 
   @@map("users")
@@ -236,21 +234,6 @@ model PersonalAccessToken {
 
   @@index([userId])
   @@map("personal_access_tokens")
-}
-
-model ReReading {
-  id       Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId   String   @map("user_id")
-  bookId   Int      @map("book_id")
-  finished DateTime @db.DateTime(0)
-  memo     String?  @db.MediumText
-  created  DateTime @default(now()) @db.DateTime(0)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book     books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([bookId])
-  @@map("re_readings")
 }
 
 model Tag {
