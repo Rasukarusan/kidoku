@@ -46,6 +46,9 @@ export class CreateBookInput {
   @Field({ nullable: true })
   price?: string;
 
+  @Field({ nullable: true })
+  media?: string;
+
   @Field(() => GraphQLISODateTime, { nullable: true })
   finished?: Date;
 }
@@ -85,6 +88,9 @@ export class UpdateBookInput {
 
   @Field({ nullable: true })
   price?: string;
+
+  @Field({ nullable: true })
+  media?: string | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   finished?: Date;
@@ -151,6 +157,9 @@ export class BookResponse {
 
   @Field({ nullable: true })
   price?: string;
+
+  @Field({ nullable: true })
+  media?: string;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   finished?: Date;

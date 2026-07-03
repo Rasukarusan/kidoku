@@ -42,6 +42,7 @@ export const getStaticProps = async (ctx) => {
         isPublicMemo: book.isPublicMemo,
         isPurchasable: book.isPurchasable,
         price: book.price,
+        media: book.media,
         sheetId: book.sheetId,
         sheet: book.sheet.name,
       }
