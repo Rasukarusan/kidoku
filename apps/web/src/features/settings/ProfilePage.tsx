@@ -90,6 +90,47 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
     window.open('/api/export/csv', '_blank')
   }
 
+  // 読書メーターCSVインポート
+  const [importSheetName, setImportSheetName] = useState('読書メーター')
+  const [importing, setImporting] = useState(false)
+  const [importMessage, setImportMessage] = useState('')
+  const [importError, setImportError] = useState('')
+  const [importSkipped, setImportSkipped] = useState<
+    { line: number; value: string; reason: string }[]
+  >([])
+  const importFileRef = useRef<HTMLInputElement>(null)
+
+  const onSelectImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImporting(true)
+    setImportMessage('')
+    setImportError('')
+    setImportSkipped([])
+    try {
+      const csv = await file.text()
+      const res = await fetch('/api/import/bookmeter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csv, sheetName: importSheetName }),
+      })
+      const json = await res.json()
+      if (!res.ok || !json.result) {
+        setImportError(json.message || 'インポートに失敗しました')
+      } else {
+        setImportMessage(
+          `${json.imported}冊をシート「${json.sheetName}」にインポートしました`
+        )
+        setImportSkipped(json.skipped || [])
+      }
+    } catch {
+      setImportError('インポートに失敗しました')
+    } finally {
+      setImporting(false)
+      if (importFileRef.current) importFileRef.current.value = ''
+    }
+  }
+
   return (
     <Container className="px-4 py-8 sm:px-10 sm:py-10">
       <NextSeo title="アカウント設定 | kidoku" />
@@ -162,6 +203,60 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         >
           CSVでダウンロード
         </button>
+      </section>
+
+      {/* データインポート */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">
+          データインポート（読書メーター）
+        </h3>
+        <p className="mb-4 text-xs text-gray-500">
+          読書メーターのエクスポートツール（bookmeter_exporter /
+          export_bookmeter）で出力したCSVファイルを取り込めます。
+          ISBN形式のCSVはopenBDから書籍情報を自動取得します。
+        </p>
+        <div className="mb-3">
+          <label className="mb-1 block text-xs text-gray-500">
+            インポート先シート名（存在しない場合は新規作成されます）
+          </label>
+          <input
+            value={importSheetName}
+            className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-slate-400 focus:bg-white"
+            onChange={(e) => setImportSheetName(e.target.value)}
+          />
+        </div>
+        <input
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          ref={importFileRef}
+          onChange={onSelectImportFile}
+        />
+        <button
+          className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={importing || !importSheetName.trim()}
+          onClick={() => importFileRef.current?.click()}
+        >
+          {importing ? 'インポート中...' : 'CSVファイルを選択してインポート'}
+        </button>
+        <div className="mt-2 text-xs">
+          {importError && <p className="text-red-600">{importError}</p>}
+          {importMessage && <p className="text-green-600">{importMessage}</p>}
+          {importSkipped.length > 0 && (
+            <div className="mt-2 max-h-40 overflow-y-auto rounded-md bg-slate-50 p-2 text-gray-500">
+              <p className="mb-1 font-medium">
+                スキップされた行（{importSkipped.length}件）
+              </p>
+              <ul className="list-inside list-disc">
+                {importSkipped.map((row) => (
+                  <li key={row.line}>
+                    {row.line}行目: {row.value} — {row.reason}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* アカウント削除 */}

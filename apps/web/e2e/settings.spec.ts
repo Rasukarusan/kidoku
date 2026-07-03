@@ -31,6 +31,21 @@ test.describe('設定ページ', () => {
     ).toBeVisible()
   })
 
+  test('データインポートセクションが表示される', async ({
+    authedPage: page,
+  }) => {
+    await page.goto('/settings/profile', { timeout: 30000 })
+    await expect(
+      page.getByText('データインポート（読書メーター）')
+    ).toBeVisible({ timeout: 15000 })
+    await expect(
+      page.getByText('インポート先シート名（存在しない場合は新規作成されます）')
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'CSVファイルを選択してインポート' })
+    ).toBeVisible()
+  })
+
   test('アカウント削除セクションが表示される', async ({
     authedPage: page,
   }) => {
