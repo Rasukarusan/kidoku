@@ -37,6 +37,7 @@ import {
 import { SuiLogo } from '@/components/icon/SuiLogo'
 import { CommentSection } from '@/features/books/components/CommentSection'
 import { QuoteSection } from '@/features/quote/components/QuoteSection'
+import { TagSection } from '@/features/tag/components/TagSection'
 import { mediaLabel } from '@/utils/media'
 
 interface Props {
@@ -296,7 +297,8 @@ export const BookDetailReadModal: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* 引用・抜き書き（本人のみ） */}
+        {/* タグ・引用（本人のみ） */}
+        {isMine && <TagSection bookId={Number(book.id)} />}
         {isMine && <QuoteSection bookId={Number(book.id)} />}
 
         {showComments && (

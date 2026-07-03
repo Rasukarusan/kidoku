@@ -12,6 +12,7 @@ import {
   AiOutlineCompass,
   AiOutlineBell,
   AiOutlineHighlight,
+  AiOutlineTags,
 } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
@@ -129,6 +130,12 @@ export const Sidebar: React.FC = () => {
         href: '/quotes',
         icon: AiOutlineHighlight,
         isActive: router.pathname.includes('/quotes'),
+      },
+      {
+        name: 'タグ本棚',
+        href: '/tags',
+        icon: AiOutlineTags,
+        isActive: router.pathname.includes('/tags'),
       },
       {
         name: '発見',
