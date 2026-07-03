@@ -36,9 +36,7 @@ export default async (req, res) => {
         memo,
         finished,
         sheet,
-        media,
       } = body
-      const allowedMedia = ['paper', 'ebook', 'audiobook', 'library', 'other']
       const data = {
         sheetId: Number(sheet.id),
         userId,
@@ -49,7 +47,6 @@ export default async (req, res) => {
         impression,
         memo,
         isPublicMemo,
-        media: allowedMedia.includes(media) ? media : null,
         finished: finished ? new Date(finished) : null,
       }
       let finalImage = image === NO_IMAGE || image.includes('http') ? image : ''
@@ -125,7 +122,6 @@ export default async (req, res) => {
             isPublicMemo: body.isPublicMemo,
             isPurchasable: body.isPurchasable,
             price: body.price ?? null,
-            media: body.media ?? null,
             finished: body.finished ? new Date(body.finished) : null,
             sheetId: body.sheetId ? Number(body.sheetId) : undefined,
           },

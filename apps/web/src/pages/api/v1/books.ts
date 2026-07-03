@@ -57,7 +57,6 @@ export default async function handler(
           category: book.category,
           impression: book.impression,
           memo: book.memo,
-          media: book.media,
           finished: book.finished?.toISOString() ?? null,
           created: book.created.toISOString(),
           updated: book.updated.toISOString(),

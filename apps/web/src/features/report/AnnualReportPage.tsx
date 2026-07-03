@@ -3,7 +3,6 @@ import useSWR from 'swr'
 import { NextSeo } from 'next-seo'
 import dayjs from 'dayjs'
 import { Container } from '@/components/layout/Container'
-import { mediaLabel } from '@/utils/media'
 
 interface ReportBook {
   id: number
@@ -12,7 +11,6 @@ interface ReportBook {
   category: string
   image: string
   impression: string
-  media: string | null
   finished: string | null
   memoLength: number
   quoteCount: number
@@ -220,7 +218,6 @@ export const AnnualReportPage: React.FC = () => {
                     <th className="py-2 pr-4 font-normal">著者</th>
                     <th className="py-2 pr-4 font-normal">カテゴリ</th>
                     <th className="py-2 pr-4 font-normal">評価</th>
-                    <th className="py-2 pr-4 font-normal">媒体</th>
                     <th className="py-2 font-normal">メモ</th>
                   </tr>
                 </thead>
@@ -240,9 +237,6 @@ export const AnnualReportPage: React.FC = () => {
                         {book.category}
                       </td>
                       <td className="py-2 pr-4">{book.impression}</td>
-                      <td className="py-2 pr-4 text-xs text-gray-500">
-                        {mediaLabel(book.media)}
-                      </td>
                       <td className="py-2 text-xs text-gray-500">
                         {book.memoLength > 0
                           ? `${book.memoLength.toLocaleString()}字`

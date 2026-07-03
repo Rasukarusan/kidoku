@@ -19,7 +19,6 @@ import { SheetSelectBox } from '@/components/input/SheetSelectBox'
 import { SuiPriceInput } from '@/components/input/SuiPriceInput'
 import { getBookCategoriesQuery } from '@/features/books/api'
 import { mySuiAddressQuery } from '@/features/user/api/queries'
-import { MEDIA_OPTIONS } from '@/utils/media'
 
 // SSRを無効にしてクライアントサイドのみでロード
 const MarkdownEditor = dynamic(
@@ -162,21 +161,6 @@ export const BookDetailEditModal: React.FC<Props> = ({
         className="mb-4"
         tabIndex={6}
       />
-      <div className="mb-4 text-left">
-        <Label text="媒体" className="mb-1" />
-        <select
-          value={book?.media ?? ''}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-          onChange={(e) => setBook({ ...book, media: e.target.value || null })}
-        >
-          <option value="">未設定</option>
-          {MEDIA_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
       <div className="mb-4">
         <div className="mb-2 flex items-center justify-between">
           <div className="flex items-center">

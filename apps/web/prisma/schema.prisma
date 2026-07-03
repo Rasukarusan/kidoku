@@ -34,7 +34,6 @@ model books {
   isPublicMemo     Boolean         @default(false) @map("is_public_memo")
   isPurchasable    Boolean         @default(false) @map("is_purchasable")
   price            String?         @db.VarChar(40)
-  media            String?         @db.VarChar(20)
   finished         DateTime?       @db.DateTime(0)
   created          DateTime        @default(now()) @db.DateTime(0)
   updated          DateTime        @default(now()) @db.DateTime(0)

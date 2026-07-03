@@ -54,7 +54,6 @@ export default async function handler(
           category: book.category,
           image: book.image,
           impression: book.impression,
-          media: book.media,
           finished: book.finished?.toISOString() ?? null,
           memoLength: book.memo?.length ?? 0,
           quoteCount: book._count.quotes,
