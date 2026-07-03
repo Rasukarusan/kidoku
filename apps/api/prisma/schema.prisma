@@ -107,6 +107,7 @@ model User {
   reReadings         ReReading[]
   ratingAxes         RatingAxis[]
   authorFollows      AuthorFollow[]
+  personalAccessTokens PersonalAccessToken[]
 
   @@map("users")
 }
@@ -225,6 +226,19 @@ model template_books {
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PersonalAccessToken {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId     String    @map("user_id")
+  name       String    @db.VarChar(60)
+  tokenHash  String    @unique @map("token_hash") @db.VarChar(64)
+  lastUsedAt DateTime? @map("last_used_at") @db.DateTime(0)
+  created    DateTime  @default(now()) @db.DateTime(0)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("personal_access_tokens")
 }
 
 model AuthorFollow {
