@@ -45,6 +45,7 @@ model books {
   purchases        Purchase[]
   bookComments     BookComment[]
   quotes           Quote[]
+  bookTags         BookTag[]
 }
 
 model Account {
@@ -100,6 +101,7 @@ model User {
   bookComments       BookComment[]
   memoTemplates      MemoTemplate[]
   quotes             Quote[]
+  tags               Tag[]
 
   @@map("users")
 }
@@ -218,6 +220,31 @@ model template_books {
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id       Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId   String    @map("user_id")
+  name     String    @db.VarChar(60)
+  created  DateTime  @default(now()) @db.DateTime(0)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookTags BookTag[]
+
+  @@unique([userId, name], map: "uniq_user_tag_name")
+  @@map("tags")
+}
+
+model BookTag {
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
+  bookId  Int      @map("book_id")
+  tagId   Int      @map("tag_id")
+  created DateTime @default(now()) @db.DateTime(0)
+  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  tag     Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([bookId, tagId], map: "uniq_book_tag")
+  @@index([tagId])
+  @@map("book_tags")
 }
 
 model Quote {
