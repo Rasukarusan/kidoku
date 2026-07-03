@@ -43,6 +43,7 @@ model books {
   likes            Like[]
   purchases        Purchase[]
   bookComments     BookComment[]
+  quotes           Quote[]
 }
 
 model Account {
@@ -97,6 +98,7 @@ model User {
   purchases          Purchase[]
   bookComments       BookComment[]
   memoTemplates      MemoTemplate[]
+  quotes             Quote[]
 
   @@map("users")
 }
@@ -215,6 +217,23 @@ model template_books {
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Quote {
+  id      Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId  String   @map("user_id")
+  bookId  Int      @map("book_id")
+  page    Int?
+  text    String   @db.Text
+  comment String?  @db.Text
+  created DateTime @default(now()) @db.DateTime(0)
+  updated DateTime @default(now()) @db.DateTime(0)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([bookId])
+  @@map("quotes")
 }
 
 model MemoTemplate {

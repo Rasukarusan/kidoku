@@ -36,6 +36,7 @@ import {
 } from '@/features/purchase/api'
 import { SuiLogo } from '@/components/icon/SuiLogo'
 import { CommentSection } from '@/features/books/components/CommentSection'
+import { QuoteSection } from '@/features/quote/components/QuoteSection'
 
 interface Props {
   book: Book
@@ -287,6 +288,9 @@ export const BookDetailReadModal: React.FC<Props> = ({
               ))}
           </div>
         </div>
+
+        {/* 引用・抜き書き（本人のみ） */}
+        {isMine && <QuoteSection bookId={Number(book.id)} />}
 
         {showComments && (
           <CommentSection bookId={book.id} bookOwnerId={book.user?.id} />
