@@ -188,6 +188,20 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </div>
       </section>
 
+      {/* 年間レポート */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">年間レポート</h3>
+        <p className="mb-4 text-xs text-gray-500">
+          年ごとの詳細な読書レポートを自分だけで振り返れます。印刷・PDF保存にも対応しています。
+        </p>
+        <Link
+          href="/report"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          レポートを見る
+        </Link>
+      </section>
+
       {/* メモテンプレート */}
       <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
         <h3 className="mb-1 text-sm font-bold text-gray-700">
