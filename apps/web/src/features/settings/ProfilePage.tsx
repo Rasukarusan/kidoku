@@ -301,6 +301,20 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </div>
       </section>
 
+      {/* 個人用API */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">個人用API</h3>
+        <p className="mb-4 text-xs text-gray-500">
+          アクセストークンを発行して、自分の読書記録を外部ツールから読み取れます。
+        </p>
+        <Link
+          href="/settings/api-tokens"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          トークンを管理する
+        </Link>
+      </section>
+
       {/* アカウント削除 */}
       <section className="rounded-lg border border-red-100 bg-red-50/40 p-6">
         <h3 className="mb-1 text-sm font-bold text-red-600">アカウント削除</h3>
