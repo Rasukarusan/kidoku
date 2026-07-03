@@ -19,6 +19,7 @@ import { Label } from '../Label'
 import { MaskingHint } from '@/components/label/MaskingHint'
 import { getSheetsQuery } from '@/features/sheet/api'
 import { getBookCategoriesQuery } from '@/features/books/api'
+import { MemoTemplate, memoTemplatesQuery } from '@/features/memo-template/api'
 import { SearchResult } from '@/types/search'
 import { normalizeCategory } from '@/utils/category'
 import {
@@ -85,6 +86,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     getBookCategoriesQuery,
     { skip: !session }
   )
+
+  // ユーザー定義のメモテンプレート。デフォルト指定があれば初期メモに使う
+  const { data: memoTemplatesData } = useQuery<{
+    memoTemplates: MemoTemplate[]
+  }>(memoTemplatesQuery, { skip: !session })
+  const memoTemplates = memoTemplatesData?.memoTemplates ?? []
+  const defaultMemo =
+    memoTemplates.find((t) => t.isDefault)?.content || DEFAULT_MEMO
   const options = categoriesData
     ? categoriesData.bookCategories.map((category) => ({
         value: category,
@@ -122,12 +131,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         ? normalizeCategory(item.category, existingCategories)
         : item.category,
       isPublicMemo: false,
-      memo: item.memo?.trim() ? item.memo : DEFAULT_MEMO,
+      memo: item.memo?.trim() ? item.memo : defaultMemo,
       impression: '-',
       finished,
     })
     // categoriesData を deps に含めるとメモ等の編集を上書きしうるため、到着後の再正規化は下の effect に任せる
   }, [item])
+
+  // デフォルトテンプレートの取得が初期化より遅れた場合、未編集のメモにだけ適用する
+  useEffect(() => {
+    if (defaultMemo === DEFAULT_MEMO) return
+    setBook((prev) =>
+      prev && prev.memo === DEFAULT_MEMO ? { ...prev, memo: defaultMemo } : prev
+    )
+  }, [defaultMemo])
 
   // 入力内容をローカルストレージに自動保存（500msデバウンス）
   // モーダルを誤って閉じても、再度開いたときに続きから再開できるようにする
@@ -166,7 +183,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         ? normalizeCategory(item.category, existingCategories)
         : item.category,
       isPublicMemo: false,
-      memo: item.memo?.trim() ? item.memo : DEFAULT_MEMO,
+      memo: item.memo?.trim() ? item.memo : defaultMemo,
       impression: '-',
       finished,
     })
@@ -299,8 +316,40 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             <Label text="メモ" className="mb-0 mr-2" />
             <MaskingHint />
           </div>
-          <div className="text-xs text-gray-500">
-            {book?.memo?.length || 0} 文字
+          <div className="flex items-center gap-2">
+            {memoTemplates.length > 0 && (
+              <select
+                className="rounded border border-gray-200 px-2 py-1 text-xs text-gray-600"
+                value=""
+                onChange={(e) => {
+                  const template = memoTemplates.find(
+                    (t) => t.id === e.target.value
+                  )
+                  if (!template || !book) return
+                  const untouched =
+                    !book.memo?.trim() ||
+                    book.memo === DEFAULT_MEMO ||
+                    book.memo === defaultMemo
+                  if (
+                    !untouched &&
+                    !window.confirm('メモをテンプレートで置き換えますか？')
+                  ) {
+                    return
+                  }
+                  setBook({ ...book, memo: template.content })
+                }}
+              >
+                <option value="">テンプレート挿入</option>
+                {memoTemplates.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            <div className="text-xs text-gray-500">
+              {book?.memo?.length || 0} 文字
+            </div>
           </div>
         </div>
         <MarkdownEditor

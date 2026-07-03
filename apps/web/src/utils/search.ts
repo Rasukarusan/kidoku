@@ -64,7 +64,7 @@ const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
         author: sd.author,
         category: sd.category,
         image: sd.coverImageUrl,
-        memo: '【期待】\n\n【感想】\n',
+        memo: '',
       }
     }
   } catch (error) {
@@ -84,7 +84,7 @@ const getLatestSoftwareDesign = async (): Promise<SearchResult | null> => {
       author: '技術評論社',
       category: 'ソフトウェア開発',
       image: `https://gihyo.jp/assets/images/cover/2024/thumb/TH320_642501${yearMonth}.jpg`,
-      memo: '【期待】\n\n【感想】\n',
+      memo: '',
     }
   }
   return null

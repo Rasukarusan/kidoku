@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import Link from 'next/link'
 import { Container } from '@/components/layout/Container'
 import { NextSeo } from 'next-seo'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
@@ -146,6 +147,22 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
           {suiError && <span className="text-red-600">{suiError}</span>}
           {suiSaved && <span className="text-green-600">保存しました</span>}
         </div>
+      </section>
+
+      {/* メモテンプレート */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">
+          メモテンプレート
+        </h3>
+        <p className="mb-4 text-xs text-gray-500">
+          本を登録するときのメモの雛形を自分の型にカスタマイズできます。
+        </p>
+        <Link
+          href="/settings/memo-templates"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          テンプレートを管理する
+        </Link>
       </section>
 
       {/* データエクスポート */}
