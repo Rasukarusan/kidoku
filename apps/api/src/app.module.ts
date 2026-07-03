@@ -19,6 +19,7 @@ import { QuoteModule } from './presentation/modules/quote';
 import { TagModule } from './presentation/modules/tag';
 import { ReReadingModule } from './presentation/modules/re-reading';
 import { RatingAxisModule } from './presentation/modules/rating-axis';
+import { AuthorFollowModule } from './presentation/modules/author-follow';
 import { FollowModule } from './presentation/modules/follow';
 import { LikeModule } from './presentation/modules/like';
 import { NotificationModule } from './presentation/modules/notification';
@@ -59,6 +60,7 @@ import { PurchaseModule } from './presentation/modules/purchase';
     TagModule,
     ReReadingModule,
     RatingAxisModule,
+    AuthorFollowModule,
     FollowModule,
     LikeModule,
     NotificationModule,

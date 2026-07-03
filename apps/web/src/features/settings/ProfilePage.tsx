@@ -218,6 +218,20 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </Link>
       </section>
 
+      {/* 著者フォロー */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">著者フォロー</h3>
+        <p className="mb-4 text-xs text-gray-500">
+          気になる著者をフォローして、最新の刊行をまとめてチェックできます。
+        </p>
+        <Link
+          href="/authors"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          フォロー中の著者を見る
+        </Link>
+      </section>
+
       {/* 評価軸 */}
       <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
         <h3 className="mb-1 text-sm font-bold text-gray-700">評価軸</h3>
