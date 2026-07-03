@@ -23,7 +23,6 @@ export class UpdateBookUseCase {
       isPublicMemo?: boolean;
       isPurchasable?: boolean;
       price?: string | null;
-      media?: string | null;
       finished?: Date | null;
       sheetId?: number;
     },

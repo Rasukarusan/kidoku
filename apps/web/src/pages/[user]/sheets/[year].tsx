@@ -44,7 +44,6 @@ export async function getStaticProps(context) {
       isPublicMemo: true,
       isPurchasable: true,
       price: true,
-      media: true,
       finished: true,
       created: false,
       updated: false,

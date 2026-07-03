@@ -16,8 +16,6 @@ export interface Book {
   isPurchasable: boolean
   /** 購入価格（MIST単位の文字列）。null/未設定の場合はグローバル既定額を用いる */
   price?: string | null
-  /** 媒体（paper/ebook/audiobook/library/other）。null は未設定 */
-  media?: string | null
   sheetId?: number
   sheet?: string
   likeCount?: number

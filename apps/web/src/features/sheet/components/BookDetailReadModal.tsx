@@ -37,7 +37,6 @@ import {
 import { SuiLogo } from '@/components/icon/SuiLogo'
 import { CommentSection } from '@/features/books/components/CommentSection'
 import { QuoteSection } from '@/features/quote/components/QuoteSection'
-import { mediaLabel } from '@/utils/media'
 
 interface Props {
   book: Book
@@ -200,12 +199,6 @@ export const BookDetailReadModal: React.FC<Props> = ({
                 <span className="font-semibold">読了日:</span>{' '}
                 {dayjs(book.finished).format('YYYY-MM-DD')}
               </div>
-              {book.media && (
-                <div>
-                  <span className="font-semibold">媒体:</span>{' '}
-                  {mediaLabel(book.media)}
-                </div>
-              )}
             </div>
           </div>
         </div>
