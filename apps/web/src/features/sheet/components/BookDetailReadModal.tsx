@@ -40,7 +40,6 @@ import { QuoteSection } from '@/features/quote/components/QuoteSection'
 import { TagSection } from '@/features/tag/components/TagSection'
 import { ReReadingSection } from '@/features/re-reading/components/ReReadingSection'
 import { RatingSection } from '@/features/rating/components/RatingSection'
-import { AuthorFollowButton } from '@/features/author-follow/components/AuthorFollowButton'
 import { mediaLabel } from '@/utils/media'
 
 interface Props {
@@ -191,10 +190,7 @@ export const BookDetailReadModal: React.FC<Props> = ({
 
           <div className="mb-6 text-center">
             <h1 className="mb-2 text-2xl font-bold">{book.title}</h1>
-            <p className="mb-4 text-gray-600">
-              {book.author}
-              {isMine && <AuthorFollowButton author={book.author} />}
-            </p>
+            <p className="mb-4 text-gray-600">{book.author}</p>
 
             <div className="flex justify-center space-x-8 text-sm text-gray-500">
               <div>
