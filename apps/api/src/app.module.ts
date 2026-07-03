@@ -17,7 +17,6 @@ import { TemplateBookModule } from './presentation/modules/template-book';
 import { MemoTemplateModule } from './presentation/modules/memo-template';
 import { QuoteModule } from './presentation/modules/quote';
 import { TagModule } from './presentation/modules/tag';
-import { ReReadingModule } from './presentation/modules/re-reading';
 import { FollowModule } from './presentation/modules/follow';
 import { LikeModule } from './presentation/modules/like';
 import { NotificationModule } from './presentation/modules/notification';
@@ -56,7 +55,6 @@ import { PurchaseModule } from './presentation/modules/purchase';
     MemoTemplateModule,
     QuoteModule,
     TagModule,
-    ReReadingModule,
     FollowModule,
     LikeModule,
     NotificationModule,
