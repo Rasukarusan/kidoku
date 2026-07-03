@@ -79,6 +79,7 @@ export class BookResolver {
       isPublicMemo: input.isPublicMemo,
       isPurchasable: input.isPurchasable,
       price: input.price,
+      media: input.media,
       finished: input.finished || null,
     });
 
@@ -100,6 +101,7 @@ export class BookResolver {
       isPublicMemo: input.isPublicMemo,
       isPurchasable: input.isPurchasable,
       price: input.price,
+      media: input.media,
       finished: input.finished,
       sheetId: input.sheetId,
     });
@@ -130,6 +132,7 @@ export class BookResolver {
       isPublicMemo: book.isPublicMemo,
       isPurchasable: book.isPurchasable,
       price: book.price ?? undefined,
+      media: book.media ?? undefined,
       finished: book.finished ?? undefined,
       created: book.created,
       updated: book.updated,

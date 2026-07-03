@@ -12,6 +12,7 @@ export class Book {
     private _isPublicMemo: boolean,
     private _isPurchasable: boolean,
     private _price: string | null,
+    private _media: string | null,
     private _finished: Date | null,
     private readonly _created: Date,
     private _updated: Date,
@@ -54,6 +55,10 @@ export class Book {
   get price(): string | null {
     return this._price;
   }
+  /** 媒体（paper/ebook/audiobook/library/other）。null は未設定 */
+  get media(): string | null {
+    return this._media;
+  }
   get finished(): Date | null {
     return this._finished;
   }
@@ -74,6 +79,7 @@ export class Book {
     isPublicMemo?: boolean;
     isPurchasable?: boolean;
     price?: string | null;
+    media?: string | null;
     finished?: Date | null;
     sheetId?: number;
   }): void {
@@ -99,6 +105,8 @@ export class Book {
       this._isPurchasable = params.isPurchasable;
     if (params.price !== undefined)
       this._price = Book.normalizePrice(params.price);
+    if (params.media !== undefined)
+      this._media = Book.normalizeMedia(params.media);
     if (params.finished !== undefined) this._finished = params.finished;
     if (params.sheetId !== undefined) this._sheetId = params.sheetId;
     this._updated = new Date();
@@ -136,6 +144,31 @@ export class Book {
 
   private static readonly MAX_TITLE_LENGTH = 100;
 
+  /** 許可される媒体の値 */
+  static readonly MEDIA_VALUES = [
+    'paper',
+    'ebook',
+    'audiobook',
+    'library',
+    'other',
+  ] as const;
+
+  /**
+   * 媒体を正規化する。null/空文字は「未設定」として null を返す。
+   * 許可された値以外はエラー。
+   */
+  private static normalizeMedia(
+    media: string | null | undefined,
+  ): string | null {
+    if (media === null || media === undefined || media === '') {
+      return null;
+    }
+    if (!(Book.MEDIA_VALUES as readonly string[]).includes(media)) {
+      throw new Error('媒体の指定が不正です');
+    }
+    return media;
+  }
+
   /**
    * 価格（MIST単位）を正規化する。
    * null/空文字は「未設定（既定額を使用）」として null を返す。
@@ -171,6 +204,7 @@ export class Book {
     isPublicMemo: boolean;
     isPurchasable?: boolean;
     price?: string | null;
+    media?: string | null;
     finished: Date | null;
   }): Book {
     if (!params.title || params.title.trim().length === 0) {
@@ -195,6 +229,7 @@ export class Book {
       params.isPublicMemo,
       params.isPurchasable ?? false,
       Book.normalizePrice(params.price),
+      Book.normalizeMedia(params.media),
       params.finished,
       now,
       now,
@@ -217,6 +252,7 @@ export class Book {
     created: Date,
     updated: Date,
     price: string | null = null,
+    media: string | null = null,
   ): Book {
     return new Book(
       id,
@@ -231,6 +267,7 @@ export class Book {
       isPublicMemo,
       isPurchasable,
       price,
+      media,
       finished,
       created,
       updated,
