@@ -106,7 +106,6 @@ model User {
   tags               Tag[]
   reReadings         ReReading[]
   ratingAxes         RatingAxis[]
-  authorFollows      AuthorFollow[]
   personalAccessTokens PersonalAccessToken[]
 
   @@map("users")
@@ -239,17 +238,6 @@ model PersonalAccessToken {
 
   @@index([userId])
   @@map("personal_access_tokens")
-}
-
-model AuthorFollow {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId     String   @map("user_id")
-  authorName String   @map("author_name") @db.VarChar(120)
-  created    DateTime @default(now()) @db.DateTime(0)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, authorName], map: "uniq_user_author")
-  @@map("author_follows")
 }
 
 model RatingAxis {

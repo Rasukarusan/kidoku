@@ -46,7 +46,6 @@ interface RakutenBookResponse {
       booksGenreId: string;
       largeImageUrl: string;
       mediumImageUrl: string;
-      salesDate?: string;
     };
   }>;
 }
@@ -56,17 +55,6 @@ export class RakutenBooksRepository implements IBookSearchRepository {
   private readonly logger = new Logger(RakutenBooksRepository.name);
 
   async searchByTitle(query: string): Promise<BookSearchItem[]> {
-    return await this.search({ title: query, hits: '30' });
-  }
-
-  async searchByAuthor(author: string): Promise<BookSearchItem[]> {
-    // 発売日の新しい順（新刊チェック用）
-    return await this.search({ author, hits: '10', sort: '-releaseDate' });
-  }
-
-  private async search(
-    extraParams: Record<string, string>,
-  ): Promise<BookSearchItem[]> {
     const applicationId = process.env.RAKUTEN_APPLICATION_ID;
     const accessKey = process.env.RAKUTEN_ACCESS_KEY;
     if (!applicationId || !accessKey) {
@@ -79,8 +67,9 @@ export class RakutenBooksRepository implements IBookSearchRepository {
     const params = new URLSearchParams({
       applicationId: applicationId.replace(/-/g, ''),
       accessKey,
+      title: query,
+      hits: '30',
       outOfStockFlag: '1',
-      ...extraParams,
     });
 
     const appUrl = process.env.RAKUTEN_APP_URL || 'https://kidoku.net';
@@ -123,7 +112,6 @@ export class RakutenBooksRepository implements IBookSearchRepository {
         item.largeImageUrl?.replace('http:', 'https:') ||
         item.mediumImageUrl?.replace('http:', 'https:') ||
         NO_IMAGE,
-      salesDate: item.salesDate,
     }));
   }
 }
