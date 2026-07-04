@@ -5,6 +5,8 @@ import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
 import { openSearchModalAtom } from '@/store/modal/atom'
+import { MyRecentBooks } from './MyRecentBooks'
+import { OnThisDay } from './OnThisDay'
 
 interface Props {
   comments: Comment[]
@@ -54,6 +56,10 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
           </div>
         </Container>
       </section>
+
+      {/* ログインユーザー専用：最近登録した本セクション + あの日の一冊モーダル(1日1回) */}
+      <MyRecentBooks />
+      <OnThisDay />
 
       <Container className="p-6">
         <section>

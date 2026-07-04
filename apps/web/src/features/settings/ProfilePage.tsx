@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import Link from 'next/link'
 import { Container } from '@/components/layout/Container'
 import { NextSeo } from 'next-seo'
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client'
@@ -90,6 +91,45 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
     window.open('/api/export/csv', '_blank')
   }
 
+  const onClickExportMarkdown = () => {
+    window.open('/api/export/markdown', '_blank')
+  }
+
+  // CSVインポート
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState('')
+  const [importError, setImportError] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const onImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImporting(true)
+    setImportResult('')
+    setImportError('')
+    try {
+      const csv = await file.text()
+      const res = await fetch('/api/import/csv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csv }),
+      })
+      const data = await res.json()
+      if (res.ok && data.result) {
+        setImportResult(
+          `${data.imported}件を取り込みました（スキップ${data.skipped}件、シート作成${data.createdSheets}件）`
+        )
+      } else {
+        setImportError(data.error || 'インポートに失敗しました')
+      }
+    } catch {
+      setImportError('インポートに失敗しました')
+    } finally {
+      setImporting(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
   return (
     <Container className="px-4 py-8 sm:px-10 sm:py-10">
       <NextSeo title="アカウント設定 | kidoku" />
@@ -148,20 +188,103 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </div>
       </section>
 
+      {/* 年間レポート */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">年間レポート</h3>
+        <p className="mb-4 text-xs text-gray-500">
+          年ごとの詳細な読書レポートを自分だけで振り返れます。印刷・PDF保存にも対応しています。
+        </p>
+        <Link
+          href="/report"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          レポートを見る
+        </Link>
+      </section>
+
+      {/* メモテンプレート */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">
+          メモテンプレート
+        </h3>
+        <p className="mb-4 text-xs text-gray-500">
+          本を登録するときのメモの雛形を自分の型にカスタマイズできます。
+        </p>
+        <Link
+          href="/settings/memo-templates"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          テンプレートを管理する
+        </Link>
+      </section>
+
       {/* データエクスポート */}
       <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
         <h3 className="mb-1 text-sm font-bold text-gray-700">
           データエクスポート
         </h3>
         <p className="mb-4 text-xs text-gray-500">
-          すべての読書記録をCSV形式でダウンロードできます。
+          すべての読書記録をCSV形式、またはObsidian等で使えるMarkdown形式（1冊=1ファイルのzip）でダウンロードできます。
         </p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+            onClick={onClickExportCSV}
+          >
+            CSVでダウンロード
+          </button>
+          <button
+            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+            onClick={onClickExportMarkdown}
+          >
+            Markdown(zip)でダウンロード
+          </button>
+        </div>
+      </section>
+
+      {/* データインポート */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">
+          データインポート
+        </h3>
+        <p className="mb-4 text-xs text-gray-500">
+          エクスポートしたCSVを書き戻せます。ヘッダー行に「タイトル」列があれば他サービスのCSVも取り込めます（著者・カテゴリ・評価・メモ・読了日・シート名に対応）。
+          同じシートに同じタイトルの本がある場合はスキップされます。
+        </p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          onChange={onImportFile}
+        />
         <button
-          className="rounded-md bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-          onClick={onClickExportCSV}
+          className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50 disabled:opacity-50"
+          disabled={importing}
+          onClick={() => fileInputRef.current?.click()}
         >
-          CSVでダウンロード
+          {importing ? 'インポート中...' : 'CSVファイルを選択'}
         </button>
+        <div className="mt-2 h-4 text-xs">
+          {importResult && (
+            <span className="text-green-600">{importResult}</span>
+          )}
+          {importError && <span className="text-red-600">{importError}</span>}
+        </div>
+      </section>
+
+      {/* 個人用API */}
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">個人用API</h3>
+        <p className="mb-4 text-xs text-gray-500">
+          アクセストークンを発行して、自分の読書記録を外部ツールから読み取れます。
+        </p>
+        <Link
+          href="/settings/api-tokens"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          トークンを管理する
+        </Link>
       </section>
 
       {/* アカウント削除 */}
