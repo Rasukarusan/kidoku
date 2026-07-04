@@ -11,7 +11,6 @@ import {
   AiOutlineClose,
   AiOutlineCompass,
   AiOutlineBell,
-  AiOutlineHighlight,
 } from 'react-icons/ai'
 import { BiExit } from 'react-icons/bi'
 import { signOut } from 'next-auth/react'
@@ -123,12 +122,6 @@ export const Sidebar: React.FC = () => {
         href: readingRecordsUrl,
         icon: AiOutlineBook,
         isActive: isSheetsPage,
-      },
-      {
-        name: '引用ノート',
-        href: '/quotes',
-        icon: AiOutlineHighlight,
-        isActive: router.pathname.includes('/quotes'),
       },
       {
         name: '発見',
