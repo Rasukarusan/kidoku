@@ -326,7 +326,7 @@ pnpm --filter web lighthouse
 
 - プレビュー用APIは全PR共通の単一サービス `kidoku-api-preview` にデプロイされ、最新のデプロイで上書きされる
 - プレビュー用の Secrets（`DATABASE_URL`, `NEXTAUTH_SECRET`, `FRONTEND_URL` 等）は GitHub の `Preview` Environment に登録する
-- プレビューDBへのスキーマ反映は `db-push.yml` を `Preview` 環境指定で手動実行する
+- DBへのスキーマ反映は `db-push.yml` が自動実行する: Prismaスキーマ変更を含む main/master へのpushで本番DB（`Production`）へ、PR（main/master 宛て）でプレビューDB（`Preview`）へ `prisma db push` が走る。`workflow_dispatch` での手動実行（環境選択・`--accept-data-loss` 指定）も引き続き可能
 - フォークからのPRはSecretsにアクセスできないため、プレビューデプロイは同一リポジトリ内のブランチPRでのみ動作する
 
 ## サンドボックス環境での開発

@@ -1,6 +1,23 @@
 name: DB Push
 
 on:
+  # main/master へのプッシュでスキーマが変更されたら Production DB に自動反映
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'apps/web/prisma/schema.prisma'
+      - 'apps/api/prisma/schema.prisma'
+  # PR でスキーマが変更されたら Preview DB に自動反映
+  # （フォークからの PR は Secrets にアクセスできないため対象外）
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'apps/web/prisma/schema.prisma'
+      - 'apps/api/prisma/schema.prisma'
   workflow_dispatch:
     inputs:
       environment:
@@ -17,18 +34,28 @@ on:
         default: false
         type: boolean
 
-# 同時に複数の db push が走らないように直列化する
+# 同一環境への db push が同時に走らないように直列化する
 concurrency:
-  group: db-push
+  group: db-push-${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.event_name == 'pull_request' && 'Preview' || 'Production' }}
   cancel-in-progress: false
 
 jobs:
   db-push:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    # push(main/master) → Production / pull_request → Preview / 手動実行 → 選択した環境
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.event_name == 'pull_request' && 'Preview' || 'Production' }}
     steps:
-      # スキーマの取得元は実行時に「Use workflow from」で選択したブランチ
+      # 自動実行時はトリガーとなったコミット、手動実行時は「Use workflow from」で選択したブランチのスキーマを使う
       - uses: actions/checkout@v4
+
+      # web と api の Prisma スキーマが同期しているか確認（片方だけの変更を検出）
+      - name: Check schema sync
+        run: |
+          if ! diff -u apps/web/prisma/schema.prisma apps/api/prisma/schema.prisma; then
+            echo "::error::apps/web/prisma/schema.prisma と apps/api/prisma/schema.prisma が一致していません。両方のスキーマを同期してください。"
+            exit 1
+          fi
+
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
