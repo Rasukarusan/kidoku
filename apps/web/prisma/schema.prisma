@@ -96,6 +96,8 @@ model User {
   actorNotifications Notification[] @relation("notificationActor")
   purchases          Purchase[]
   bookComments       BookComment[]
+  memoTemplates      MemoTemplate[]
+  personalAccessTokens PersonalAccessToken[]
 
   @@map("users")
 }
@@ -214,6 +216,33 @@ model template_books {
   created        DateTime @default(now()) @db.DateTime(0)
   updated        DateTime @default(now()) @db.DateTime(0)
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PersonalAccessToken {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  userId     String    @map("user_id")
+  name       String    @db.VarChar(60)
+  tokenHash  String    @unique @map("token_hash") @db.VarChar(64)
+  lastUsedAt DateTime? @map("last_used_at") @db.DateTime(0)
+  created    DateTime  @default(now()) @db.DateTime(0)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("personal_access_tokens")
+}
+
+model MemoTemplate {
+  id        Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId    String   @map("user_id")
+  name      String   @db.VarChar(120)
+  content   String   @db.MediumText
+  isDefault Boolean  @default(false) @map("is_default")
+  created   DateTime @default(now()) @db.DateTime(0)
+  updated   DateTime @default(now()) @db.DateTime(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("memo_templates")
 }
 
 model BookComment {

@@ -3,6 +3,7 @@ import { Category, Year } from '../../types'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { Rankings } from './Rankings'
 import { YearsGraph } from './YearsGraph'
+import { LifetimeStats } from './LifetimeStats'
 import { BasePieChart, PieSlice } from '../BasePieChart'
 import { Books } from '../Books'
 import { Book, YearlyTopBook } from '@/types/book'
@@ -89,6 +90,8 @@ export const SheetTotalPage: React.FC<Props> = ({
         <div className="m-auto mb-4 h-[300px] w-full sm:w-3/4">
           <YearsGraph years={years} />
         </div>
+
+        <LifetimeStats books={books} years={years} />
 
         <TitleWithLine text="年間ベスト書籍" />
         {yearlyTopBooks.length > 0 ? (

@@ -23,11 +23,12 @@ test.describe('設定ページ', () => {
     await expect(page.getByText('データエクスポート')).toBeVisible({
       timeout: 15000,
     })
-    await expect(
-      page.getByText('すべての読書記録をCSV形式でダウンロードできます。')
-    ).toBeVisible()
+    await expect(page.getByText('すべての読書記録をCSV形式')).toBeVisible()
     await expect(
       page.getByRole('button', { name: 'CSVでダウンロード' })
+    ).toBeVisible()
+    await expect(
+      page.getByRole('button', { name: 'Markdown(zip)でダウンロード' })
     ).toBeVisible()
   })
 

@@ -14,6 +14,7 @@ import { YearlyTopBookModule } from './presentation/modules/yearly-top-book';
 import { UserModule } from './presentation/modules/user';
 import { AiSummaryModule } from './presentation/modules/ai-summary';
 import { TemplateBookModule } from './presentation/modules/template-book';
+import { MemoTemplateModule } from './presentation/modules/memo-template';
 import { FollowModule } from './presentation/modules/follow';
 import { LikeModule } from './presentation/modules/like';
 import { NotificationModule } from './presentation/modules/notification';
@@ -49,6 +50,7 @@ import { PurchaseModule } from './presentation/modules/purchase';
     UserModule,
     AiSummaryModule,
     TemplateBookModule,
+    MemoTemplateModule,
     FollowModule,
     LikeModule,
     NotificationModule,

@@ -19,6 +19,7 @@ export const getStaticProps = async (ctx) => {
   const userId = user.id
   const books = await prisma.books.findMany({
     where: { userId },
+    include: { sheet: { select: { name: true } } },
   })
   // 全シート横断の書籍データ（カテゴリーフィルター表示用）
   // 公開ページのため、非公開メモは表示しない（[year].tsx と同様の整形）
@@ -42,6 +43,7 @@ export const getStaticProps = async (ctx) => {
         isPurchasable: book.isPurchasable,
         price: book.price,
         sheetId: book.sheetId,
+        sheet: book.sheet.name,
       }
     })
   )
