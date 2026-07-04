@@ -38,7 +38,6 @@ export default async function handler(
 
     const books = await prisma.books.findMany({
       where: { userId, sheetId: sheet.id },
-      include: { _count: { select: { quotes: true } } },
       orderBy: { finished: 'asc' },
     })
 
@@ -56,7 +55,6 @@ export default async function handler(
           impression: book.impression,
           finished: book.finished?.toISOString() ?? null,
           memoLength: book.memo?.length ?? 0,
-          quoteCount: book._count.quotes,
         })),
       },
     })

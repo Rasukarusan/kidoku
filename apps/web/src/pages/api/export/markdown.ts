@@ -18,7 +18,7 @@ function formatDate(date: Date | null): string {
   return `${year}-${month}-${day}`
 }
 
-// 全蔵書を1冊=1ファイルのMarkdown(frontmatter付き)でzipエクスポート。
+// 全蔵書を1冊=1ファイルのMarkdown(frontmatter+メモ付き)でzipエクスポート。
 // Obsidian/Notionなどの知的生産ツールへの取り込みを想定している。
 export default async function handler(
   req: NextApiRequest,
@@ -39,7 +39,6 @@ export default async function handler(
       include: {
         books: {
           orderBy: { finished: 'desc' },
-          include: { quotes: { orderBy: [{ page: 'asc' }] } },
         },
       },
       orderBy: { order: 'asc' },
@@ -72,19 +71,7 @@ export default async function handler(
           .filter(Boolean)
           .join('\n')
 
-        const quoteSection =
-          book.quotes.length > 0
-            ? '\n\n## 引用\n\n' +
-              book.quotes
-                .map((quote) => {
-                  const page = quote.page ? ` (P.${quote.page})` : ''
-                  const comment = quote.comment ? `\n  - ${quote.comment}` : ''
-                  return `> ${quote.text.replace(/\n/g, '\n> ')}${page}${comment}`
-                })
-                .join('\n\n')
-            : ''
-
-        const content = `${frontmatter}\n\n# ${book.title}\n\n${book.memo}${quoteSection}\n`
+        const content = `${frontmatter}\n\n# ${book.title}\n\n${book.memo}\n`
         folder.file(`${base}.md`, content)
       })
     })

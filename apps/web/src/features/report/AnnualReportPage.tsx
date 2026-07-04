@@ -13,7 +13,6 @@ interface ReportBook {
   impression: string
   finished: string | null
   memoLength: number
-  quoteCount: number
 }
 
 interface ReportResponse {
@@ -64,7 +63,6 @@ export const AnnualReportPage: React.FC = () => {
       categories[c] = (categories[c] || 0) + 1
     })
     const totalMemoLength = books.reduce((sum, b) => sum + b.memoLength, 0)
-    const totalQuotes = books.reduce((sum, b) => sum + b.quoteCount, 0)
     const longestMemoBook = [...books].sort(
       (a, b) => b.memoLength - a.memoLength
     )[0]
@@ -73,7 +71,6 @@ export const AnnualReportPage: React.FC = () => {
       monthly,
       categories: Object.entries(categories).sort((a, b) => b[1] - a[1]),
       totalMemoLength,
-      totalQuotes,
       longestMemoBook,
       busiestMonth,
     }
@@ -126,7 +123,7 @@ export const AnnualReportPage: React.FC = () => {
               value={stats.totalMemoLength.toLocaleString()}
               label="書いたメモの文字数"
             />
-            <Stat value={stats.totalQuotes} label="残した引用" />
+            <Stat value={stats.categories.length} label="読んだカテゴリ" />
             <Stat
               value={stats.busiestMonth ? stats.busiestMonth[0] : '—'}
               label={`いちばん読んだ月${stats.busiestMonth ? `（${stats.busiestMonth[1]}冊）` : ''}`}

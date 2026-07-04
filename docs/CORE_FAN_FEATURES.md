@@ -4,19 +4,18 @@
 
 ## 実装状況（2026-07）
 
-不採用: A-1 読書ステータス / A-4 再読の記録 / A-5 評価軸 / テーマB（蔵書管理）全体 / テーマE。
+不採用: A-1 読書ステータス / A-2 引用・抜き書き（記録操作の手間が大きいため） / A-4 再読の記録 / A-5 評価軸 / テーマB（蔵書管理）全体 / テーマE。
 
 | 機能 | 実装 |
 |---|---|
 | トップページ「最近登録した本」(本人専用セクション) | `/api/me/recent-books` + `IndexPage` |
 | 「あの日の一冊(◯年前の今日)」 | トップページアクセス時にモーダルでふわっと表示。1日1回のみ（localStorageで制御） |
-| A-2 引用・抜き書き | 本詳細モーダル + `/quotes`(引用ノート) |
 | A-3 カスタムメモテンプレート | `/settings/memo-templates` + 本登録フォームに適用 |
 | C-1 生涯統計 | `/total` に著者ランキング・カテゴリの変遷を追加 |
 | C-2 AI分析の時系列比較 | `/ai-history` |
 | C-4 年間レポート(私的版) | `/report`（印刷/PDF対応） |
 | D-1 CSVインポート | `/api/import/csv` + 設定画面（ヘッダーゆらぎ吸収） |
-| D-2 Markdown一括エクスポート | `/api/export/markdown`（frontmatter+引用付きzip） |
+| D-2 Markdown一括エクスポート | `/api/export/markdown`（frontmatter+メモ付きzip） |
 | D-3 個人用API | `/settings/api-tokens` + `/api/v1/books`（読み取り専用） |
 
 ## 1. コアファンは誰か
