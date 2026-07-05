@@ -59,12 +59,12 @@ export const MIGRATIONS: Migration[] = [
       },
     ],
   },
-  // 将来的なマイグレーション例：
-  // {
-  //   from: 2,
-  //   to: 3,
-  //   transformations: [
-  //     { type: 'add', key: 'reading_motivation', defaultValue: '' },
-  //   ]
-  // }
+  {
+    from: 2,
+    to: 3,
+    transformations: [
+      // 読書性格タイプ（MBTI風診断）。過去データは未診断のため空文字
+      { type: 'add', key: 'personality_type', defaultValue: '' },
+    ],
+  },
 ]
