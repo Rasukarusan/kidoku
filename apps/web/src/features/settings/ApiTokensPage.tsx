@@ -178,8 +178,11 @@ export const ApiTokensPage: React.FC = () => {
           発行したトークンをAuthorizationヘッダーに指定して読書記録を取得できます。
         </p>
         <pre className="overflow-x-auto rounded bg-slate-900 p-4 font-mono text-xs text-slate-100">
-          {`curl -H "Authorization: Bearer <トークン>" \\\n  ${typeof window !== 'undefined' ? window.location.origin : 'https://kidoku.net'}/api/v1/books`}
+          {`curl -H "Authorization: Bearer <トークン>" \\\n  "${typeof window !== 'undefined' ? window.location.origin : 'https://kidoku.net'}/api/v1/books?page=1&perPage=100"`}
         </pre>
+        <p className="mt-2 text-xs text-gray-500">
+          読了日の新しい順に返されます。page（ページ番号、1始まり）とperPage（1ページあたりの件数、デフォルト100・最大200）でページネーションできます。
+        </p>
       </section>
     </Container>
   )
