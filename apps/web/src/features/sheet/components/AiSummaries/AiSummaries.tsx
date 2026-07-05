@@ -9,7 +9,6 @@ import { StepIndicator } from './StepIndicator'
 import { AI_SUMMARY_FIELDS, AiSummaryFieldKey } from './fields'
 import { CourseId } from '@/types/user'
 import { Book } from '@/types/book'
-import Link from 'next/link'
 import { FaCircleNotch, FaTrash } from 'react-icons/fa'
 import { FiShare2 } from 'react-icons/fi'
 import { shareToSns } from '@/utils/socialShare'
@@ -166,14 +165,6 @@ export const AiSummaries: React.FC<Props> = ({
           <div className="flex items-baseline justify-between gap-4 text-xs text-gray-400">
             <span className="shrink text-left">
               ※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。
-              {isMine && (
-                <Link
-                  href="/ai-history"
-                  className="ml-2 text-blue-500 hover:underline"
-                >
-                  過去の分析とくらべる →
-                </Link>
-              )}
             </span>
             {aiSummaries.length > 1 && (
               <StepIndicator
