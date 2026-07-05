@@ -12,7 +12,6 @@
 | 「あの日の一冊(◯年前の今日)」 | トップページアクセス時にモーダルでふわっと表示。1日1回のみ（localStorageで制御） |
 | A-3 カスタムメモテンプレート | `/settings/memo-templates` + 本登録フォームに適用 |
 | C-1 生涯統計 | `/total` に著者ランキング・カテゴリの変遷を追加 |
-| C-2 AI分析の時系列比較 | `/ai-history` |
 | C-4 年間レポート(私的版) | `/report`（印刷/PDF対応） |
 | D-1 CSVインポート | `/api/import/csv` + 設定画面（ヘッダーゆらぎ吸収） |
 | D-2 Markdown一括エクスポート | `/api/export/markdown`（frontmatter+メモ付きzip） |
