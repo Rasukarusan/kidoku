@@ -57,7 +57,34 @@ describe('SaveAiSummaryUseCase', () => {
     expect(mockAiSummaryRepo.create).toHaveBeenCalledWith(
       'user-1',
       1,
-      { _schemaVersion: 2, ...validAnalysis },
+      { _schemaVersion: 3, personality_type: '', ...validAnalysis },
+      0,
+    );
+  });
+
+  it('読書性格タイプ付きの分析データを保存できる', async () => {
+    const sheet = Sheet.fromDatabase(
+      '1',
+      'user-1',
+      '2025',
+      1,
+      new Date(),
+      new Date(),
+    );
+    mockSheetRepo.findByUserIdAndName.mockResolvedValue(sheet);
+    mockAiSummaryRepo.create.mockResolvedValue(undefined);
+
+    const analysisWithType = {
+      ...validAnalysis,
+      personality_type: 'adventurer',
+    };
+
+    await useCase.execute('user-1', '2025', analysisWithType);
+
+    expect(mockAiSummaryRepo.create).toHaveBeenCalledWith(
+      'user-1',
+      1,
+      { _schemaVersion: 3, ...analysisWithType },
       0,
     );
   });
