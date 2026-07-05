@@ -152,6 +152,15 @@ type TemplateBookResponse {
   updated: DateTime!
 }
 
+type MemoTemplateResponse {
+  id: ID!
+  name: String!
+  content: String!
+  isDefault: Boolean!
+  created: DateTime!
+  updated: DateTime!
+}
+
 type FollowInfoResponse {
   followers: Int!
   following: Int!
@@ -241,6 +250,7 @@ type Query {
   mySuiAddress: String
   aiSummaryUsage: Int!
   templateBooks: [TemplateBookResponse!]!
+  memoTemplates: [MemoTemplateResponse!]!
   followInfo(input: GetFollowInfoInput!): FollowInfoResponse!
   followCounts(input: GetFollowInfoInput!): FollowInfoResponse!
   feed(input: GetFeedInput!): FeedResponse!
@@ -342,6 +352,9 @@ type Mutation {
   deleteAiSummary(input: DeleteAiSummaryInput!): DeleteAiSummaryResponse!
   createTemplateBook(input: CreateTemplateBookInput!): TemplateBookResponse!
   deleteTemplateBook(input: DeleteTemplateBookInput!): Boolean!
+  createMemoTemplate(input: CreateMemoTemplateInput!): MemoTemplateResponse!
+  updateMemoTemplate(input: UpdateMemoTemplateInput!): MemoTemplateResponse!
+  deleteMemoTemplate(input: DeleteMemoTemplateInput!): Boolean!
   followUser(input: FollowUserInput!): Boolean!
   unfollowUser(input: FollowUserInput!): Boolean!
   likeBook(input: LikeBookInput!): Int!
@@ -456,6 +469,23 @@ input CreateTemplateBookInput {
 }
 
 input DeleteTemplateBookInput {
+  id: Int!
+}
+
+input CreateMemoTemplateInput {
+  name: String!
+  content: String!
+  isDefault: Boolean!
+}
+
+input UpdateMemoTemplateInput {
+  id: Int!
+  name: String!
+  content: String!
+  isDefault: Boolean!
+}
+
+input DeleteMemoTemplateInput {
   id: Int!
 }
 
