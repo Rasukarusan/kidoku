@@ -119,9 +119,6 @@ export const OnThisDay: React.FC = () => {
                 </Link>
               ))}
             </div>
-            <p className="mt-4 text-center text-[11px] text-gray-400">
-              あなただけに表示されています
-            </p>
           </motion.div>
         </>
       )}

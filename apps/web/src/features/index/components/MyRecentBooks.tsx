@@ -36,7 +36,6 @@ export const MyRecentBooks: React.FC = () => {
       <Container className="px-4 py-8">
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="text-lg font-bold text-gray-800">最近登録した本</h2>
-          <span className="text-xs text-gray-400">あなただけに表示</span>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {data.books.map((book) => (
