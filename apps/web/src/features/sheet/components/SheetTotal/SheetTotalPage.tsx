@@ -91,7 +91,7 @@ export const SheetTotalPage: React.FC<Props> = ({
           <YearsGraph years={years} />
         </div>
 
-        <LifetimeStats books={books} years={years} />
+        <LifetimeStats books={books} />
 
         <TitleWithLine text="年間ベスト書籍" />
         {yearlyTopBooks.length > 0 ? (

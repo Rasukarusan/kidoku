@@ -1,17 +1,6 @@
 import { useMemo } from 'react'
-import {
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Bar,
-  Legend,
-} from 'recharts'
 import { TitleWithLine } from '@/components/label/TitleWithLine'
 import { Book } from '@/types/book'
-import { Year } from '../../types'
 
 // YearsGraph と同じパレットを使用
 const colors = [
@@ -29,16 +18,12 @@ const colors = [
   '#2B2F6C',
 ]
 
-const OTHER_LABEL = 'その他'
-const TOP_CATEGORY_COUNT = 5
-
 interface Props {
   books: Book[]
-  years: Year[]
 }
 
-// 生涯統計: 著者ランキングとカテゴリの変遷
-export const LifetimeStats: React.FC<Props> = ({ books, years }) => {
+// 生涯統計: 著者ランキング
+export const LifetimeStats: React.FC<Props> = ({ books }) => {
   // 著者ランキング（上位10）
   const authorRanking = useMemo(() => {
     const counts: Record<string, number> = {}
@@ -64,37 +49,6 @@ export const LifetimeStats: React.FC<Props> = ({ books, years }) => {
       books.map((b) => b.category?.trim()).filter((c) => c && c !== '-')
     ).size
   }, [books])
-
-  // カテゴリの変遷（シート＝年ごとの上位カテゴリ構成）
-  const { evolutionData, evolutionKeys } = useMemo(() => {
-    const totalByCategory: Record<string, number> = {}
-    books.forEach((book) => {
-      const category = book.category?.trim() || '-'
-      totalByCategory[category] = (totalByCategory[category] || 0) + 1
-    })
-    const topCategories = Object.entries(totalByCategory)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, TOP_CATEGORY_COUNT)
-      .map(([name]) => name)
-
-    const rows = years.map(({ year }) => {
-      const row: Record<string, number | string> = { year }
-      topCategories.forEach((c) => (row[c] = 0))
-      row[OTHER_LABEL] = 0
-      books
-        .filter((book) => book.sheet === year)
-        .forEach((book) => {
-          const category = book.category?.trim() || '-'
-          const key = topCategories.includes(category) ? category : OTHER_LABEL
-          row[key] = (row[key] as number) + 1
-        })
-      return row
-    })
-    return {
-      evolutionData: rows,
-      evolutionKeys: [...topCategories, OTHER_LABEL],
-    }
-  }, [books, years])
 
   if (books.length === 0) return null
 
@@ -144,38 +98,6 @@ export const LifetimeStats: React.FC<Props> = ({ books, years }) => {
             </div>
           ))}
         </div>
-      )}
-
-      {years.length > 1 && (
-        <>
-          <TitleWithLine text="カテゴリの変遷" />
-          <div className="m-auto mb-4 h-[300px] w-full sm:w-3/4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={evolutionData}
-                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-              >
-                <XAxis dataKey="year" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <CartesianGrid stroke="#f5f5f5" />
-                <Tooltip formatter={(value) => [`${value}冊`]} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                {evolutionKeys.map((key, i) => (
-                  <Bar
-                    key={key}
-                    dataKey={key}
-                    stackId="category"
-                    fill={
-                      key === OTHER_LABEL
-                        ? '#cbd5e1'
-                        : colors[i % colors.length]
-                    }
-                  />
-                ))}
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </>
       )}
     </>
   )
