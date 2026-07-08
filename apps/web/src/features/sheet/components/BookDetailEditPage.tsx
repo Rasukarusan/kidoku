@@ -13,12 +13,14 @@ interface Props {
   book: Book
   onClose: () => void
   onCancel: () => void
+  onSaved: (book: Book) => void
 }
 
 export const BookDetailEditPage: React.FC<Props> = ({
   book: initialBook,
   onClose,
   onCancel,
+  onSaved,
 }) => {
   const [book, setBook] = useState<Book>(initialBook)
   const [loading, setLoading] = useState(false)
@@ -99,13 +101,21 @@ export const BookDetailEditPage: React.FC<Props> = ({
       })
 
       if (response.ok) {
+        // サーバー側で画像がVercel Blobにアップロードされた場合、最終的なURLが返る
+        const result = await response.json().catch(() => null)
+        const savedBook: Book =
+          result?.image != null ? { ...book, image: result.image } : book
+
         // 保存成功時にローカルストレージの下書きを削除
         if (book.id) {
           removeBookDraft(String(book.id))
         }
         reward() // 保存成功時にアニメーション
         setTimeout(() => {
-          onCancel() // 編集モードを終了して読み取りモードに戻る
+          // 編集内容を親に反映して読み取りモードに戻る。
+          // ISRの再生成を待たずに保存済みデータを即座に表示するため、
+          // 再取得ではなく手元の編集結果をそのまま渡す。
+          onSaved(savedBook)
         }, 500) // アニメーションが見えるように少し遅延
       }
     } catch (error) {
