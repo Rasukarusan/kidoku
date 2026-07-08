@@ -7,6 +7,8 @@ import useAiHelpers from './useAiHelpers'
 import { Confirm } from './Confirm'
 import { StepIndicator } from './StepIndicator'
 import { AI_SUMMARY_FIELDS, AiSummaryFieldKey } from './fields'
+import { PersonalityCard } from './personality/PersonalityCard'
+import { findPersonalityType } from '@/libs/ai/personality/personality-types'
 import { CourseId } from '@/types/user'
 import { Book } from '@/types/book'
 import { FaCircleNotch, FaTrash } from 'react-icons/fa'
@@ -43,6 +45,9 @@ export const AiSummaries: React.FC<Props> = ({
     summaryIndex,
     setSummaryIndex,
   } = useAiHelpers(sheet, aiSummaries)
+
+  // MBTI風の読書性格タイプ（未診断の過去データ・不明IDはundefined）
+  const personalityType = findPersonalityType(json?.personality_type)
 
   if (error) {
     return <Error text={error} />
@@ -108,31 +113,49 @@ export const AiSummaries: React.FC<Props> = ({
               <span>削除</span>
             </button>
           )}
-          {json.character_summary && (
-            <div className="mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5 shadow-sm">
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                一言でいうとこんな人
-              </h3>
-              <p className="text-xl font-bold leading-relaxed text-gray-800">
-                {json.character_summary}
-              </p>
-              {isMine && (
-                <div className="mt-4 flex justify-center">
-                  <button
-                    onClick={() =>
-                      shareToSns(
-                        `私の読書性格は「${json.character_summary}」でした📚✨\n#kidoku のAI読書分析`,
-                        shareUrl
-                      )
-                    }
-                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
-                  >
-                    <FiShare2 size={16} />
-                    診断結果をシェア
-                  </button>
-                </div>
-              )}
-            </div>
+          {personalityType ? (
+            <PersonalityCard
+              type={personalityType}
+              characterSummary={json.character_summary}
+              showShare={isMine}
+              onShare={() =>
+                shareToSns(
+                  `私の読書性格タイプは「${personalityType.name}」でした📚✨\n${
+                    json.character_summary
+                      ? `一言でいうと「${json.character_summary}」\n`
+                      : ''
+                  }#kidoku のAI読書分析`,
+                  shareUrl
+                )
+              }
+            />
+          ) : (
+            json.character_summary && (
+              <div className="mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5 shadow-sm">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  一言でいうとこんな人
+                </h3>
+                <p className="text-xl font-bold leading-relaxed text-gray-800">
+                  {json.character_summary}
+                </p>
+                {isMine && (
+                  <div className="mt-4 flex justify-center">
+                    <button
+                      onClick={() =>
+                        shareToSns(
+                          `私の読書性格は「${json.character_summary}」でした📚✨\n#kidoku のAI読書分析`,
+                          shareUrl
+                        )
+                      }
+                      className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 text-sm font-bold text-white shadow-sm transition-transform hover:scale-105 hover:brightness-105"
+                    >
+                      <FiShare2 size={16} />
+                      診断結果をシェア
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
           )}
           <div className="mb-1 grid grid-cols-1 gap-4 md:grid-cols-2">
             {Object.keys(json)
@@ -140,6 +163,7 @@ export const AiSummaries: React.FC<Props> = ({
                 (key) =>
                   key !== 'id' &&
                   key !== 'character_summary' &&
+                  key !== 'personality_type' &&
                   !key.startsWith('_')
               )
               .sort((a, b) => {

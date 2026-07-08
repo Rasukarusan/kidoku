@@ -187,7 +187,9 @@ export const SheetPage: React.FC<Props> = ({
         username
       )}&summary=${encodeURIComponent(
         latestAiSummary.character_summary
-      )}&sub=${encodeURIComponent(latestAiSummary.overall_feedback ?? '')}`
+      )}&sub=${encodeURIComponent(
+        latestAiSummary.overall_feedback ?? ''
+      )}&ptype=${encodeURIComponent(latestAiSummary.personality_type ?? '')}`
     : ''
   // AI診断があればそれを、なければ年間まとめ（Wrapped）をOGに使う
   const ogImage = latestAiSummary ? aiOgImage : wrappedOgImage

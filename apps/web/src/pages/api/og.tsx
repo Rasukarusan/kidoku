@@ -1,4 +1,6 @@
 import { ImageResponse } from '@vercel/og'
+import { findPersonalityType } from '@/libs/ai/personality/personality-types'
+import { personalityCharacterSvg } from '@/libs/ai/personality/personality-character'
 
 export const config = {
   runtime: 'edge',
@@ -52,6 +54,76 @@ const renderAi = (params: URLSearchParams) => {
   const user = trim(params.get('user') ?? 'kidoku user', 24)
   const summary = trim(params.get('summary') ?? 'あなたの読書性格', 60)
   const sub = trim(params.get('sub') ?? '', 90)
+  // MBTI風の読書性格タイプ（キャラクター画像付きレイアウト）
+  const personalityType = findPersonalityType(params.get('ptype'))
+
+  if (personalityType) {
+    // SVGはASCIIのみで構成されているためbtoaでbase64化できる
+    const characterSrc = `data:image/svg+xml;base64,${btoa(
+      personalityCharacterSvg(personalityType)
+    )}`
+    return new ImageResponse(
+      <div
+        style={{
+          ...baseStyle,
+          background: `linear-gradient(135deg, ${personalityType.colorLight} 0%, rgba(255,255,255,1) 55%, ${personalityType.colorLight} 100%)`,
+        }}
+      >
+        {header('AI読書性格診断', personalityType.color)}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
+          <div
+            style={{
+              ...cardStyle,
+              flex: 1,
+              gap: '16px',
+            }}
+          >
+            <div style={{ fontSize: 26, color: '#475569' }}>
+              {`${user} さんの読書性格タイプは…`}
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                alignSelf: 'flex-start',
+                borderRadius: '9999px',
+                backgroundColor: personalityType.color,
+                color: '#ffffff',
+                fontSize: 24,
+                fontWeight: 700,
+                letterSpacing: '0.2em',
+                padding: '6px 20px',
+              }}
+            >
+              {personalityType.code}
+            </div>
+            <div
+              style={{
+                fontSize: 64,
+                fontWeight: 800,
+                lineHeight: 1.15,
+                color: personalityType.color,
+              }}
+            >
+              {personalityType.name}
+            </div>
+            {summary ? (
+              <div style={{ fontSize: 30, color: '#334155', lineHeight: 1.4 }}>
+                {`「${summary}」`}
+              </div>
+            ) : null}
+            {sub ? (
+              <div style={{ fontSize: 24, color: '#64748b', lineHeight: 1.4 }}>
+                {sub}
+              </div>
+            ) : null}
+          </div>
+          <img src={characterSrc} width={300} height={300} />
+        </div>
+        {footer('#475569')}
+      </div>,
+      { width, height }
+    )
+  }
 
   return new ImageResponse(
     <div
