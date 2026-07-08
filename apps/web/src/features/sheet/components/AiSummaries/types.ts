@@ -8,6 +8,8 @@ export type AiSummariesJson = {
   _schemaVersion?: number
   /** 元のスキーマバージョン（レガシー表示用） */
   _originalSchemaVersion?: number
+  /** 読書性格タイプのID（personality-types.tsで定義、未診断の過去データは空文字） */
+  personality_type: string
   /** 一言でいうとこんな人 */
   character_summary: string
   /** 読書傾向分析 */

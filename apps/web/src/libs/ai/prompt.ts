@@ -1,12 +1,16 @@
+import { personalityTypePromptList } from './personality/personality-types'
+
 export const aiSummaryPrompt = `以下のJSONを読み取り、ルールに基づきフィードバックを提供してください。
 [ルール]
-・フィードバックは「一言でいうとこんな人」「読書傾向分析」「感情分析」「無意識に追いかけているもの」「総評」の5項目
+・フィードバックは「読書性格タイプ」「一言でいうとこんな人」「読書傾向分析」「感情分析」「無意識に追いかけているもの」「総評」の6項目
 ・各分析の本文は「ユーザーは」や「あなたは」などは出力せず、本題から入ること
 ・感想の引用はせず、あなたの言葉で書いてください
 ・できるだけ抽象的な表現は避け、極論を言う事
 ・character_summaryは最大50文字、それ以外のvalueはそれぞれ最大400文字までとする
-・出力はjsonでキー名はそれぞれcharacter_summary, reading_trend_analysis, sentiment_analysis, hidden_theme_discovery, overall_feedbackで、valueは日本語で出力
-・分析に必要なデータが十分ではない場合、各valueは「分析に必要なデータが足りません」とする
+・出力はjsonでキー名はこの順にpersonality_type, character_summary, reading_trend_analysis, sentiment_analysis, hidden_theme_discovery, overall_feedbackで、valueは日本語で出力
+・分析に必要なデータが十分ではない場合、personality_type以外の各valueは「分析に必要なデータが足りません」とする
+・読書性格タイプ：読書傾向を総合的に分析し、以下の12タイプから最も当てはまるものを1つ選ぶ。personality_typeのvalueは必ず以下のID（英小文字）のみを出力すること。データが足りない場合は空文字にする
+${personalityTypePromptList}
 ・一言でいうとこんな人：4つの指標を総合的に分析し、このユーザーの人物像を一言で表現する。キャッチーで印象的な見出しにすること
 ・読書傾向分析：ユーザーが好むジャンル、著者、テーマを分析し、その傾向を可視化する
 ・感情分析：ユーザーが読んだ本の感想を分析して、どんな本が最もポジティブな反応を引き出したか、または特定の感情を呼び起こしたかを示す

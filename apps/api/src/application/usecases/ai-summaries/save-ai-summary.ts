@@ -38,7 +38,9 @@ export class SaveAiSummaryUseCase {
       userId,
       parseInt(sheet.id, 10),
       {
-        _schemaVersion: 2,
+        _schemaVersion: 3,
+        // 読書性格タイプは旧フォーマットのペーストでも保存できるよう任意とする
+        personality_type: '',
         ...analysis,
       },
       0,

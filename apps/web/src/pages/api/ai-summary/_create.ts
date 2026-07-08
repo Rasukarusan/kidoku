@@ -1,6 +1,7 @@
 import prisma from '@/libs/prisma/edge'
 import dayjs from 'dayjs'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
+import { PERSONALITY_TYPE_IDS } from '@/libs/ai/personality/personality-types'
 import openai from '@/libs/ai/openai'
 import { RequestCookies } from '@edge-runtime/cookies'
 
@@ -77,6 +78,7 @@ export const handleCreate = async (req: Request) => {
         console.log(text)
         const json = JSON.parse(text)
         const {
+          personality_type,
           character_summary,
           reading_trend_analysis,
           sentiment_analysis,
@@ -88,7 +90,11 @@ export const handleCreate = async (req: Request) => {
             userId,
             sheetId: sheet.id,
             analysis: {
-              _schemaVersion: 2,
+              _schemaVersion: 3,
+              // 定義外のタイプIDが返ってきた場合は未診断扱いにする
+              personality_type: PERSONALITY_TYPE_IDS.includes(personality_type)
+                ? personality_type
+                : '',
               character_summary,
               reading_trend_analysis,
               sentiment_analysis,

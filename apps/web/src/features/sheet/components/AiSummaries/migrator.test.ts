@@ -1,8 +1,8 @@
 import { migrateAnalysis } from './migrator'
 
 describe('migrateAnalysis()', () => {
-  describe('バージョン1からバージョン2へのマイグレーション', () => {
-    it('what_if_scenarioがhidden_theme_discoveryにリネームされること', () => {
+  describe('バージョン1から最新バージョンへのマイグレーション', () => {
+    it('what_if_scenarioがhidden_theme_discoveryにリネームされ、personality_typeが追加されること', () => {
       const v1Data = {
         character_summary: 'テスト人物像',
         reading_trend_analysis: 'テスト傾向',
@@ -14,8 +14,9 @@ describe('migrateAnalysis()', () => {
       const result = migrateAnalysis(v1Data)
 
       expect(result).toEqual({
-        _schemaVersion: 2,
+        _schemaVersion: 3,
         _originalSchemaVersion: 1,
+        personality_type: '',
         character_summary: 'テスト人物像',
         reading_trend_analysis: 'テスト傾向',
         sentiment_analysis: 'テスト感情',
@@ -51,15 +52,16 @@ describe('migrateAnalysis()', () => {
 
       const result = migrateAnalysis(v1Data)
 
-      expect(result._schemaVersion).toBe(2)
+      expect(result._schemaVersion).toBe(3)
       expect(result._originalSchemaVersion).toBe(1)
       expect(result.hidden_theme_discovery).toBe('テストシナリオ')
+      expect(result.personality_type).toBe('')
       expect(result).not.toHaveProperty('what_if_scenario')
     })
   })
 
-  describe('すでに最新バージョンの場合', () => {
-    it('_schemaVersionが2の場合は変換されずそのまま返ること', () => {
+  describe('バージョン2からバージョン3へのマイグレーション', () => {
+    it('personality_typeが空文字で追加されること', () => {
       const v2Data = {
         _schemaVersion: 2,
         character_summary: 'テスト人物像',
@@ -71,12 +73,18 @@ describe('migrateAnalysis()', () => {
 
       const result = migrateAnalysis(v2Data)
 
-      expect(result).toEqual(v2Data)
-      expect(result._originalSchemaVersion).toBeUndefined()
+      expect(result._schemaVersion).toBe(3)
+      expect(result._originalSchemaVersion).toBe(2)
+      expect(result.personality_type).toBe('')
+      expect(result.hidden_theme_discovery).toBe('テストテーマ')
     })
+  })
 
-    it('すでにhidden_theme_discoveryを持つデータはそのまま返ること', () => {
-      const v2Data = {
+  describe('すでに最新バージョンの場合', () => {
+    it('_schemaVersionが3の場合は変換されずそのまま返ること', () => {
+      const v3Data = {
+        _schemaVersion: 3,
+        personality_type: 'adventurer',
         character_summary: 'テスト人物像',
         reading_trend_analysis: 'テスト傾向',
         sentiment_analysis: 'テスト感情',
@@ -84,9 +92,27 @@ describe('migrateAnalysis()', () => {
         overall_feedback: 'テスト総評',
       }
 
-      const result = migrateAnalysis(v2Data)
+      const result = migrateAnalysis(v3Data)
 
-      expect(result.hidden_theme_discovery).toBe('テストテーマ')
+      expect(result).toEqual(v3Data)
+      expect(result._originalSchemaVersion).toBeUndefined()
+    })
+
+    it('すでにpersonality_typeを持つデータは上書きされないこと', () => {
+      const v2DataWithType = {
+        _schemaVersion: 2,
+        personality_type: 'detective',
+        character_summary: 'テスト人物像',
+        reading_trend_analysis: 'テスト傾向',
+        sentiment_analysis: 'テスト感情',
+        hidden_theme_discovery: 'テストテーマ',
+        overall_feedback: 'テスト総評',
+      }
+
+      const result = migrateAnalysis(v2DataWithType)
+
+      expect(result._schemaVersion).toBe(3)
+      expect(result.personality_type).toBe('detective')
     })
   })
 
@@ -105,6 +131,7 @@ describe('migrateAnalysis()', () => {
       const result = migrateAnalysis(partialData)
 
       expect(result.hidden_theme_discovery).toBe('テストシナリオのみ')
+      expect(result.personality_type).toBe('')
       expect(result).not.toHaveProperty('what_if_scenario')
     })
   })
