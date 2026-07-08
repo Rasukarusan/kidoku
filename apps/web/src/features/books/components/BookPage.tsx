@@ -73,6 +73,14 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
     router.back()
   }
 
+  // 保存成功時: 編集結果を即座に表示へ反映して読み取りモードに戻す。
+  // ISRのpropsは非同期に再生成されるため、それを待つと保存直後に古い内容が
+  // 表示されてしまう。保存済みデータでローカル状態を更新して即時反映する。
+  const handleSaved = (updatedBook: Book) => {
+    setBook(updatedBook)
+    setEditMode(false)
+  }
+
   const handleEditToggle = async () => {
     // 編集モードに入る際は、マスクされていない最新のメモを取得してから切り替える。
     // ISR直後の再取得が完了する前に編集ボタンを押すと、マスク済みメモ(*****)が
@@ -158,6 +166,7 @@ export default function BookPage({ book: initialBook }: BookPageProps) {
             book={book}
             onClose={handleClose}
             onCancel={handleEditToggle}
+            onSaved={handleSaved}
           />
         ) : (
           <BookDetailReadModal
