@@ -44,7 +44,8 @@ export const AiSummaries: React.FC<Props> = ({
     setOpen,
     summaryIndex,
     setSummaryIndex,
-  } = useAiHelpers(sheet, aiSummaries)
+    summaries,
+  } = useAiHelpers(sheet, aiSummaries, isMine)
 
   // MBTI風の読書性格タイプ（未診断の過去データ・不明IDはundefined）
   const personalityType = findPersonalityType(json?.personality_type)
@@ -190,17 +191,17 @@ export const AiSummaries: React.FC<Props> = ({
             <span className="shrink text-left">
               ※読書履歴(カテゴリ、公開中のメモ)に基づきAIが生成しています。
             </span>
-            {aiSummaries.length > 1 && (
+            {summaries.length > 1 && (
               <StepIndicator
                 step={summaryIndex}
-                maxStep={aiSummaries.length}
+                maxStep={summaries.length}
                 onBack={() => {
                   if (summaryIndex === 0) return
                   setSummaryIndex(summaryIndex - 1)
                 }}
                 onNext={() => {
                   const newSummaryIndex = summaryIndex + 1
-                  if (newSummaryIndex === aiSummaries.length) return
+                  if (newSummaryIndex === summaries.length) return
                   setSummaryIndex(newSummaryIndex)
                 }}
               />

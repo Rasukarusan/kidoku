@@ -3,12 +3,18 @@ import { toggleNoScrollBody } from '@/utils/element'
 import { useSession } from 'next-auth/react'
 import { useMutation } from '@apollo/client'
 import { deleteAiSummaryMutation } from '../../api'
+import type { AiSummariesJson } from './types'
 
-const useAiHelpers = (sheet, aiSummaries) => {
+const useAiHelpers = (
+  sheet: string,
+  aiSummaries: AiSummariesJson[],
+  isMine: boolean
+) => {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [json, setJson] = useState(null)
+  const [summaries, setSummaries] = useState(aiSummaries)
   const [error, setError] = useState(null)
   const [summaryIndex, setSummaryIndex] = useState(0)
   const { data: session } = useSession()
@@ -19,8 +25,38 @@ const useAiHelpers = (sheet, aiSummaries) => {
   }, [sheet])
 
   useEffect(() => {
-    setJson(aiSummaries[summaryIndex])
-  }, [sheet, summaryIndex])
+    setSummaries(aiSummaries)
+  }, [aiSummaries])
+
+  useEffect(() => {
+    setJson(summaries[summaryIndex] ?? null)
+  }, [summaries, summaryIndex])
+
+  useEffect(() => {
+    if (!isMine) return
+
+    const controller = new AbortController()
+    const fetchSummaries = async () => {
+      try {
+        const response = await fetch(
+          `/api/ai-summary?sheetName=${encodeURIComponent(sheet)}`,
+          { signal: controller.signal }
+        )
+        if (!response.ok) return
+        const { summaries } = await response.json()
+        if (!controller.signal.aborted) {
+          setSummaries(summaries)
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          console.error('AI分析結果の取得に失敗しました', error)
+        }
+      }
+    }
+
+    fetchSummaries()
+    return () => controller.abort()
+  }, [isMine, sheet])
 
   const generateSummary = async (sheetName, months, categories) => {
     if (loading || !session) return
@@ -72,7 +108,8 @@ const useAiHelpers = (sheet, aiSummaries) => {
       })
       if (data?.deleteAiSummary) {
         // 削除したアイテムをリストから除外
-        const newSummaries = aiSummaries.filter((s) => s.id !== id)
+        const newSummaries = summaries.filter((s) => s.id !== id)
+        setSummaries(newSummaries)
         if (newSummaries.length === 0) {
           setJson(null)
         } else {
@@ -103,6 +140,7 @@ const useAiHelpers = (sheet, aiSummaries) => {
     setOpen,
     summaryIndex,
     setSummaryIndex,
+    summaries,
   }
 }
 
