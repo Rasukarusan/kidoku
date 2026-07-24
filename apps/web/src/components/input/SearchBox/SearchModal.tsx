@@ -15,6 +15,7 @@ import { RegisterForm } from './RegisterForm'
 import { SuccessView } from './SuccessView'
 import { SearchResult } from '@/types/search'
 import { getBookRegisterDraft } from '@/utils/localStorage'
+import { extractISBNFromAmazonUrl } from '@/utils/isbn'
 
 /**
  * 入力がISBN形式かどうかを判定する
@@ -126,6 +127,7 @@ export const SearchModal: React.FC = () => {
   }
 
   const isISBN = isISBNLike(inputValue)
+  const amazonISBN = extractISBNFromAmazonUrl(inputValue)
 
   return (
     <Modal
@@ -159,7 +161,7 @@ export const SearchModal: React.FC = () => {
                   type="search"
                   name="q"
                   className="h-12 w-full appearance-none rounded-md bg-white py-2 pl-16 pr-12 text-sm text-gray-900 focus:outline-none"
-                  placeholder="本のタイトルまたはISBNを入力..."
+                  placeholder="本のタイトル、ISBN、Amazon URLを入力..."
                   autoComplete="off"
                   onChange={onChange}
                   value={inputValue}
@@ -190,9 +192,9 @@ export const SearchModal: React.FC = () => {
                   onSelectBook={handleSelectBook}
                 />
               ) : inputValue ? (
-                isISBN ? (
+                isISBN || amazonISBN ? (
                   <ISBNSearchResult
-                    isbn={inputValue}
+                    isbn={amazonISBN || inputValue}
                     onClose={onClose}
                     onSelectBook={handleSelectBook}
                   />
