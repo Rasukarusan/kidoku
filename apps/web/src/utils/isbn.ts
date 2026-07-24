@@ -61,6 +61,32 @@ export const normalizeISBN = (isbn: string): string => {
 }
 
 /**
+ * Amazon.co.jpの商品URLから、ISBNとして利用できる商品IDを取得する
+ * 紙の書籍では /dp/ または /gp/product/ にISBN-10が含まれることが多い。
+ */
+export const extractISBNFromAmazonUrl = (input: string): string | null => {
+  let url: URL
+  try {
+    url = new URL(input.trim())
+  } catch {
+    return null
+  }
+
+  const hostname = url.hostname.toLowerCase()
+  if (hostname !== 'amazon.co.jp' && hostname !== 'www.amazon.co.jp') {
+    return null
+  }
+
+  const match = url.pathname.match(/\/(?:dp|gp\/product)\/([^/]+)/i)
+  if (!match) return null
+
+  const productId = match[1].toUpperCase()
+  return /^\d{9}[\dX]$/.test(productId) || /^\d{13}$/.test(productId)
+    ? productId
+    : null
+}
+
+/**
  * ISBN-10をISBN-13に変換
  */
 export const convertISBN10to13 = (isbn10: string): string => {
