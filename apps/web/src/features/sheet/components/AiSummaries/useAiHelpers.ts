@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { toggleNoScrollBody } from '@/utils/element'
 import { useSession } from 'next-auth/react'
-import { useMutation } from '@apollo/client'
-import { deleteAiSummaryMutation } from '../../api'
+import { useMutation, useQuery } from '@apollo/client'
+import { aiSummariesQuery, deleteAiSummaryMutation } from '../../api'
+import { migrateAnalysis } from './migrator'
 import type { AiSummariesJson } from './types'
 
 const useAiHelpers = (
@@ -32,31 +33,30 @@ const useAiHelpers = (
     setJson(summaries[summaryIndex] ?? null)
   }, [summaries, summaryIndex])
 
-  useEffect(() => {
-    if (!isMine) return
-
-    const controller = new AbortController()
-    const fetchSummaries = async () => {
-      try {
-        const response = await fetch(
-          `/api/ai-summary?sheetName=${encodeURIComponent(sheet)}`,
-          { signal: controller.signal }
-        )
-        if (!response.ok) return
-        const { summaries } = await response.json()
-        if (!controller.signal.aborted) {
-          setSummaries(summaries)
-        }
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error('AI分析結果の取得に失敗しました', error)
-        }
-      }
+  const { data: aiSummariesData, error: aiSummariesError } = useQuery(
+    aiSummariesQuery,
+    {
+      variables: { sheetName: sheet },
+      skip: !isMine,
+      fetchPolicy: 'cache-and-network',
     }
+  )
 
-    fetchSummaries()
-    return () => controller.abort()
-  }, [isMine, sheet])
+  useEffect(() => {
+    if (aiSummariesError) {
+      console.error('AI分析結果の取得に失敗しました', aiSummariesError)
+      return
+    }
+    if (!aiSummariesData?.aiSummaries) return
+    setSummaries(
+      aiSummariesData.aiSummaries.map(({ id, analysis }) => ({
+        id,
+        ...migrateAnalysis(
+          typeof analysis === 'string' ? JSON.parse(analysis) : analysis
+        ),
+      }))
+    )
+  }, [aiSummariesData, aiSummariesError])
 
   const generateSummary = async (sheetName, months, categories) => {
     if (loading || !session) return
@@ -64,11 +64,10 @@ const useAiHelpers = (
     setLoading(true)
     setJson(null)
     try {
-      const userId = session.user.id
-
       const response = await fetch(`/api/ai-summary`, {
         method: 'POST',
-        body: JSON.stringify({ sheetName, months, categories, userId }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheetName, months, categories }),
       })
       const reader = response.body?.getReader()
       if (!reader) return

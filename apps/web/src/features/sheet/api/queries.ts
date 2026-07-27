@@ -32,3 +32,12 @@ export const aiSummaryUsageQuery = gql`
     aiSummaryUsage
   }
 `
+
+export const aiSummariesQuery = gql`
+  query AiSummaries($sheetName: String!) {
+    aiSummaries(sheetName: $sheetName) {
+      id
+      analysis
+    }
+  }
+`
