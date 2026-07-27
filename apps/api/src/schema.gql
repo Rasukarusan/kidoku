@@ -135,6 +135,14 @@ type UserResponse {
   suiAddress: String
 }
 
+type AiSummaryResponse {
+  id: Int!
+  analysis: JSON!
+}
+
+"""JSON custom scalar type"""
+scalar JSON
+
 type DeleteAiSummaryResponse {
   deletedCount: Int!
 }
@@ -248,6 +256,7 @@ type Query {
   userImage(input: GetUserImageInput!): String!
   isNameAvailable(input: CheckNameAvailableInput!): Boolean!
   mySuiAddress: String
+  aiSummaries(sheetName: String!): [AiSummaryResponse!]!
   aiSummaryUsage: Int!
   templateBooks: [TemplateBookResponse!]!
   memoTemplates: [MemoTemplateResponse!]!
@@ -450,9 +459,6 @@ input SaveAiSummaryInput {
   sheetName: String!
   analysis: JSON!
 }
-
-"""JSON custom scalar type"""
-scalar JSON
 
 input DeleteAiSummaryInput {
   id: Int!

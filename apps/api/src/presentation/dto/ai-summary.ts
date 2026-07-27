@@ -12,6 +12,24 @@ const GraphQLJSON = new GraphQLScalarType({
   },
 });
 
+/**
+ * AI読書分析生成(REST: POST /ai-summary/generate)のリクエストボディ
+ */
+export class GenerateAiSummaryDto {
+  sheetName: string;
+  months: number[];
+  categories: string[];
+}
+
+@ObjectType()
+export class AiSummaryResponse {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => GraphQLJSON)
+  analysis: Record<string, unknown>;
+}
+
 @InputType()
 export class SaveAiSummaryInput {
   @Field()
