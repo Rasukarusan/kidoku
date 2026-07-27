@@ -120,6 +120,33 @@ export class GraphQLBackendClient {
 
     return result.data
   }
+
+  /**
+   * バックエンドのRESTエンドポイントへ認証付きPOSTリクエストを実行し、
+   * レスポンスをそのまま返す（ストリーミング用途）
+   */
+  async fetchRest(
+    userId: string,
+    path: string,
+    body: Record<string, unknown>,
+    isAdmin = false
+  ): Promise<Response> {
+    const timestamp = Date.now().toString()
+    const signature = this.generateSignature(userId, isAdmin, timestamp)
+    const baseUrl = this.endpoint.replace(/\/graphql$/, '')
+
+    return await fetch(`${baseUrl}${path}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Id': userId,
+        'X-User-Admin': String(isAdmin),
+        'X-Timestamp': timestamp,
+        'X-Signature': signature,
+      },
+      body: JSON.stringify(body),
+    })
+  }
 }
 
 /**
