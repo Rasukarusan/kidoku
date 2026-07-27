@@ -8,18 +8,26 @@ import {
 
 @Injectable()
 export class OpenAiChatGateway implements IAiChatGateway {
-  private readonly client: OpenAI;
+  // APIキー未設定でもアプリ全体の起動は通すため、クライアントは初回利用時に生成する
+  private client: OpenAI | null = null;
 
-  constructor(configService: ConfigService) {
-    this.client = new OpenAI({
-      apiKey: configService.get<string>('OPENAI_API_KEY'),
-    });
+  constructor(private readonly configService: ConfigService) {}
+
+  private getClient(): OpenAI {
+    if (!this.client) {
+      const apiKey = this.configService.get<string>('OPENAI_API_KEY');
+      if (!apiKey) {
+        throw new Error('OPENAI_API_KEY is not configured');
+      }
+      this.client = new OpenAI({ apiKey });
+    }
+    return this.client;
   }
 
   async *streamJsonCompletion(
     prompt: string,
   ): AsyncIterable<AiChatStreamChunk> {
-    const response = await this.client.chat.completions.create({
+    const response = await this.getClient().chat.completions.create({
       model: 'gpt-5.4-mini',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },
