@@ -1,4 +1,11 @@
+import { AiSummary } from '../models/ai-summary';
+
 export abstract class IAiSummaryRepository {
+  abstract findByUserIdAndSheetId(
+    userId: string,
+    sheetId: number,
+  ): Promise<AiSummary[]>;
+
   abstract countByUserIdAndMonth(
     userId: string,
     start: Date,
