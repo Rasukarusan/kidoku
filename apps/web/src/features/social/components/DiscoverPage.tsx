@@ -14,6 +14,7 @@ import {
   feedQuery,
 } from '../api'
 import { LikeButton } from './LikeButton'
+import { OnThisDaySection } from './OnThisDaySection'
 
 interface PopularBook {
   id: string
@@ -79,6 +80,8 @@ export const DiscoverPage: React.FC = () => {
       />
 
       <h1 className="mb-8 mt-6 text-center text-2xl font-bold">発見</h1>
+
+      <OnThisDaySection />
 
       {isAuthed && feed.length > 0 && (
         <section className="mb-12">
