@@ -1,156 +1,205 @@
 <div align="center">
 
+<img src="./docs/readme-assets/koboyo/open-book.svg" width="112" alt="開いた本のイラスト">
+
 # Kidoku
 
-**あなたのための読書記録 & 分析アプリ**
+### 読み終えた一冊が、あなたの物語になる。
 
-バーコードスキャン、全文検索、美しい統計を備えた、AIによる読書傾向の分析。
+本を見つける。記録する。あとから振り返る。<br>
+**Kidoku（キドク）は、読書の足あとを無理なく残せる読書記録アプリです。**
 
-[デモ](https://kidoku.net/) | [コントリビュート](./CONTRIBUTING.md) | [ドキュメント](./docs/)
+[Kidoku を見てみる](https://kidoku.net/)　·　[できること](#kidoku-でできること)　·　[開発に参加する](./CONTRIBUTING.md)
 
 [![CI](https://github.com/Rasukarusan/kidoku/actions/workflows/ci.yml/badge.svg)](https://github.com/Rasukarusan/kidoku/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 </div>
 
-<img width="1247" alt="Kidoku - 読書記録管理" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
-<img width="1059" alt="Kidoku - 読書統計" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
+---
+
+<div align="center">
+  <sub>SCENE 01 — 読み終えた夜</sub>
+  <h2>「この本、よかった」を忘れない。</h2>
+  <p>本棚に戻す前に、タイトルを検索。<br>読んだ本を一冊ずつ、自分だけの記録へ。</p>
+  <img src="./docs/readme-assets/koboyo/bookshelf.svg" width="132" alt="本棚のイラスト">
+</div>
+
+<br>
+
+<img width="1247" alt="Kidoku の読書記録画面" src="https://github.com/Rasukarusan/kidoku/assets/17779386/d2b88d99-670b-468e-8fd3-27f6ecb50430">
+
+<br>
+
+<div align="center">
+  <sub>SCENE 02 — 記録がたまった頃</sub>
+  <h2>並べるだけで、読書が見えてくる。</h2>
+  <p>いつ、どんな本を読んだのか。<br>年ごとの読書シートが、あなたの一年を一目で見せてくれます。</p>
+  <img src="./docs/readme-assets/koboyo/calendar.svg" width="112" alt="カレンダーのイラスト">
+  &nbsp;&nbsp;&nbsp;
+  <img src="./docs/readme-assets/koboyo/chart.svg" width="112" alt="グラフのイラスト">
+</div>
+
+<br>
+
+<img width="1059" alt="Kidoku の読書統計画面" src="https://github.com/Rasukarusan/kidoku/assets/17779386/52735f61-825a-44ed-88dd-12a6153a7eca">
+
+<br>
+
+<div align="center">
+  <sub>SCENE 03 — ふと振り返る日</sub>
+  <h2>記録は、まだ知らない自分を教えてくれる。</h2>
+  <p>よく読むジャンル、読書のペース、心に残した言葉。<br>統計と AI が、積み重ねた本からあなたらしい傾向を見つけます。</p>
+  <img src="./docs/readme-assets/koboyo/brain.svg" width="112" alt="脳のイラスト">
+  &nbsp;&nbsp;&nbsp;
+  <img src="./docs/readme-assets/koboyo/sparkles.svg" width="112" alt="きらめきのイラスト">
+</div>
 
 ---
 
-## 機能
+## Kidoku でできること
 
-- **本の登録** - タイトル検索またはバーコードスキャンで、本をすぐに追加
-- **年別読書シート** - 読書履歴を年ごとにビジュアルなカードで整理
-- **AI読書分析** - OpenAI による分析であなたの読書傾向を発見
-- **読書統計** - 月別の読書数、カテゴリ別の内訳、トレンドを可視化
-- **全文検索** - MeiliSearch による高速な日本語全文検索
+<table>
+  <tr>
+    <td width="90" align="center"><img src="./docs/readme-assets/koboyo/magnifying-glass.svg" width="58" alt="虫眼鏡"></td>
+    <td><strong>読みたい本が、すぐ見つかる</strong><br>タイトル検索やバーコードスキャンで本を探せます。細かな情報を一から入力する必要はありません。</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./docs/readme-assets/koboyo/heart.svg" width="58" alt="ハート"></td>
+    <td><strong>感想を、気軽に残せる</strong><br>読了の記録と一緒に、そのとき感じたことをメモ。ほかの読書家の感想にも出会えます。</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./docs/readme-assets/koboyo/bar-chart.svg" width="58" alt="棒グラフ"></td>
+    <td><strong>読書の変化を、目で楽しめる</strong><br>月ごとの冊数やカテゴリの内訳をグラフで表示。数字が苦手でも、直感的に振り返れます。</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./docs/readme-assets/koboyo/robot.svg" width="58" alt="ロボット"></td>
+    <td><strong>AI と、自分の「好き」を発見できる</strong><br>蓄積した記録をもとに、AI が読書傾向を整理します。次の一冊を選ぶヒントにも。</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./docs/readme-assets/koboyo/quote.svg" width="58" alt="引用符"></td>
+    <td><strong>読書を通じて、ゆるくつながる</strong><br>コメントや「いいね」、フォローで、本をきっかけにした交流を楽しめます。</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="./docs/readme-assets/koboyo/download.svg" width="58" alt="ダウンロード"></td>
+    <td><strong>自分の記録を、手元に残せる</strong><br>読書記録は CSV や Markdown で書き出せます。大切なデータをアプリの外でも保管できます。</td>
+  </tr>
+</table>
 
-## 技術スタック
+## 使い方は、3 ステップ
 
-| レイヤー | 技術 |
-|-------|------------|
-| モノレポ | Turborepo + pnpm workspaces |
-| フロントエンド | Next.js 14, React 18, TypeScript, Tailwind CSS |
-| バックエンド | NestJS 11, GraphQL, DDDアーキテクチャ |
-| データベース | MySQL 9.3 + Prisma ORM |
-| 認証 | NextAuth.js (Google OAuth) |
-| 検索 | MeiliSearch (日本語最適化ビルド) |
-| AI | OpenAI |
-| 決済 | Stripe |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="./docs/readme-assets/koboyo/search.svg" width="72" alt="検索"><br>
+      <strong>1. 本を探す</strong><br>
+      <sub>タイトル検索 / バーコード</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./docs/readme-assets/koboyo/open-book.svg" width="82" alt="開いた本"><br>
+      <strong>2. 読書を記録する</strong><br>
+      <sub>読了日や感想を残す</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./docs/readme-assets/koboyo/bar-chart.svg" width="72" alt="グラフ"><br>
+      <strong>3. あとから振り返る</strong><br>
+      <sub>シート / 統計 / AI 分析</sub>
+    </td>
+  </tr>
+</table>
 
-## プロジェクト構成
+> [!TIP]
+> **まずは一冊だけで大丈夫。** Kidoku は、たくさん読ませるためではなく、あなたのペースで読んだ本を残すための場所です。
 
-```
-kidoku/
-├── apps/
-│   ├── web/          # Next.js フロントエンド
-│   └── api/          # NestJS GraphQL API (DDD)
-├── packages/
-│   └── eslint-config # 共通 ESLint 設定
-├── docker/           # MeiliSearch & MySQL コンテナ
-├── docs/             # アーキテクチャ・デプロイ関連ドキュメント
-└── scripts/          # 開発自動化スクリプト
-```
+<div align="center">
 
-## はじめに
+<img src="./docs/readme-assets/koboyo/rocket.svg" width="92" alt="ロケット">
 
-### 前提条件
+### 次に読み終えた一冊から、はじめよう。
 
-- Node.js >= 22
-- pnpm >= 10.5.2
-- Docker & Docker Compose
+**[Kidoku で記録をはじめる →](https://kidoku.net/)**
+
+</div>
+
+---
+
+<details>
+<summary><strong>開発者の方へ — ローカルで動かす</strong></summary>
+
+### 必要なもの
+
+- Node.js 22 以上
+- pnpm 10.5.2 以上
+- Docker / Docker Compose
 
 ### セットアップ
 
 ```bash
-# 依存関係のインストール
+# 1. 依存パッケージをインストール
 pnpm install
 
-# 環境変数の設定
+# 2. 環境変数を用意
 cp apps/web/.env.example apps/web/.env
 cp apps/api/.env.example apps/api/.env
 
-# Docker サービス起動 (MySQL, MeiliSearch)
+# 3. MySQL と MeiliSearch を起動
 docker-compose up -d
 
-# データベースのセットアップ
+# 4. データベースを準備
 pnpm --filter web db:push
 pnpm --filter web prisma generate
 pnpm --filter api db:push
 
-# 全ての開発サーバーを起動
+# 5. アプリを起動
 pnpm dev
 ```
 
-### アクセスURL
+起動後は、Web アプリを `http://localhost:3000`、GraphQL API を `http://localhost:4000/graphql`、MeiliSearch を `http://localhost:7700` で確認できます。
 
-| サービス | URL |
-|---------|-----|
-| Webアプリ | http://localhost:3000 |
-| GraphQL API | http://localhost:4000/graphql |
-| MeiliSearch | http://localhost:7700 |
+### 技術スタック
 
-### 検索のセットアップ (MeiliSearch)
+| 役割         | 使用技術                                          |
+| ------------ | ------------------------------------------------- |
+| Web アプリ   | Next.js 14 / React 18 / TypeScript / Tailwind CSS |
+| API          | NestJS 11 / GraphQL / ドメイン駆動設計            |
+| データベース | MySQL 9.3 / Prisma ORM                            |
+| ログイン     | NextAuth.js / Google OAuth                        |
+| 検索         | MeiliSearch（日本語最適化ビルド）                 |
+| AI・決済     | OpenAI / Stripe                                   |
+| モノレポ     | Turborepo / pnpm workspaces                       |
 
-```bash
-docker-compose up --build
-
-# MeiliSearch にドキュメントを登録
-curl -XPOST -H "Authorization: Bearer ${ADMIN_AUTH_TOKEN}" \
-  http://localhost:3000/api/batch/meilisearch
-```
-
-## 開発
+### よく使うコマンド
 
 ```bash
-pnpm dev              # 全サービス起動
-pnpm build            # 全パッケージのビルド
-pnpm lint             # リント実行
-pnpm lint:fix         # リントの自動修正
-pnpm format           # Prettier でフォーマット
-pnpm check-types      # 型チェック
-pnpm validate         # lint + 型チェック + テストを一括実行
+pnpm dev          # 開発サーバーを起動
+pnpm build        # 本番用にビルド
+pnpm lint         # コードを検査
+pnpm check-types  # 型を検査
+pnpm test         # テストを実行
+pnpm validate     # lint・型検査・テストをまとめて実行
 ```
 
-### テスト
+### リポジトリの構成
 
-```bash
-# フロントエンド
-pnpm --filter web test          # 単体テスト
-pnpm --filter web test:c        # カバレッジ付き
-
-# バックエンド
-pnpm --filter api test          # 単体テスト
-pnpm --filter api test:e2e      # E2Eテスト
+```text
+kidoku/
+├── apps/web/            # ブラウザで使う画面
+├── apps/api/            # データを扱う GraphQL API
+├── packages/            # プロジェクト共通の設定
+├── docker/              # MySQL / MeiliSearch の環境
+├── docs/                # 設計・運用ドキュメント
+└── scripts/             # 開発を助けるスクリプト
 ```
 
-## アーキテクチャ
+詳しい情報は [セキュリティ](./docs/SECURITY.md)、[管理者 API](./docs/ADMIN_API.md)、[コントリビューションガイド](./CONTRIBUTING.md) をご覧ください。
 
-バックエンドAPIは **ドメイン駆動設計 (DDD)** によるレイヤードアーキテクチャを採用しています。
+</details>
 
-```
-apps/api/src/
-├── domain/           # ビジネスロジックの中核 (エンティティ、リポジトリインターフェース)
-├── application/      # ユースケース
-├── infrastructure/   # 外部連携 (DB, 認証)
-├── presentation/     # GraphQLリゾルバー、DTO、モジュール
-└── shared/           # 横断的関心事
-```
+## このプロジェクトについて
 
-**依存ルール**: `domain` は他層に依存しません。`application` は `domain` のみに依存します。`infrastructure` は `domain` のインターフェースを実装します。`presentation` は `application` を通して処理を実行します。
+<p>
+  <img src="./docs/readme-assets/koboyo/lock.svg" width="30" alt="鍵" align="left">
+  Kidoku は <a href="./LICENSE">MIT License</a> で公開されています。改善提案やコントリビューションを歓迎します。
+</p>
 
-詳細なアーキテクチャドキュメントは以下を参照してください。
-- [セキュリティ & 認証](./docs/SECURITY.md)
-- [管理者API & バッチ処理](./docs/ADMIN_API.md)
-- [デプロイガイド](./docs/DEPLOYMENT.md)
-
-## コントリビュート
-
-コントリビュートを歓迎します！ガイドラインは [CONTRIBUTING.md](./CONTRIBUTING.md) を参照してください。
-
-## ライセンス
-
-[MIT](./LICENSE) - Naoto Tanaka
-</content>
-</invoke>
+README 内の手描きイラストは [Koboyo Icons](https://koboyo.com/icons) を使用しています（商用・個人利用可、クレジット不要）。
