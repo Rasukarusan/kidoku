@@ -12,7 +12,6 @@ describe('GetAiSummariesUseCase', () => {
   beforeEach(() => {
     mockAiSummaryRepo = {
       findByUserIdAndSheetId: jest.fn(),
-      countByUserIdAndMonth: jest.fn(),
       create: jest.fn(),
       delete: jest.fn(),
     } as unknown as jest.Mocked<IAiSummaryRepository>;

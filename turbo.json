@@ -16,7 +16,6 @@
         "ADMIN_AUTH_TOKEN",
         "RESEND_API_KEY",
         "MAIL_FROM",
-        "OPENAI_API_KEY",
         "KV_URL",
         "KV_REST_API_URL",
         "BACKDOOR_USER_EMAIL",

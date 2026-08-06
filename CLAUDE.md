@@ -77,6 +77,13 @@ apps/api/src/
 - **MeiliSearch日本語版**（`getmeili/meilisearch:prototype-japanese-6`）を使用
 - Dockerfileで専用イメージをビルド
 
+### AI読書分析のLLM接続
+
+- ChatGPTサブスクリプションのCodexバックエンド（Responses API）を使用し、OpenAI APIキーは使わない
+- 各ユーザーが自分のChatGPTアカウントをデバイス認可フローで接続し、自分のプラン枠で分析を実行する（トークンはユーザーごとに`codex_auth`テーブルへ暗号化保存）
+- 接続の導線はAI分析の実行確認モーダルと `/settings/codex`
+- 詳細は [docs/CODEX.md](./docs/CODEX.md) を参照
+
 ## コーディング規約
 
 ### ファイル命名

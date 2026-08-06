@@ -6,12 +6,6 @@ export abstract class IAiSummaryRepository {
     sheetId: number,
   ): Promise<AiSummary[]>;
 
-  abstract countByUserIdAndMonth(
-    userId: string,
-    start: Date,
-    end: Date,
-  ): Promise<number>;
-
   abstract create(
     userId: string,
     sheetId: number,

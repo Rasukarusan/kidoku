@@ -57,7 +57,11 @@ export class GenerateAiSummaryUseCase {
 
     let text = '';
     let token = 0;
-    for await (const chunk of this.aiChatGateway.streamJsonCompletion(prompt)) {
+    // 生成はユーザー自身が接続したChatGPTアカウントで行う
+    for await (const chunk of this.aiChatGateway.streamJsonCompletion(
+      userId,
+      prompt,
+    )) {
       if (chunk.delta) {
         text += chunk.delta;
         yield chunk.delta;

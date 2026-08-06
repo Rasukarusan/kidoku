@@ -29,24 +29,6 @@ export class AiSummaryRepository implements IAiSummaryRepository {
     );
   }
 
-  async countByUserIdAndMonth(
-    userId: string,
-    start: Date,
-    end: Date,
-  ): Promise<number> {
-    const rows = await this.prisma.aiSummaries.findMany({
-      where: {
-        userId,
-        created: {
-          gte: start,
-          lt: end,
-        },
-      },
-      select: { id: true },
-    });
-    return rows.length;
-  }
-
   async create(
     userId: string,
     sheetId: number,

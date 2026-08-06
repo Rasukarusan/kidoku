@@ -95,8 +95,12 @@ describe('GenerateAiSummaryUseCase', () => {
       }),
       123,
     );
+    // 生成はユーザー自身のChatGPTアカウントで行う
+    expect(mockAiChatGateway.streamJsonCompletion.mock.calls[0][0]).toBe(
+      'user-1',
+    );
     // 非公開部分はマスクしてプロンプトに含める
-    const prompt = mockAiChatGateway.streamJsonCompletion.mock.calls[0][0];
+    const prompt = mockAiChatGateway.streamJsonCompletion.mock.calls[0][1];
     expect(prompt).toContain('面白かった***');
     expect(prompt).not.toContain('秘密の感想');
   });
@@ -150,7 +154,7 @@ describe('GenerateAiSummaryUseCase', () => {
 
     await collect(useCase.execute('user-1', '2024', [5], ['小説']));
 
-    const prompt = mockAiChatGateway.streamJsonCompletion.mock.calls[0][0];
+    const prompt = mockAiChatGateway.streamJsonCompletion.mock.calls[0][1];
     expect(prompt).toContain('対象');
     expect(prompt).not.toContain('カテゴリ不一致');
     expect(prompt).not.toContain('月不一致');

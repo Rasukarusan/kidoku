@@ -1,7 +1,6 @@
 import { UseGuards } from '@nestjs/common';
-import { Query, Mutation, Resolver, Args, Int } from '@nestjs/graphql';
+import { Query, Mutation, Resolver, Args } from '@nestjs/graphql';
 import { GetAiSummariesUseCase } from '../../application/usecases/ai-summaries/get-ai-summaries';
-import { GetAiSummaryUsageUseCase } from '../../application/usecases/ai-summaries/get-ai-summary-usage';
 import { SaveAiSummaryUseCase } from '../../application/usecases/ai-summaries/save-ai-summary';
 import { DeleteAiSummaryUseCase } from '../../application/usecases/ai-summaries/delete-ai-summary';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
@@ -18,7 +17,6 @@ import {
 export class AiSummaryResolver {
   constructor(
     private readonly getAiSummariesUseCase: GetAiSummariesUseCase,
-    private readonly getAiSummaryUsageUseCase: GetAiSummaryUsageUseCase,
     private readonly saveAiSummaryUseCase: SaveAiSummaryUseCase,
     private readonly deleteAiSummaryUseCase: DeleteAiSummaryUseCase,
   ) {}
@@ -36,11 +34,6 @@ export class AiSummaryResolver {
       id: parseInt(summary.id ?? '0', 10),
       analysis: summary.analysis,
     }));
-  }
-
-  @Query(() => Int)
-  async aiSummaryUsage(@CurrentUser() user: { id: string }): Promise<number> {
-    return await this.getAiSummaryUsageUseCase.execute(user.id);
   }
 
   @Mutation(() => Boolean)

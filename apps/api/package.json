@@ -39,7 +39,6 @@
     "class-validator": "^0.14.1",
     "graphql": "^16.11.0",
     "meilisearch": "^0.35.0",
-    "openai": "^6.45.0",
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "reflect-metadata": "^0.2.2",

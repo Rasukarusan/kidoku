@@ -4,6 +4,8 @@ import { useSession } from 'next-auth/react'
 import { useMutation, useQuery } from '@apollo/client'
 import { aiSummariesQuery, deleteAiSummaryMutation } from '../../api'
 import { migrateAnalysis } from './migrator'
+/** バックエンドが生成失敗をストリーム本文で伝えるときのマーカー */
+const AI_SUMMARY_ERROR_PREFIX = 'ERROR:'
 import type { AiSummariesJson } from './types'
 
 const useAiHelpers = (
@@ -82,6 +84,8 @@ const useAiHelpers = (
         const text = decoder.decode(value)
         if (text === 'COMPLETE') {
           setLoading(false)
+        } else if (text.startsWith(AI_SUMMARY_ERROR_PREFIX)) {
+          setError(text.slice(AI_SUMMARY_ERROR_PREFIX.length))
         } else {
           json = json + text
           try {
@@ -94,6 +98,8 @@ const useAiHelpers = (
       }
     } catch (error) {
       setError('通信中にエラーが発生しました')
+    } finally {
+      setLoading(false)
     }
   }
 

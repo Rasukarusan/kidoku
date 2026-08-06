@@ -147,6 +147,25 @@ type DeleteAiSummaryResponse {
   deletedCount: Int!
 }
 
+type CodexAuthStatusResponse {
+  connected: Boolean!
+  accountId: String
+  expiresAt: DateTime
+  expired: Boolean!
+}
+
+type CodexDeviceAuthResponse {
+  deviceAuthId: String!
+  userCode: String!
+  verificationUrl: String!
+  intervalSeconds: Int!
+}
+
+type PollCodexDeviceAuthResponse {
+  status: String!
+  accountId: String
+}
+
 type TemplateBookResponse {
   id: ID!
   name: String!
@@ -257,7 +276,7 @@ type Query {
   isNameAvailable(input: CheckNameAvailableInput!): Boolean!
   mySuiAddress: String
   aiSummaries(sheetName: String!): [AiSummaryResponse!]!
-  aiSummaryUsage: Int!
+  codexAuthStatus: CodexAuthStatusResponse!
   templateBooks: [TemplateBookResponse!]!
   memoTemplates: [MemoTemplateResponse!]!
   followInfo(input: GetFollowInfoInput!): FollowInfoResponse!
@@ -359,6 +378,9 @@ type Mutation {
   deleteUser: Boolean!
   saveAiSummary(input: SaveAiSummaryInput!): Boolean!
   deleteAiSummary(input: DeleteAiSummaryInput!): DeleteAiSummaryResponse!
+  startCodexDeviceAuth: CodexDeviceAuthResponse!
+  pollCodexDeviceAuth(input: PollCodexDeviceAuthInput!): PollCodexDeviceAuthResponse!
+  disconnectCodexAuth: Boolean!
   createTemplateBook(input: CreateTemplateBookInput!): TemplateBookResponse!
   deleteTemplateBook(input: DeleteTemplateBookInput!): Boolean!
   createMemoTemplate(input: CreateMemoTemplateInput!): MemoTemplateResponse!
@@ -462,6 +484,11 @@ input SaveAiSummaryInput {
 
 input DeleteAiSummaryInput {
   id: Int!
+}
+
+input PollCodexDeviceAuthInput {
+  deviceAuthId: String!
+  userCode: String!
 }
 
 input CreateTemplateBookInput {

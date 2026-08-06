@@ -72,9 +72,6 @@ importers:
       meilisearch:
         specifier: ^0.35.0
         version: 0.35.1
-      openai:
-        specifier: ^6.45.0
-        version: 6.45.0(ws@8.19.0)
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -262,9 +259,6 @@ importers:
       novel:
         specifier: ^0.5.0
         version: 0.5.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@tiptap/extension-code-block@2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))(@tiptap/pm@2.27.2))(@types/react@18.2.79)(highlight.js@11.11.1)(lowlight@3.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      openai:
-        specifier: ^6.45.0
-        version: 6.45.0(ws@8.19.0)
       prisma:
         specifier: ^5.2.0
         version: 5.22.0
@@ -6729,26 +6723,6 @@ packages:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
 
-  openai@6.45.0:
-    resolution: {integrity: sha512-5DQVNErssk0afNpTTHUm/qZPU4iKR9OYdNid8Ib4puq4gHNNvGWZht2zY4h9a8JMF949Ik6m8gQutllVPbjdnw==}
-    peerDependencies:
-      '@aws-sdk/credential-provider-node': '>=3.972.0 <4'
-      '@smithy/hash-node': '>=4.3.0 <5'
-      '@smithy/signature-v4': '>=5.4.0 <6'
-      ws: ^8.18.0
-      zod: ^3.25 || ^4.0
-    peerDependenciesMeta:
-      '@aws-sdk/credential-provider-node':
-        optional: true
-      '@smithy/hash-node':
-        optional: true
-      '@smithy/signature-v4':
-        optional: true
-      ws:
-        optional: true
-      zod:
-        optional: true
-
   opener@1.5.2:
     resolution: {integrity: sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==}
     hasBin: true
@@ -8924,12 +8898,6 @@ snapshots:
       graphql: 16.12.0
       typescript: 5.8.2
 
-  '@0no-co/graphqlsp@1.17.3(graphql@16.14.2)(typescript@5.8.2)':
-    dependencies:
-      '@gql.tada/internal': 1.2.1(graphql@16.14.2)(typescript@5.8.2)
-      graphql: 16.14.2
-      typescript: 5.8.2
-
   '@adobe/css-tools@4.4.4': {}
 
   '@alloc/quick-lru@5.2.0': {}
@@ -9601,7 +9569,7 @@ snapshots:
 
   '@gql.tada/cli-utils@1.9.2(@0no-co/graphqlsp@1.17.3(graphql@16.14.2)(typescript@5.8.2))(graphql@16.14.2)(typescript@5.8.2)':
     dependencies:
-      '@0no-co/graphqlsp': 1.17.3(graphql@16.14.2)(typescript@5.8.2)
+      '@0no-co/graphqlsp': 1.17.3(graphql@16.12.0)(typescript@5.8.2)
       '@gql.tada/internal': 1.2.1(graphql@16.14.2)(typescript@5.8.2)
       graphql: 16.14.2
       typescript: 5.8.2
@@ -9614,7 +9582,7 @@ snapshots:
 
   '@gql.tada/internal@1.2.1(graphql@16.14.2)(typescript@5.8.2)':
     dependencies:
-      '@0no-co/graphql.web': 1.3.2(graphql@16.14.2)
+      '@0no-co/graphql.web': 1.3.2(graphql@16.12.0)
       graphql: 16.14.2
       typescript: 5.8.2
 
@@ -14238,7 +14206,7 @@ snapshots:
   gql.tada@1.11.2(graphql@16.14.2)(typescript@5.8.2):
     dependencies:
       '@0no-co/graphql.web': 1.3.2(graphql@16.14.2)
-      '@0no-co/graphqlsp': 1.17.3(graphql@16.14.2)(typescript@5.8.2)
+      '@0no-co/graphqlsp': 1.17.3(graphql@16.12.0)(typescript@5.8.2)
       '@gql.tada/cli-utils': 1.9.2(@0no-co/graphqlsp@1.17.3(graphql@16.14.2)(typescript@5.8.2))(graphql@16.14.2)(typescript@5.8.2)
       '@gql.tada/internal': 1.2.1(graphql@16.14.2)(typescript@5.8.2)
       typescript: 5.8.2
@@ -16212,10 +16180,6 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
-
-  openai@6.45.0(ws@8.19.0):
-    optionalDependencies:
-      ws: 8.19.0
 
   opener@1.5.2: {}
 
