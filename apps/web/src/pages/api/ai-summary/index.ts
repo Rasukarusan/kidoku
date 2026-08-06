@@ -62,5 +62,6 @@ export default async function handler(
 }
 
 export const config = {
-  maxDuration: 300,
+  // Vercel Hobbyプランの上限は60秒
+  maxDuration: 60,
 }
