@@ -7,7 +7,6 @@ describe('DeleteAiSummaryUseCase', () => {
 
   beforeEach(() => {
     mockAiSummaryRepo = {
-      countByUserIdAndMonth: jest.fn(),
       create: jest.fn(),
       delete: jest.fn(),
     } as unknown as jest.Mocked<IAiSummaryRepository>;

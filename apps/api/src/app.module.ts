@@ -13,6 +13,7 @@ import { SearchModule } from './presentation/modules/search';
 import { YearlyTopBookModule } from './presentation/modules/yearly-top-book';
 import { UserModule } from './presentation/modules/user';
 import { AiSummaryModule } from './presentation/modules/ai-summary';
+import { CodexModule } from './presentation/modules/codex';
 import { TemplateBookModule } from './presentation/modules/template-book';
 import { MemoTemplateModule } from './presentation/modules/memo-template';
 import { FollowModule } from './presentation/modules/follow';
@@ -49,6 +50,7 @@ import { PurchaseModule } from './presentation/modules/purchase';
     YearlyTopBookModule,
     UserModule,
     AiSummaryModule,
+    CodexModule,
     TemplateBookModule,
     MemoTemplateModule,
     FollowModule,

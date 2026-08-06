@@ -5,6 +5,13 @@ import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
 import { HttpAuthGuard } from '../../infrastructure/auth/http-auth.guard';
 import { GenerateAiSummaryDto } from '../dto/ai-summary';
 
+/** 生成失敗をストリーム本文で伝えるためのマーカー */
+export const AI_SUMMARY_ERROR_PREFIX = 'ERROR:';
+
+/** 利用者に見せる生成失敗の案内 */
+export const AI_SUMMARY_ERROR_MESSAGE =
+  'AI分析の生成に失敗しました。時間をおいて再度お試しください。';
+
 /**
  * AI読書分析の生成エンドポイント。
  * 生成テキストをストリーミング返却するためGraphQLではなくRESTで提供する。
@@ -41,7 +48,9 @@ export class AiSummaryController {
       res.write('COMPLETE');
     } catch (e) {
       console.error('AI summary generation failed:', e);
-      res.write(JSON.stringify({ result: false }));
+      // ヘッダー送出後はステータスコードを変えられないため、本文にエラーを載せて中継する。
+      // 原因(LLMバックエンドの応答など)はログのみに残し、利用者には固定の案内を返す。
+      res.write(`${AI_SUMMARY_ERROR_PREFIX}${AI_SUMMARY_ERROR_MESSAGE}`);
     } finally {
       res.end();
     }

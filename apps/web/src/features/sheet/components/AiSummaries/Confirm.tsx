@@ -9,8 +9,10 @@ import { twMerge } from 'tailwind-merge'
 import { aiSummaryPrompt } from '@/libs/ai/prompt'
 import { FaRegCopy, FaCheck, FaDownload } from 'react-icons/fa'
 import { MdFilterList } from 'react-icons/md'
-import { useMutation, useQuery } from '@apollo/client'
-import { aiSummaryUsageQuery, saveAiSummaryMutation } from '../../api'
+import { useMutation } from '@apollo/client'
+import { saveAiSummaryMutation } from '../../api'
+import { CodexDeviceCode } from '@/features/codex/CodexDeviceCode'
+import { useCodexConnect } from '@/features/codex/useCodexConnect'
 
 export type FilterSettings = {
   months: string[]
@@ -35,7 +37,6 @@ export const Confirm: React.FC<Props> = ({
   sheetName,
   books,
 }) => {
-  const MONTHLY_LIMIT = 3
   const initialMonths = uniq(
     books.filter((b) => b.finished).map((b) => dayjs(b.finished).month() + 1)
   )
@@ -120,9 +121,10 @@ export const Confirm: React.FC<Props> = ({
     }
   }
 
-  const { data } = useQuery(aiSummaryUsageQuery)
+  // ChatGPTの接続状況。未接続のうちはOKの代わりに接続ボタンを出す
+  const codex = useCodexConnect({ skip: !open })
+  const connected = codex.status?.connected ?? false
 
-  const isLimited = data?.aiSummaryUsage >= MONTHLY_LIMIT
   return (
     <Modal
       open={open}
@@ -130,37 +132,43 @@ export const Confirm: React.FC<Props> = ({
       className="max-w-md flex-col items-center"
     >
       <div className="w-full rounded-md p-6 sm:w-[450px] sm:p-10">
-        <div className="mb-2 text-center text-sm font-bold leading-5">
-          今月の残り：
-          <span className="fon-bold mx-1">
-            {MONTHLY_LIMIT - data?.aiSummaryUsage}/{MONTHLY_LIMIT}
-          </span>
-          回
+        <div className="mb-2 text-center text-sm font-bold">
+          AI分析を実行しますか？
         </div>
-        <div
-          className={twMerge(
-            'mb-2 text-center text-sm font-bold',
-            isLimited && 'text-red-500'
-          )}
-        >
-          {isLimited ? '今月の上限に達しました' : 'AI分析を実行しますか？'}
-        </div>
-        <div className="mb-2 flex items-center justify-evenly">
-          <button
-            className="w-[90px] rounded-md border bg-gray-400 py-2 text-xs text-white hover:brightness-110 sm:w-[130px] sm:text-sm"
-            onClick={onCancel}
-          >
-            キャンセル
-          </button>
-          {!isLimited && (
+        {codex.device ? (
+          <CodexDeviceCode device={codex.device} onCancel={codex.cancel} />
+        ) : (
+          <div className="mb-2 flex items-center justify-evenly">
             <button
-              className="w-[90px] rounded-md border border-ai py-2 text-xs text-ai hover:brightness-125 sm:w-[130px] sm:text-sm"
-              onClick={() => onConfirm({ months: months, categories })}
+              className="w-[90px] rounded-md border bg-gray-400 py-2 text-xs text-white hover:brightness-110 sm:w-[130px] sm:text-sm"
+              onClick={onCancel}
             >
-              OK
+              キャンセル
             </button>
-          )}
-        </div>
+            {/* 分析は自分のChatGPTアカウントで実行するため、未接続なら先に接続させる */}
+            {connected ? (
+              <button
+                className="w-[90px] rounded-md border border-ai py-2 text-xs text-ai hover:brightness-125 sm:w-[130px] sm:text-sm"
+                onClick={() => onConfirm({ months: months, categories })}
+              >
+                OK
+              </button>
+            ) : (
+              <button
+                className="w-[130px] rounded-md bg-slate-800 py-2 text-xs font-medium text-white transition hover:bg-slate-700 disabled:opacity-50 sm:w-[170px] sm:text-sm"
+                disabled={codex.starting || !codex.status}
+                onClick={codex.start}
+              >
+                {codex.starting ? '開始中...' : 'ChatGPTと接続する'}
+              </button>
+            )}
+          </div>
+        )}
+        {codex.error && (
+          <div className="mb-2 text-center text-xs text-red-500">
+            {codex.error}
+          </div>
+        )}
         <div className="my-4 border-t pt-4">
           <div className="mb-2 font-bold">手動で結果をセット</div>
 

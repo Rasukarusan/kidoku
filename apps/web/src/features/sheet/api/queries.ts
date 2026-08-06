@@ -27,12 +27,6 @@ export const getYearlyTopBooksQuery = gql`
   }
 `
 
-export const aiSummaryUsageQuery = gql`
-  query AiSummaryUsage {
-    aiSummaryUsage
-  }
-`
-
 export const aiSummariesQuery = gql`
   query AiSummaries($sheetName: String!) {
     aiSummaries(sheetName: $sheetName) {

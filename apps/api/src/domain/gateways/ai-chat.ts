@@ -7,10 +7,12 @@ export type AiChatStreamChunk = {
 
 /**
  * LLMチャット補完のゲートウェイ。
+ * 生成はユーザー自身が接続したLLMアカウントで行うため、対象ユーザーを受け取る。
  * JSON形式の応答をストリーミングで返す。
  */
 export abstract class IAiChatGateway {
   abstract streamJsonCompletion(
+    userId: string,
     prompt: string,
   ): AsyncIterable<AiChatStreamChunk>;
 }

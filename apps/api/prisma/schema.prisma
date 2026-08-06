@@ -98,6 +98,7 @@ model User {
   bookComments       BookComment[]
   memoTemplates      MemoTemplate[]
   personalAccessTokens PersonalAccessToken[]
+  codexAuth            CodexAuth?
 
   @@map("users")
 }
@@ -137,6 +138,20 @@ model AiSummaries {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_summaries")
+}
+
+/// AI分析で使うChatGPTアカウント(Codex)のOAuthトークン。ユーザーごとに1件保持する。
+/// access/refresh/id tokenはAES-256-GCMで暗号化してtoken_encに格納する。
+model CodexAuth {
+  userId    String   @id @map("user_id")
+  accountId String?  @map("account_id") @db.VarChar(128)
+  tokenEnc  String   @map("token_enc") @db.MediumText
+  expiresAt DateTime @map("expires_at") @db.DateTime(0)
+  created   DateTime @default(now()) @db.DateTime(0)
+  updated   DateTime @default(now()) @updatedAt @db.DateTime(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("codex_auth")
 }
 
 model Follow {
