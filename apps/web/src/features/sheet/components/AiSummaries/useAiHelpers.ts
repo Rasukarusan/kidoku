@@ -4,9 +4,32 @@ import { useSession } from 'next-auth/react'
 import { useMutation, useQuery } from '@apollo/client'
 import { aiSummariesQuery, deleteAiSummaryMutation } from '../../api'
 import { migrateAnalysis } from './migrator'
-/** バックエンドが生成失敗をストリーム本文で伝えるときのマーカー */
-const AI_SUMMARY_ERROR_PREFIX = 'ERROR:'
 import type { AiSummariesJson } from './types'
+
+// バックエンドがストリーム本文に混ぜて送る制御メッセージ。
+// apps/api/src/presentation/controllers/ai-summary.ts と同期を保つこと。
+const AI_SUMMARY_CONTROL_SEPARATOR = '\u0000'
+const AI_SUMMARY_COMPLETE = 'COMPLETE'
+const AI_SUMMARY_ERROR_PREFIX = 'ERROR:'
+
+/**
+ * 生成中の途中までのJSONと、完成したJSONの両方を読めるようにする。
+ * プロキシがストリームをまとめて返す環境では全文が一度に届くため、
+ * 途中までのJSONを補完する方法だけでは解釈できない。
+ */
+const parseAnalysis = (text: string): Record<string, string> | null => {
+  if (!text) return null
+  // 完成したJSON → 文字列の途中で切れたJSON の順に試す
+  for (const candidate of [text, `${text}"}`]) {
+    try {
+      const parsed = JSON.parse(candidate)
+      if (parsed && typeof parsed === 'object') return parsed
+    } catch {
+      // 次の候補を試す
+    }
+  }
+  return null
+}
 
 const useAiHelpers = (
   sheet: string,
@@ -74,26 +97,28 @@ const useAiHelpers = (
       const reader = response.body?.getReader()
       if (!reader) return
 
-      let json = ''
       const decoder = new TextDecoder()
+      let received = ''
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
         if (!value) continue
-        const text = decoder.decode(value)
-        if (text === 'COMPLETE') {
+        // マルチバイト文字がチャンク境界で切れても壊れないようstreamで復号する
+        received += decoder.decode(value, { stream: true })
+
+        // 制御メッセージは本文の後ろに区切り文字付きで届く
+        const [body, ...control] = received.split(AI_SUMMARY_CONTROL_SEPARATOR)
+        const controlMessage = control.join('')
+
+        if (controlMessage.startsWith(AI_SUMMARY_ERROR_PREFIX)) {
+          setError(controlMessage.slice(AI_SUMMARY_ERROR_PREFIX.length))
+          return
+        }
+        const analysis = parseAnalysis(body)
+        if (analysis) setJson(analysis)
+        if (controlMessage.startsWith(AI_SUMMARY_COMPLETE)) {
           setLoading(false)
-        } else if (text.startsWith(AI_SUMMARY_ERROR_PREFIX)) {
-          setError(text.slice(AI_SUMMARY_ERROR_PREFIX.length))
-        } else {
-          json = json + text
-          try {
-            const newJson = JSON.parse(json + '"}')
-            setJson(newJson)
-          } catch (e) {
-            //
-          }
         }
       }
     } catch (error) {
