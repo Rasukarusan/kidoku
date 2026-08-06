@@ -5,7 +5,17 @@ import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
 import { HttpAuthGuard } from '../../infrastructure/auth/http-auth.guard';
 import { GenerateAiSummaryDto } from '../dto/ai-summary';
 
-/** 生成失敗をストリーム本文で伝えるためのマーカー */
+/**
+ * 生成テキストと制御メッセージを区切る文字。
+ * JSONの本文には現れないNUL文字を使うことで、分析結果の文字列と衝突しない。
+ * apps/web/src/features/sheet/components/AiSummaries/useAiHelpers.ts と同期を保つこと。
+ */
+export const AI_SUMMARY_CONTROL_SEPARATOR = '\u0000';
+
+/** 生成完了を伝える制御メッセージ */
+export const AI_SUMMARY_COMPLETE = 'COMPLETE';
+
+/** 生成失敗を伝える制御メッセージのプレフィックス */
 export const AI_SUMMARY_ERROR_PREFIX = 'ERROR:';
 
 /** 利用者に見せる生成失敗の案内 */
@@ -45,12 +55,14 @@ export class AiSummaryController {
       for await (const delta of stream) {
         res.write(delta);
       }
-      res.write('COMPLETE');
+      res.write(`${AI_SUMMARY_CONTROL_SEPARATOR}${AI_SUMMARY_COMPLETE}`);
     } catch (e) {
       console.error('AI summary generation failed:', e);
       // ヘッダー送出後はステータスコードを変えられないため、本文にエラーを載せて中継する。
       // 原因(LLMバックエンドの応答など)はログのみに残し、利用者には固定の案内を返す。
-      res.write(`${AI_SUMMARY_ERROR_PREFIX}${AI_SUMMARY_ERROR_MESSAGE}`);
+      res.write(
+        `${AI_SUMMARY_CONTROL_SEPARATOR}${AI_SUMMARY_ERROR_PREFIX}${AI_SUMMARY_ERROR_MESSAGE}`,
+      );
     } finally {
       res.end();
     }

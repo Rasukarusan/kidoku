@@ -76,7 +76,7 @@ jobs:
             --cpu 1 \
             --min-instances 0 \
             --max-instances 2 \
-            --timeout 30 \
+            --timeout 60 \
             --set-env-vars "NODE_ENV=production" \
             --set-env-vars "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" \
             --set-env-vars "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
