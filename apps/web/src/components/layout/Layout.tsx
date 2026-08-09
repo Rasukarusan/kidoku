@@ -2,6 +2,7 @@ import { SearchModal } from '../input/SearchBox/SearchModal'
 import { LoginModal } from './LoginModal'
 import { Sidebar } from './Sidebar'
 import { BottomNav } from './BottomNav'
+import { ReadingChat } from '@/features/reading-chat/ReadingChat'
 
 interface Props {
   children: React.ReactNode
@@ -16,6 +17,7 @@ export const Layout: React.FC<Props> = ({ children }) => {
         <LoginModal />
         <main className="flex-1 pb-14">{children}</main>
         <BottomNav />
+        <ReadingChat />
       </div>
     </div>
   )
