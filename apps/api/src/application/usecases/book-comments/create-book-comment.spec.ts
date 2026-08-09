@@ -10,6 +10,7 @@ describe('CreateBookCommentUseCase', () => {
 
   beforeEach(() => {
     mockRepo = {
+      isBookPublic: jest.fn().mockResolvedValue(true),
       create: jest.fn(),
       findByBook: jest.fn(),
       delete: jest.fn(),
@@ -73,6 +74,25 @@ describe('CreateBookCommentUseCase', () => {
   it('不正な内容はドメインバリデーションで弾かれる', async () => {
     await expect(useCase.execute('commenter', 10, '   ')).rejects.toThrow(
       'コメントを入力してください',
+    );
+    expect(mockRepo.create).not.toHaveBeenCalled();
+  });
+
+  it('非公開の書籍にはコメントを作成しない', async () => {
+    mockRepo.isBookPublic.mockResolvedValue(false);
+
+    await expect(useCase.execute('commenter', 10, 'いいね')).rejects.toThrow(
+      '非公開の書籍にはコメントできません',
+    );
+    expect(mockRepo.create).not.toHaveBeenCalled();
+    expect(mockNotificationRepo.create).not.toHaveBeenCalled();
+  });
+
+  it('存在しない書籍にはコメントを作成しない', async () => {
+    mockRepo.isBookPublic.mockResolvedValue(null);
+
+    await expect(useCase.execute('commenter', 10, 'いいね')).rejects.toThrow(
+      '書籍が見つかりません',
     );
     expect(mockRepo.create).not.toHaveBeenCalled();
   });
