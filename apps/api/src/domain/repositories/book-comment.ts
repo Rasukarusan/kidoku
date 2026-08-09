@@ -2,6 +2,9 @@ import { BookComment } from '../models/book-comment';
 import { PaginatedResult } from '../types/paginated-result';
 
 export abstract class IBookCommentRepository {
+  /** 指定した本がコメント可能な公開状態かを返す。存在しない場合は null */
+  abstract isBookPublic(bookId: number): Promise<boolean | null>;
+
   /** コメントを作成し、作成されたコメントと本の所有者IDを返す */
   abstract create(
     comment: BookComment,
