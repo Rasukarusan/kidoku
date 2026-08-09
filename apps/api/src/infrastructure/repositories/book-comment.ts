@@ -8,15 +8,27 @@ import { PaginatedResult } from '../../domain/types/paginated-result';
 export class BookCommentRepository implements IBookCommentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async isBookPublic(bookId: number): Promise<boolean | null> {
+    const book = await this.prisma.books.findUnique({
+      where: { id: bookId },
+      select: { isPublicMemo: true },
+    });
+    return book?.isPublicMemo ?? null;
+  }
+
   async create(
     comment: BookComment,
   ): Promise<{ comment: BookComment; bookOwnerId: string | null }> {
     const book = await this.prisma.books.findUnique({
       where: { id: comment.bookId },
-      select: { userId: true },
+      select: { userId: true, isPublicMemo: true },
     });
     if (!book) {
       throw new Error('書籍が見つかりません');
+    }
+    // 公開状態が事前確認後に変更された場合にも、コメントを保存しない。
+    if (!book.isPublicMemo) {
+      throw new Error('非公開の書籍にはコメントできません');
     }
 
     const created = await this.prisma.bookComment.create({

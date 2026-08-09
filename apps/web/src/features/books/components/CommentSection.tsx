@@ -27,11 +27,16 @@ interface Props {
   bookId: number | string
   /** 本の所有者ID。投稿者本人に加えて本の所有者もコメントを削除できる */
   bookOwnerId?: string
+  canComment?: boolean
 }
 
 const MAX_LENGTH = 1000
 
-export const CommentSection: React.FC<Props> = ({ bookId, bookOwnerId }) => {
+export const CommentSection: React.FC<Props> = ({
+  bookId,
+  bookOwnerId,
+  canComment = true,
+}) => {
   const numericBookId = Number(bookId)
   const { session, status } = useCachedSession()
   const isAuthed = status === 'authenticated'
@@ -98,42 +103,50 @@ export const CommentSection: React.FC<Props> = ({ bookId, bookOwnerId }) => {
       </h2>
 
       {/* 投稿フォーム */}
-      <form onSubmit={handleSubmit} className="mb-6">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          maxLength={MAX_LENGTH}
-          rows={3}
-          placeholder={
-            isAuthed
-              ? 'この感想にコメントする'
-              : 'ログインするとコメントできます'
-          }
-          onFocusCapture={() => {
-            if (!isAuthed) setOpenLogin(true)
-          }}
-          className="w-full resize-none rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-        />
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-xs text-gray-400">
-            {content.length}/{MAX_LENGTH}
-          </span>
-          <button
-            type="submit"
-            disabled={submitting || content.trim().length === 0}
-            className="rounded-full bg-slate-800 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {submitting ? '送信中...' : 'コメントする'}
-          </button>
-        </div>
-      </form>
+      {canComment ? (
+        <form onSubmit={handleSubmit} className="mb-6">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            maxLength={MAX_LENGTH}
+            rows={3}
+            placeholder={
+              isAuthed
+                ? 'この感想にコメントする'
+                : 'ログインするとコメントできます'
+            }
+            onFocusCapture={() => {
+              if (!isAuthed) setOpenLogin(true)
+            }}
+            className="w-full resize-none rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          />
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-xs text-gray-400">
+              {content.length}/{MAX_LENGTH}
+            </span>
+            <button
+              type="submit"
+              disabled={submitting || content.trim().length === 0}
+              className="rounded-full bg-slate-800 px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? '送信中...' : 'コメントする'}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <p className="mb-6 rounded-lg bg-gray-100 p-4 text-center text-sm text-gray-500">
+          非公開の本にはコメントできません
+        </p>
+      )}
 
       {/* コメント一覧 */}
       {loading && comments.length === 0 ? (
         <p className="py-6 text-center text-sm text-gray-400">読み込み中...</p>
       ) : comments.length === 0 ? (
         <p className="py-6 text-center text-sm text-gray-400">
-          まだコメントはありません。最初のコメントを投稿してみましょう。
+          {canComment
+            ? 'まだコメントはありません。最初のコメントを投稿してみましょう。'
+            : 'コメントはありません。'}
         </p>
       ) : (
         <ul className="space-y-4">

@@ -16,6 +16,14 @@ export class CreateBookCommentUseCase {
     content: string,
   ): Promise<BookComment> {
     const comment = BookComment.create({ userId, bookId, content });
+    const isBookPublic = await this.bookCommentRepository.isBookPublic(bookId);
+    if (isBookPublic === null) {
+      throw new Error('書籍が見つかりません');
+    }
+    if (!isBookPublic) {
+      throw new Error('非公開の書籍にはコメントできません');
+    }
+
     const { comment: created, bookOwnerId } =
       await this.bookCommentRepository.create(comment);
 

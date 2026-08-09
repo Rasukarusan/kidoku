@@ -289,7 +289,11 @@ export const BookDetailReadModal: React.FC<Props> = ({
         </div>
 
         {showComments && (
-          <CommentSection bookId={book.id} bookOwnerId={book.user?.id} />
+          <CommentSection
+            bookId={book.id}
+            bookOwnerId={book.user?.id}
+            canComment={book.isPublicMemo}
+          />
         )}
       </div>
 
