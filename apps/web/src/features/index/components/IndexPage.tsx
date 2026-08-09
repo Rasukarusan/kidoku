@@ -33,7 +33,7 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
     <>
       {/* ヒーロー：淡々と記録する、を伝えるミニマルなファーストビュー */}
       <section className="border-b border-gray-100">
-        <Container className="px-4 py-20 sm:py-28">
+        <Container className="px-4 py-10 sm:py-16">
           <div className="mx-auto max-w-xl text-center">
             <h1 className="text-2xl font-bold leading-relaxed tracking-wide text-gray-800 sm:text-3xl">
               読んだ本を、ただ記録する。
