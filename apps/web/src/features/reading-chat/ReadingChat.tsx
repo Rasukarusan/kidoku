@@ -7,7 +7,12 @@ import {
   useState,
 } from 'react'
 import { useRouter } from 'next/router'
-import { AnimatePresence, motion } from 'framer-motion'
+import {
+  AnimatePresence,
+  motion,
+  PanInfo,
+  useDragControls,
+} from 'framer-motion'
 import {
   ArrowUp,
   BookOpen,
@@ -90,6 +95,7 @@ export function ReadingChat() {
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const visualViewport = useVisualViewport(isOpen)
+  const dragControls = useDragControls()
 
   const openChat = useCallback(() => setIsOpen(true), [])
 
@@ -228,8 +234,18 @@ export function ReadingChat() {
           <motion.aside
             initial={{ opacity: 0, y: 18, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.98 }}
+            exit={{ opacity: 0, y: '100%', scale: 0.98 }}
             transition={{ duration: 0.18 }}
+            drag={visualViewport.isMobile ? 'y' : false}
+            dragControls={dragControls}
+            dragListener={false}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.35 }}
+            onDragEnd={(_, info: PanInfo) => {
+              if (info.offset.y > 90 || info.velocity.y > 550) {
+                setIsOpen(false)
+              }
+            }}
             style={
               visualViewport.isMobile && visualViewport.height
                 ? {
@@ -242,6 +258,14 @@ export function ReadingChat() {
             className="fixed inset-x-2 bottom-20 z-50 flex h-[min(680px,calc(100dvh-1rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[min(680px,calc(100vh-3rem))] sm:w-[410px]"
             aria-label="読書AIチャット"
           >
+            <button
+              type="button"
+              onPointerDown={(event) => dragControls.start(event)}
+              className="flex h-5 shrink-0 cursor-grab touch-none items-center justify-center active:cursor-grabbing sm:hidden"
+              aria-label="下にスワイプしてチャットを閉じる"
+            >
+              <span className="h-1 w-10 rounded-full bg-slate-200" />
+            </button>
             <header
               className={`flex shrink-0 items-center gap-3 border-b border-slate-100 px-4 ${
                 visualViewport.isKeyboardOpen ? 'py-2' : 'py-3.5'
