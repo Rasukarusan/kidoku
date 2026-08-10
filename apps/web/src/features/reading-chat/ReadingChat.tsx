@@ -30,6 +30,48 @@ type PageContext = {
   year?: number
 }
 
+type VisualViewportState = {
+  height: number
+  offsetTop: number
+  isMobile: boolean
+  isKeyboardOpen: boolean
+}
+
+function useVisualViewport(isOpen: boolean): VisualViewportState {
+  const [viewport, setViewport] = useState<VisualViewportState>({
+    height: 0,
+    offsetTop: 0,
+    isMobile: false,
+    isKeyboardOpen: false,
+  })
+
+  useEffect(() => {
+    if (!isOpen) return
+    const visualViewport = window.visualViewport
+    const initialHeight = window.innerHeight
+    const update = () => {
+      const height = visualViewport?.height ?? window.innerHeight
+      setViewport({
+        height,
+        offsetTop: visualViewport?.offsetTop ?? 0,
+        isMobile: window.matchMedia('(max-width: 639px)').matches,
+        isKeyboardOpen: initialHeight - height > 150,
+      })
+    }
+    update()
+    visualViewport?.addEventListener('resize', update)
+    visualViewport?.addEventListener('scroll', update)
+    window.addEventListener('orientationchange', update)
+    return () => {
+      visualViewport?.removeEventListener('resize', update)
+      visualViewport?.removeEventListener('scroll', update)
+      window.removeEventListener('orientationchange', update)
+    }
+  }, [isOpen])
+
+  return viewport
+}
+
 const suggestions = [
   'このページについて教えて',
   '最近読んだ本の傾向を教えて',
@@ -47,6 +89,7 @@ export function ReadingChat() {
   const [isContextAttached, setIsContextAttached] = useState(true)
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const visualViewport = useVisualViewport(isOpen)
 
   const openChat = useCallback(() => setIsOpen(true), [])
 
@@ -110,6 +153,15 @@ export function ReadingChat() {
   useEffect(() => {
     setIsContextAttached(true)
   }, [router.asPath])
+
+  useEffect(() => {
+    if (!isOpen || !visualViewport.isMobile) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [isOpen, visualViewport.isMobile])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -178,18 +230,33 @@ export function ReadingChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="fixed inset-x-3 bottom-20 z-50 flex h-[min(680px,calc(100vh-7rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[410px]"
+            style={
+              visualViewport.isMobile && visualViewport.height
+                ? {
+                    top: visualViewport.offsetTop + 8,
+                    bottom: 'auto',
+                    height: Math.max(1, visualViewport.height - 16),
+                  }
+                : undefined
+            }
+            className="fixed inset-x-2 bottom-20 z-50 flex h-[min(680px,calc(100dvh-1rem))] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[min(680px,calc(100vh-3rem))] sm:w-[410px]"
             aria-label="読書AIチャット"
           >
-            <header className="flex items-center gap-3 border-b border-slate-100 px-4 py-3.5">
+            <header
+              className={`flex shrink-0 items-center gap-3 border-b border-slate-100 px-4 ${
+                visualViewport.isKeyboardOpen ? 'py-2' : 'py-3.5'
+              }`}
+            >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-100 to-indigo-100 text-violet-700">
                 <Sparkles size={18} aria-hidden="true" />
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-sm font-bold text-slate-800">Kidoku AI</h2>
-                <p className="text-xs text-slate-500">
-                  あなたの読書記録に質問できます
-                </p>
+                {!visualViewport.isKeyboardOpen && (
+                  <p className="text-xs text-slate-500">
+                    あなたの読書記録に質問できます
+                  </p>
+                )}
               </div>
               <button
                 type="button"
@@ -201,7 +268,11 @@ export function ReadingChat() {
               </button>
             </header>
 
-            <div className="flex-1 overflow-y-auto px-4 py-5">
+            <div
+              className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 ${
+                visualViewport.isKeyboardOpen ? 'py-2' : 'py-5'
+              }`}
+            >
               {messages.length === 0 ? (
                 <div className="flex min-h-full flex-col justify-center">
                   <div className="mb-5 text-center">
@@ -277,7 +348,10 @@ export function ReadingChat() {
               )}
             </div>
 
-            <form onSubmit={submit} className="border-t border-slate-100 p-3">
+            <form
+              onSubmit={submit}
+              className="shrink-0 border-t border-slate-100 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+            >
               {isContextAttached && (
                 <div className="mb-2 flex items-center">
                   <div className="flex min-w-0 items-center gap-2 rounded-full border border-violet-100 bg-violet-50 px-3 py-1.5 text-xs text-violet-800">
@@ -325,9 +399,11 @@ export function ReadingChat() {
                   <ArrowUp size={17} />
                 </button>
               </div>
-              <p className="mt-2 text-center text-[11px] text-slate-400">
-                ⌘ J でいつでも開閉
-              </p>
+              {!visualViewport.isKeyboardOpen && (
+                <p className="mt-2 text-center text-[11px] text-slate-400">
+                  ⌘ J でいつでも開閉
+                </p>
+              )}
             </form>
           </motion.aside>
         )}
