@@ -65,19 +65,19 @@ export class AskReadingChatUseCase {
           limit: 1,
         })
       : [];
-    const safeBooks = books.map((book) => ({
-      ...book,
-      ...(book.memo
-        ? { memo: book.memo.replace(/\*.*?\*/g, '***').slice(0, 1200) }
-        : {}),
-    }));
+    const safeBooks = books
+      .map((book) => this.sanitizeBook(book))
+      .filter((book) => {
+        if (!query.searchText || !query.includeMemo) return true;
+        const needle = query.searchText.toLocaleLowerCase('ja');
+        // Search only the already-redacted representation. A query matching
+        // solely inside *hidden text* cannot affect which records reach the AI.
+        return [book.title, book.author, book.category, book.memo ?? ''].some(
+          (value) => value.toLocaleLowerCase('ja').includes(needle),
+        );
+      });
 
-    const safePageBooks = pageBooks.map((book) => ({
-      ...book,
-      ...(book.memo
-        ? { memo: book.memo.replace(/\*.*?\*/g, '***').slice(0, 1200) }
-        : {}),
-    }));
+    const safePageBooks = pageBooks.map((book) => this.sanitizeBook(book));
 
     const prompt = `あなたは読書記録アプリKidokuのアシスタントです。利用者が現在開いているページの情報と、質問に合わせてDBで絞り込んだ本人の読書記録を使って回答してください。「この本」「このページ」などは現在のページを指します。記録にない事実は推測しないでください。返答は {"answer":"返答本文"} のJSONだけにしてください。\n\n質問: ${normalizedQuestion}\n\n現在のページ: ${JSON.stringify(context ?? null)}\n\n現在のページの本: ${JSON.stringify(safePageBooks)}\n\n適用した検索条件: ${JSON.stringify(query)}\n\n検索結果: ${JSON.stringify(safeBooks)}`;
     const result = await this.collectJson<{ answer?: unknown }>(
@@ -175,6 +175,15 @@ export class AskReadingChatUseCase {
         ? { sheetName: context.sheetName.slice(0, 120) }
         : {}),
       ...(Number.isInteger(context.year) ? { year: context.year } : {}),
+    };
+  }
+
+  private sanitizeBook<T extends { memo?: string }>(book: T): T {
+    if (!book.memo) return book;
+    return {
+      ...book,
+      // [\s\S] also protects masked sections spanning multiple lines.
+      memo: book.memo.replace(/\*[\s\S]*?\*/g, '***').slice(0, 1200),
     };
   }
 

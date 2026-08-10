@@ -33,15 +33,16 @@ export class BookRepository implements IBookRepository {
           ? { category: { in: query.categories } }
           : {}),
         ...(query.authors?.length ? { author: { in: query.authors } } : {}),
-        ...(query.searchText
+        // Memos can contain *masked* sections. Searching the raw DB value would
+        // leak that a hidden phrase exists through the result set, even if the
+        // phrase is redacted later. Memo-inclusive searches are therefore
+        // filtered only after server-side redaction in AskReadingChatUseCase.
+        ...(query.searchText && !query.includeMemo
           ? {
               OR: [
                 { title: { contains: query.searchText } },
                 { author: { contains: query.searchText } },
                 { category: { contains: query.searchText } },
-                ...(query.includeMemo
-                  ? [{ memo: { contains: query.searchText } }]
-                  : []),
               ],
             }
           : {}),
