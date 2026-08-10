@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import {
   AiChatStreamChunk,
+  AiChatOptions,
   IAiChatGateway,
 } from '../../../domain/gateways/ai-chat';
 import { JsonObjectStream } from '../../../shared/ai/json-object-stream';
@@ -36,10 +37,13 @@ export class CodexChatGateway implements IAiChatGateway {
   async *streamJsonCompletion(
     userId: string,
     prompt: string,
+    options?: AiChatOptions,
   ): AsyncIterable<AiChatStreamChunk> {
     const auth = await this.accessTokenProvider.get(userId);
     const model =
-      this.configService.get<string>('CODEX_MODEL') ?? DEFAULT_MODEL;
+      (options?.purpose === 'planning'
+        ? this.configService.get<string>('CODEX_QUERY_MODEL') || 'gpt-5-nano'
+        : this.configService.get<string>('CODEX_MODEL')) || DEFAULT_MODEL;
 
     const response = await fetch(RESPONSES_URL, {
       method: 'POST',
@@ -66,7 +70,10 @@ export class CodexChatGateway implements IAiChatGateway {
         tools: [],
         tool_choice: 'auto',
         parallel_tool_calls: false,
-        reasoning: { effort: 'low', summary: 'auto' },
+        reasoning: {
+          effort: options?.reasoningEffort ?? 'low',
+          summary: 'auto',
+        },
         store: false,
         stream: true,
         include: ['reasoning.encrypted_content'],
