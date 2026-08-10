@@ -29,6 +29,7 @@ describe('AskReadingChatUseCase', () => {
         prompt: string,
         options?: { purpose?: string },
       ) {
+        await Promise.resolve();
         calls.push({ prompt, purpose: options?.purpose });
         yield {
           delta:
@@ -67,6 +68,7 @@ describe('AskReadingChatUseCase', () => {
         _prompt: string,
         options?: { purpose?: string },
       ) {
+        await Promise.resolve();
         yield {
           delta:
             options?.purpose === 'planning'
@@ -109,6 +111,7 @@ describe('AskReadingChatUseCase', () => {
         prompt: string,
         options?: { purpose?: string },
       ) {
+        await Promise.resolve();
         prompts.push(prompt);
         yield {
           delta:
@@ -134,5 +137,52 @@ describe('AskReadingChatUseCase', () => {
     });
     expect(prompts[0]).toContain('"label":"雪国"');
     expect(prompts[1]).toContain('再読したい');
+  });
+
+  it('マスキング部分だけに一致する本を回答モデルへ渡さない', async () => {
+    repository.findForReadingChat.mockResolvedValue([
+      {
+        title: '非公開部分だけに一致',
+        author: '',
+        category: '文学',
+        impression: '3',
+        finished: null,
+        memo: '公開文\n*秘密の\nキーワード*',
+      },
+      {
+        title: '公開部分に一致',
+        author: '',
+        category: '文学',
+        impression: '4',
+        finished: null,
+        memo: '秘密のキーワードについての公開メモ',
+      },
+    ]);
+    const prompts: string[] = [];
+    const gateway = {
+      async *streamJsonCompletion(
+        _userId: string,
+        prompt: string,
+        options?: { purpose?: string },
+      ) {
+        await Promise.resolve();
+        prompts.push(prompt);
+        yield {
+          delta:
+            options?.purpose === 'planning'
+              ? '{"searchText":"秘密のキーワード","authors":[],"categories":[],"finishedFrom":null,"finishedTo":null,"finishedOnly":false,"includeMemo":true,"orderBy":"recent","limit":40}'
+              : '{"answer":"公開メモが1件あります。"}',
+        };
+      },
+    } as IAiChatGateway;
+
+    await new AskReadingChatUseCase(repository, gateway).execute(
+      'user-1',
+      '秘密のキーワードについて書いた本は？',
+    );
+
+    expect(prompts[1]).not.toContain('非公開部分だけに一致');
+    expect(prompts[1]).not.toContain('秘密の\nキーワード');
+    expect(prompts[1]).toContain('公開部分に一致');
   });
 });
