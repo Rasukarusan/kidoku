@@ -1,6 +1,7 @@
 import { Book } from '../models/book';
 
 export type ReadingChatBookQuery = {
+  ids?: number[];
   searchText?: string;
   authors?: string[];
   categories?: string[];

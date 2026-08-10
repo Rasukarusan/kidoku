@@ -1,10 +1,14 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { AskReadingChatUseCase } from '../../application/usecases/reading-chat/ask-reading-chat';
+import {
+  AskReadingChatUseCase,
+  ReadingChatPageContext,
+} from '../../application/usecases/reading-chat/ask-reading-chat';
 import { CurrentUser } from '../../infrastructure/auth/current-user.decorator';
 import { HttpAuthGuard } from '../../infrastructure/auth/http-auth.guard';
 
 class AskReadingChatDto {
   question: string;
+  pageContext?: ReadingChatPageContext;
 }
 
 @Controller('reading-chat')
@@ -18,7 +22,11 @@ export class ReadingChatController {
     @Body() body: AskReadingChatDto,
   ): Promise<{ answer: string }> {
     return {
-      answer: await this.askReadingChat.execute(user.id, body.question),
+      answer: await this.askReadingChat.execute(
+        user.id,
+        body.question,
+        body.pageContext,
+      ),
     };
   }
 }

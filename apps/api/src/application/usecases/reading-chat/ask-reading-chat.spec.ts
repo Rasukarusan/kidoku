@@ -88,4 +88,51 @@ describe('AskReadingChatUseCase', () => {
       limit: 40,
     });
   });
+
+  it('本のページではその本を本人のDBから取得して回答モデルへ渡す', async () => {
+    repository.findForReadingChat
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          title: '雪国',
+          author: '川端康成',
+          category: '文学',
+          impression: '5',
+          finished: null,
+          memo: '再読したい',
+        },
+      ]);
+    const prompts: string[] = [];
+    const gateway = {
+      async *streamJsonCompletion(
+        _userId: string,
+        prompt: string,
+        options?: { purpose?: string },
+      ) {
+        prompts.push(prompt);
+        yield {
+          delta:
+            options?.purpose === 'planning'
+              ? '{"searchText":null,"authors":[],"categories":[],"finishedFrom":null,"finishedTo":null,"finishedOnly":false,"includeMemo":false,"orderBy":"recent","limit":20}'
+              : '{"answer":"この本は『雪国』です。"}',
+        };
+      },
+    } as IAiChatGateway;
+
+    await new AskReadingChatUseCase(repository, gateway).execute(
+      'user-1',
+      'この本について教えて',
+      { type: 'book', label: '雪国', path: '/books/42', bookId: 42 },
+    );
+
+    expect(repository.findForReadingChat).toHaveBeenNthCalledWith(2, 'user-1', {
+      ids: [42],
+      finishedOnly: false,
+      includeMemo: true,
+      orderBy: 'recent',
+      limit: 1,
+    });
+    expect(prompts[0]).toContain('"label":"雪国"');
+    expect(prompts[1]).toContain('再読したい');
+  });
 });
