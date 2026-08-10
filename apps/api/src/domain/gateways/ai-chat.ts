@@ -5,6 +5,12 @@ export type AiChatStreamChunk = {
   totalTokens?: number;
 };
 
+export type AiChatOptions = {
+  /** Planning uses a smaller configurable model instead of the answer model. */
+  purpose?: 'answer' | 'planning';
+  reasoningEffort?: 'low' | 'medium' | 'high';
+};
+
 /**
  * LLMチャット補完のゲートウェイ。
  * 生成はユーザー自身が接続したLLMアカウントで行うため、対象ユーザーを受け取る。
@@ -14,5 +20,6 @@ export abstract class IAiChatGateway {
   abstract streamJsonCompletion(
     userId: string,
     prompt: string,
+    options?: AiChatOptions,
   ): AsyncIterable<AiChatStreamChunk>;
 }
