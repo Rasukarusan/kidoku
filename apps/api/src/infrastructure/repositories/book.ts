@@ -18,6 +18,7 @@ export class BookRepository implements IBookRepository {
     const rows = await this.prisma.books.findMany({
       where: {
         userId,
+        ...(query.ids?.length ? { id: { in: query.ids } } : {}),
         ...(query.finishedOnly ? { finished: { not: null } } : {}),
         ...(query.finishedFrom || query.finishedTo
           ? {

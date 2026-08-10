@@ -12,7 +12,10 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: 'ログインが必要です' }, { status: 401 })
   }
 
-  const { question } = (await request.json()) as { question?: unknown }
+  const { question, pageContext } = (await request.json()) as {
+    question?: unknown
+    pageContext?: unknown
+  }
   if (typeof question !== 'string' || !question.trim()) {
     return Response.json({ error: '質問を入力してください' }, { status: 400 })
   }
@@ -21,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
     const response = await graphqlClient.fetchRest(
       session.user.id,
       '/reading-chat',
-      { question: question.trim() },
+      { question: question.trim(), pageContext },
       session.user.admin || false
     )
     const body = await response.text()

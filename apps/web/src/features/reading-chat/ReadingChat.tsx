@@ -1,32 +1,91 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import { useRouter } from 'next/router'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowUp,
   BookOpen,
+  FileText,
   MessageCircle,
   Minimize2,
   Sparkles,
+  X,
 } from 'lucide-react'
 import { useCachedSession } from '@/hooks/useCachedSession'
 
 type Message = { role: 'user' | 'assistant'; content: string }
 
+type PageContext = {
+  type: 'book' | 'sheet' | 'report' | 'search' | 'other'
+  label: string
+  path: string
+  bookId?: number
+  sheetName?: string
+  year?: number
+}
+
 const suggestions = [
+  'このページについて教えて',
   '最近読んだ本の傾向を教えて',
   'いちばん多く読んでいるジャンルは？',
-  '過去のメモから次に読む本を考えて',
 ]
 
 export function ReadingChat() {
+  const router = useRouter()
   const { status } = useCachedSession()
   const [isOpen, setIsOpen] = useState(false)
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [pageTitle, setPageTitle] = useState('このページ')
+  const [isContextAttached, setIsContextAttached] = useState(true)
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const openChat = useCallback(() => setIsOpen(true), [])
+
+  const pageContext = useMemo<PageContext>(() => {
+    const path = router.asPath.split('?')[0]
+    const first = (value: string | string[] | undefined) =>
+      Array.isArray(value) ? value[0] : value
+    if (router.pathname === '/books/[bookId]') {
+      const bookId = Number(first(router.query.bookId))
+      return {
+        type: 'book',
+        label: pageTitle || 'この本のページ',
+        path,
+        ...(Number.isInteger(bookId) && bookId > 0 ? { bookId } : {}),
+      }
+    }
+    if (router.pathname.includes('/sheets/')) {
+      const year = Number(first(router.query.year))
+      return {
+        type: 'sheet',
+        label: Number.isInteger(year) ? `${year}年の読書記録` : '読書記録',
+        path,
+        ...(Number.isInteger(year) ? { year } : {}),
+      }
+    }
+    if (router.pathname.startsWith('/report')) {
+      return { type: 'report', label: '年間レポート', path }
+    }
+    if (router.pathname.startsWith('/search')) {
+      return { type: 'search', label: '検索ページ', path }
+    }
+    const labels: Record<string, string> = {
+      '/': 'ホーム',
+      '/discover': '本を発見',
+      '/comments': 'みんなの読書メモ',
+      '/notifications': 'お知らせ',
+    }
+    return { type: 'other', label: labels[path] || pageTitle, path }
+  }, [pageTitle, router.asPath, router.pathname, router.query])
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -41,8 +100,16 @@ export function ReadingChat() {
   }, [])
 
   useEffect(() => {
-    if (isOpen) window.setTimeout(() => inputRef.current?.focus(), 150)
+    if (isOpen) {
+      const title = document.title.split(/[|｜]/)[0]?.trim()
+      if (title) setPageTitle(title)
+      window.setTimeout(() => inputRef.current?.focus(), 150)
+    }
   }, [isOpen])
+
+  useEffect(() => {
+    setIsContextAttached(true)
+  }, [router.asPath])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -63,7 +130,10 @@ export function ReadingChat() {
       const response = await fetch('/api/reading-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: normalized }),
+        body: JSON.stringify({
+          question: normalized,
+          pageContext: isContextAttached ? pageContext : undefined,
+        }),
       })
       const data = (await response.json()) as {
         answer?: string
@@ -208,6 +278,24 @@ export function ReadingChat() {
             </div>
 
             <form onSubmit={submit} className="border-t border-slate-100 p-3">
+              {isContextAttached && (
+                <div className="mb-2 flex items-center">
+                  <div className="flex min-w-0 items-center gap-2 rounded-full border border-violet-100 bg-violet-50 px-3 py-1.5 text-xs text-violet-800">
+                    <FileText size={14} className="shrink-0" />
+                    <span className="max-w-[245px] truncate">
+                      このページ: {pageContext.label}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsContextAttached(false)}
+                      className="-mr-1 rounded-full p-0.5 text-violet-400 transition hover:bg-violet-100 hover:text-violet-700"
+                      aria-label="ページ情報を外す"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                </div>
+              )}
               <div className="flex items-end gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2 focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-violet-100">
                 <textarea
                   ref={inputRef}
@@ -221,7 +309,11 @@ export function ReadingChat() {
                   }}
                   maxLength={500}
                   rows={1}
-                  placeholder="読書記録について質問する…"
+                  placeholder={
+                    isContextAttached
+                      ? 'このページについて質問する…'
+                      : '読書記録について質問する…'
+                  }
                   className="max-h-28 min-h-[36px] flex-1 resize-none bg-transparent px-1.5 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400"
                 />
                 <button
