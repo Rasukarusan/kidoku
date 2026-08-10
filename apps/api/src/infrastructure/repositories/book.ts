@@ -1,11 +1,76 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { Book } from '../../domain/models/book';
-import { IBookRepository } from '../../domain/repositories/book';
+import {
+  IBookRepository,
+  ReadingChatBook,
+  ReadingChatBookQuery,
+} from '../../domain/repositories/book';
 
 @Injectable()
 export class BookRepository implements IBookRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findForReadingChat(
+    userId: string,
+    query: ReadingChatBookQuery,
+  ): Promise<ReadingChatBook[]> {
+    const rows = await this.prisma.books.findMany({
+      where: {
+        userId,
+        ...(query.ids?.length ? { id: { in: query.ids } } : {}),
+        ...(query.finishedOnly ? { finished: { not: null } } : {}),
+        ...(query.finishedFrom || query.finishedTo
+          ? {
+              finished: {
+                ...(query.finishedOnly ? { not: null } : {}),
+                ...(query.finishedFrom ? { gte: query.finishedFrom } : {}),
+                ...(query.finishedTo ? { lte: query.finishedTo } : {}),
+              },
+            }
+          : {}),
+        ...(query.categories?.length
+          ? { category: { in: query.categories } }
+          : {}),
+        ...(query.authors?.length ? { author: { in: query.authors } } : {}),
+        // Memos can contain *masked* sections. Searching the raw DB value would
+        // leak that a hidden phrase exists through the result set, even if the
+        // phrase is redacted later. Memo-inclusive searches are therefore
+        // filtered only after server-side redaction in AskReadingChatUseCase.
+        ...(query.searchText && !query.includeMemo
+          ? {
+              OR: [
+                { title: { contains: query.searchText } },
+                { author: { contains: query.searchText } },
+                { category: { contains: query.searchText } },
+              ],
+            }
+          : {}),
+      },
+      select: {
+        title: true,
+        author: true,
+        category: true,
+        impression: true,
+        finished: true,
+        ...(query.includeMemo ? { memo: true } : {}),
+      },
+      orderBy:
+        query.orderBy === 'title'
+          ? { title: 'asc' }
+          : { finished: query.orderBy === 'oldest' ? 'asc' : 'desc' },
+      take: query.limit,
+    });
+
+    return rows.map((row) => ({
+      title: row.title,
+      author: row.author,
+      category: row.category,
+      impression: row.impression,
+      finished: row.finished,
+      ...('memo' in row ? { memo: row.memo } : {}),
+    }));
+  }
 
   async findById(id: string): Promise<Book | null> {
     const bookId = parseInt(id, 10);
