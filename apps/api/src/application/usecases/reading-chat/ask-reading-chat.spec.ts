@@ -185,4 +185,50 @@ describe('AskReadingChatUseCase', () => {
     expect(prompts[1]).not.toContain('秘密の\nキーワード');
     expect(prompts[1]).toContain('公開部分に一致');
   });
+
+  it('感想の長さを比較するときは全候補の本文を取得する', async () => {
+    repository.findForReadingChat.mockResolvedValue([
+      {
+        title: '長い感想の本',
+        author: '',
+        category: '',
+        impression: '5',
+        finished: null,
+        memo: 'とても長い感想本文',
+      },
+    ]);
+    const prompts: string[] = [];
+    const gateway = {
+      async *streamJsonCompletion(
+        _userId: string,
+        prompt: string,
+        options?: { purpose?: string },
+      ) {
+        await Promise.resolve();
+        prompts.push(prompt);
+        yield {
+          delta:
+            options?.purpose === 'planning'
+              ? '{"searchText":"感想","authors":[],"categories":[],"finishedFrom":null,"finishedTo":null,"finishedOnly":true,"includeMemo":false,"orderBy":"recent","limit":1}'
+              : '{"answer":"『長い感想の本』です。"}',
+        };
+      },
+    } as IAiChatGateway;
+
+    const answer = await new AskReadingChatUseCase(repository, gateway).execute(
+      'user-1',
+      '今までで一番感想が長い本は？',
+    );
+
+    expect(answer).toBe('『長い感想の本』です。');
+    expect(repository.findForReadingChat).toHaveBeenCalledWith(
+      'user-1',
+      expect.objectContaining({
+        searchText: undefined,
+        includeMemo: true,
+        limit: 100,
+      }),
+    );
+    expect(prompts[1]).toContain('とても長い感想本文');
+  });
 });
