@@ -97,10 +97,13 @@ export class AskReadingChatUseCase {
     pageContext?: ReadingChatPageContext,
   ): Promise<ReadingChatBookQuery> {
     const today = new Date().toISOString().slice(0, 10);
-    const prompt = `読書記録への質問をDB検索条件に変換してください。今日は${today}です。現在のページ情報も質問の文脈として使ってください。返すJSONは searchText(string|null), authors(string[]), categories(string[]), finishedFrom(YYYY-MM-DD|null), finishedTo(YYYY-MM-DD|null), finishedOnly(boolean), includeMemo(boolean), orderBy("recent"|"oldest"|"title"), limit(1〜100) だけです。メモ・感想の内容を尋ねる場合だけincludeMemo=trueにしてください。全体傾向・集計はフィルタなし、limit=100にしてください。現在のページ: ${JSON.stringify(pageContext ?? null)} 質問: ${question}`;
+    const prompt = `読書記録への質問をDB検索条件に変換してください。今日は${today}です。現在のページ情報も質問の文脈として使ってください。返すJSONは searchText(string|null), authors(string[]), categories(string[]), finishedFrom(YYYY-MM-DD|null), finishedTo(YYYY-MM-DD|null), finishedOnly(boolean), includeMemo(boolean), orderBy("recent"|"oldest"|"title"), limit(1〜100) だけです。メモ・感想の本文、長さ、文字数、内容の比較を尋ねる場合はincludeMemo=trueにしてください。最長・最多・傾向・集計など複数記録を比較する質問ではsearchText=null, limit=100にしてください。現在のページ: ${JSON.stringify(pageContext ?? null)} 質問: ${question}`;
     try {
-      return this.normalizePlan(
-        await this.collectJson<QueryPlan>(userId, prompt, 'planning'),
+      return this.applyQuestionIntent(
+        this.normalizePlan(
+          await this.collectJson<QueryPlan>(userId, prompt, 'planning'),
+        ),
+        question,
       );
     } catch {
       // Planner outages never fall back to sending the complete library.
@@ -111,6 +114,30 @@ export class AskReadingChatUseCase {
         limit: DEFAULT_LIMIT,
       };
     }
+  }
+
+  /**
+   * 補助モデルの表現揺れで必要な本文が欠落しないよう、明確な質問意図は
+   * アプリ側でも保証する。特に「一番感想が長い」は全文を比較する質問であり、
+   * `searchText: "感想"` と解釈すると全件が誤って除外されてしまう。
+   */
+  private applyQuestionIntent(
+    plan: ReadingChatBookQuery,
+    question: string,
+  ): ReadingChatBookQuery {
+    const refersToMemo = /(感想|メモ|コメント|レビュー|本文)/u.test(question);
+    const comparesRecords =
+      /(一番|いちばん|最も|もっとも|最長|最短|最多|少な|長(?:い|さ)|短(?:い|さ)|文字数|ランキング|順位|傾向|比較|平均|合計|何冊)/u.test(
+        question,
+      );
+
+    if (!refersToMemo) return plan;
+
+    return {
+      ...plan,
+      includeMemo: true,
+      ...(comparesRecords ? { searchText: undefined, limit: MAX_LIMIT } : {}),
+    };
   }
 
   private normalizePlan(plan: QueryPlan): ReadingChatBookQuery {
