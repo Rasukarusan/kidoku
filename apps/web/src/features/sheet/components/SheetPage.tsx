@@ -24,6 +24,8 @@ import { twMerge } from 'tailwind-merge'
 import { useQuery } from '@apollo/client'
 import { getBooksQuery } from '@/features/books/api'
 import dayjs from 'dayjs'
+import { useUiMode } from '@/features/ui-mode/UiModeProvider'
+import { TerminalSheetView } from '@/features/ui-mode/TerminalSheetView'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -62,6 +64,7 @@ export const SheetPage: React.FC<Props> = ({
   aiSummaries,
 }) => {
   const router = useRouter()
+  const { mode: uiMode } = useUiMode()
   const { data: session } = useSession()
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
   const { data: booksData } = useQuery(getBooksQuery, {
@@ -243,6 +246,50 @@ export const SheetPage: React.FC<Props> = ({
       default:
         return sorted
     }
+  }
+
+  if (uiMode !== 'normal') {
+    return (
+      <Container className="mb-12">
+        <NextSeo
+          title={`${username}/${year} | kidoku`}
+          description={monthlySummary}
+          openGraph={{ images: [{ url: ogImage, width: 1200, height: 630 }] }}
+          twitter={{ cardType: 'summary_large_image' }}
+        />
+        <SheetTabsWithMenu
+          sheets={sheets}
+          currentSheet={year}
+          username={username}
+          userId={userId}
+          variant="simple"
+        />
+        <TerminalSheetView
+          key={username}
+          books={isMine ? res.books : data}
+          sheets={sheets}
+          year={year}
+          username={username}
+        />
+        {uiMode === 'terminal' && (
+          <>
+            <AiSummaries
+              aiSummaries={aiSummaries}
+              username={username}
+              bookCount={data.length}
+              sheet={year}
+              isMine={isMine}
+              books={data}
+            />
+            <YearlyTopBooks
+              books={currentData}
+              year={year}
+              yearlyTopBooks={yearlyTopBooks}
+            />
+          </>
+        )}
+      </Container>
+    )
   }
 
   if (data.length === 0) {

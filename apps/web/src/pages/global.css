@@ -16,6 +16,107 @@ div {
   background-color: yellow;
 }
 
+/* Terminal modes keep images and complex widgets as native rich content. */
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli']) {
+  color-scheme: dark;
+  background: #0d1117;
+  color: #c9d1d9;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli']) body {
+  background: #0d1117;
+  color: #c9d1d9;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli'])
+  :is(div, input, select, textarea, button, pre) {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, var(--font-notojp), monospace;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli'])
+  :is(.bg-white, .bg-main, .bg-gray-50, .bg-gray-100) {
+  background-color: #161b22;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli'])
+  :is(
+    .text-black,
+    .text-gray-900,
+    .text-gray-800,
+    .text-gray-700,
+    .text-gray-600
+  ) {
+  color: #c9d1d9;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli'])
+  :is(.text-gray-500, .text-gray-400) {
+  color: #9da7b3;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli'])
+  :is(.border-gray-100, .border-gray-200, .border-gray-300, .border-gray-400) {
+  border-color: #3d4855;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli'])
+  :is(input, textarea, select) {
+  background-color: #0d1117;
+  color: #c9d1d9;
+}
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli']) .highlight {
+  background: #604b14;
+  color: #fff3b0;
+}
+
+.terminal-workspace {
+  background: #0d1117;
+  color: #a7f3d0;
+  border-color: #3d4855;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.terminal-workspace :is(nav a, li, form, .border-t, button.border) {
+  border-color: #3d4855;
+}
+.terminal-muted {
+  color: #9da7b3;
+}
+.terminal-link {
+  color: #79c0ff;
+}
+.terminal-link[aria-current='page'] {
+  color: #a7f3d0;
+  border-color: #a7f3d0;
+}
+.terminal-memo {
+  color: #c9d1d9;
+}
+.terminal-memo img {
+  max-width: 100%;
+  height: auto;
+}
+.terminal-memo a {
+  color: #79c0ff;
+  text-decoration: underline;
+}
+.terminal-memo pre {
+  overflow-x: auto;
+  padding: 0.75rem;
+  background: #161b22;
+}
+.terminal-memo :is(ul, ol) {
+  padding-left: 1.5rem;
+}
+.terminal-memo ul {
+  list-style: disc;
+}
+.terminal-memo ol {
+  list-style: decimal;
+}
+
 @layer utilities {
   .no-scrollbar {
     -ms-overflow-style: none; /* IE, Edge 対応 */
