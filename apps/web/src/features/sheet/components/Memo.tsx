@@ -47,21 +47,21 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
           margin: 0.5rem 0;
         }
         .memo-content blockquote {
-          border-left: 4px solid #d1d5db;
+          border-left: 4px solid var(--ui-border);
           padding-left: 1rem;
           margin: 0.5rem 0;
-          color: #6b7280;
+          color: var(--ui-muted);
           font-style: italic;
         }
         .memo-content code {
-          background-color: #f3f4f6;
+          background-color: var(--ui-code-bg);
           padding: 0.125rem 0.25rem;
           border-radius: 0.25rem;
           font-size: 0.875rem;
           font-family: ui-monospace, monospace;
         }
         .memo-content pre {
-          background-color: #f3f4f6;
+          background-color: var(--ui-code-bg);
           padding: 1rem;
           border-radius: 0.5rem;
           overflow-x: auto;
@@ -72,18 +72,18 @@ export const Memo: React.FC<MemoProps> = ({ memo }) => {
           padding: 0;
         }
         .memo-content a {
-          color: #3b82f6;
+          color: var(--ui-link);
           text-decoration: underline;
         }
         .memo-content a:hover {
-          color: #2563eb;
+          color: var(--ui-link-hover);
         }
         .memo-content p {
           margin: 0.5rem 0;
         }
         .memo-content hr {
           border: none;
-          border-top: 2px solid #e5e7eb;
+          border-top: 2px solid var(--ui-divider);
           margin: 1rem 0;
         }
         .memo-content strong {
