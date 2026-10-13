@@ -44,16 +44,16 @@ export const MemoPreview: React.FC<MemoPreviewProps> = ({
         .memo-preview blockquote {
           display: inline;
           font-style: italic;
-          color: #6b7280;
+          color: var(--ui-muted);
         }
         .memo-preview code {
-          background-color: #f3f4f6;
+          background-color: var(--ui-code-bg);
           padding: 0 0.25rem;
           border-radius: 0.125rem;
           font-size: 0.875em;
         }
         .memo-preview a {
-          color: #3b82f6;
+          color: var(--ui-link);
           text-decoration: underline;
         }
       `}</style>
