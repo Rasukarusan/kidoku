@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { LayoutGrid, Monitor, Terminal } from 'lucide-react'
 
 export type UiMode = 'normal' | 'terminal' | 'cli'
 const STORAGE_KEY = 'kidoku-ui-mode'
@@ -56,19 +57,34 @@ export const useUiMode = () => useContext(UiModeContext)
 
 export function UiModeSwitch() {
   const { mode, setMode } = useUiMode()
+  const modes = [
+    { value: 'normal' as const, label: '通常', Icon: LayoutGrid },
+    { value: 'terminal' as const, label: 'ターミナル風', Icon: Monitor },
+    { value: 'cli' as const, label: 'CLI', Icon: Terminal },
+  ]
   return (
-    <label className="flex shrink-0 items-center gap-1 text-xs text-gray-700">
-      <span className="sr-only">UI表示モード</span>
-      <select
-        aria-label="UI表示モード"
-        value={mode}
-        onChange={(event) => setMode(event.target.value as UiMode)}
-        className="max-w-[120px] rounded border border-gray-300 bg-white px-1 py-2 text-xs sm:px-2"
-      >
-        <option value="normal">通常</option>
-        <option value="terminal">ターミナル風</option>
-        <option value="cli">CLI</option>
-      </select>
-    </label>
+    <div
+      role="group"
+      aria-label="UI表示モード"
+      className="flex shrink-0 items-center gap-1 rounded border border-gray-300 bg-white p-1"
+    >
+      {modes.map(({ value, label, Icon }) => (
+        <button
+          key={value}
+          type="button"
+          aria-label={label}
+          aria-pressed={mode === value}
+          title={label}
+          onClick={() => setMode(value)}
+          className={`rounded p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+            mode === value
+              ? 'bg-gray-100 text-emerald-600 ring-1 ring-emerald-500'
+              : 'text-gray-500 hover:text-emerald-600'
+          }`}
+        >
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </button>
+      ))}
+    </div>
   )
 }
