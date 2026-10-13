@@ -275,7 +275,7 @@ export const Sidebar: React.FC = () => {
                     >
                       <div className="mr-3">
                         <img
-                          className="h-10 w-10 rounded-full ring-2 ring-white"
+                          className="h-10 w-10 rounded-full"
                           src={session.user.image || ''}
                           alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
                         />

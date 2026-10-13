@@ -1,3 +1,4 @@
+import { useUiMode } from '@/features/ui-mode/UiModeProvider'
 import { FiShare2 } from 'react-icons/fi'
 import type { PersonalityType } from '@/libs/ai/personality/personality-types'
 import { personalityCharacterDataUri } from '@/libs/ai/personality/personality-character'
@@ -19,24 +20,47 @@ export const PersonalityCard: React.FC<Props> = ({
   showShare,
   onShare,
 }) => {
+  const { mode } = useUiMode()
   return (
     <div
-      className="mb-6 rounded-xl px-6 py-7 shadow-sm"
+      className="ai-personality-card mb-6 rounded-xl px-6 py-7 shadow-sm"
       style={{
-        background: `linear-gradient(135deg, ${type.colorLight} 0%, #ffffff 60%, ${type.colorLight}80 100%)`,
+        background:
+          mode === 'normal'
+            ? `linear-gradient(135deg, ${type.colorLight} 0%, #ffffff 60%, ${type.colorLight}80 100%)`
+            : 'var(--ui-surface)',
       }}
     >
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500">
         あなたの読書性格タイプ
       </h3>
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-8">
-        <img
-          src={personalityCharacterDataUri(type)}
-          alt={type.name}
-          width={140}
-          height={140}
-          className="h-[140px] w-[140px] drop-shadow-md"
-        />
+        {mode === 'normal' ? (
+          <img
+            src={personalityCharacterDataUri(type)}
+            alt={type.name}
+            width={140}
+            height={140}
+            className="h-[140px] w-[140px] drop-shadow-md"
+          />
+        ) : (
+          <pre
+            role="img"
+            aria-label={type.name}
+            className="shrink-0 font-mono text-sm leading-5"
+          >
+            {[
+              '    .--------.',
+              `    | ${type.face === 'closed' ? '-  -' : type.face === 'sparkle' ? '*  *' : 'o  o'}  |`,
+              '    |   __   |',
+              "    '---..---'",
+              '   /|        |\\',
+              '  +----+----+ ',
+              '  |    |    | ',
+              '  +----+----+ ',
+            ].join('\n')}
+          </pre>
+        )}
         <div className="text-center sm:text-left">
           <span
             className="inline-block rounded-full px-3 py-1 text-xs font-bold tracking-widest text-white"
