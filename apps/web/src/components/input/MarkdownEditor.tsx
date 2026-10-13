@@ -293,7 +293,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           outline: none;
         }
         .novel-editor .tiptap p.is-editor-empty:first-child::before {
-          color: #9ca3af;
+          color: var(--ui-muted);
           content: attr(data-placeholder);
           float: left;
           height: 0;
@@ -328,7 +328,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         }
         .novel-editor .tiptap hr {
           border: none;
-          border-top: 2px solid #e5e7eb;
+          border-top: 2px solid var(--ui-divider);
           margin: 1rem 0;
         }
       `}</style>

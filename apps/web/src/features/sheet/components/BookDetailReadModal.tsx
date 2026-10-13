@@ -132,6 +132,7 @@ export const BookDetailReadModal: React.FC<Props> = ({
               onMouseDown={(e) => e.preventDefault()}
               data-tooltip-id="share-button"
               data-tooltip-content="URLをコピー"
+              aria-label="URLをコピー"
             >
               <FaLink size={18} />
             </button>
@@ -143,6 +144,7 @@ export const BookDetailReadModal: React.FC<Props> = ({
               }
               data-tooltip-id="book-sns-share"
               data-tooltip-content="SNSで共有"
+              aria-label="SNSで共有"
             >
               <FiShare2 size={18} />
             </button>
@@ -156,6 +158,7 @@ export const BookDetailReadModal: React.FC<Props> = ({
                   onEdit()
                 }}
                 disabled={loading}
+                aria-label="本を編集"
               >
                 {loading ? (
                   <Loading className="h-[18px] w-[18px] border-[3px] border-black" />

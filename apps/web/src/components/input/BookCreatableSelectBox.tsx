@@ -36,7 +36,7 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
       height: '30px',
       minHeight: '30px',
       border: isChanged ? 'solid #f6ad54 2px' : 'unset',
-      backgroundColor: '#f1f5f9',
+      backgroundColor: 'var(--ui-control-bg)',
       '&:hover': {
         border: isChanged ? 'solid #f6ad54 2px' : 'unset',
         cursor: 'pointer',
@@ -47,6 +47,46 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
     <div>
       <Label text={label} />
       <CreatableSelect
+        classNamePrefix="book-select"
+        theme={(theme) => ({
+          ...theme,
+          colors: {
+            ...theme.colors,
+            primary: 'var(--ui-select-primary)',
+            primary25: 'var(--ui-select-focused)',
+            primary50: 'var(--ui-select-active)',
+            neutral0: 'var(--ui-surface)',
+            neutral5: 'var(--ui-control-bg)',
+            neutral10: 'var(--ui-divider)',
+            neutral20: 'var(--ui-border)',
+            neutral30: 'var(--ui-muted)',
+            neutral40: 'var(--ui-muted)',
+            neutral50: 'var(--ui-muted)',
+            neutral60: 'var(--ui-text)',
+            neutral70: 'var(--ui-text)',
+            neutral80: 'var(--ui-text)',
+            neutral90: 'var(--ui-text)',
+          },
+        })}
+        styles={{
+          ...customStyles,
+          dropdownIndicator: (base) => ({
+            ...base,
+            color: 'var(--ui-muted)',
+            '&:hover': { color: 'var(--ui-text)' },
+          }),
+          clearIndicator: (base) => ({
+            ...base,
+            color: 'var(--ui-muted)',
+            '&:hover': { color: 'var(--ui-text)' },
+          }),
+          option: (base, state) => ({
+            ...base,
+            color: state.isSelected
+              ? 'var(--ui-select-selected-text)'
+              : 'var(--ui-text)',
+          }),
+        }}
         classNames={{
           valueContainer: () => '!p-0',
           singleValue: () => '!py-0 !px-2 !m-0',
@@ -57,7 +97,6 @@ export const BookCreatableSelectBox: React.FC<Props> = ({
           indicatorSeparator: () => '!my-[6px] !mx-0',
         }}
         className="text-sm"
-        styles={customStyles}
         value={value !== undefined ? value : defaultValue}
         isClearable
         options={options}
