@@ -62,29 +62,20 @@ export function UiModeSwitch() {
     { value: 'terminal' as const, label: 'ターミナル風', Icon: Monitor },
     { value: 'cli' as const, label: 'CLI', Icon: Terminal },
   ]
+  const currentIndex = modes.findIndex((item) => item.value === mode)
+  const current = modes[currentIndex]
+  const next = modes[(currentIndex + 1) % modes.length]
+  const Icon = current.Icon
+  const label = `UI表示モード: ${current.label}。${next.label}に切り替え`
   return (
-    <div
-      role="group"
-      aria-label="UI表示モード"
-      className="flex shrink-0 items-center gap-1 rounded border border-gray-300 bg-white p-1"
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={() => setMode(next.value)}
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-600 transition-colors hover:text-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
     >
-      {modes.map(({ value, label, Icon }) => (
-        <button
-          key={value}
-          type="button"
-          aria-label={label}
-          aria-pressed={mode === value}
-          title={label}
-          onClick={() => setMode(value)}
-          className={`rounded p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
-            mode === value
-              ? 'bg-gray-100 text-emerald-600 ring-1 ring-emerald-500'
-              : 'text-gray-500 hover:text-emerald-600'
-          }`}
-        >
-          <Icon className="h-4 w-4" aria-hidden="true" />
-        </button>
-      ))}
-    </div>
+      <Icon className="h-5 w-5" aria-hidden="true" />
+    </button>
   )
 }

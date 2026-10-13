@@ -7,29 +7,40 @@ afterEach(() => {
   localStorage.clear()
 })
 
-it('restores and persists a mode, then returns to the normal UI', () => {
+it('shows one icon and cycles through all modes while persisting the choice', () => {
+  render(
+    <UiModeProvider>
+      <UiModeSwitch />
+    </UiModeProvider>
+  )
+  expect(screen.getAllByRole('button')).toHaveLength(1)
+  const button = screen.getByRole('button')
+  for (const [current, next, value] of [
+    ['通常', 'ターミナル風', 'terminal'],
+    ['ターミナル風', 'CLI', 'cli'],
+    ['CLI', '通常', 'normal'],
+  ]) {
+    expect(button).toHaveAccessibleName(
+      `UI表示モード: ${current}。${next}に切り替え`
+    )
+    fireEvent.click(button)
+    expect(localStorage.getItem('kidoku-ui-mode')).toBe(value)
+    expect(document.documentElement).toHaveAttribute('data-ui-mode', value)
+    expect(screen.getAllByRole('button')).toHaveLength(1)
+  }
+})
+
+it('restores the saved mode and cycles back to normal', () => {
   localStorage.setItem('kidoku-ui-mode', 'cli')
   render(
     <UiModeProvider>
       <UiModeSwitch />
     </UiModeProvider>
   )
-  expect(screen.getByRole('button', { name: 'CLI' })).toHaveAttribute(
-    'aria-pressed',
-    'true'
-  )
   expect(document.documentElement).toHaveAttribute('data-ui-mode', 'cli')
-  fireEvent.click(screen.getByRole('button', { name: 'ターミナル風' }))
-  expect(localStorage.getItem('kidoku-ui-mode')).toBe('terminal')
-  expect(screen.getByRole('button', { name: 'ターミナル風' })).toHaveAttribute(
-    'aria-pressed',
-    'true'
+  fireEvent.click(
+    screen.getByRole('button', { name: 'UI表示モード: CLI。通常に切り替え' })
   )
-  expect(screen.getByRole('button', { name: 'CLI' })).toHaveAttribute(
-    'aria-pressed',
-    'false'
-  )
-  fireEvent.click(screen.getByRole('button', { name: '通常' }))
   expect(document.documentElement).toHaveAttribute('data-ui-mode', 'normal')
 })
 
@@ -40,8 +51,7 @@ it('ignores an invalid saved preference', () => {
       <UiModeSwitch />
     </UiModeProvider>
   )
-  expect(screen.getByRole('button', { name: '通常' })).toHaveAttribute(
-    'aria-pressed',
-    'true'
+  expect(screen.getByRole('button')).toHaveAccessibleName(
+    'UI表示モード: 通常。ターミナル風に切り替え'
   )
 })
