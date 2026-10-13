@@ -278,3 +278,19 @@ html:is([data-ui-mode='terminal'], [data-ui-mode='cli']) .readmore-blur::after {
     left: 0;
   }
 }
+
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli']) .bg-ai-summary {
+  background-color: var(--ui-surface);
+}
+html:is([data-ui-mode='terminal'], [data-ui-mode='cli']) .ai-personality-card {
+  background: var(--ui-surface);
+}
+.cli-window {
+  min-height: calc(100dvh - 3rem);
+  box-shadow: 0 20px 70px #0008;
+}
+.cli-window-title {
+  background: #21262d;
+  color: #9da7b3;
+  border-bottom: 1px solid #3d4855;
+}

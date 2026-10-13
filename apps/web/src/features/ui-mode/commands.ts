@@ -14,6 +14,7 @@ export type CommandResult =
   | { type: 'clear' }
 
 export const COMMAND_HELP = `help                 コマンド一覧
+ai                   AI読書分析を表示
 pwd                  現在の場所
 ls                   シート／本の一覧（本はID付き）
 tree                 シートと現在の本のツリー
@@ -167,6 +168,7 @@ export function completeCommand(
   if (!input.includes(' '))
     return [
       'help',
+      'ai',
       'pwd',
       'ls',
       'tree',

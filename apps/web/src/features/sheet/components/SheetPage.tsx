@@ -257,15 +257,18 @@ export const SheetPage: React.FC<Props> = ({
           openGraph={{ images: [{ url: ogImage, width: 1200, height: 630 }] }}
           twitter={{ cardType: 'summary_large_image' }}
         />
-        <SheetTabsWithMenu
-          sheets={sheets}
-          currentSheet={year}
-          username={username}
-          userId={userId}
-          variant="simple"
-        />
+        {uiMode === 'terminal' && (
+          <SheetTabsWithMenu
+            sheets={sheets}
+            currentSheet={year}
+            username={username}
+            userId={userId}
+            variant="simple"
+          />
+        )}
         <TerminalSheetView
           key={username}
+          aiSummary={latestAiSummary ?? undefined}
           books={isMine ? res.books : data}
           sheets={sheets}
           year={year}

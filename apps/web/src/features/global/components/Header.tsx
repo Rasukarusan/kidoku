@@ -1,3 +1,4 @@
+import { useUiMode } from '@/features/ui-mode/UiModeProvider'
 import { useRouter } from 'next/router'
 import { Container } from '@/components/layout/Container'
 import React from 'react'
@@ -12,13 +13,17 @@ import { UiModeSwitch } from '@/features/ui-mode/UiModeProvider'
 
 // レスポンシブヘッダー
 export const Header = () => {
+  const { mode } = useUiMode()
   const router = useRouter()
   const { session, status } = useCachedSession()
   const setOpenSidebar = useSetAtom(openNavSidebarAtom)
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const unreadCount = useUnreadNotificationCount()
 
-  if (router.asPath.startsWith('/auth/init')) {
+  if (
+    (mode === 'cli' && router.pathname.includes('/sheets/')) ||
+    router.asPath.startsWith('/auth/init')
+  ) {
     return null
   }
 
@@ -45,7 +50,7 @@ export const Header = () => {
                 }
               >
                 <img
-                  className="h-10 w-10 rounded-full ring-2 ring-white"
+                  className="h-10 w-10 rounded-full"
                   src={session.user.image || ''}
                   alt={`${session.user.name || 'ユーザー'}のプロフィール画像`}
                 />

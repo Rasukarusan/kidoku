@@ -132,7 +132,7 @@ export const AiSummaries: React.FC<Props> = ({
             />
           ) : (
             json.character_summary && (
-              <div className="mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5 shadow-sm">
+              <div className="ai-personality-card mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-5 shadow-sm">
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
                   一言でいうとこんな人
                 </h3>
