@@ -8,6 +8,7 @@ import { Logo } from '@/components/icon/Logo'
 import Link from 'next/link'
 import { useCachedSession } from '@/hooks/useCachedSession'
 import { useUnreadNotificationCount } from '@/features/social/hooks/useUnreadNotificationCount'
+import { UiModeSwitch } from '@/features/ui-mode/UiModeProvider'
 
 // レスポンシブヘッダー
 export const Header = () => {
@@ -31,6 +32,7 @@ export const Header = () => {
           <div className="flex-1">
             <SearchBox />
           </div>
+          <UiModeSwitch />
           {session ? (
             <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
               <button

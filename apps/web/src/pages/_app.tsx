@@ -13,6 +13,7 @@ import { AppProps } from 'next/app'
 import { ApolloProvider } from '@apollo/client'
 import apolloClient from '@/libs/apollo'
 import { StoreAccessToken } from '@/features/global/components/StoreAccessToken'
+import { UiModeProvider } from '@/features/ui-mode/UiModeProvider'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -30,12 +31,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <SessionProvider session={pageProps.session}>
             <StoreAccessToken />
             <LoadingTopBar />
-            <Layout>
-              <Header />
-              <Component {...pageProps} />
-              <Analytics />
-              <Footer />
-            </Layout>
+            <UiModeProvider>
+              <Layout>
+                <Header />
+                <Component {...pageProps} />
+                <Analytics />
+                <Footer />
+              </Layout>
+            </UiModeProvider>
           </SessionProvider>
         </ApolloProvider>
       </Provider>
