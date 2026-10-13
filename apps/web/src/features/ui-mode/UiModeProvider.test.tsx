@@ -14,15 +14,22 @@ it('restores and persists a mode, then returns to the normal UI', () => {
       <UiModeSwitch />
     </UiModeProvider>
   )
-  expect(screen.getByRole('combobox')).toHaveValue('cli')
+  expect(screen.getByRole('button', { name: 'CLI' })).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  )
   expect(document.documentElement).toHaveAttribute('data-ui-mode', 'cli')
-  fireEvent.change(screen.getByRole('combobox'), {
-    target: { value: 'terminal' },
-  })
+  fireEvent.click(screen.getByRole('button', { name: 'ターミナル風' }))
   expect(localStorage.getItem('kidoku-ui-mode')).toBe('terminal')
-  fireEvent.change(screen.getByRole('combobox'), {
-    target: { value: 'normal' },
-  })
+  expect(screen.getByRole('button', { name: 'ターミナル風' })).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  )
+  expect(screen.getByRole('button', { name: 'CLI' })).toHaveAttribute(
+    'aria-pressed',
+    'false'
+  )
+  fireEvent.click(screen.getByRole('button', { name: '通常' }))
   expect(document.documentElement).toHaveAttribute('data-ui-mode', 'normal')
 })
 
@@ -33,5 +40,8 @@ it('ignores an invalid saved preference', () => {
       <UiModeSwitch />
     </UiModeProvider>
   )
-  expect(screen.getByRole('combobox')).toHaveValue('normal')
+  expect(screen.getByRole('button', { name: '通常' })).toHaveAttribute(
+    'aria-pressed',
+    'true'
+  )
 })
