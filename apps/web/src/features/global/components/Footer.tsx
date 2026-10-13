@@ -1,3 +1,4 @@
+import { useUiMode } from '@/features/ui-mode/UiModeProvider'
 import Link from 'next/link'
 import { Logo } from '@/components/icon/Logo'
 import { SUPPORT_URL } from '@/libs/constants'
@@ -37,10 +38,12 @@ const Column: React.FC<ColumnProps> = ({ title, items }) => {
 
 export const Footer: React.FC = () => {
   const { data: session } = useSession()
+  const { mode } = useUiMode()
   const router = useRouter()
   if (router.asPath.startsWith('/auth/init')) {
     return null
   }
+  if (mode === 'cli' && router.pathname.includes('/sheets/')) return null
   return (
     <footer className="bg-main">
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
