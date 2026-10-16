@@ -16,8 +16,7 @@ it('shows one icon and cycles through all modes while persisting the choice', ()
   expect(screen.getAllByRole('button')).toHaveLength(1)
   const button = screen.getByRole('button')
   for (const [current, next, value] of [
-    ['通常', 'ターミナル風', 'terminal'],
-    ['ターミナル風', 'CLI', 'cli'],
+    ['通常', 'CLI', 'cli'],
     ['CLI', '通常', 'normal'],
   ]) {
     expect(button).toHaveAccessibleName(
@@ -52,6 +51,16 @@ it('ignores an invalid saved preference', () => {
     </UiModeProvider>
   )
   expect(screen.getByRole('button')).toHaveAccessibleName(
-    'UI表示モード: 通常。ターミナル風に切り替え'
+    'UI表示モード: 通常。CLIに切り替え'
   )
+})
+
+it('migrates the removed terminal mode to CLI', () => {
+  localStorage.setItem('kidoku-ui-mode', 'terminal')
+  render(
+    <UiModeProvider>
+      <UiModeSwitch />
+    </UiModeProvider>
+  )
+  expect(document.documentElement).toHaveAttribute('data-ui-mode', 'cli')
 })

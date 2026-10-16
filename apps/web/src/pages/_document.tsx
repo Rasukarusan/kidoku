@@ -1,11 +1,14 @@
 import React from 'react'
 import Document, { Html, Head, Main, NextScript } from 'next/document'
-import { kosugi, notojp } from '@/libs/fonts'
+import { kosugi, mono, notojp } from '@/libs/fonts'
 
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html lang="ja" className={`${kosugi.variable} ${notojp.variable}`}>
+      <Html
+        lang="ja"
+        className={`${kosugi.variable} ${notojp.variable} ${mono.variable}`}
+      >
         <Head>
           {/* PWA primary color */}
           <meta name="theme-color" content="#0f766e" />

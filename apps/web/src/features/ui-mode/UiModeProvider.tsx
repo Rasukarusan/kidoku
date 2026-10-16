@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { LayoutGrid, Monitor, Terminal } from 'lucide-react'
+import { LayoutGrid, Terminal } from 'lucide-react'
 
-export type UiMode = 'normal' | 'terminal' | 'cli'
+export type UiMode = 'normal' | 'cli'
 const STORAGE_KEY = 'kidoku-ui-mode'
-const isUiMode = (value: string): value is UiMode =>
-  ['normal', 'terminal', 'cli'].includes(value)
+// 廃止した「ターミナル風」モードを選んでいた人はCLIに引き継ぐ
+const parseUiMode = (value: string | null): UiMode =>
+  value === 'cli' || value === 'terminal' ? 'cli' : 'normal'
 
 const UiModeContext = createContext<{
   mode: UiMode
@@ -16,14 +17,13 @@ export function UiModeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      if (isUiMode(saved)) updateMode(saved)
+      updateMode(parseUiMode(localStorage.getItem(STORAGE_KEY)))
     } catch {
       // Storage can be disabled; switching still works for this session.
     }
     const sync = (event: StorageEvent) => {
       if (event.key === STORAGE_KEY) {
-        updateMode(isUiMode(event.newValue) ? event.newValue : 'normal')
+        updateMode(parseUiMode(event.newValue))
       }
     }
     window.addEventListener('storage', sync)
@@ -59,7 +59,6 @@ export function UiModeSwitch() {
   const { mode, setMode } = useUiMode()
   const modes = [
     { value: 'normal' as const, label: '通常', Icon: LayoutGrid },
-    { value: 'terminal' as const, label: 'ターミナル風', Icon: Monitor },
     { value: 'cli' as const, label: 'CLI', Icon: Terminal },
   ]
   const currentIndex = modes.findIndex((item) => item.value === mode)
