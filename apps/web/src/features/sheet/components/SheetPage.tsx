@@ -21,11 +21,11 @@ import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
 import { IoGrid } from 'react-icons/io5'
 import { twMerge } from 'tailwind-merge'
-import { useQuery } from '@apollo/client'
-import { getBooksQuery } from '@/features/books/api'
+import { useMutation, useQuery } from '@apollo/client'
+import { getBooksQuery, updateBookMemoMutation } from '@/features/books/api'
 import dayjs from 'dayjs'
 import { useUiMode } from '@/features/ui-mode/UiModeProvider'
-import { TerminalSheetView } from '@/features/ui-mode/TerminalSheetView'
+import { CliSheetView } from '@/features/ui-mode/CliSheetView'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -69,6 +69,9 @@ export const SheetPage: React.FC<Props> = ({
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
   const { data: booksData } = useQuery(getBooksQuery, {
     variables: { input: { sheetName: year } },
+  })
+  const [updateBookMemo] = useMutation(updateBookMemoMutation, {
+    refetchQueries: [getBooksQuery],
   })
   const res = useMemo(
     () =>
@@ -248,50 +251,30 @@ export const SheetPage: React.FC<Props> = ({
     }
   }
 
-  if (uiMode !== 'normal') {
+  if (uiMode === 'cli') {
     return (
-      <Container className="mb-12">
+      <>
         <NextSeo
           title={`${username}/${year} | kidoku`}
           description={monthlySummary}
           openGraph={{ images: [{ url: ogImage, width: 1200, height: 630 }] }}
           twitter={{ cardType: 'summary_large_image' }}
         />
-        {uiMode === 'terminal' && (
-          <SheetTabsWithMenu
-            sheets={sheets}
-            currentSheet={year}
-            username={username}
-            userId={userId}
-            variant="simple"
-          />
-        )}
-        <TerminalSheetView
+        <CliSheetView
           key={username}
           aiSummary={latestAiSummary ?? undefined}
           books={isMine ? res.books : data}
           sheets={sheets}
           year={year}
           username={username}
+          canEdit={Boolean(isMine)}
+          onSaveMemo={async (bookId, memo) => {
+            await updateBookMemo({
+              variables: { input: { id: String(bookId), memo } },
+            })
+          }}
         />
-        {uiMode === 'terminal' && (
-          <>
-            <AiSummaries
-              aiSummaries={aiSummaries}
-              username={username}
-              bookCount={data.length}
-              sheet={year}
-              isMine={isMine}
-              books={data}
-            />
-            <YearlyTopBooks
-              books={currentData}
-              year={year}
-              yearlyTopBooks={yearlyTopBooks}
-            />
-          </>
-        )}
-      </Container>
+      </>
     )
   }
 
