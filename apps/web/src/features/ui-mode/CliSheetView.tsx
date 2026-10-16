@@ -6,9 +6,11 @@ import { useUiMode } from './UiModeProvider'
 import { ansi } from './ansi'
 import { AnsiText } from './AnsiText'
 import { LessPager } from './LessPager'
+import { FinderAction, finderLine, FuzzyFinder } from './FuzzyFinder'
 import { byteLength, VimEditor, WriteResult } from './VimEditor'
 import {
   BANNER,
+  bookFile,
   completeCommand,
   EditorFile,
   Env,
@@ -103,6 +105,7 @@ export function CliSheetView({
   ])
   const [readerBook, setReaderBook] = useState<Book | null>(null)
   const [editor, setEditor] = useState<EditorFile | null>(null)
+  const [finder, setFinder] = useState<{ query: string } | null>(null)
   const [rc, setRc] = useState(DEFAULT_ZSHRC)
   const [shell, setShell] = useState<{ aliases: Env; vars: Env }>(() => ({
     aliases: {},
@@ -149,12 +152,13 @@ export function CliSheetView({
   useEffect(() => {
     setAtRoot(false)
     setReaderBook(null)
+    setFinder(null)
   }, [year, username])
 
   useEffect(() => {
-    if (!readerBook && !editor && !busy)
+    if (!readerBook && !editor && !finder && !busy)
       inputRef.current?.focus({ preventScroll: true })
-  }, [readerBook, editor, busy])
+  }, [readerBook, editor, finder, busy])
 
   useEffect(() => {
     const screen = screenRef.current
@@ -217,6 +221,10 @@ export function CliSheetView({
       case 'less':
         append(command, '')
         setReaderBook(result.book)
+        break
+      case 'lk':
+        append(command, '')
+        setFinder({ query: result.query })
         break
       case 'open':
         append(command, result.text)
@@ -362,9 +370,30 @@ export function CliSheetView({
     }
   }
 
+  // fzf と同じく選んだ行を出力してから、その本を開く
+  const selectFromFinder = (book: Book, action: FinderAction) => {
+    setFinder(null)
+    append(null, finderLine(book))
+    if (action === 'vim') setEditor(bookFile(book, canEdit))
+    else setReaderBook(book)
+  }
+
   const toggleFullscreen = () => {
-    if (document.fullscreenElement) void document.exitFullscreen()
-    else void windowRef.current?.requestFullscreen?.()
+    if (document.fullscreenElement) {
+      void document.exitFullscreen()
+      return
+    }
+    // フルスクリーン中の Esc はブラウザが解除に使ってしまい、vim でノーマルモードに戻れなくなる。
+    // Keyboard Lock API に対応したブラウザでは Esc をページで受け取る（長押しで解除）
+    const keyboard = (
+      navigator as Navigator & {
+        keyboard?: { lock?: (keys: string[]) => Promise<void> }
+      }
+    ).keyboard
+    void windowRef.current
+      ?.requestFullscreen?.()
+      .then(() => keyboard?.lock?.(['Escape']))
+      .catch(() => undefined)
   }
 
   const codePoint = input.codePointAt(caret)
@@ -443,7 +472,7 @@ export function CliSheetView({
                 {input.slice(0, caret)}
                 <span
                   className={
-                    focused && !readerBook && !editor
+                    focused && !readerBook && !editor && !finder
                       ? 'cli-cursor cli-cursor-blink'
                       : 'cli-cursor-idle'
                   }
@@ -483,6 +512,14 @@ export function CliSheetView({
             onOpen={(href) => void router.push(href)}
           />
         )}
+        {finder && (
+          <FuzzyFinder
+            books={books}
+            initialQuery={finder.query}
+            onSelect={selectFromFinder}
+            onCancel={() => setFinder(null)}
+          />
+        )}
         {editor && (
           <VimEditor
             file={editor}
@@ -496,7 +533,7 @@ export function CliSheetView({
       <div
         className="cli-keybar"
         aria-label="補助キー"
-        hidden={Boolean(editor || readerBook)}
+        hidden={Boolean(editor || readerBook || finder)}
       >
         {(
           [

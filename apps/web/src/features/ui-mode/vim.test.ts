@@ -1,5 +1,6 @@
 import {
   createVimState,
+  imeTextToKeys,
   vimContent,
   vimInsertText,
   vimKeys,
@@ -114,5 +115,14 @@ describe('vim', () => {
       vimKeys(type(createVimState(content), ':set nu').state, ['Enter']).state
         .number
     ).toBe(true)
+  })
+})
+
+describe('imeTextToKeys', () => {
+  it('converts text typed with IME on into vim keys', () => {
+    expect(imeTextToKeys('：ｗ')).toEqual([':', 'w'])
+    expect(imeTextToKeys('：ｗｑ！')).toEqual([':', 'w', 'q', '!'])
+    expect(imeTextToKeys('い')).toEqual(['i'])
+    expect(imeTextToKeys('・検索\n')).toEqual(['/', '検', '索', 'Enter'])
   })
 })

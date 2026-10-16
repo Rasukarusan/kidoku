@@ -765,3 +765,27 @@ export function vimKeys(state: VimState, keys: string[]): VimResult {
   }
   return result
 }
+
+// 日本語入力オンのまま押されたキーをノーマル／コマンドモードの操作として解釈するための変換表
+const IME_KEYS: Record<string, string> = {
+  あ: 'a',
+  い: 'i',
+  う: 'u',
+  え: 'e',
+  お: 'o',
+  '・': '/',
+  ー: '-',
+  '。': '.',
+  '、': ',',
+}
+
+/**
+ * IME で確定された文字列（例: 「：ｗ」）をキー列に変換する。
+ * 全角英数記号は半角にし、改行は Enter として扱う。
+ */
+export const imeTextToKeys = (text: string): string[] =>
+  Array.from(text).map((char) => {
+    if (char === '\n') return 'Enter'
+    const normalized = char.normalize('NFKC')
+    return IME_KEYS[char] ?? (normalized.length === 1 ? normalized : char)
+  })
