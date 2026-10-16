@@ -133,3 +133,60 @@ it('loads ~/.zshrc on login and persists edits made with vim', async () => {
   )
   localStorage.clear()
 })
+
+it('saves with :w typed while Japanese IME is on', async () => {
+  const onSaveMemo = jest.fn().mockResolvedValue(undefined)
+  render(
+    <CliSheetView {...props} books={[book]} canEdit onSaveMemo={onSaveMemo} />
+  )
+  type('vim 42')
+  vim(['A', 'x', 'Escape'])
+  const editor = screen.getByRole('textbox', { name: /^vim:/ })
+  fireEvent.compositionStart(editor)
+  fireEvent.input(editor, { target: { value: '：ｗ' }, isComposing: true })
+  fireEvent.compositionEnd(editor)
+  vim(['Enter'])
+  await waitFor(() => expect(onSaveMemo).toHaveBeenCalledWith(42, 'oldx'))
+})
+
+it('picks a book with the lk fuzzy finder and opens it', async () => {
+  // jsdom は scrollTo を実装していない（less が開くときに呼ばれる）
+  Element.prototype.scrollTo = jest.fn()
+  const other = {
+    ...book,
+    id: 7,
+    title: 'リーダブルコード',
+    memo: '読みやすさ',
+  }
+  render(<CliSheetView {...props} books={[book, other]} canEdit />)
+  type('lk')
+  const query = screen.getByRole('textbox', { name: 'lk: 検索語' })
+  expect(screen.getAllByRole('option')).toHaveLength(2)
+  fireEvent.change(query, { target: { value: 'りーだ' } })
+  expect(screen.getAllByRole('option')).toHaveLength(1)
+  expect(
+    screen.getByRole('document', { name: 'プレビュー' }).textContent
+  ).toContain('読みやすさ')
+  fireEvent.keyDown(query, { key: 'Enter' })
+  expect(screen.queryByRole('dialog', { name: 'lk' })).toBeNull()
+  expect(screen.getByRole('log').textContent).toContain('7  リーダブルコード')
+  expect(
+    screen.getByRole('document', { name: 'less: リーダブルコード' })
+  ).toBeTruthy()
+})
+
+it('opens the selected book in vim with Ctrl-E and cancels with Esc', () => {
+  render(<CliSheetView {...props} books={[book]} canEdit />)
+  type('lk 本')
+  fireEvent.keyDown(screen.getByRole('textbox', { name: 'lk: 検索語' }), {
+    key: 'e',
+    ctrlKey: true,
+  })
+  expect(screen.getByRole('textbox', { name: 'vim: 本.md' })).toBeTruthy()
+  vim([':', 'q', 'Enter'])
+  type('lk')
+  fireEvent.keyDown(screen.getByRole('textbox', { name: 'lk: 検索語' }), {
+    key: 'Escape',
+  })
+  expect(screen.queryByRole('dialog', { name: 'lk' })).toBeNull()
+})
