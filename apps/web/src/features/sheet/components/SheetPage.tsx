@@ -25,7 +25,7 @@ import { useQuery } from '@apollo/client'
 import { getBooksQuery } from '@/features/books/api'
 import dayjs from 'dayjs'
 import { useUiMode } from '@/features/ui-mode/UiModeProvider'
-import { TerminalSheetView } from '@/features/ui-mode/TerminalSheetView'
+import { CliSheetView } from '@/features/ui-mode/CliSheetView'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -248,25 +248,16 @@ export const SheetPage: React.FC<Props> = ({
     }
   }
 
-  if (uiMode !== 'normal') {
+  if (uiMode === 'cli') {
     return (
-      <Container className="mb-12">
+      <>
         <NextSeo
           title={`${username}/${year} | kidoku`}
           description={monthlySummary}
           openGraph={{ images: [{ url: ogImage, width: 1200, height: 630 }] }}
           twitter={{ cardType: 'summary_large_image' }}
         />
-        {uiMode === 'terminal' && (
-          <SheetTabsWithMenu
-            sheets={sheets}
-            currentSheet={year}
-            username={username}
-            userId={userId}
-            variant="simple"
-          />
-        )}
-        <TerminalSheetView
+        <CliSheetView
           key={username}
           aiSummary={latestAiSummary ?? undefined}
           books={isMine ? res.books : data}
@@ -274,24 +265,7 @@ export const SheetPage: React.FC<Props> = ({
           year={year}
           username={username}
         />
-        {uiMode === 'terminal' && (
-          <>
-            <AiSummaries
-              aiSummaries={aiSummaries}
-              username={username}
-              bookCount={data.length}
-              sheet={year}
-              isMine={isMine}
-              books={data}
-            />
-            <YearlyTopBooks
-              books={currentData}
-              year={year}
-              yearlyTopBooks={yearlyTopBooks}
-            />
-          </>
-        )}
-      </Container>
+      </>
     )
   }
 
