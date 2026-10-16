@@ -447,3 +447,24 @@ html[data-ui-mode='cli'] .ai-personality-card {
   background: var(--term-fg);
   color: var(--term-bg);
 }
+.cli-vim {
+  background: var(--term-bg);
+}
+.cli-vim-status {
+  flex-shrink: 0;
+  padding: 0 10px;
+  background: var(--term-chrome);
+  border-top: 1px solid var(--term-line);
+  color: var(--ansi-b7);
+  white-space: pre;
+}
+.cli-vim-error {
+  background: #da3633;
+  color: #fff;
+}
+.cli-cursor-bar {
+  box-shadow: inset 2px 0 0 var(--term-fg);
+}
+.cli-keybar[hidden] {
+  display: none;
+}

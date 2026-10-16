@@ -15,8 +15,24 @@ export interface TerminalSheet {
   name: string
   order: number
 }
+/** vim で開くバッファ */
+export interface EditorFile {
+  kind: 'rc' | 'book' | 'scratch'
+  /** ステータスラインに表示するファイル名（空なら [No Name]） */
+  name: string
+  content: string
+  bookId?: number
+  readonly?: boolean
+  isNew?: boolean
+}
+
+export type Env = Record<string, string>
+
 export type CommandResult =
   | { type: 'text'; text: string }
+  | { type: 'env'; aliases: Env; vars: Env; text: string }
+  | { type: 'source'; script: string; path: string }
+  | { type: 'vim'; file: EditorFile }
   | { type: 'cd'; sheet: string | null }
   | { type: 'less'; book: Book }
   | { type: 'open'; href: string; text: string }
@@ -30,7 +46,17 @@ export interface CommandContext {
   books: Book[]
   history?: string[]
   aiSummary?: AiSummariesJson
+  /** エイリアス（name → 展開後のコマンド） */
+  aliases?: Env
+  /** シェル変数（PROMPT, HOME など） */
+  vars?: Env
+  /** ~/.zshrc の内容 */
+  rc?: string
+  /** 本のメモを vim で保存できるか（自分のシートのみ） */
+  canEdit?: boolean
 }
+
+export const RC_PATH = '~/.zshrc'
 
 const HELP: Array<[string, string]> = [
   ['help', 'コマンド一覧を表示'],
@@ -46,6 +72,11 @@ const HELP: Array<[string, string]> = [
   ['ai', 'AI読書分析を表示'],
   ['neofetch', '読書プロフィールを表示'],
   ['history', 'コマンド履歴'],
+  ['vim <id|~/.zshrc>', 'メモや設定ファイルを編集（:w 保存 / :q 終了）'],
+  ['source ~/.zshrc', '設定ファイルを読み込み直す'],
+  ['alias / unalias', 'エイリアスの一覧・設定・削除'],
+  ['export / env / unset', 'シェル変数（PROMPT など）'],
+  ['which <cmd>', 'コマンドの種類を表示'],
   ['whoami / date / echo', ''],
   ['clear', '画面を消去（Ctrl+L）'],
   ['exit', 'CLIを終了して通常表示に戻る'],
@@ -60,12 +91,15 @@ const KEYS: Array<[string, string]> = [
 
 export const COMMANDS = [
   'ai',
+  'alias',
   'cat',
   'cd',
   'clear',
   'date',
   'echo',
+  'env',
   'exit',
+  'export',
   'grep',
   'help',
   'history',
@@ -75,8 +109,14 @@ export const COMMANDS = [
   'neofetch',
   'open',
   'pwd',
+  'source',
   'stats',
   'tree',
+  'unalias',
+  'unset',
+  'vi',
+  'vim',
+  'which',
   'whoami',
 ]
 
@@ -103,13 +143,32 @@ export const BANNER = [0, 1, 2, 3, 4]
   .map((row) => [K, I, D, O, K, U].map((glyph) => glyph[row]).join(''))
   .join('\n')
 
-export function tokenizeCommand(input: string): string[] {
+const NAME = /^[A-Za-z_][A-Za-z0-9_]*/
+
+/**
+ * シェル風にトークン分割する。vars を渡すと引用符（'）の外の $NAME / ${NAME} を展開する。
+ * 引用符の外で単語の先頭にある # 以降はコメントとして無視する。
+ */
+export function tokenizeCommand(input: string, vars?: Env): string[] {
   const tokens: string[] = []
   let token = ''
   let quote = ''
   let started = false
   let escaped = false
-  for (const char of input.trim()) {
+  const chars = Array.from(input.trim())
+  for (let index = 0; index < chars.length; index++) {
+    const char = chars[index]
+    if (vars && char === '$' && quote !== "'" && !escaped) {
+      const rest = chars.slice(index + 1).join('')
+      const braced = rest.match(/^\{([A-Za-z_][A-Za-z0-9_]*)\}/)
+      const name = braced ? braced[1] : rest.match(NAME)?.[0]
+      if (name) {
+        token += vars[name] ?? ''
+        started = true
+        index += Array.from(braced ? braced[0] : name).length
+        continue
+      }
+    }
     if (escaped) {
       token += char
       started = true
@@ -123,6 +182,8 @@ export function tokenizeCommand(input: string): string[] {
     } else if (char === '"' || char === "'") {
       quote = char
       started = true
+    } else if (char === '#' && !started) {
+      break
     } else if (/\s/.test(char)) {
       if (started) tokens.push(token)
       token = ''
@@ -137,6 +198,18 @@ export function tokenizeCommand(input: string): string[] {
   if (started) tokens.push(token)
   return tokens
 }
+
+/** 先頭の単語がエイリアスなら展開する（自身を含むエイリアスは1段だけ展開） */
+export function expandAlias(input: string, aliases: Env = {}): string {
+  const match = input.match(/^(\s*)([^\s'"\\=]+)/)
+  if (!match || !(match[2] in aliases)) return input
+  return match[1] + aliases[match[2]] + input.slice(match[0].length)
+}
+
+const quoteValue = (value: string) => `'${value.replace(/'/g, `'\\''`)}'`
+
+const isRcPath = (path: string, username: string) =>
+  [RC_PATH, '.zshrc', './.zshrc', `/${username}/.zshrc`].includes(path)
 
 /** 空白や引用符をバックスラッシュでエスケープし、1トークンとして解釈できるようにする */
 export const escapeArgument = (value: string) =>
@@ -286,9 +359,11 @@ export function runCommand(
   context: CommandContext
 ): CommandResult {
   const text = (value: string): CommandResult => ({ type: 'text', text: value })
+  const aliases = context.aliases ?? {}
+  const vars = context.vars ?? {}
   let tokens: string[]
   try {
-    tokens = tokenizeCommand(input)
+    tokens = tokenizeCommand(expandAlias(input, aliases), vars)
   } catch (error) {
     return text(`${SHELL}: ${(error as Error).message}`)
   }
@@ -305,7 +380,121 @@ export function runCommand(
     `${ansi.bold(sanitize(book.title))} ${ansi.gray(`— ${sanitize(book.author)}`)}`
   const listing = books.map((book) => `${id(book, idWidth)}  ${name(book)}`)
   if (!command) return text('')
+  if (tokens.every((token) => /^[A-Za-z_][A-Za-z0-9_]*=/.test(token))) {
+    const next = { ...vars }
+    for (const token of tokens) {
+      const separator = token.indexOf('=')
+      next[token.slice(0, separator)] = token.slice(separator + 1)
+    }
+    return { type: 'env', aliases, vars: next, text: '' }
+  }
+  const home = `/${username}`
   switch (command) {
+    case 'alias': {
+      if (!rest.length)
+        return text(
+          Object.entries(aliases)
+            .map(([key, value]) => `${key}=${quoteValue(sanitize(value))}`)
+            .join('\n')
+        )
+      const next = { ...aliases }
+      const shown: string[] = []
+      for (const arg of rest) {
+        const separator = arg.indexOf('=')
+        if (separator === -1) {
+          if (arg in next)
+            shown.push(`${arg}=${quoteValue(sanitize(next[arg]))}`)
+          continue
+        }
+        const key = arg.slice(0, separator)
+        if (!/^[^\s'"\\]+$/.test(key))
+          return text(`alias: invalid alias name: ${sanitize(key)}`)
+        next[key] = arg.slice(separator + 1)
+      }
+      return { type: 'env', aliases: next, vars, text: shown.join('\n') }
+    }
+    case 'unalias': {
+      if (!rest.length) return text('unalias: not enough arguments')
+      const next = { ...aliases }
+      for (const key of rest) {
+        if (!(key in next))
+          return text(`unalias: no such hash table element: ${sanitize(key)}`)
+        delete next[key]
+      }
+      return { type: 'env', aliases: next, vars, text: '' }
+    }
+    case 'env':
+    case 'export': {
+      if (command === 'env' || !rest.length)
+        return text(
+          Object.entries(vars)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([key, value]) => `${key}=${sanitize(value)}`)
+            .join('\n')
+        )
+      const next = { ...vars }
+      for (const arg of rest) {
+        const separator = arg.indexOf('=')
+        const key = separator === -1 ? arg : arg.slice(0, separator)
+        if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key))
+          return text(`export: not an identifier: ${sanitize(key)}`)
+        if (separator !== -1) next[key] = arg.slice(separator + 1)
+        else next[key] = next[key] ?? ''
+      }
+      return { type: 'env', aliases, vars: next, text: '' }
+    }
+    case 'unset': {
+      const next = { ...vars }
+      for (const key of rest) delete next[key]
+      return { type: 'env', aliases, vars: next, text: '' }
+    }
+    case 'which':
+    case 'type':
+      if (!rest.length) return text(`${command}: 使い方: ${command} <コマンド>`)
+      return text(
+        rest
+          .map((name) =>
+            name in aliases
+              ? `${name}: aliased to ${sanitize(aliases[name])}`
+              : COMMANDS.includes(name)
+                ? `${name}: shell built-in command`
+                : `${sanitize(name)} not found`
+          )
+          .join('\n')
+      )
+    case 'source':
+    case '.':
+      if (!argument) return text(`${command}: not enough arguments`)
+      return isRcPath(argument, username)
+        ? { type: 'source', script: context.rc ?? '', path: RC_PATH }
+        : text(`${command}: no such file or directory: ${sanitize(argument)}`)
+    case 'vi':
+    case 'vim':
+    case 'nvim': {
+      if (!argument)
+        return { type: 'vim', file: { kind: 'scratch', name: '', content: '' } }
+      if (isRcPath(argument, username))
+        return {
+          type: 'vim',
+          file: { kind: 'rc', name: RC_PATH, content: context.rc ?? '' },
+        }
+      const book = currentSheet ? findBook(command, argument, books) : null
+      if (book && typeof book !== 'string')
+        return {
+          type: 'vim',
+          file: {
+            kind: 'book',
+            name: `${sanitize(book.title)}.md`,
+            content: book.memo ?? '',
+            bookId: book.id,
+            readonly: !context.canEdit,
+          },
+        }
+      return {
+        type: 'vim',
+        file: { kind: 'scratch', name: argument, content: '', isNew: true },
+      }
+    }
     case 'help':
       return text(helpText())
     case 'pwd':
@@ -323,6 +512,13 @@ export function runCommand(
           .join('\n')
       )
     case 'ls': {
+      if (['~', '~/', home, `${home}/`].includes(argument))
+        return text(
+          [
+            ...(flags.some((flag) => flag.includes('a')) ? ['.zshrc'] : []),
+            ansi.bold(ansi.blue('sheets/')),
+          ].join('\n')
+        )
       if (!currentSheet)
         return text(
           sheets
@@ -381,6 +577,8 @@ export function runCommand(
     case 'less':
     case 'cat':
     case 'open': {
+      if (command === 'cat' && isRcPath(argument, username))
+        return text(sanitize(context.rc ?? ''))
       if (!currentSheet)
         return text(
           `${command}: 先に cd <シート名> でシートに移動してください。`
@@ -474,11 +672,14 @@ export interface Completion {
 export function completeCommand(
   input: string,
   sheets: TerminalSheet[],
-  books: Book[]
+  books: Book[],
+  aliases: Env = {}
 ): Completion {
   const separator = input.search(/\s/)
   if (separator === -1) {
-    const matches = COMMANDS.filter((command) => command.startsWith(input))
+    const matches = Array.from(new Set([...COMMANDS, ...Object.keys(aliases)]))
+      .sort()
+      .filter((command) => command.startsWith(input))
     if (matches.length === 1) return { line: `${matches[0]} `, candidates: [] }
     return {
       line: matches.length ? commonPrefix(matches) : input,
@@ -496,11 +697,18 @@ export function completeCommand(
   const options: Array<{ value: string; label: string }> =
     command === 'cd'
       ? sheets.map((sheet) => ({ value: sheet.name, label: `${sheet.name}/` }))
-      : ['less', 'cat', 'open'].includes(command)
-        ? books.map((book) => ({
-            value: String(book.id),
-            label: `${book.id}  ${book.title}`,
-          }))
+      : ['less', 'cat', 'open', 'vi', 'vim', 'source'].includes(command)
+        ? [
+            ...(['cat', 'vi', 'vim', 'source'].includes(command)
+              ? [{ value: RC_PATH, label: RC_PATH }]
+              : []),
+            ...(command === 'source'
+              ? []
+              : books.map((book) => ({
+                  value: String(book.id),
+                  label: `${book.id}  ${book.title}`,
+                }))),
+          ]
         : command === 'mode'
           ? ['normal', 'cli'].map((value) => ({ value, label: value }))
           : []

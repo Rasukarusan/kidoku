@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { CliSheetView } from './CliSheetView'
 import { useUiMode } from './UiModeProvider'
 
@@ -71,4 +71,65 @@ it('supports history, Ctrl+C and exit', () => {
   expect(screen.getByRole('log').textContent).toContain('whoami^C')
   type('exit')
   expect(setMode).toHaveBeenCalledWith('normal')
+})
+
+const book = {
+  id: 42,
+  title: '本',
+  author: '著者',
+  memo: 'old',
+  image: '',
+  month: '1月',
+} as unknown as import('@/types/book').Book
+
+const vim = (keys: string[]) => {
+  const editor = screen.getByRole('textbox', { name: /^vim:/ })
+  for (const key of keys)
+    fireEvent.keyDown(
+      editor,
+      key.startsWith('C-') ? { key: key.slice(2), ctrlKey: true } : { key }
+    )
+}
+
+it('edits a memo with vim and saves it with :wq', async () => {
+  const onSaveMemo = jest.fn().mockResolvedValue(undefined)
+  render(
+    <CliSheetView {...props} books={[book]} canEdit onSaveMemo={onSaveMemo} />
+  )
+  type('vim 42')
+  expect(screen.getByRole('status').textContent).toContain('"本.md" 1L, 3B')
+  vim(['A', ' ', 'n', 'e', 'w', 'Escape', ':', 'w', 'q', 'Enter'])
+  await waitFor(() => expect(onSaveMemo).toHaveBeenCalledWith(42, 'old new'))
+  await waitFor(() =>
+    expect(screen.queryByRole('textbox', { name: /^vim:/ })).toBeNull()
+  )
+})
+
+it('refuses to save memos of other users', async () => {
+  const onSaveMemo = jest.fn()
+  render(<CliSheetView {...props} books={[book]} onSaveMemo={onSaveMemo} />)
+  type('vim 42')
+  vim(['x', ':', 'w', 'Enter'])
+  await waitFor(() =>
+    expect(screen.getByRole('status').textContent).toContain('E45')
+  )
+  expect(onSaveMemo).not.toHaveBeenCalled()
+})
+
+it('loads ~/.zshrc on login and persists edits made with vim', async () => {
+  localStorage.setItem(
+    'kidoku-zshrc',
+    "alias hi='echo hello'\nPROMPT='%n> '\nwhoami"
+  )
+  render(<CliSheetView {...props} />)
+  const log = screen.getByRole('log')
+  expect(log.textContent).toContain('reader')
+  type('hi')
+  expect(log.textContent).toContain('reader> hihello')
+  type('vim ~/.zshrc')
+  vim(['G', 'o', 'l', 's', 'Escape', ':', 'w', 'q', 'Enter'])
+  await waitFor(() =>
+    expect(localStorage.getItem('kidoku-zshrc')).toContain('\nls')
+  )
+  localStorage.clear()
 })

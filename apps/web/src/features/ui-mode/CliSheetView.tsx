@@ -6,13 +6,24 @@ import { useUiMode } from './UiModeProvider'
 import { ansi } from './ansi'
 import { AnsiText } from './AnsiText'
 import { LessPager } from './LessPager'
+import { byteLength, VimEditor, WriteResult } from './VimEditor'
 import {
   BANNER,
   completeCommand,
+  EditorFile,
+  Env,
   runCommand,
   SHELL,
   TerminalSheet,
 } from './commands'
+import {
+  DEFAULT_PROMPT,
+  DEFAULT_ZSHRC,
+  defaultVars,
+  RC_STORAGE_KEY,
+  renderPrompt,
+  runScript,
+} from './shell'
 
 interface Props {
   aiSummary?: AiSummariesJson
@@ -20,11 +31,15 @@ interface Props {
   sheets: TerminalSheet[]
   year: string
   username: string
+  /** 自分のシートなら true（vim でメモを保存できる） */
+  canEdit?: boolean
+  onSaveMemo?: (bookId: number, memo: string) => Promise<void>
 }
 
 interface Entry {
   id: number
-  cwd: string
+  /** 実行時のプロンプト（ANSI） */
+  prompt: string
   /** null はプロンプトを伴わない出力（ログインメッセージなど） */
   command: string | null
   output: string
@@ -32,15 +47,20 @@ interface Entry {
 
 const MAX_ENTRIES = 300
 
-function Prompt({ username, cwd }: { username: string; cwd: string }) {
+function Prompt({ prompt }: { prompt: string }) {
   return (
     <span aria-hidden="true">
-      <span className="ansi-bold ansi-2">
-        {username}@{SHELL}
-      </span>
-      :<span className="ansi-bold ansi-4">{cwd}</span>${' '}
+      <AnsiText text={prompt} />
     </span>
   )
+}
+
+const loadRc = () => {
+  try {
+    return localStorage.getItem(RC_STORAGE_KEY) ?? DEFAULT_ZSHRC
+  } catch {
+    return DEFAULT_ZSHRC
+  }
 }
 
 export function CliSheetView({
@@ -49,6 +69,8 @@ export function CliSheetView({
   year,
   username,
   aiSummary,
+  canEdit = false,
+  onSaveMemo,
 }: Props) {
   const { setMode } = useUiMode()
   const router = useRouter()
@@ -64,7 +86,7 @@ export function CliSheetView({
   const [log, setLog] = useState<Entry[]>(() => [
     {
       id: 0,
-      cwd: '',
+      prompt: '',
       command: null,
       output: [
         ansi.gray(
@@ -80,11 +102,49 @@ export function CliSheetView({
     },
   ])
   const [readerBook, setReaderBook] = useState<Book | null>(null)
+  const [editor, setEditor] = useState<EditorFile | null>(null)
+  const [rc, setRc] = useState(DEFAULT_ZSHRC)
+  const [shell, setShell] = useState<{ aliases: Env; vars: Env }>(() => ({
+    aliases: {},
+    vars: defaultVars(username),
+  }))
   const [busy, setBusy] = useState(false)
   const windowRef = useRef<HTMLElement>(null)
   const screenRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const cwd = atRoot ? '~/sheets' : `~/sheets/${year}`
+  const path = `/${username}/sheets${atRoot ? '' : `/${year}`}`
+  const prompt = renderPrompt(shell.vars.PROMPT ?? DEFAULT_PROMPT, {
+    user: username,
+    cwd,
+    path,
+  })
+  const context = (history?: string[]) => ({
+    username,
+    currentSheet: atRoot ? null : year,
+    sheets,
+    books,
+    history,
+    aiSummary,
+    aliases: shell.aliases,
+    vars: { ...shell.vars, PWD: path },
+    rc,
+    canEdit,
+  })
+
+  // ログイン時に ~/.zshrc を読み込む
+  useEffect(() => {
+    const script = loadRc()
+    setRc(script)
+    const result = runScript(script, {
+      ...context(),
+      aliases: {},
+      vars: defaultVars(username),
+    })
+    setShell({ aliases: result.aliases, vars: result.vars })
+    if (result.output) append(null, result.output)
+    // 初回のみ実行する
+  }, [])
 
   useEffect(() => {
     setAtRoot(false)
@@ -92,13 +152,14 @@ export function CliSheetView({
   }, [year, username])
 
   useEffect(() => {
-    if (!readerBook && !busy) inputRef.current?.focus({ preventScroll: true })
-  }, [readerBook, busy])
+    if (!readerBook && !editor && !busy)
+      inputRef.current?.focus({ preventScroll: true })
+  }, [readerBook, editor, busy])
 
   useEffect(() => {
     const screen = screenRef.current
     if (screen) screen.scrollTop = screen.scrollHeight
-  }, [log, busy, input, readerBook])
+  }, [log, busy, input, readerBook, editor])
 
   useLayoutEffect(() => {
     if (pendingCaret.current === null) return
@@ -115,10 +176,10 @@ export function CliSheetView({
     pendingCaret.current = position
   }
 
-  const append = (command: string | null, output: string, at = cwd) =>
+  const append = (command: string | null, output: string) =>
     setLog((previous) => [
       ...previous.slice(-(MAX_ENTRIES - 1)),
-      { id: nextId.current++, cwd: at, command, output },
+      { id: nextId.current++, prompt, command, output },
     ])
 
   const execute = async (command: string) => {
@@ -131,17 +192,24 @@ export function CliSheetView({
     }
     const nextHistory = [...history.slice(-499), command]
     setHistory(nextHistory)
-    const result = runCommand(command, {
-      username,
-      currentSheet: atRoot ? null : year,
-      sheets,
-      books,
-      history: nextHistory,
-      aiSummary,
-    })
+    const result = runCommand(command, context(nextHistory))
     switch (result.type) {
       case 'text':
         append(command, result.text)
+        break
+      case 'env':
+        setShell({ aliases: result.aliases, vars: result.vars })
+        append(command, result.text)
+        break
+      case 'source': {
+        const sourced = runScript(result.script, context(), result.path)
+        setShell({ aliases: sourced.aliases, vars: sourced.vars })
+        append(command, sourced.output)
+        break
+      }
+      case 'vim':
+        append(command, '')
+        setEditor(result.file)
         break
       case 'clear':
         setLog([])
@@ -191,7 +259,8 @@ export function CliSheetView({
     const { line, candidates } = completeCommand(
       input,
       sheets,
-      atRoot ? [] : books
+      atRoot ? [] : books,
+      shell.aliases
     )
     if (candidates.length) append(input, candidates.join('\n'))
     if (line !== input) setLine(line)
@@ -253,6 +322,46 @@ export function CliSheetView({
   const syncCaret = (event: React.SyntheticEvent<HTMLInputElement>) =>
     setCaret(event.currentTarget.selectionStart ?? input.length)
 
+  const writeFile = async (
+    file: EditorFile,
+    content: string
+  ): Promise<WriteResult> => {
+    const written = `"${file.name}" ${content.split('\n').length}L, ${byteLength(content)}B written`
+    if (file.kind === 'rc') {
+      setRc(content)
+      try {
+        localStorage.setItem(RC_STORAGE_KEY, content)
+      } catch {
+        return {
+          ok: true,
+          message: `${written} (ブラウザに保存できないため、このセッション限りです)`,
+        }
+      }
+      return { ok: true, message: written }
+    }
+    if (file.kind === 'scratch')
+      return {
+        ok: false,
+        message: file.name
+          ? `E212: Can't open file for writing: ${file.name}`
+          : 'E32: No file name',
+      }
+    if (file.readonly || !onSaveMemo || file.bookId === undefined)
+      return {
+        ok: false,
+        message: "E45: 'readonly' option is set (他の人のメモは編集できません)",
+      }
+    try {
+      await onSaveMemo(file.bookId, content)
+      return { ok: true, message: written }
+    } catch {
+      return {
+        ok: false,
+        message: `E212: Can't open file for writing: 保存に失敗しました`,
+      }
+    }
+  }
+
   const toggleFullscreen = () => {
     if (document.fullscreenElement) void document.exitFullscreen()
     else void windowRef.current?.requestFullscreen?.()
@@ -305,7 +414,7 @@ export function CliSheetView({
               <div key={entry.id}>
                 {entry.command !== null && (
                   <div className="cli-line">
-                    <Prompt username={username} cwd={entry.cwd} />
+                    <Prompt prompt={entry.prompt} />
                     {entry.command}
                   </div>
                 )}
@@ -329,12 +438,12 @@ export function CliSheetView({
                 void execute(input)
               }}
             >
-              <Prompt username={username} cwd={cwd} />
+              <Prompt prompt={prompt} />
               <span aria-hidden="true">
                 {input.slice(0, caret)}
                 <span
                   className={
-                    focused && !readerBook
+                    focused && !readerBook && !editor
                       ? 'cli-cursor cli-cursor-blink'
                       : 'cli-cursor-idle'
                   }
@@ -374,10 +483,21 @@ export function CliSheetView({
             onOpen={(href) => void router.push(href)}
           />
         )}
+        {editor && (
+          <VimEditor
+            file={editor}
+            onWrite={(content) => writeFile(editor, content)}
+            onQuit={() => setEditor(null)}
+          />
+        )}
       </div>
 
       {/* タッチ端末にはTabや矢印キーがないため補助キーを表示する */}
-      <div className="cli-keybar" aria-label="補助キー">
+      <div
+        className="cli-keybar"
+        aria-label="補助キー"
+        hidden={Boolean(editor || readerBook)}
+      >
         {(
           [
             ['Tab', complete],

@@ -21,8 +21,8 @@ import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
 import { IoGrid } from 'react-icons/io5'
 import { twMerge } from 'tailwind-merge'
-import { useQuery } from '@apollo/client'
-import { getBooksQuery } from '@/features/books/api'
+import { useMutation, useQuery } from '@apollo/client'
+import { getBooksQuery, updateBookMemoMutation } from '@/features/books/api'
 import dayjs from 'dayjs'
 import { useUiMode } from '@/features/ui-mode/UiModeProvider'
 import { CliSheetView } from '@/features/ui-mode/CliSheetView'
@@ -69,6 +69,9 @@ export const SheetPage: React.FC<Props> = ({
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
   const { data: booksData } = useQuery(getBooksQuery, {
     variables: { input: { sheetName: year } },
+  })
+  const [updateBookMemo] = useMutation(updateBookMemoMutation, {
+    refetchQueries: [getBooksQuery],
   })
   const res = useMemo(
     () =>
@@ -264,6 +267,12 @@ export const SheetPage: React.FC<Props> = ({
           sheets={sheets}
           year={year}
           username={username}
+          canEdit={Boolean(isMine)}
+          onSaveMemo={async (bookId, memo) => {
+            await updateBookMemo({
+              variables: { input: { id: String(bookId), memo } },
+            })
+          }}
         />
       </>
     )
