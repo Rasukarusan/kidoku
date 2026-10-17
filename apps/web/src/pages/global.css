@@ -465,6 +465,19 @@ html[data-ui-mode='cli'] .ai-personality-card {
 .cli-cursor-bar {
   box-shadow: inset 2px 0 0 var(--term-fg);
 }
+.cli-finder-active {
+  background: var(--term-chrome);
+  color: var(--ansi-b7);
+}
+.cli-finder-preview {
+  border-bottom: 1px solid var(--term-line);
+}
+@media (min-width: 640px) {
+  .cli-finder-preview {
+    border-bottom: 0;
+    border-left: 1px solid var(--term-line);
+  }
+}
 .cli-keybar[hidden] {
   display: none;
 }

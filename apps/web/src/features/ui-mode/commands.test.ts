@@ -32,6 +32,17 @@ const output = (command: string, ctx: CommandContext = context) => {
 }
 
 describe('reading CLI', () => {
+  it('starts the lk fuzzy finder only inside a sheet', () => {
+    expect(runCommand('lk コード 著者', context)).toEqual({
+      type: 'lk',
+      query: 'コード 著者',
+    })
+    expect(output('lk', { ...context, currentSheet: null })).toContain(
+      'cd <シート名>'
+    )
+    expect(output('lk', { ...context, books: [] })).toBe('lk: 本がありません')
+  })
+
   it('moves by name, quoted name and absolute virtual path', () => {
     for (const command of [
       'cd "読みたい 本"',

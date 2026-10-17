@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { EditorFile } from './commands'
 import {
   createVimState,
+  imeTextToKeys,
   vimContent,
   vimInsertText,
   vimKey,
@@ -169,8 +170,7 @@ export function VimEditor({ file, onWrite, onQuit }: Props) {
     if (!value) return
     if (stateRef.current.mode === 'insert')
       commit(vimInsertText(stateRef.current, value))
-    else
-      press(Array.from(value).map((char) => (char === '\n' ? 'Enter' : char)))
+    else press(imeTextToKeys(value))
   }
 
   const onCompositionEnd = (
@@ -179,8 +179,11 @@ export function VimEditor({ file, onWrite, onQuit }: Props) {
     const value = event.currentTarget.value
     event.currentTarget.value = ''
     setComposing('')
-    if (value && stateRef.current.mode === 'insert')
+    if (!value) return
+    if (stateRef.current.mode === 'insert')
       commit(vimInsertText(stateRef.current, value))
+    // 日本語入力オンのまま打った :w などもコマンドとして受け付ける
+    else press(imeTextToKeys(value))
   }
 
   const gutter = String(state.lines.length).length + 1
@@ -282,6 +285,7 @@ export function VimEditor({ file, onWrite, onQuit }: Props) {
         {state.mode === 'command' ? (
           <span>
             {state.command}
+            {composing && <span className="ansi-underline">{composing}</span>}
             <span className="cli-cursor"> </span>
           </span>
         ) : state.message ? (

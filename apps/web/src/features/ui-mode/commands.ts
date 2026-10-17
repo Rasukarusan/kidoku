@@ -35,6 +35,7 @@ export type CommandResult =
   | { type: 'vim'; file: EditorFile }
   | { type: 'cd'; sheet: string | null }
   | { type: 'less'; book: Book }
+  | { type: 'lk'; query: string }
   | { type: 'open'; href: string; text: string }
   | { type: 'mode'; mode: UiMode; text: string }
   | { type: 'clear' }
@@ -65,6 +66,7 @@ const HELP: Array<[string, string]> = [
   ['pwd', '現在のディレクトリを表示'],
   ['tree', 'シートと本のツリーを表示'],
   ['less <id|title>', '書影とメモをページャーで読む'],
+  ['lk [query]', '本をあいまい検索し、プレビューを見ながら選ぶ'],
   ['cat <id|title>', 'メモをそのまま出力'],
   ['open <id|title>', '本の詳細・編集ページを開く'],
   ['grep <word>', '題名・著者・メモを検索'],
@@ -104,6 +106,7 @@ export const COMMANDS = [
   'help',
   'history',
   'less',
+  'lk',
   'ls',
   'mode',
   'neofetch',
@@ -216,6 +219,15 @@ export const escapeArgument = (value: string) =>
   value.replace(/([\s"'\\])/g, '\\$1')
 
 const coverOf = (book: Book) => sanitize(book.title)
+
+/** 本のメモを vim で開くためのバッファ */
+export const bookFile = (book: Book, canEdit = false): EditorFile => ({
+  kind: 'book',
+  name: `${sanitize(book.title)}.md`,
+  content: book.memo ?? '',
+  bookId: book.id,
+  readonly: !canEdit,
+})
 
 const findBook = (
   command: string,
@@ -480,16 +492,7 @@ export function runCommand(
         }
       const book = currentSheet ? findBook(command, argument, books) : null
       if (book && typeof book !== 'string')
-        return {
-          type: 'vim',
-          file: {
-            kind: 'book',
-            name: `${sanitize(book.title)}.md`,
-            content: book.memo ?? '',
-            bookId: book.id,
-            readonly: !context.canEdit,
-          },
-        }
+        return { type: 'vim', file: bookFile(book, context.canEdit) }
       return {
         type: 'vim',
         file: { kind: 'scratch', name: argument, content: '', isNew: true },
@@ -594,6 +597,11 @@ export function runCommand(
         }
       return text(sanitize(book.memo) || ansi.gray('(メモはありません)'))
     }
+    case 'lk':
+      if (!currentSheet)
+        return text('lk: 先に cd <シート名> でシートに移動してください。')
+      if (!books.length) return text('lk: 本がありません')
+      return { type: 'lk', query: argument }
     case 'grep': {
       if (!argument) return text('grep: 使い方: grep <検索語>')
       if (!currentSheet)
