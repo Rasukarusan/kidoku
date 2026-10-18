@@ -22,7 +22,10 @@ export default async function handler(
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  if (req.method === 'OPTIONS') return res.status(204).end()
+  if (req.method === 'OPTIONS') {
+    res.status(204).end()
+    return
+  }
   try {
     const { issuer, resource } = mcpUrls()
     const action = req.query.action
@@ -50,11 +53,16 @@ export default async function handler(
         scopes_supported: [MCP_SCOPE],
       })
     }
-    if (!['register', 'authorize', 'token', 'revoke'].includes(String(action)))
-      return res.status(404).end()
+    if (
+      !['register', 'authorize', 'token', 'revoke'].includes(String(action))
+    ) {
+      res.status(404).end()
+      return
+    }
     if (req.method !== 'POST') {
       res.setHeader('Allow', 'POST, OPTIONS')
-      return res.status(405).end()
+      res.status(405).end()
+      return
     }
     const body = req.body
     if (!body || typeof body !== 'object' || Array.isArray(body))
@@ -140,7 +148,8 @@ export default async function handler(
           await createAuthorizationCode(session.user.id, auth)
         )
       else redirect.searchParams.set('error', 'access_denied')
-      return res.redirect(303, redirect.toString())
+      res.redirect(303, redirect.toString())
+      return
     }
     if (action === 'token') return res.json(await exchangeToken(body))
     if (action === 'revoke') {
@@ -155,7 +164,8 @@ export default async function handler(
           ],
         },
       })
-      return res.status(200).end()
+      res.status(200).end()
+      return
     }
   } catch (error) {
     if (error instanceof OAuthError)

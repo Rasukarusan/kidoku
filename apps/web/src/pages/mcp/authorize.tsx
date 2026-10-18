@@ -88,6 +88,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   try {
     const params = new URL(resolvedUrl, 'http://localhost').searchParams
     const { clientName, authorization } = await validateAuthorization(params)
+    // form-action also applies to the redirect after submit, so allow the registered callback origin.
+    res.setHeader(
+      'Content-Security-Policy',
+      `frame-ancestors 'none'; form-action 'self' ${new URL(authorization.redirectUri).origin}`
+    )
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) return { props: { callbackUrl: resolvedUrl } }
     return {

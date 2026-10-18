@@ -59,7 +59,10 @@ export default async function handler(
           )
         )
     const result = await handleMcpRequest(req.body, userId)
-    if (result === null) return res.status(202).end()
+    if (result === null) {
+      res.status(202).end()
+      return
+    }
     return res
       .status('error' in result && result.error.code === -32600 ? 400 : 200)
       .json(result)

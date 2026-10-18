@@ -39,7 +39,7 @@ export default async function handler(
       return res.json({ result: true })
     }
     res.setHeader('Allow', 'GET, DELETE')
-    return res.status(405).end()
+    res.status(405).end()
   } catch {
     return res.status(500).json({ error: '接続を取得・解除できませんでした' })
   }
