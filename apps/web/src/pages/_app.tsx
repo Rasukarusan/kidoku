@@ -9,13 +9,27 @@ import './global.css'
 import { SessionProvider } from 'next-auth/react'
 import { Layout } from '@/components/layout/Layout'
 import { Provider } from 'jotai'
-import { AppProps } from 'next/app'
+import type { ReactElement } from 'react'
+import type { AppProps } from 'next/app'
+import type { NextPageWithLayout } from '@/types/page'
 import { ApolloProvider } from '@apollo/client'
 import apolloClient from '@/libs/apollo'
 import { StoreAccessToken } from '@/features/global/components/StoreAccessToken'
 import { UiModeProvider } from '@/features/ui-mode/UiModeProvider'
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+const defaultLayout = (page: ReactElement) => (
+  <Layout>
+    <Header />
+    {page}
+    <Footer />
+  </Layout>
+)
+
+export default function MyApp({
+  Component,
+  pageProps,
+}: AppProps & { Component: NextPageWithLayout }) {
+  const getLayout = Component.getLayout ?? defaultLayout
   return (
     <>
       <Head>
@@ -32,12 +46,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             <StoreAccessToken />
             <LoadingTopBar />
             <UiModeProvider>
-              <Layout>
-                <Header />
-                <Component {...pageProps} />
-                <Analytics />
-                <Footer />
-              </Layout>
+              {getLayout(<Component {...pageProps} />)}
+              <Analytics />
             </UiModeProvider>
           </SessionProvider>
         </ApolloProvider>
