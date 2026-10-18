@@ -281,14 +281,16 @@ model McpClient {
   id           String     @id @db.VarChar(64)
   name         String     @db.VarChar(120)
   redirectUris Json       @map("redirect_uris")
-  grants       McpGrant[]
+  createdAt    DateTime   @default(now()) @map("created_at")
 
   @@map("mcp_clients")
 }
 
 model McpGrant {
   id             String    @id @default(cuid())
-  clientId       String    @map("client_id") @db.VarChar(64)
+  // Either a dynamic registration id or a Client ID Metadata Document URL.
+  clientId       String    @map("client_id") @db.VarChar(255)
+  clientName     String    @map("client_name") @db.VarChar(120)
   userId         String    @map("user_id")
   codeHash       String?   @unique @map("code_hash") @db.VarChar(64)
   codeChallengeHash String @map("code_challenge_hash") @db.VarChar(64)
@@ -299,7 +301,6 @@ model McpGrant {
   tokenExpiresAt DateTime? @map("token_expires_at")
   refreshHash    String?   @unique @map("refresh_hash") @db.VarChar(64)
   expiresAt      DateTime  @map("expires_at")
-  client         McpClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([clientId])

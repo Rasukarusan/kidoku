@@ -11,6 +11,7 @@ import {
   mcpUrls,
   OAuthError,
   readConsent,
+  removeUnusedRegistrations,
   validRedirectUri,
 } from '@/libs/mcp/oauth'
 
@@ -51,6 +52,8 @@ export default async function handler(
         revocation_endpoint_auth_methods_supported: ['none'],
         code_challenge_methods_supported: ['S256'],
         scopes_supported: [MCP_SCOPE],
+        client_id_metadata_document_supported: true,
+        authorization_response_iss_parameter_supported: true,
       })
     }
     if (
@@ -110,6 +113,7 @@ export default async function handler(
           'invalid_client_metadata',
           'books:read のみ利用できます'
         )
+      await removeUnusedRegistrations()
       const client = await prisma.mcpClient.create({
         data: {
           id: randomUUID(),
@@ -140,6 +144,8 @@ export default async function handler(
         session.user.id
       )
       const redirect = new URL(auth.redirectUri)
+      // RFC 9207: lets the client confirm which authorization server sent the response.
+      redirect.searchParams.set('iss', issuer)
       if (auth.state !== undefined)
         redirect.searchParams.set('state', auth.state)
       if (body.decision === 'allow')

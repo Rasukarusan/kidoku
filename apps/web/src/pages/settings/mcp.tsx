@@ -7,7 +7,12 @@ import type { GetServerSideProps } from 'next'
 export default function McpSettings({ endpoint }: { endpoint: string }) {
   const [message, setMessage] = useState('')
   const { data, error, mutate } = useSWR<{
-    connections: { id: string; client: { name: string }; expiresAt: string }[]
+    connections: {
+      id: string
+      clientName: string
+      clientHost: string | null
+      expiresAt: string
+    }[]
   }>('/api/me/mcp-connections', async (url) => {
     const response = await fetch(url)
     if (!response.ok) throw new Error('接続を取得できませんでした')
@@ -46,7 +51,14 @@ export default function McpSettings({ endpoint }: { endpoint: string }) {
             key={connection.id}
             className="flex items-center justify-between border-b py-4"
           >
-            <span>{connection.client.name}</span>
+            <span>
+              {connection.clientName}
+              {connection.clientHost && (
+                <span className="ml-2 text-sm text-gray-500">
+                  {connection.clientHost}
+                </span>
+              )}
+            </span>
             <button
               className="rounded border px-3 py-2"
               onClick={() => disconnect(connection.id)}

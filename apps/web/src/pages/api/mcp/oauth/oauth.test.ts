@@ -10,7 +10,7 @@ jest.mock('@/pages/api/auth/[...nextauth]', () => ({ authOptions: {} }))
 jest.mock('@/libs/prisma', () => ({
   __esModule: true,
   default: {
-    mcpClient: { create: jest.fn() },
+    mcpClient: { create: jest.fn(), deleteMany: jest.fn() },
     mcpGrant: { create: jest.fn(), deleteMany: jest.fn(), findMany: jest.fn() },
   },
 }))
@@ -37,6 +37,7 @@ function request(action: string, body: unknown = {}, method = 'POST') {
 }
 const auth = {
   clientId: 'client-1',
+  clientName: 'Test app',
   redirectUri: 'https://client.example/callback',
   codeChallenge: 'a'.repeat(43),
   resource: 'https://kidoku.example/api/mcp',
@@ -58,6 +59,8 @@ test('publishes discoverable OAuth endpoints and protected resource metadata', a
       issuer: 'https://kidoku.example',
       authorization_endpoint: 'https://kidoku.example/mcp/authorize',
       code_challenge_methods_supported: ['S256'],
+      client_id_metadata_document_supported: true,
+      authorization_response_iss_parameter_supported: true,
     })
   )
   const resource = response()
@@ -71,6 +74,7 @@ test('publishes discoverable OAuth endpoints and protected resource metadata', a
 })
 
 test('registers public clients and rejects unsafe redirect metadata', async () => {
+  prisma.mcpGrant.findMany.mockResolvedValue([])
   prisma.mcpClient.create.mockResolvedValue({ id: 'client-1', name: 'Test' })
   const res = response()
   await handler(
@@ -82,6 +86,7 @@ test('registers public clients and rejects unsafe redirect metadata', async () =
     res
   )
   expect(res.status).toHaveBeenCalledWith(201)
+  expect(prisma.mcpClient.deleteMany).toHaveBeenCalled()
   expect(res.json).toHaveBeenCalledWith(
     expect.objectContaining({
       client_id: 'client-1',
@@ -111,9 +116,11 @@ test('only issues authorization codes after authenticated, untampered consent', 
   const redirect = new URL(res.redirect.mock.calls[0][1])
   expect(redirect.origin).toBe('https://client.example')
   expect(redirect.searchParams.get('state')).toBe('state-1')
+  expect(redirect.searchParams.get('iss')).toBe('https://kidoku.example')
   expect(prisma.mcpGrant.create).toHaveBeenCalledWith({
     data: expect.objectContaining({
       userId: 'user-1',
+      clientName: 'Test app',
       codeHash: hash(redirect.searchParams.get('code')),
     }),
   })

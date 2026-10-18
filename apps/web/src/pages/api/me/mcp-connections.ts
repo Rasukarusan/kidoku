@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import prisma from '@/libs/prisma'
 import { mcpUrls } from '@/libs/mcp/oauth'
+import { isClientIdUrl } from '@/libs/mcp/client-metadata'
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,18 +15,18 @@ export default async function handler(
     if (!session?.user?.id)
       return res.status(401).json({ error: 'Unauthorized' })
     if (req.method === 'GET') {
-      const connections = await prisma.mcpGrant.findMany({
+      const grants = await prisma.mcpGrant.findMany({
         where: {
           userId: session.user.id,
           tokenHash: { not: null },
           expiresAt: { gt: new Date() },
         },
-        select: {
-          id: true,
-          client: { select: { name: true } },
-          expiresAt: true,
-        },
+        select: { id: true, clientId: true, clientName: true, expiresAt: true },
       })
+      const connections = grants.map(({ clientId, ...grant }) => ({
+        ...grant,
+        clientHost: isClientIdUrl(clientId) ? new URL(clientId).hostname : null,
+      }))
       return res.json({ connections })
     }
     if (req.method === 'DELETE') {

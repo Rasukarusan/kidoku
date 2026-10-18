@@ -24,7 +24,7 @@ Google の ID トークンを MCP API のアクセストークンとして受け
 - Protected Resource Metadata: `/.well-known/oauth-protected-resource/api/mcp`
 - Authorization Server Metadata: `/.well-known/oauth-authorization-server`
 - 認可画面: `/mcp/authorize`
-- クライアント登録: `/api/mcp/oauth/register`（public client / `none`）
+- クライアントの識別: Client ID Metadata Document（CIMD）と動的クライアント登録（`/api/mcp/oauth/register`、public client / `none`）
 - トークン交換・更新: `/api/mcp/oauth/token`
 - 失効: `/api/mcp/oauth/revoke`
 - スコープ: `books:read`
@@ -32,8 +32,26 @@ Google の ID トークンを MCP API のアクセストークンとして受け
 認可コードは 5 分で失効し、一度だけ交換できます。アクセストークンは 1 時間、接続は最大 30 日です。
 更新トークンは使用するたびに交換され、以前のアクセストークンも失効します。
 コード・トークンは SHA-256 ハッシュのみ DB に保存します。
-リダイレクト URI はクライアント登録時の値と完全一致する必要があります。
+リダイレクト URI は登録された値と完全一致する必要があります。loopback（`http://localhost` / `127.0.0.1` / `[::1]`）のみポート番号を無視して照合します（RFC 8252）。
 OAuth の `resource` は接続先の `/api/mcp` URL に限定されます。
+認可レスポンスには `iss` を付与します（RFC 9207）。
+
+### クライアントの識別
+
+`client_id` が HTTPS の URL の場合は CIMD として扱います。
+Kidoku はその URL からメタデータ JSON を取得し、`client_id` が URL と一致すること、`redirect_uris` に要求のリダイレクト URI が含まれることを確認します。
+CIMD のクライアントは DB に保存せず、取得結果を `Cache-Control` の `max-age`（60 秒〜24 時間、指定なしは 1 時間）に従ってメモリにキャッシュします。
+同意画面にはメタデータを公開しているドメインを表示します。
+
+メタデータの取得はサーバーから任意の URL へ接続するため、次の制限を設けます。
+
+- HTTPS・既定ポート・パス付きの URL のみ。IP アドレス直指定は不可
+- 名前解決した接続先がプライベート・loopback・リンクローカル等のアドレスなら接続しない
+- リダイレクトは追わない。応答は 200 の JSON・5KB 以内・5 秒以内
+- `client_secret` を含むメタデータや `token_endpoint_auth_method` が `none` 以外のものは拒否
+
+それ以外の `client_id` は動的クライアント登録で発行した ID として `mcp_clients` から読みます。
+登録は認証なしで受け付けるため、登録のたびに期限切れの grant と、接続に使われないまま 1 日経過した登録を削除します。
 
 MCP は Streamable HTTP の JSON レスポンスを使用し、SSE 接続・セッション ID は発行しません。
 対応プロトコルは `2025-03-26`、`2025-06-18`、`2025-11-25` です。
@@ -57,9 +75,9 @@ pnpm --filter web exec prisma generate
 pnpm --filter api exec prisma generate
 ```
 
-追加するテーブルは `mcp_clients` と `mcp_grants` です。
+追加するテーブルは `mcp_clients`（動的クライアント登録）と `mcp_grants`（ユーザーごとの接続）です。
+`mcp_grants.client_id` は登録 ID または CIMD の URL で、接続時のアプリ名を `client_name` に保持します。
 両アプリの Prisma スキーマに同じ定義を追加しています。
-期限切れの grant は `expires_at` を条件として定期削除できます。
 追加スキーマの SQL は `docs/sql/mcp.sql` にあります。
 
 ローカルの裏口ログインを有効にしている場合、その NextAuth セッションでも認可を検証できます。

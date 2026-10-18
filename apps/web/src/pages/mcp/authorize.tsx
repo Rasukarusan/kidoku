@@ -20,6 +20,7 @@ type Account = {
 
 type Props = {
   clientName?: string
+  clientHost?: string | null
   consent?: string
   account?: Account
   redirectOrigin?: string
@@ -73,6 +74,7 @@ const AccountCard: React.FC<{ account: Account }> = ({ account }) => (
 
 const McpAuthorize: NextPageWithLayout<Props> = ({
   clientName,
+  clientHost,
   consent,
   account,
   redirectOrigin,
@@ -107,10 +109,20 @@ const McpAuthorize: NextPageWithLayout<Props> = ({
         </>
       ) : (
         <>
-          <h1 className="mb-6 text-center text-xl font-bold">
+          <h1 className="mb-2 text-center text-xl font-bold">
             <span className="block break-all text-gray-500">{clientName}</span>
             に読み取りを許可しますか？
           </h1>
+          <p className="mb-6 text-center text-xs text-gray-500">
+            {clientHost ? (
+              <>
+                <span className="font-bold text-gray-700">{clientHost}</span>{' '}
+                が公開しているアプリ情報で確認しました
+              </>
+            ) : (
+              'アプリ名はアプリ自身が名乗ったものです'
+            )}
+          </p>
           {account && <AccountCard account={account} />}
           <p className="mb-3 text-sm font-bold">
             次のデータへのアクセスを求めています
@@ -193,7 +205,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   )
   try {
     const params = new URL(resolvedUrl, 'http://localhost').searchParams
-    const { clientName, authorization } = await validateAuthorization(params)
+    const { clientHost, authorization } = await validateAuthorization(params)
     const redirectOrigin = new URL(authorization.redirectUri).origin
     // form-action also applies to the redirect after submit, so allow the registered callback origin.
     res.setHeader(
@@ -204,7 +216,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     if (!session?.user?.id) return { props: { callbackUrl: resolvedUrl } }
     return {
       props: {
-        clientName,
+        clientName: authorization.clientName,
+        clientHost,
         consent: createConsent(session.user.id, authorization),
         account: {
           name: session.user.name ?? null,

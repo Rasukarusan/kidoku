@@ -1,10 +1,13 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto'
 import type { NextApiRequest } from 'next'
 import prisma from '@/libs/prisma'
+import { fetchClientMetadata, isClientIdUrl } from './client-metadata'
 
 export const MCP_SCOPE = 'books:read'
 export const ACCESS_TOKEN_SECONDS = 3600
 const GRANT_SECONDS = 30 * 24 * 3600
+const UNUSED_CLIENT_SECONDS = 24 * 3600
+const LOOPBACK_HOSTS = ['127.0.0.1', '[::1]', 'localhost']
 export const hash = (value: string) =>
   createHash('sha256').update(value).digest('hex')
 const randomToken = () => randomBytes(32).toString('base64url')
@@ -47,16 +50,85 @@ export function validRedirectUri(value: string) {
       !url.username &&
       !url.password &&
       (url.protocol === 'https:' ||
-        (url.protocol === 'http:' &&
-          ['127.0.0.1', '[::1]', 'localhost'].includes(url.hostname)))
+        (url.protocol === 'http:' && LOOPBACK_HOSTS.includes(url.hostname)))
     )
   } catch {
     return false
   }
 }
 
+// Native apps listen on an ephemeral loopback port, so the port is ignored for loopback URIs (RFC 8252 7.3).
+export function redirectUriAllowed(registered: string[], requested: string) {
+  if (registered.includes(requested)) return true
+  try {
+    const url = new URL(requested)
+    if (url.protocol !== 'http:' || !LOOPBACK_HOSTS.includes(url.hostname))
+      return false
+    return registered.some((value) => {
+      const candidate = new URL(value)
+      return (
+        candidate.protocol === 'http:' &&
+        candidate.hostname === url.hostname &&
+        candidate.pathname === url.pathname &&
+        candidate.search === url.search
+      )
+    })
+  } catch {
+    return false
+  }
+}
+
+// A client_id is either an HTTPS metadata document URL or an id issued by dynamic registration.
+async function resolveClient(clientId: string) {
+  if (isClientIdUrl(clientId)) {
+    const metadata = await fetchClientMetadata(
+      clientId,
+      validRedirectUri
+    ).catch(() => {
+      throw new OAuthError(
+        'invalid_client',
+        'クライアント情報を取得できませんでした'
+      )
+    })
+    return { ...metadata, host: new URL(clientId).hostname }
+  }
+  const client = clientId
+    ? await prisma.mcpClient.findUnique({ where: { id: clientId } })
+    : null
+  if (!client)
+    throw new OAuthError('invalid_client', '登録済みのクライアントが必要です')
+  return {
+    name: client.name,
+    redirectUris: client.redirectUris as string[],
+    host: null,
+  }
+}
+
+// Dynamic registration is unauthenticated, so registrations that never led to a connection are removed.
+export async function removeUnusedRegistrations(now = new Date()) {
+  await prisma.mcpGrant.deleteMany({
+    where: {
+      OR: [
+        { expiresAt: { lte: now } },
+        { tokenHash: null, codeExpiresAt: { lte: now } },
+      ],
+    },
+  })
+  const active = await prisma.mcpGrant.findMany({
+    distinct: ['clientId'],
+    select: { clientId: true },
+  })
+  await prisma.mcpClient.deleteMany({
+    where: {
+      createdAt: { lt: new Date(now.getTime() - UNUSED_CLIENT_SECONDS * 1000) },
+      id: { notIn: active.map((grant) => grant.clientId) },
+    },
+  })
+}
+
 export type Authorization = {
   clientId: string
+  clientName: string
   redirectUri: string
   codeChallenge: string
   resource: string
@@ -66,11 +138,11 @@ export type Authorization = {
 export async function validateAuthorization(params: URLSearchParams) {
   const clientId = params.get('client_id') || ''
   const redirectUri = params.get('redirect_uri') || ''
-  const client = await prisma.mcpClient.findUnique({ where: { id: clientId } })
-  if (!client || !(client.redirectUris as string[]).includes(redirectUri)) {
+  const client = await resolveClient(clientId)
+  if (!redirectUriAllowed(client.redirectUris, redirectUri)) {
     throw new OAuthError(
       'invalid_request',
-      '登録済みのクライアントとリダイレクトURLが必要です'
+      '登録済みのリダイレクトURLが必要です'
     )
   }
   if (params.get('response_type') !== 'code') {
@@ -99,9 +171,10 @@ export async function validateAuthorization(params: URLSearchParams) {
     throw new OAuthError('invalid_request', 'state が長すぎます')
   }
   return {
-    clientName: client.name,
+    clientHost: client.host,
     authorization: {
       clientId,
+      clientName: client.name,
       redirectUri,
       codeChallenge,
       resource,
@@ -152,6 +225,7 @@ export async function createAuthorizationCode(
     data: {
       userId,
       clientId: auth.clientId,
+      clientName: auth.clientName,
       redirectUriHash: hash(auth.redirectUri),
       codeChallengeHash: hash(auth.codeChallenge),
       resource: auth.resource,
