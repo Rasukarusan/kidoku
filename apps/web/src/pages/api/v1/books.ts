@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { createHash } from 'crypto'
 import prisma from '@/libs/prisma'
 import { parsePagination } from '@/utils/pagination'
+import { listPersonalBooks } from '@/libs/books/personal-books'
 
 // 個人用REST API v1: 自分の読書記録を取得する（読み取り専用）
 //
@@ -47,38 +48,9 @@ export default async function handler(
       data: { lastUsedAt: new Date() },
     })
 
-    const where = { userId: pat.userId }
-    const [total, books] = await prisma.$transaction([
-      prisma.books.count({ where }),
-      prisma.books.findMany({
-        where,
-        include: { sheet: { select: { name: true } } },
-        // MySQLではDESCでNULL(未読了)が末尾に並ぶ。idは同日読了時の順序安定用
-        orderBy: [{ finished: 'desc' }, { id: 'desc' }],
-        skip: (page - 1) * perPage,
-        take: perPage,
-      }),
-    ])
-
+    const result = await listPersonalBooks(pat.userId, { page, perPage })
     res.setHeader('Cache-Control', 'private, no-store')
-    return res.status(200).json({
-      total,
-      page,
-      perPage,
-      totalPages: Math.ceil(total / perPage),
-      books: books.map((book) => ({
-        id: book.id,
-        title: book.title,
-        author: book.author,
-        category: book.category,
-        impression: book.impression,
-        memo: book.memo,
-        sheet: book.sheet.name,
-        finished: book.finished?.toISOString() ?? null,
-        created: book.created.toISOString(),
-        updated: book.updated.toISOString(),
-      })),
-    })
+    return res.status(200).json(result)
   } catch (error) {
     console.error('v1/books error:', error)
     return res.status(500).json({ error: 'Internal server error' })

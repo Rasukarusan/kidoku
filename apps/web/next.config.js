@@ -17,6 +17,22 @@ const nextConfig = {
   },
   // Novelとその依存関係をトランスパイル
   transpilePackages: ['novel', 'katex'],
+  async rewrites() {
+    return [
+      {
+        source: '/.well-known/oauth-protected-resource/api/mcp',
+        destination: '/api/mcp/oauth/resource',
+      },
+      {
+        source: '/.well-known/oauth-protected-resource',
+        destination: '/api/mcp/oauth/resource',
+      },
+      {
+        source: '/.well-known/oauth-authorization-server',
+        destination: '/api/mcp/oauth/metadata',
+      },
+    ]
+  },
   webpack(config, options) {
     config.resolve.alias['@'] = path.join(__dirname, 'src')
     return config
