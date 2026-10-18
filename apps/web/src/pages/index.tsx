@@ -3,6 +3,7 @@ export default IndexPage
 
 import prisma, { parse } from '@/libs/prisma'
 import { mask } from '@/utils/string'
+import { mcpUrls } from '@/libs/mcp/oauth'
 
 export const getStaticProps = async () => {
   const books = await prisma.books.findMany({
@@ -30,7 +31,7 @@ export const getStaticProps = async () => {
     })
   })
   return {
-    props: { comments },
+    props: { comments, mcpEndpoint: mcpUrls().resource },
     revalidate: 5,
   }
 }

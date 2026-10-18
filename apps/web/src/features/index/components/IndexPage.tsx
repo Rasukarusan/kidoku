@@ -1,18 +1,20 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useAtom } from 'jotai'
 import { Container } from '@/components/layout/Container'
 import { BookComment, Comment } from '@/components/layout/BookComment'
 import Link from 'next/link'
+import { Check, Copy } from 'lucide-react'
 import { openSearchModalAtom } from '@/store/modal/atom'
 import { MyRecentBooks } from './MyRecentBooks'
 import { OnThisDay } from './OnThisDay'
 
 interface Props {
   comments: Comment[]
+  mcpEndpoint: string
 }
 
-export const IndexPage: React.FC<Props> = ({ comments }) => {
+export const IndexPage: React.FC<Props> = ({ comments, mcpEndpoint }) => {
   const router = useRouter()
   const [, setOpenSearchModal] = useAtom(openSearchModalAtom)
 
@@ -27,6 +29,13 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
   // 本の検索モーダルを開く（登録時にログインが必要なら都度案内される）
   const handleStart = () => {
     setOpenSearchModal(true)
+  }
+
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(mcpEndpoint)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -52,6 +61,23 @@ export const IndexPage: React.FC<Props> = ({ comments }) => {
               >
                 記録をはじめる
               </button>
+            </div>
+            <div className="mt-12">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+                MCP
+              </p>
+              <div className="relative mx-auto mt-3 max-w-md rounded-lg bg-gray-900 px-10 py-4 shadow-sm">
+                <code className="block break-all text-center font-mono text-sm text-gray-100">
+                  {mcpEndpoint}
+                </code>
+                <button
+                  onClick={handleCopy}
+                  aria-label="URLをコピー"
+                  className="absolute right-2 top-2 rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+                >
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+              </div>
             </div>
           </div>
         </Container>
