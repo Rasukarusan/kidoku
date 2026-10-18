@@ -287,6 +287,20 @@ export const ProfilePage: React.FC<Props> = ({ name, image }) => {
         </Link>
       </section>
 
+      <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
+        <h3 className="mb-1 text-sm font-bold text-gray-700">MCP 接続</h3>
+        <p className="mb-4 text-xs text-gray-500">
+          Google
+          ログインで、対応アプリに読書記録とメモの読み取りを許可できます。
+        </p>
+        <Link
+          href="/settings/mcp"
+          className="inline-block rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-slate-50"
+        >
+          MCP 接続を管理する
+        </Link>
+      </section>
+
       {/* ChatGPT連携 */}
       <section className="mb-6 rounded-lg border border-slate-200 bg-white p-6">
         <h3 className="mb-1 text-sm font-bold text-gray-700">ChatGPT連携</h3>

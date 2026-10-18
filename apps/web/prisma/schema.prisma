@@ -75,6 +75,7 @@ model Session {
 }
 
 model User {
+  mcpGrants        McpGrant[]
   id               String           @id @default(cuid())
   name             String?          @unique(map: "uniq_name")
   email            String?          @unique
@@ -273,4 +274,36 @@ model BookComment {
   @@index([bookId])
   @@index([userId])
   @@map("book_comments")
+}
+
+// MCP clients use the existing Google/NextAuth login for user authentication.
+model McpClient {
+  id           String     @id @db.VarChar(64)
+  name         String     @db.VarChar(120)
+  redirectUris Json       @map("redirect_uris")
+  grants       McpGrant[]
+
+  @@map("mcp_clients")
+}
+
+model McpGrant {
+  id             String    @id @default(cuid())
+  clientId       String    @map("client_id") @db.VarChar(64)
+  userId         String    @map("user_id")
+  codeHash       String?   @unique @map("code_hash") @db.VarChar(64)
+  codeChallengeHash String @map("code_challenge_hash") @db.VarChar(64)
+  redirectUriHash String @map("redirect_uri_hash") @db.VarChar(64)
+  resource       String    @db.VarChar(255)
+  codeExpiresAt  DateTime  @map("code_expires_at")
+  tokenHash      String?   @unique @map("token_hash") @db.VarChar(64)
+  tokenExpiresAt DateTime? @map("token_expires_at")
+  refreshHash    String?   @unique @map("refresh_hash") @db.VarChar(64)
+  expiresAt      DateTime  @map("expires_at")
+  client         McpClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("mcp_grants")
 }

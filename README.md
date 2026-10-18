@@ -143,6 +143,7 @@ apps/api/src/
 詳細なアーキテクチャドキュメントは以下を参照してください。
 - [セキュリティ & 認証](./docs/SECURITY.md)
 - [管理者API & バッチ処理](./docs/ADMIN_API.md)
+- [MCP 接続と認証](./docs/MCP.md)
 - [デプロイガイド](./docs/DEPLOYMENT.md)
 
 ## コントリビュート
