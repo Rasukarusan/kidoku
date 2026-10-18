@@ -31,9 +31,18 @@ export const IndexPage: React.FC<Props> = ({ comments, mcpEndpoint }) => {
     setOpenSearchModal(true)
   }
 
+  const mcpClients = [
+    {
+      name: 'Claude Code',
+      command: `claude mcp add --transport http kidoku ${mcpEndpoint}`,
+    },
+    { name: 'Codex', command: `codex mcp add kidoku --url ${mcpEndpoint}` },
+  ]
+  const [mcpClient, setMcpClient] = useState(mcpClients[0].name)
+  const mcpAddCommand = mcpClients.find((c) => c.name === mcpClient).command
   const [copied, setCopied] = useState(false)
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(mcpEndpoint)
+    await navigator.clipboard.writeText(mcpAddCommand)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -63,20 +72,37 @@ export const IndexPage: React.FC<Props> = ({ comments, mcpEndpoint }) => {
               </button>
             </div>
             <div className="mt-12">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
-                MCP
-              </p>
-              <div className="relative mx-auto mt-3 max-w-md rounded-lg bg-gray-900 px-10 py-4 shadow-sm">
-                <code className="block break-all text-center font-mono text-sm text-gray-100">
-                  {mcpEndpoint}
+              <div className="mx-auto max-w-lg overflow-hidden rounded-lg bg-gray-900 shadow-sm">
+                <div className="flex items-center border-b border-gray-700 pl-2 pr-1">
+                  <div role="tablist" className="flex">
+                    {mcpClients.map((client) => (
+                      <button
+                        key={client.name}
+                        role="tab"
+                        aria-selected={client.name === mcpClient}
+                        onClick={() => setMcpClient(client.name)}
+                        className={`-mb-px border-b-2 px-3 py-2 text-xs transition-colors ${
+                          client.name === mcpClient
+                            ? 'border-white text-white'
+                            : 'border-transparent text-gray-500 hover:text-gray-300'
+                        }`}
+                      >
+                        {client.name}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={handleCopy}
+                    aria-label="コマンドをコピー"
+                    className="ml-auto rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+                  >
+                    {copied ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+                <code className="block break-all px-6 py-4 text-center font-mono text-sm text-gray-100">
+                  <span className="select-none text-gray-500">$ </span>
+                  {mcpAddCommand}
                 </code>
-                <button
-                  onClick={handleCopy}
-                  aria-label="URLをコピー"
-                  className="absolute right-2 top-2 rounded-md p-1.5 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
-                >
-                  {copied ? <Check size={14} /> : <Copy size={14} />}
-                </button>
               </div>
             </div>
           </div>
