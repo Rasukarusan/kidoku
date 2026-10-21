@@ -34,16 +34,17 @@ export default async (req, res) => {
       userId,
       name,
       title,
-      author,
-      image,
+      itemTypeId: 'book',
+      attributes: { authors: author ? [author] : [] },
+      imageUrl: image,
       category,
       memo,
       isPublicMemo,
     }
     const isImageSelected = image !== NO_IMAGE && !image.includes('http')
     // 画像選択された際はそのままDBに保存するとカラムの容量エラーとなるため、一旦空文字でDB保存し、VercelにアップロードしたあとにVercelのURLをDB保存する
-    data['image'] = isImageSelected ? '' : image
-    const template = await prisma.template_books.create({ data })
+    data['imageUrl'] = isImageSelected ? '' : image
+    const template = await prisma.itemTemplate.create({ data })
 
     // 画像選択されたものはVercel Blobにアップロードする
     if (isImageSelected) {
@@ -52,10 +53,10 @@ export default async (req, res) => {
       const { url } = await put(`template_${template.id}.webp`, buffer, {
         access: 'public',
       })
-      await prisma.template_books.update({
+      await prisma.itemTemplate.update({
         where: { id: template.id },
         data: {
-          image: url,
+          imageUrl: url,
         },
       })
     }

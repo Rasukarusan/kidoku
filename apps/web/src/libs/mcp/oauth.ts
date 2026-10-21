@@ -4,6 +4,8 @@ import prisma from '@/libs/prisma'
 import { fetchClientMetadata, isClientIdUrl } from './client-metadata'
 
 export const MCP_SCOPE = 'books:read'
+export const MCP_ITEMS_SCOPE = 'items:read'
+export const MCP_SCOPES = [MCP_SCOPE, MCP_ITEMS_SCOPE]
 export const ACCESS_TOKEN_SECONDS = 3600
 const GRANT_SECONDS = 30 * 24 * 3600
 const UNUSED_CLIENT_SECONDS = 24 * 3600
@@ -20,6 +22,19 @@ export class OAuthError extends Error {
   ) {
     super(message)
   }
+}
+
+export function normalizeMcpScope(value: string) {
+  const requested = value.split(/\s+/).filter(Boolean)
+  if (
+    !requested.length ||
+    requested.some((scope) => !MCP_SCOPES.includes(scope))
+  )
+    throw new OAuthError(
+      'invalid_scope',
+      'books:read または items:read を指定してください'
+    )
+  return requested.includes(MCP_ITEMS_SCOPE) ? MCP_ITEMS_SCOPE : MCP_SCOPE
 }
 
 export function mcpUrls() {
@@ -133,6 +148,7 @@ export type Authorization = {
   codeChallenge: string
   resource: string
   state?: string
+  scope?: string
 }
 
 export async function validateAuthorization(params: URLSearchParams) {
@@ -162,10 +178,7 @@ export async function validateAuthorization(params: URLSearchParams) {
   if (resource !== mcpUrls().resource) {
     throw new OAuthError('invalid_target', 'MCP リソースURLが一致しません')
   }
-  const scope = params.get('scope') || MCP_SCOPE
-  if (scope !== MCP_SCOPE) {
-    throw new OAuthError('invalid_scope', 'books:read のみ利用できます')
-  }
+  const scope = normalizeMcpScope(params.get('scope') || MCP_SCOPE)
   const state = params.get('state')
   if (state && state.length > 2048) {
     throw new OAuthError('invalid_request', 'state が長すぎます')
@@ -178,6 +191,7 @@ export async function validateAuthorization(params: URLSearchParams) {
       redirectUri,
       codeChallenge,
       resource,
+      scope,
       ...(state !== null && { state }),
     } as Authorization,
   }
@@ -224,6 +238,7 @@ export async function createAuthorizationCode(
   await prisma.mcpGrant.create({
     data: {
       userId,
+      scope: auth.scope || MCP_SCOPE,
       clientId: auth.clientId,
       clientName: auth.clientName,
       redirectUriHash: hash(auth.redirectUri),
@@ -251,9 +266,10 @@ export async function exchangeToken(body: Record<string, unknown>) {
   if (body.resource !== undefined && body.resource !== mcpUrls().resource) {
     throw new OAuthError('invalid_target', 'MCP リソースURLが一致しません')
   }
-  if (body.scope !== undefined && body.scope !== MCP_SCOPE) {
-    throw new OAuthError('invalid_scope', 'books:read のみ利用できます')
-  }
+  const requestedScope =
+    body.scope === undefined
+      ? undefined
+      : normalizeMcpScope(typeof body.scope === 'string' ? body.scope : '')
   if (body.grant_type === 'authorization_code') {
     const code = typeof body.code === 'string' ? body.code : ''
     const verifier =
@@ -267,6 +283,7 @@ export async function exchangeToken(body: Record<string, unknown>) {
     const result = await prisma.mcpGrant.updateMany({
       where: {
         clientId,
+        ...(requestedScope !== undefined ? { scope: requestedScope } : {}),
         codeHash: hash(code),
         codeChallengeHash: hash(challenge),
         redirectUriHash: hash(
@@ -288,6 +305,7 @@ export async function exchangeToken(body: Record<string, unknown>) {
     const result = await prisma.mcpGrant.updateMany({
       where: {
         clientId,
+        ...(requestedScope !== undefined ? { scope: requestedScope } : {}),
         refreshHash: hash(refresh),
         resource: mcpUrls().resource,
         expiresAt: { gt: now },
@@ -299,16 +317,20 @@ export async function exchangeToken(body: Record<string, unknown>) {
   } else {
     throw new OAuthError('unsupported_grant_type', '未対応の grant_type です')
   }
+  const tokenGrant = await prisma.mcpGrant.findUnique({
+    where: { tokenHash: data.tokenHash },
+    select: { scope: true },
+  })
   return {
     access_token: accessToken,
     token_type: 'Bearer',
     expires_in: ACCESS_TOKEN_SECONDS,
     refresh_token: refreshToken,
-    scope: MCP_SCOPE,
+    scope: tokenGrant?.scope || MCP_SCOPE,
   }
 }
 
-export async function authenticateMcp(req: NextApiRequest) {
+export async function authenticateMcpGrant(req: NextApiRequest) {
   const match = /^Bearer ([A-Za-z0-9_-]{43})$/i.exec(
     req.headers.authorization || ''
   )
@@ -324,5 +346,9 @@ export async function authenticateMcp(req: NextApiRequest) {
     grant.resource !== mcpUrls().resource
   )
     return null
-  return grant.userId
+  return { userId: grant.userId, scope: grant.scope || MCP_SCOPE }
+}
+
+export async function authenticateMcp(req: NextApiRequest) {
+  return (await authenticateMcpGrant(req))?.userId ?? null
 }

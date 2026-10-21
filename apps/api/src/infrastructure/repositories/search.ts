@@ -66,8 +66,30 @@ export class SearchRepository implements ISearchRepository {
   }
 
   async deleteDocument(id: string): Promise<void> {
-    const index = this.client.index(INDEX_NAME);
-    await index.deleteDocument(id);
+    try {
+      const index = this.client.index(INDEX_NAME);
+      const queued = await index.deleteDocument(id);
+      const task = await this.client.waitForTask(queued.taskUid, {
+        timeOutMs: 10000,
+      });
+      if (task.status === 'failed' && task.error?.code === 'index_not_found')
+        return;
+      if (task.status !== 'succeeded')
+        throw new Error(
+          '検索データを更新できませんでした。もう一度お試しください',
+        );
+    } catch (error) {
+      // An absent index already satisfies deletion. Authentication, transport
+      // and other failures must still prevent publishing stale private data.
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        error.code === 'index_not_found'
+      )
+        return;
+      throw error;
+    }
   }
 
   private maskMemo(memo: string): string {

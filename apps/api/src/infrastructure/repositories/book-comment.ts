@@ -9,8 +9,8 @@ export class BookCommentRepository implements IBookCommentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async isBookPublic(bookId: number): Promise<boolean | null> {
-    const book = await this.prisma.books.findUnique({
-      where: { id: bookId },
+    const book = await this.prisma.item.findFirst({
+      where: { id: bookId, itemTypeId: 'book' },
       select: { isPublicMemo: true },
     });
     return book?.isPublicMemo ?? null;
@@ -19,7 +19,7 @@ export class BookCommentRepository implements IBookCommentRepository {
   async create(
     comment: BookComment,
   ): Promise<{ comment: BookComment; bookOwnerId: string | null }> {
-    const book = await this.prisma.books.findUnique({
+    const book = await this.prisma.item.findFirst({
       where: { id: comment.bookId },
       select: { userId: true, isPublicMemo: true },
     });

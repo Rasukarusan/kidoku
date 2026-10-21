@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { authenticateMcp, MCP_SCOPE, mcpUrls } from '@/libs/mcp/oauth'
+import {
+  authenticateMcpGrant,
+  MCP_ITEMS_SCOPE,
+  mcpUrls,
+} from '@/libs/mcp/oauth'
 import {
   handleMcpRequest,
   PROTOCOL_VERSIONS,
@@ -15,11 +19,11 @@ export default async function handler(
     const urls = mcpUrls()
     if (req.headers.origin && req.headers.origin !== urls.issuer)
       return res.status(403).json(rpcError(null, -32000, 'Origin not allowed'))
-    const userId = await authenticateMcp(req)
-    if (!userId) {
+    const grant = await authenticateMcpGrant(req)
+    if (!grant) {
       res.setHeader(
         'WWW-Authenticate',
-        `Bearer resource_metadata="${urls.resourceMetadata}", scope="${MCP_SCOPE}"${req.headers.authorization ? ', error="invalid_token"' : ''}`
+        `Bearer resource_metadata="${urls.resourceMetadata}", scope="${MCP_ITEMS_SCOPE}"${req.headers.authorization ? ', error="invalid_token"' : ''}`
       )
       return res
         .status(401)
@@ -58,7 +62,7 @@ export default async function handler(
             'Accept must include application/json and text/event-stream'
           )
         )
-    const result = await handleMcpRequest(req.body, userId)
+    const result = await handleMcpRequest(req.body, grant.userId, grant.scope)
     if (result === null) {
       res.status(202).end()
       return

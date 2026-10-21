@@ -1,3 +1,4 @@
+import { CollectionRepository } from './collection';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { Sheet } from '../../domain/models/sheet';
@@ -80,13 +81,14 @@ export class SheetRepository implements ISheetRepository {
 
   async save(sheet: Sheet): Promise<Sheet> {
     if (sheet.id === null) {
-      const created = await this.prisma.sheets.create({
+      const created = await this.prisma.collection.create({
         data: {
           userId: sheet.userId,
           name: sheet.name,
-          order: sheet.order,
-          created: sheet.created,
-          updated: sheet.updated,
+          description: '',
+          position: sheet.order,
+          createdAt: sheet.created,
+          updatedAt: sheet.updated,
         },
       });
 
@@ -104,12 +106,12 @@ export class SheetRepository implements ISheetRepository {
         throw new Error('Invalid sheet ID');
       }
 
-      await this.prisma.sheets.update({
+      await this.prisma.collection.update({
         where: { id: sheetId },
         data: {
           name: sheet.name,
-          order: sheet.order,
-          updated: sheet.updated,
+          position: sheet.order,
+          updatedAt: sheet.updated,
         },
       });
 
@@ -123,9 +125,13 @@ export class SheetRepository implements ISheetRepository {
       throw new Error('Invalid sheet ID');
     }
 
-    await this.prisma.sheets.delete({
+    const collection = await this.prisma.collection.findUniqueOrThrow({
       where: { id: sheetId },
     });
+    await new CollectionRepository(this.prisma).deleteCollection(
+      collection.userId,
+      sheetId,
+    );
   }
 
   async saveAll(sheetList: Sheet[]): Promise<void> {

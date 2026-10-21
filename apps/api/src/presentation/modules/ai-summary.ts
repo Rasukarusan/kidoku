@@ -1,3 +1,5 @@
+import { ICollectionRepository } from '../../domain/repositories/collection';
+import { CollectionRepository } from '../../infrastructure/repositories/collection';
 import { Module } from '@nestjs/common';
 import { AiSummaryResolver } from '../resolvers/ai-summary';
 import { AiSummaryController } from '../controllers/ai-summary';
@@ -23,6 +25,7 @@ import { CodexModule } from './codex';
     SaveAiSummaryUseCase,
     DeleteAiSummaryUseCase,
     GenerateAiSummaryUseCase,
+    { provide: ICollectionRepository, useClass: CollectionRepository },
     {
       provide: IBookRepository,
       useClass: BookRepository,

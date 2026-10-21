@@ -1,4 +1,4 @@
-name: DB Push
+name: DB Schema Verification
 
 on:
   # main/master へのプッシュでスキーマが変更されたら Production DB に自動反映
@@ -7,8 +7,8 @@ on:
       - main
       - master
     paths:
-      - 'apps/web/prisma/schema.prisma'
-      - 'apps/api/prisma/schema.prisma'
+      - "apps/web/prisma/schema.prisma"
+      - "apps/api/prisma/schema.prisma"
   # PR でスキーマが変更されたら Preview DB に自動反映
   # （フォークからの PR は Secrets にアクセスできないため対象外）
   pull_request:
@@ -16,25 +16,20 @@ on:
       - main
       - master
     paths:
-      - 'apps/web/prisma/schema.prisma'
-      - 'apps/api/prisma/schema.prisma'
+      - "apps/web/prisma/schema.prisma"
+      - "apps/api/prisma/schema.prisma"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'プッシュ先のデータベース環境'
+        description: "プッシュ先のデータベース環境"
         required: true
-        default: 'Production'
+        default: "Production"
         type: choice
         options:
           - Production
           - Preview
-      accept_data_loss:
-        description: 'データ損失を許容して push する（--accept-data-loss）'
-        required: false
-        default: false
-        type: boolean
 
-# 同一環境への db push が同時に走らないように直列化する
+# 同一環境のスキーマ確認を直列化する
 concurrency:
   group: db-push-${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.event_name == 'pull_request' && 'Preview' || 'Production' }}
   cancel-in-progress: false
@@ -59,8 +54,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma clients
@@ -68,14 +63,10 @@ jobs:
           pnpm --filter web exec prisma generate
           pnpm --filter api exec prisma generate
 
-      - name: Push schema to database
-        run: |
-          ARGS="--skip-generate"
-          if [ "${{ inputs.accept_data_loss }}" = "true" ]; then
-            ARGS="$ARGS --accept-data-loss"
-          fi
-          echo "prisma db push $ARGS"
-          pnpm --filter web exec prisma db push $ARGS
-          pnpm --filter api exec prisma db push $ARGS
+      # The collection migration renames live tables and creates compatibility
+      # views. `db push` would infer destructive drops and cannot manage the views.
+      # Apply reviewed SQL during maintenance; CI only verifies the result.
+      - name: Verify collection schema (read only)
+        run: node scripts/verify-collection-schema.mjs
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}

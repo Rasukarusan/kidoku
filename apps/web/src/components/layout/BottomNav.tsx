@@ -11,20 +11,17 @@ import {
   AiOutlineCompass,
   AiFillCompass,
 } from 'react-icons/ai'
-import { useAtom } from 'jotai'
 import { useCachedSession } from '@/hooks/useCachedSession'
 import { useReadingRecordsUrl } from '@/hooks/useReadingRecordsUrl'
-import { openSearchModalAtom } from '@/store/modal/atom'
 
 export const BottomNav: React.FC = () => {
   const router = useRouter()
   const { session, status } = useCachedSession()
   const readingRecordsUrl = useReadingRecordsUrl()
-  const [, setOpenSearchModal] = useAtom(openSearchModalAtom)
 
   const navigationItems = useMemo(() => {
     const isHomePage = router.pathname === '/'
-    const isSheetsPage = router.pathname.includes('/sheets')
+    const isSheetsPage = router.pathname.includes('/collections')
     const isDiscoverPage = router.pathname.includes('/discover')
 
     return [
@@ -36,18 +33,18 @@ export const BottomNav: React.FC = () => {
         isActive: isHomePage,
       },
       {
-        name: '読書記録',
+        name: 'コレクション',
         href: readingRecordsUrl,
         icon: AiOutlineBook,
         activeIcon: AiFillBook,
         isActive: isSheetsPage,
       },
       {
-        name: '本を登録',
+        name: '追加',
         icon: AiOutlinePlusCircle,
         activeIcon: AiFillPlusCircle,
         isActive: false,
-        onClick: () => setOpenSearchModal(true),
+        onClick: () => router.push('/items/new'),
       },
       {
         name: '発見',
@@ -57,7 +54,7 @@ export const BottomNav: React.FC = () => {
         isActive: isDiscoverPage,
       },
     ]
-  }, [readingRecordsUrl, router.pathname, setOpenSearchModal])
+  }, [readingRecordsUrl, router.pathname, router])
 
   if (status !== 'authenticated' || !session) {
     return null

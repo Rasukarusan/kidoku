@@ -51,7 +51,39 @@ export default async (req, res) => {
       }
       let finalImage = image === NO_IMAGE || image.includes('http') ? image : ''
       data['image'] = finalImage
-      const book = await prisma.books.create({ data })
+      const result = await graphqlClient.execute<{
+        saveItem: { id: number }
+      }>(
+        userId,
+        `mutation RegisterBookItem($input: SaveItemInput!) { saveItem(input: $input) { id } }`,
+        {
+          input: {
+            itemTypeId: 'book',
+            collectionIds: [data.sheetId],
+            title,
+            attributes: {
+              authors: author ? [author] : [],
+              ...(body.isbn ? { isbn: body.isbn } : {}),
+            },
+            category,
+            imageUrl: finalImage,
+            rating: impression,
+            memo,
+            isPublicMemo,
+            ...(data.finished
+              ? {
+                  initialLog: {
+                    kind: 'read',
+                    occurredAt: data.finished,
+                    memo: '',
+                    rating: null,
+                  },
+                }
+              : {}),
+          },
+        }
+      )
+      const book = { id: result.saveItem.id }
 
       // 画像選択された場合はVercel Blobにアップロードする
       if (image !== NO_IMAGE && !image.includes('http')) {
@@ -62,10 +94,10 @@ export default async (req, res) => {
         const { url } = await put(`${book.id}.webp`, buffer, {
           access: 'public',
         })
-        await prisma.books.update({
+        await prisma.item.update({
           where: { id: book.id },
           data: {
-            image: url,
+            imageUrl: url,
           },
         })
         finalImage = url

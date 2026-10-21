@@ -22,6 +22,7 @@ import { NotificationModule } from './presentation/modules/notification';
 import { DiscoveryModule } from './presentation/modules/discovery';
 import { PurchaseModule } from './presentation/modules/purchase';
 import { ReadingChatModule } from './presentation/modules/reading-chat';
+import { CollectionModule } from './presentation/modules/collection';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { ReadingChatModule } from './presentation/modules/reading-chat';
     DiscoveryModule,
     PurchaseModule,
     ReadingChatModule,
+    CollectionModule,
   ],
 })
 export class AppModule {}

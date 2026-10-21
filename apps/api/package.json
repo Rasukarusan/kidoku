@@ -20,8 +20,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "db:push": "prisma db push",
-    "reindex": "npx tsx src/scripts/reindex-meilisearch.ts"
+    "db:push": "node ../../scripts/verify-collection-schema.mjs",
+    "reindex": "npx tsx src/scripts/reindex-meilisearch.ts",
+    "db:check": "node ../../scripts/verify-collection-schema.mjs",
+    "db:initialize": "node ../../scripts/initialize-collection-database.mjs --apply"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",

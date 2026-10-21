@@ -25,10 +25,10 @@ const post = async (request: NextApiRequest, response: NextApiResponse) => {
       access: 'public',
     })
     console.log(url)
-    await prisma.books.update({
+    await prisma.item.update({
       where: { id: book.id },
       data: {
-        image: url,
+        imageUrl: url,
       },
     })
   }

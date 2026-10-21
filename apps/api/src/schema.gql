@@ -258,6 +258,60 @@ type PurchaseResponse {
   created: DateTime!
 }
 
+type ItemTypeResponse {
+  key: String!
+  name: String!
+  schemaVersion: Int!
+  definition: CollectionJSON!
+}
+
+"""Structured item type definitions and validated item attributes"""
+scalar CollectionJSON
+
+type CollectionHighlightResponse {
+  itemId: Int!
+  position: Int!
+}
+
+type CollectionResponse {
+  id: Int!
+  userId: String!
+  name: String!
+  description: String!
+  position: Int!
+  itemCount: Int!
+  highlights: [CollectionHighlightResponse!]!
+}
+
+type ItemLogResponse {
+  id: Int!
+  itemId: Int!
+  kind: String!
+  occurredAt: DateTime
+  memo: String!
+  rating: String
+}
+
+type ItemResponse {
+  id: Int!
+  userId: String!
+  itemTypeId: String!
+  title: String!
+  imageUrl: String!
+  category: String!
+  rating: String!
+  memo: String!
+  isPublicMemo: Boolean!
+  isPurchasable: Boolean!
+  price: String
+  attributes: CollectionJSON!
+  attributesVersion: Int!
+  collectionIds: [Int!]!
+  logs: [ItemLogResponse!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type Query {
   sheets: [SheetResponse!]!
   comments(input: GetCommentsInput!): CommentResponse!
@@ -290,6 +344,10 @@ type Query {
   myPurchasedBookIds: [Int!]!
   purchasedBookMemo(input: GetPurchasedBookMemoInput!): String
   bookPaymentRecipient(input: GetBookPaymentRecipientInput!): String
+  itemTypes: [ItemTypeResponse!]!
+  collections: [CollectionResponse!]!
+  items(input: ItemFilterInput): [ItemResponse!]!
+  item(id: Int!): ItemResponse!
 }
 
 input GetCommentsInput {
@@ -360,6 +418,14 @@ input GetBookPaymentRecipientInput {
   bookId: Int!
 }
 
+input ItemFilterInput {
+  collectionId: Int
+  itemTypeId: String
+  from: DateTime
+  to: DateTime
+  query: String
+}
+
 type Mutation {
   createSheet(input: CreateSheetInput!): SheetResponse!
   updateSheet(input: UpdateSheetInput!): SheetResponse!
@@ -392,6 +458,13 @@ type Mutation {
   unlikeBook(input: LikeBookInput!): Int!
   markNotificationsRead: Boolean!
   createPurchase(input: CreatePurchaseInput!): PurchaseResponse!
+  saveCollection(input: SaveCollectionInput!): CollectionResponse!
+  deleteCollection(id: Int!): Boolean!
+  saveItem(input: SaveItemInput!): ItemResponse!
+  setCollectionHighlight(collectionId: Int!, position: Int!, itemId: Int): Boolean!
+  deleteItem(id: Int!): Boolean!
+  saveItemLog(itemId: Int!, input: ItemLogInput!, id: Int): ItemLogResponse!
+  deleteItemLog(itemId: Int!, id: Int!): Boolean!
 }
 
 input CreateSheetInput {
@@ -536,4 +609,33 @@ input CreatePurchaseInput {
   txDigest: String!
   senderAddress: String!
   network: String!
+}
+
+input SaveCollectionInput {
+  id: Int
+  name: String!
+  description: String! = ""
+}
+
+input SaveItemInput {
+  id: Int
+  itemTypeId: String!
+  title: String!
+  imageUrl: String! = "/no-image.png"
+  category: String! = ""
+  rating: String! = "-"
+  memo: String! = ""
+  isPublicMemo: Boolean! = false
+  isPurchasable: Boolean
+  price: String
+  attributes: CollectionJSON!
+  collectionIds: [Int!]! = []
+  initialLog: ItemLogInput
+}
+
+input ItemLogInput {
+  kind: String!
+  occurredAt: DateTime = null
+  memo: String! = ""
+  rating: String = null
 }

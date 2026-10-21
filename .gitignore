@@ -70,3 +70,5 @@ src/app/play
 **/playwright-report/
 **/blob-report/
 **/playwright/.cache/
+# Local migration progress (never contains credentials)
+.collection-migration-progress.json

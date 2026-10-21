@@ -1,32 +1,13 @@
 import { test, expect } from './fixtures'
 
 test.describe('書籍詳細ページ', () => {
-  test('本棚ページで書籍画像をクリックするとサイドバーが開く', async ({
-    page,
-  }) => {
-    await page.goto('/testuser/sheets/本棚', { timeout: 30000 })
-    await expect(page.getByText('累計読書数')).toBeVisible({ timeout: 15000 })
-
-    // 書籍のカバー画像（drop-shadow-lgクラス付き）が表示されるまで待つ
-    const bookImages = page.locator('img.drop-shadow-lg')
-    await expect(bookImages.first()).toBeVisible({ timeout: 15000 })
-
-    // React hydrationを待つ（img要素にReactのイベントハンドラが紐づくまで）
-    await page.waitForFunction(
-      () => {
-        const img = document.querySelector('img.drop-shadow-lg')
-        if (!img) return false
-        return Object.keys(img).some((key) => key.startsWith('__react'))
-      },
-      { timeout: 30000 }
-    )
-
-    // 最初の書籍画像をクリック
-    // Playwright click()はマウス移動でhoverオーバーレイの再レンダリングが発生するため
-    // dispatchEventで直接クリックイベントを発火させる
-    await bookImages.first().dispatchEvent('click')
-    // サイドバーが開く（「本の詳細」が表示される）
-    await expect(page.getByText('本の詳細')).toBeVisible({ timeout: 10000 })
+  test('アイテムの画像から詳細ページへ遷移できる', async ({ page }) => {
+    await page.goto('/testuser/collections')
+    const link = page.locator('a[href^="/items/"]').first()
+    const href = await link.getAttribute('href')
+    await link.click()
+    await expect(page).toHaveURL(href!)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   })
 
   test('パンくずリストが表示される（/books/[id]ページ）', async ({

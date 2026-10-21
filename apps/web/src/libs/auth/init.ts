@@ -6,8 +6,8 @@ export async function initUser(user: User) {
   const name = dayjs().format('YYYY')
   const userId = user.id
   const order = 1
-  const res = await prisma.sheets.create({
-    data: { userId, name, order },
+  const res = await prisma.collection.create({
+    data: { userId, name, position: order, description: '' },
   })
   return res
 }

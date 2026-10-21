@@ -6,18 +6,18 @@ on:
       - main
       - master
     paths:
-      - 'apps/api/**'
-      - 'docker/Dockerfile.api'
-      - '.github/workflows/deploy-api-preview.yml'
+      - "apps/api/**"
+      - "docker/Dockerfile.api"
+      - ".github/workflows/deploy-api-preview.yml"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'デプロイ環境'
+        description: "デプロイ環境"
         required: true
-        default: 'preview'
+        default: "preview"
         type: choice
         options:
-        - preview
+          - preview
 
 # 同じプレビューサービスへ複数の PR が同時にデプロイして競合しないよう直列化する
 concurrency:
@@ -43,6 +43,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # A table rename must be applied during maintenance before deploying code.
+      # Verify only; never run a destructive schema push from a deployment job.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter web exec prisma generate
+      - name: Verify collection migration before deployment
+        run: node scripts/verify-collection-schema.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2

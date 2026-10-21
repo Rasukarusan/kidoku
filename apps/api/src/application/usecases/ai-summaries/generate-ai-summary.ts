@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ICollectionRepository } from '../../../domain/repositories/collection';
+import { Injectable, NotFoundException, Optional } from '@nestjs/common';
 import { IAiChatGateway } from '../../../domain/gateways/ai-chat';
 import { IAiSummaryRepository } from '../../../domain/repositories/ai-summary';
 import { IBookRepository } from '../../../domain/repositories/book';
@@ -19,6 +20,7 @@ export class GenerateAiSummaryUseCase {
     private readonly sheetRepository: ISheetRepository,
     private readonly bookRepository: IBookRepository,
     private readonly aiChatGateway: IAiChatGateway,
+    @Optional() private readonly collectionRepository?: ICollectionRepository,
   ) {}
 
   async *execute(
@@ -36,22 +38,42 @@ export class GenerateAiSummaryUseCase {
     }
     const sheetId = parseInt(sheet.id, 10);
 
-    const books = await this.bookRepository.findByUserIdAndSheetId(
-      userId,
-      sheetId,
-    );
-    const targetBooks = books
-      .filter((book) => {
-        if (!book.finished) return false;
-        const month = new Date(book.finished).getMonth() + 1;
-        return months.includes(month) && categories.includes(book.category);
-      })
-      .map((book) => ({
-        category: book.category,
-        // 非公開部分（*で囲まれた箇所）はマスクして渡す
-        memo: book.memo.replace(/\*.*\*/g, '***'),
-        finished: book.finished,
-      }));
+    const targetBooks = this.collectionRepository
+      ? (
+          await this.collectionRepository.items(userId, {
+            collectionId: sheetId,
+            itemTypeId: 'book',
+          })
+        ).flatMap((item) =>
+          item.logs
+            .filter(
+              (log) =>
+                log.kind === 'read' &&
+                log.occurredAt &&
+                months.includes(log.occurredAt.getUTCMonth() + 1) &&
+                categories.includes(item.category),
+            )
+            .map((log) => ({
+              category: item.category,
+              memo: [item.memo, log.memo]
+                .filter(Boolean)
+                .join('\n')
+                .replace(/\*.*\*/g, '***'),
+              finished: log.occurredAt,
+            })),
+        )
+      : (await this.bookRepository.findByUserIdAndSheetId(userId, sheetId))
+          .filter(
+            (book) =>
+              book.finished &&
+              months.includes(book.finished.getMonth() + 1) &&
+              categories.includes(book.category),
+          )
+          .map((book) => ({
+            category: book.category,
+            memo: book.memo.replace(/\*.*\*/g, '***'),
+            finished: book.finished,
+          }));
 
     const prompt = `${aiSummaryPrompt}\n${JSON.stringify(targetBooks)}`;
 
@@ -86,6 +108,14 @@ export class GenerateAiSummaryUseCase {
       sheetId,
       {
         _schemaVersion: ANALYSIS_SCHEMA_VERSION,
+        _analysisKind: 'reading',
+        _criteria: {
+          collectionId: sheetId,
+          itemTypeId: 'book',
+          logKind: 'read',
+          months,
+          categories,
+        },
         // 定義外のタイプIDが返ってきた場合は未診断扱いにする
         personality_type: PERSONALITY_TYPE_IDS.includes(
           personality_type as string,

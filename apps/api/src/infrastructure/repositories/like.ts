@@ -10,8 +10,8 @@ export class LikeRepository implements ILikeRepository {
     actor: LikeActor,
     bookId: number,
   ): Promise<{ created: boolean; bookOwnerId: string | null }> {
-    const book = await this.prisma.books.findUnique({
-      where: { id: bookId },
+    const book = await this.prisma.item.findFirst({
+      where: { id: bookId, itemTypeId: 'book' },
       select: { userId: true },
     });
     if (!book) return { created: false, bookOwnerId: null };

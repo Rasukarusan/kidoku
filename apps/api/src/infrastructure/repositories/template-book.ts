@@ -18,14 +18,17 @@ export class TemplateBookRepository implements ITemplateBookRepository {
 
   async save(templateBook: TemplateBook): Promise<TemplateBook> {
     if (templateBook.id === null) {
-      const created = await this.prisma.template_books.create({
+      const created = await this.prisma.itemTemplate.create({
         data: {
           userId: templateBook.userId,
           name: templateBook.name,
           title: templateBook.title,
-          author: templateBook.author,
+          itemTypeId: 'book',
+          attributes: {
+            authors: templateBook.author ? [templateBook.author] : [],
+          },
           category: templateBook.category,
-          image: templateBook.image,
+          imageUrl: templateBook.image,
           memo: templateBook.memo,
           isPublicMemo: templateBook.isPublicMemo,
         },
@@ -38,22 +41,25 @@ export class TemplateBookRepository implements ITemplateBookRepository {
         templateBook.title,
         templateBook.author,
         templateBook.category,
-        created.image,
+        created.imageUrl,
         templateBook.memo,
         templateBook.isPublicMemo,
-        created.created,
-        created.updated,
+        created.createdAt,
+        created.updatedAt,
       );
     } else {
       const id = parseInt(templateBook.id, 10);
-      await this.prisma.template_books.update({
+      await this.prisma.itemTemplate.update({
         where: { id },
         data: {
           name: templateBook.name,
           title: templateBook.title,
-          author: templateBook.author,
+          itemTypeId: 'book',
+          attributes: {
+            authors: templateBook.author ? [templateBook.author] : [],
+          },
           category: templateBook.category,
-          image: templateBook.image,
+          imageUrl: templateBook.image,
           memo: templateBook.memo,
           isPublicMemo: templateBook.isPublicMemo,
         },
@@ -63,7 +69,7 @@ export class TemplateBookRepository implements ITemplateBookRepository {
   }
 
   async delete(id: number, userId: string): Promise<void> {
-    await this.prisma.template_books.delete({
+    await this.prisma.itemTemplate.delete({
       where: { id, userId },
     });
   }

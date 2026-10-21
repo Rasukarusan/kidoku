@@ -2,9 +2,9 @@
 
 # Kidoku
 
-**あなたのための読書記録 & 分析アプリ**
+**本・映画などをまとめるコレクション管理 & 記録アプリ**
 
-バーコードスキャン、全文検索、美しい統計を備えた、AIによる読書傾向の分析。
+本・映画などのアイテムを自由なコレクションに整理し、読了・鑑賞の履歴を記録。バーコードによる本の検索とAI読書分析も利用できます。
 
 [デモ](https://kidoku.net/) | [コントリビュート](./CONTRIBUTING.md) | [ドキュメント](./docs/)
 
@@ -20,6 +20,10 @@
 
 ## 機能
 
+- **コレクション管理** - アイテムを複数のコレクションに整理
+- **本・映画の記録** - 種類ごとの属性と、再読・再鑑賞を含む履歴を管理
+- **汎用エクスポート** - 属性・所属・履歴をCSV / JSONで出力
+
 - **本の登録** - タイトル検索またはバーコードスキャンで、本をすぐに追加
 - **年別読書シート** - 読書履歴を年ごとにビジュアルなカードで整理
 - **AI読書分析** - ChatGPT による分析であなたの読書傾向を発見
@@ -28,16 +32,16 @@
 
 ## 技術スタック
 
-| レイヤー | 技術 |
-|-------|------------|
-| モノレポ | Turborepo + pnpm workspaces |
+| レイヤー       | 技術                                           |
+| -------------- | ---------------------------------------------- |
+| モノレポ       | Turborepo + pnpm workspaces                    |
 | フロントエンド | Next.js 14, React 18, TypeScript, Tailwind CSS |
-| バックエンド | NestJS 11, GraphQL, DDDアーキテクチャ |
-| データベース | MySQL 9.3 + Prisma ORM |
-| 認証 | NextAuth.js (Google OAuth) |
-| 検索 | MeiliSearch (日本語最適化ビルド) |
-| AI | ChatGPT (Codex backend) |
-| 決済 | Stripe |
+| バックエンド   | NestJS 11, GraphQL, DDDアーキテクチャ          |
+| データベース   | MySQL 9.3 + Prisma ORM                         |
+| 認証           | NextAuth.js (Google OAuth)                     |
+| 検索           | MeiliSearch (日本語最適化ビルド)               |
+| AI             | ChatGPT (Codex backend)                        |
+| 決済           | Stripe                                         |
 
 ## プロジェクト構成
 
@@ -75,21 +79,25 @@ cp apps/api/.env.example apps/api/.env
 docker-compose up -d
 
 # データベースのセットアップ
-pnpm --filter web db:push
-pnpm --filter web prisma generate
-pnpm --filter api db:push
+pnpm --filter web exec prisma generate
+pnpm --filter api exec prisma generate
+# 新しい空DBだけを初期化（既存DBは変更しません）
+pnpm --filter web db:initialize
+pnpm --filter web db:check
 
 # 全ての開発サーバーを起動
 pnpm dev
 ```
 
+既存の本のDBから切り替える場合は、先に [コレクション移行手順](./docs/COLLECTION_MIGRATION.md) を確認してください。`prisma db push` での切り替えは行わないでください。
+
 ### アクセスURL
 
-| サービス | URL |
-|---------|-----|
-| Webアプリ | http://localhost:3000 |
+| サービス    | URL                           |
+| ----------- | ----------------------------- |
+| Webアプリ   | http://localhost:3000         |
 | GraphQL API | http://localhost:4000/graphql |
-| MeiliSearch | http://localhost:7700 |
+| MeiliSearch | http://localhost:7700         |
 
 ### 検索のセットアップ (MeiliSearch)
 
@@ -141,6 +149,7 @@ apps/api/src/
 **依存ルール**: `domain` は他層に依存しません。`application` は `domain` のみに依存します。`infrastructure` は `domain` のインターフェースを実装します。`presentation` は `application` を通して処理を実行します。
 
 詳細なアーキテクチャドキュメントは以下を参照してください。
+
 - [セキュリティ & 認証](./docs/SECURITY.md)
 - [管理者API & バッチ処理](./docs/ADMIN_API.md)
 - [MCP 接続と認証](./docs/MCP.md)
