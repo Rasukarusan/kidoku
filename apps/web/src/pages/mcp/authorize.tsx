@@ -8,11 +8,10 @@ import { Logo } from '@/components/icon/Logo'
 import { SignInWithGoogleButton } from '@/components/button/SignInWithGoogleButton'
 import {
   createConsent,
-  MCP_SCOPE,
-  MCP_ITEMS_SCOPE,
   OAuthError,
   validateAuthorization,
 } from '@/libs/mcp/oauth'
+import { MCP_SCOPE, MCP_ITEMS_SCOPE } from '@/libs/mcp/scopes'
 
 type Account = {
   name: string | null

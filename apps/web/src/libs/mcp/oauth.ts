@@ -2,10 +2,9 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto'
 import type { NextApiRequest } from 'next'
 import prisma from '@/libs/prisma'
 import { fetchClientMetadata, isClientIdUrl } from './client-metadata'
+import { MCP_SCOPE, MCP_ITEMS_SCOPE, MCP_SCOPES } from './scopes'
 
-export const MCP_SCOPE = 'books:read'
-export const MCP_ITEMS_SCOPE = 'items:read'
-export const MCP_SCOPES = [MCP_SCOPE, MCP_ITEMS_SCOPE]
+export { MCP_SCOPE, MCP_ITEMS_SCOPE, MCP_SCOPES } from './scopes'
 export const ACCESS_TOKEN_SECONDS = 3600
 const GRANT_SECONDS = 30 * 24 * 3600
 const UNUSED_CLIENT_SECONDS = 24 * 3600

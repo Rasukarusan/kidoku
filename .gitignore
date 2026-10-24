@@ -72,3 +72,4 @@ src/app/play
 **/playwright/.cache/
 # Local migration progress (never contains credentials)
 .collection-migration-progress.json
+/.local-backups/
