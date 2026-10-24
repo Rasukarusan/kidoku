@@ -104,7 +104,7 @@ jobs:
           --health-retries=20
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      BACKUP_DIRECTORY: ${{ runner.temp }}/preview-backup
+      BACKUP_DIRECTORY: /tmp/kidoku-preview-backup
     steps:
       - name: Require backup certificate
         env:
@@ -138,7 +138,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: preview-database-backup-${{ github.run_id }}
-          path: ${{ runner.temp }}/preview-backup/preview.sql.cms
+          path: /tmp/kidoku-preview-backup/preview.sql.cms
           if-no-files-found: error
           retention-days: 30
       - name: Rehearse migration on restored backup
