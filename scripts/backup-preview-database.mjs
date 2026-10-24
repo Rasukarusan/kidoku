@@ -83,7 +83,6 @@ try {
         "mysqldump",
         process.env.DATABASE_URL,
         [
-          "--single-transaction",
           "--skip-lock-tables",
           "--no-tablespaces",
           "--column-statistics=0",
