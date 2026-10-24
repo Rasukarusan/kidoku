@@ -21,12 +21,13 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: "検査またはPreview限定の移行"
+        description: "検査または環境を指定した手動移行"
         type: choice
         default: verify
         options:
           - verify
           - migrate-preview
+          - migrate-production
       backup_certificate:
         description: "バックアップ暗号化用の公開証明書（base64）"
         type: string
@@ -51,7 +52,7 @@ concurrency:
 
 jobs:
   db-push:
-    if: ${{ inputs.operation != 'migrate-preview' }}
+    if: ${{ inputs.operation != 'migrate-preview' && inputs.operation != 'migrate-production' }}
     runs-on: ubuntu-latest
     # push(main/master) → Production / pull_request → Preview / 手動実行 → 選択した環境
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.event_name == 'pull_request' && 'Preview' || 'Production' }}
@@ -87,10 +88,10 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-  migrate-preview:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'migrate-preview' && inputs.environment == 'Preview' }}
+  migrate-database:
+    if: ${{ github.event_name == 'workflow_dispatch' && ((inputs.operation == 'migrate-preview' && inputs.environment == 'Preview') || (inputs.operation == 'migrate-production' && inputs.environment == 'Production')) }}
     runs-on: ubuntu-latest
-    environment: Preview
+    environment: ${{ inputs.environment }}
     permissions:
       contents: read
     services:
@@ -108,7 +109,8 @@ jobs:
           --health-retries=20
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      BACKUP_DIRECTORY: /tmp/kidoku-preview-backup
+      BACKUP_DIRECTORY: /tmp/kidoku-database-backup
+      SERVICE_NAME: ${{ inputs.environment == 'Production' && 'kidoku-api' || 'kidoku-api-preview' }}
       MIGRATION_FLAGS: ${{ inputs.resume_after_backfill && '--resume-after-backfill' || '' }}
     steps:
       - name: Require backup certificate
@@ -129,8 +131,9 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-      - name: Restrict preview API during maintenance
-        run: gcloud run services update kidoku-api-preview --region asia-northeast1 --ingress internal
+      - name: Restrict API during maintenance
+        id: maintenance
+        run: gcloud run services update "$SERVICE_NAME" --region asia-northeast1 --ingress internal
       - run: sudo apt-get update -qq && sudo apt-get install -y mysql-client
       - name: Preflight
         run: node scripts/migrate-collections.mjs $MIGRATION_FLAGS
@@ -142,8 +145,8 @@ jobs:
       - name: Store encrypted backup
         uses: actions/upload-artifact@v4
         with:
-          name: preview-database-backup-${{ github.run_id }}
-          path: /tmp/kidoku-preview-backup/preview.sql.cms
+          name: ${{ inputs.environment }}-database-backup-${{ github.run_id }}
+          path: /tmp/kidoku-database-backup/preview.sql.cms
           if-no-files-found: error
           retention-days: 30
       - name: Rehearse migration on restored backup
@@ -152,7 +155,8 @@ jobs:
           node scripts/verify-collection-schema.mjs
         env:
           DATABASE_URL: mysql://root:restore-verification-only@127.0.0.1:13306/restore_check
-      - name: Apply preview migration
+      - name: Apply migration
+        id: apply
         run: |
           node scripts/backup-preview-database.mjs --check-unchanged
           node scripts/migrate-collections.mjs $MIGRATION_FLAGS --apply --writers-stopped --backup-verified
@@ -161,10 +165,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: preview-migration-progress-${{ github.run_id }}
+          name: ${{ inputs.environment }}-migration-progress-${{ github.run_id }}
           path: .collection-migration-progress.json
           include-hidden-files: true
           if-no-files-found: ignore
       - name: Remove plaintext backup
         if: always()
         run: rm -f "$BACKUP_DIRECTORY/preview.sql" "$BACKUP_DIRECTORY/recovery.sql"
+      - name: Restore access if migration has not started
+        if: ${{ always() && steps.maintenance.outcome == 'success' && steps.apply.outcome == 'skipped' }}
+        run: gcloud run services update "$SERVICE_NAME" --region asia-northeast1 --ingress all
