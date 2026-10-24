@@ -61,7 +61,80 @@ function mysql(command, connection, extra, input, output) {
 }
 
 try {
-  if (process.argv.includes("--check-unchanged")) {
+  if (process.argv.includes("--restore")) {
+    if (!process.env.PREVIEW_RESTORE_SQL || !process.env.RESTORE_DATABASE_URL)
+      throw new Error("Restoration configuration is required");
+    const restoreUrl = new URL(process.env.RESTORE_DATABASE_URL);
+    if (
+      restoreUrl.hostname !== "127.0.0.1" ||
+      restoreUrl.pathname !== "/restore_check"
+    )
+      throw new Error(
+        "Recovery verification must use the local restore database",
+      );
+    const current = await manifest(source);
+    if (!current.items || !current.collections || current.books)
+      throw new Error("Recovery requires the expected partial migration state");
+    mkdirSync(directory, { recursive: true, mode: 0o700 });
+    const sql = join(directory, "recovery.sql");
+    writeFileSync(
+      sql,
+      process.env.PREVIEW_RESTORE_SQL.replace(
+        /^LOCK TABLES .*;\r?\n/gm,
+        "",
+      ).replace(/^UNLOCK TABLES;\r?\n/gm, ""),
+      { mode: 0o600 },
+    );
+    const local = new PrismaClient({
+      datasources: { db: { url: restoreUrl.toString() } },
+    });
+    await local.$executeRawUnsafe("CREATE DATABASE restore_recovery");
+    await local.$disconnect();
+    restoreUrl.pathname = "/restore_recovery";
+    const restored = new PrismaClient({
+      datasources: { db: { url: restoreUrl.toString() } },
+    });
+    try {
+      for (const connection of [
+        restoreUrl.toString(),
+        process.env.DATABASE_URL,
+      ]) {
+        const input = openSync(sql, "r");
+        try {
+          mysql("mysql", connection, [], input, "ignore");
+        } finally {
+          closeSync(input);
+        }
+      }
+      const expected = await manifest(restored);
+      const actual = await manifest(source);
+      const original = Object.fromEntries(
+        Object.entries(actual).filter(([name]) => name in expected),
+      );
+      if (JSON.stringify(expected) !== JSON.stringify(original))
+        throw new Error("Recovered tables do not match the backup");
+      const canonical = [
+        "collection_highlights",
+        "collection_items",
+        "item_comments",
+        "item_logs",
+        "item_templates",
+        "item_types",
+        "items",
+        "collections",
+      ];
+      const extra = Object.keys(actual).filter((name) => !(name in expected));
+      if (extra.some((name) => !canonical.includes(name)))
+        throw new Error("Unexpected tables require inspection before recovery");
+      for (const name of canonical.filter((name) => extra.includes(name)))
+        await source.$executeRawUnsafe(`DROP TABLE ${quote(name)}`);
+      if (JSON.stringify(expected) !== JSON.stringify(await manifest(source)))
+        throw new Error("Recovery verification failed");
+      console.log("Preview database recovered and verified against the backup");
+    } finally {
+      await restored.$disconnect();
+    }
+  } else if (process.argv.includes("--check-unchanged")) {
     const expected = JSON.parse(
       readFileSync(join(directory, "manifest.json"), "utf8"),
     );
@@ -84,6 +157,7 @@ try {
         process.env.DATABASE_URL,
         [
           "--skip-lock-tables",
+          "--skip-add-locks",
           "--no-tablespaces",
           "--column-statistics=0",
           "--set-gtid-purged=OFF",

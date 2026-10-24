@@ -4,7 +4,10 @@
 
 RENAME TABLE sheets TO collections, books TO items, template_books TO item_templates, yearly_top_books TO collection_highlights, book_comments TO item_comments;
 
-ALTER TABLE collections CHANGE COLUMN `order` position INT NOT NULL DEFAULT 1, CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ADD COLUMN description TEXT;
+ALTER TABLE collections CHANGE COLUMN `order` position INT NOT NULL DEFAULT 1;
+ALTER TABLE collections CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE collections CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE collections ADD COLUMN description TEXT;
 UPDATE collections SET description = '' WHERE description IS NULL;
 ALTER TABLE collections MODIFY COLUMN description TEXT NOT NULL;
 
@@ -19,7 +22,9 @@ INSERT INTO item_types (`key`, name, definition) VALUES
 ('book', '本', '{"fields":[{"key":"authors","label":"著者","type":"textList","maxLength":120},{"key":"isbn","label":"ISBN","type":"text","maxLength":20}],"logKinds":[{"key":"read","label":"読了","dateLabel":"読了日"},{"key":"purchased","label":"購入","dateLabel":"購入日"}],"itemUnit":"冊","searchProvider":"books","analysis":["reading"]}'),
 ('movie', '映画', '{"fields":[{"key":"directors","label":"監督","type":"textList","maxLength":120},{"key":"releaseYear","label":"公開年","type":"number","min":1888,"max":9999},{"key":"runtimeMinutes","label":"上映時間（分）","type":"number","min":1,"max":100000}],"logKinds":[{"key":"watched","label":"鑑賞","dateLabel":"鑑賞日"},{"key":"purchased","label":"購入","dateLabel":"購入日"}],"itemUnit":"作品"}');
 
-ALTER TABLE items ADD COLUMN item_type_id VARCHAR(40) NOT NULL DEFAULT 'book', ADD COLUMN attributes JSON, ADD COLUMN attributes_version INT NOT NULL DEFAULT 1;
+ALTER TABLE items ADD COLUMN item_type_id VARCHAR(40) NOT NULL DEFAULT 'book';
+ALTER TABLE items ADD COLUMN attributes JSON;
+ALTER TABLE items ADD COLUMN attributes_version INT NOT NULL DEFAULT 1;
 UPDATE items SET attributes = JSON_OBJECT('authors', JSON_ARRAY(author));
 ALTER TABLE items MODIFY COLUMN attributes JSON NOT NULL;
 
@@ -48,18 +53,45 @@ INSERT INTO item_logs (item_id, kind, occurred_at, memo, rating, created_at, upd
 
 ALTER TABLE collection_highlights ADD COLUMN collection_id INT UNSIGNED NULL;
 UPDATE collection_highlights h JOIN collections c ON c.user_id = h.user_id AND BINARY c.name = BINARY h.year SET h.collection_id = c.id;
-ALTER TABLE collection_highlights MODIFY COLUMN collection_id INT UNSIGNED NOT NULL, CHANGE COLUMN book_id item_id INT UNSIGNED NOT NULL, ADD UNIQUE INDEX collection_highlights_collection_position (collection_id, `order`);
-ALTER TABLE collection_highlights DROP INDEX uniq_user_order_year, DROP COLUMN user_id, DROP COLUMN year, CHANGE COLUMN `order` position INT NOT NULL, CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ADD INDEX collection_highlights_item_id_idx (item_id);
+ALTER TABLE collection_highlights MODIFY COLUMN collection_id INT UNSIGNED NOT NULL;
+ALTER TABLE collection_highlights CHANGE COLUMN book_id item_id INT UNSIGNED NOT NULL;
+ALTER TABLE collection_highlights ADD UNIQUE INDEX collection_highlights_collection_position (collection_id, `order`);
+ALTER TABLE collection_highlights DROP INDEX uniq_user_order_year;
+ALTER TABLE collection_highlights DROP COLUMN user_id;
+ALTER TABLE collection_highlights DROP COLUMN year;
+ALTER TABLE collection_highlights CHANGE COLUMN `order` position INT NOT NULL;
+ALTER TABLE collection_highlights CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE collection_highlights CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE collection_highlights ADD INDEX collection_highlights_item_id_idx (item_id);
 ALTER TABLE ai_summaries CHANGE COLUMN sheet_id collection_id INT NOT NULL;
 ALTER TABLE likes CHANGE COLUMN book_id item_id INT UNSIGNED NOT NULL;
 ALTER TABLE purchases CHANGE COLUMN book_id item_id INT UNSIGNED NOT NULL;
 ALTER TABLE notifications CHANGE COLUMN book_id item_id INT UNSIGNED NULL;
 ALTER TABLE item_comments CHANGE COLUMN book_id item_id INT UNSIGNED NOT NULL;
 
-ALTER TABLE items DROP COLUMN sheet_id, DROP COLUMN author, DROP COLUMN finished, CHANGE COLUMN image image_url VARCHAR(255) NOT NULL DEFAULT '/no-image.png', CHANGE COLUMN impression rating VARCHAR(5) NOT NULL DEFAULT '-', CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, MODIFY COLUMN category VARCHAR(120) NOT NULL DEFAULT '', ALTER COLUMN item_type_id DROP DEFAULT, ADD INDEX items_user_id_item_type_id_idx (user_id, item_type_id), ADD INDEX items_item_type_id_idx (item_type_id);
-ALTER TABLE item_templates ADD COLUMN item_type_id VARCHAR(40) NOT NULL DEFAULT 'book', ADD COLUMN attributes JSON, ADD COLUMN attributes_version INT NOT NULL DEFAULT 1;
+ALTER TABLE items DROP COLUMN sheet_id;
+ALTER TABLE items DROP COLUMN author;
+ALTER TABLE items DROP COLUMN finished;
+ALTER TABLE items CHANGE COLUMN image image_url VARCHAR(255) NOT NULL DEFAULT '/no-image.png';
+ALTER TABLE items CHANGE COLUMN impression rating VARCHAR(5) NOT NULL DEFAULT '-';
+ALTER TABLE items CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE items CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE items MODIFY COLUMN category VARCHAR(120) NOT NULL DEFAULT '';
+ALTER TABLE items ALTER COLUMN item_type_id DROP DEFAULT;
+ALTER TABLE items ADD INDEX items_user_id_item_type_id_idx (user_id, item_type_id);
+ALTER TABLE items ADD INDEX items_item_type_id_idx (item_type_id);
+ALTER TABLE item_templates ADD COLUMN item_type_id VARCHAR(40) NOT NULL DEFAULT 'book';
+ALTER TABLE item_templates ADD COLUMN attributes JSON;
+ALTER TABLE item_templates ADD COLUMN attributes_version INT NOT NULL DEFAULT 1;
 UPDATE item_templates SET attributes = JSON_OBJECT('authors', JSON_ARRAY(author));
-ALTER TABLE item_templates MODIFY COLUMN attributes JSON NOT NULL, DROP COLUMN author, CHANGE COLUMN image image_url VARCHAR(255) NOT NULL, CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, ALTER COLUMN item_type_id DROP DEFAULT, ADD INDEX item_templates_user_id_item_type_id_idx (user_id, item_type_id), ADD INDEX item_templates_item_type_id_idx (item_type_id);
+ALTER TABLE item_templates MODIFY COLUMN attributes JSON NOT NULL;
+ALTER TABLE item_templates DROP COLUMN author;
+ALTER TABLE item_templates CHANGE COLUMN image image_url VARCHAR(255) NOT NULL;
+ALTER TABLE item_templates CHANGE COLUMN created created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE item_templates CHANGE COLUMN updated updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE item_templates ALTER COLUMN item_type_id DROP DEFAULT;
+ALTER TABLE item_templates ADD INDEX item_templates_user_id_item_type_id_idx (user_id, item_type_id);
+ALTER TABLE item_templates ADD INDEX item_templates_item_type_id_idx (item_type_id);
 
 ALTER TABLE mcp_grants ADD COLUMN scope VARCHAR(40) NOT NULL DEFAULT 'books:read';
 

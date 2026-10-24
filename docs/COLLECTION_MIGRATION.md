@@ -35,6 +35,18 @@ MySQLのDDLはトランザクションで戻せない。途中失敗時はライ
 適用中の文番号は `.collection-migration-progress.json` に記録する。このファイルには秘密情報を保存しない。
 書き込み再開後は新しい記録が発生するため、移行前バックアップへの単純な復元は行わず、別途データ保全を含む復旧計画を立てる。
 
+## Preview環境での実行
+
+GitHub ActionsのDB検証ワークフローで、対象ブランチ、`environment=Preview`、`operation=migrate-preview` を指定する。
+`backup_certificate` にはバックアップ暗号化用のX.509公開証明書をbase64で渡し、対応する秘密鍵はローカルに保管する。
+
+ジョブはPreview APIへの外部アクセスを止め、DBをバックアップする。
+別DBへの復元結果を全テーブルの件数・データハッシュで照合し、復元したDBで移行を検証する。
+暗号化バックアップをArtifactに保存し、接続先のデータがバックアップと一致することを確認してからPreview DBに適用する。
+APIの再デプロイで外部アクセスを再開する。
+
+バックアップの復号には `openssl cms -decrypt -binary -inform DER -in preview.sql.cms -inkey private.pem -out preview.sql` を使用する。
+
 ## 動作確認
 
 - 本の既存ID・メモ・公開設定・価格・購入・コメントと旧URLが対応している。

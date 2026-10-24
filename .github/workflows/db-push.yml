@@ -1,7 +1,7 @@
 name: DB Schema Verification
 
 on:
-  # main/master へのプッシュでスキーマが変更されたら Production DB に自動反映
+  # main/master のスキーマ変更時に Production DB の構成を確認する
   push:
     branches:
       - main
@@ -9,7 +9,7 @@ on:
     paths:
       - "apps/web/prisma/schema.prisma"
       - "apps/api/prisma/schema.prisma"
-  # PR でスキーマが変更されたら Preview DB に自動反映
+  # PR のスキーマ変更時に Preview DB の構成を確認する
   # （フォークからの PR は Secrets にアクセスできないため対象外）
   pull_request:
     branches:
@@ -31,8 +31,12 @@ on:
         description: "バックアップ暗号化用の公開証明書（base64）"
         type: string
         required: false
+      restore_from_backup:
+        description: "失敗した移行をPreview専用の復元Secretから復旧する"
+        type: boolean
+        default: false
       environment:
-        description: "プッシュ先のデータベース環境"
+        description: "対象のデータベース環境"
         required: true
         default: "Production"
         type: choice
@@ -118,8 +122,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web exec prisma generate
-      - name: Preflight
-        run: node scripts/migrate-collections.mjs
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
@@ -129,6 +131,14 @@ jobs:
       - name: Restrict preview API during maintenance
         run: gcloud run services update kidoku-api-preview --region asia-northeast1 --ingress internal
       - run: sudo apt-get update -qq && sudo apt-get install -y mysql-client
+      - name: Recover partial preview migration
+        if: inputs.restore_from_backup
+        run: node scripts/backup-preview-database.mjs --restore
+        env:
+          RESTORE_DATABASE_URL: mysql://root:restore-verification-only@127.0.0.1:13306/restore_check
+          PREVIEW_RESTORE_SQL: ${{ secrets.PREVIEW_RESTORE_SQL }}
+      - name: Preflight
+        run: node scripts/migrate-collections.mjs
       - name: Backup and verify restoration
         run: node scripts/backup-preview-database.mjs
         env:
@@ -158,7 +168,8 @@ jobs:
         with:
           name: preview-migration-progress-${{ github.run_id }}
           path: .collection-migration-progress.json
+          include-hidden-files: true
           if-no-files-found: ignore
       - name: Remove plaintext backup
         if: always()
-        run: rm -f "$BACKUP_DIRECTORY/preview.sql"
+        run: rm -f "$BACKUP_DIRECTORY/preview.sql" "$BACKUP_DIRECTORY/recovery.sql"
