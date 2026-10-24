@@ -101,8 +101,7 @@ export const Sidebar: React.FC = () => {
     // 現在のパスに基づいてアクティブ状態を判定
     const isHomePage = router.pathname === '/'
     const isSheetsPage =
-      router.pathname.includes('/collections') &&
-      !router.pathname.includes('/total')
+      router.pathname.includes('/sheets') && !router.pathname.includes('/total')
     const isSettingsPage = router.pathname.includes('/settings')
 
     return [
@@ -119,7 +118,7 @@ export const Sidebar: React.FC = () => {
         isActive: isHomePage,
       },
       {
-        name: 'コレクション',
+        name: '読書記録',
         href: readingRecordsUrl,
         icon: AiOutlineBook,
         isActive: isSheetsPage,

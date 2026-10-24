@@ -38,7 +38,7 @@ MySQLのDDLはトランザクションで戻せない。途中失敗時はライ
 ## 動作確認
 
 - 本の既存ID・メモ・公開設定・価格・購入・コメントと旧URLが対応している。
-- 映画を登録し、監督・公開年・上映時間を編集できる。
+- 汎用APIで映画を登録し、監督・公開年・上映時間を編集できる。
 - アイテムを複数コレクションに所属させ、未所属にもできる。
 - コレクションを削除してもアイテムと履歴が残る。
 - 同じ映画の再鑑賞を追加するとアイテム数は増えず、履歴数が増える。
@@ -48,14 +48,13 @@ MySQLのDDLはトランザクションで戻せない。途中失敗時はライ
 - 所有者以外のアイテム・コレクション・履歴への変更を拒否する。
 - CSV・JSONエクスポートに、固有属性・複数所属・再読や再鑑賞の履歴が含まれる。
 
-## 新しい利用経路
+## 利用経路
 
-- コレクション: `/:user/collections`、`/:user/collections/:collectionId`
-- 登録・詳細: `/items/new`、`/items/:itemId`
+- Web: `/:user/sheets/:name`、`/:user/sheets/total`、`/books/:id`。本の検索・登録は検索モーダルを使用する。
 - GraphQL: `collections`, `itemTypes`, `items`, `item`, `saveCollection`, `deleteCollection`, `saveItem`, `deleteItem`, `saveItemLog`, `deleteItemLog`, `setCollectionHighlight`
 - PATによる読み取り: `/api/v1/items`、`/api/v1/items/:itemId`
-- MCP読み取り: `list_collections`, `list_items`, `get_item`。旧 `list_books` / `get_book` は維持。
-  汎用ツールには新しく同意した `items:read` 権限が必要。既存の `books:read` 接続は本のみを読める状態を維持する。
+- MCP読み取り: `list_collections`, `list_items`, `get_item`。`list_books` / `get_book` は本のみを返す。
+  汎用ツールには `items:read` 権限が必要。
 - エクスポート: `/api/export/items`、`/api/export/items?format=json`
 
 種類の追加は `item_types` に定義を追加する。定義はフィールド、履歴の種類・日時ラベル、単位を含む。
@@ -68,14 +67,3 @@ MySQLのDDLはトランザクションで戻せない。途中失敗時はライ
 単体テスト・型チェックと、MySQLでの移行検証・実画面の確認は区別する。
 Prismaの型情報のみを生成した環境では、ネイティブエンジンとMySQL接続を必要とする検証は実行できない。
 実施した検証結果は変更の報告に明記する。
-
-## この作業環境で確認できた結果
-
-- API: 68スイート・263テストが成功。アプリ全体の起動、署名付きGraphQLでの映画登録、所有者検証、既存APIとの互換性を含む。
-- Web: 24スイート・191テストが成功。種類定義からのフォーム生成、映画の登録内容、複数所属の集計、編集前の非公開メモ取得、MCPの権限制御を含む。
-- API / Web の型チェック、Prismaスキーマの接続を伴わない検証、両スキーマの一致確認が成功。
-- lintはエラーなし。既存ファイルの未使用変数の警告6件は残っている。
-- Playwrightは49テストの定義を読み込めることまで確認。映画の登録・再鑑賞・複数所属・コレクション削除後の履歴保持を確認するシナリオを追加した。
-- 移行・初期化スクリプトは構文を確認。コンテナへの接続、Prismaエンジンの取得、ローカルHTTP待ち受けの権限制限により、実DBの移行、通常ビルド、実ブラウザのE2Eは未実施。
-
-デプロイ前には移行後のスキーマを検証する。新しいコードを既存DBへ先行配信することや、自動の `db push` によるテーブル削除は行わない。

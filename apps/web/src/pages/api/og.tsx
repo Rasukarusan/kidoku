@@ -258,17 +258,8 @@ const renderWrapped = (params: URLSearchParams) => {
 
 const renderBook = (params: URLSearchParams) => {
   const user = trim(params.get('user') ?? 'kidoku user', 24)
-  const title = trim(
-    params.get('title') ??
-      (params.get('type') === 'item' ? 'アイテムの詳細' : '本の詳細'),
-    44
-  )
-  const subtitle = trim(
-    params.get('subtitle') ??
-      params.get('author') ??
-      (params.get('type') === 'item' ? 'コレクションの記録' : 'book detail'),
-    50
-  )
+  const title = trim(params.get('title') ?? '本の詳細', 44)
+  const subtitle = trim(params.get('author') ?? 'book detail', 50)
   const value = trim(params.get('category') ?? '', 20)
   const imageParam = params.get('image') ?? ''
   const hasCover =
@@ -276,11 +267,7 @@ const renderBook = (params: URLSearchParams) => {
 
   return new ImageResponse(
     <div style={baseStyle}>
-      {header(
-        params.get('type') === 'item'
-          ? 'コレクションをシェア'
-          : '読書記録をシェア'
-      )}
+      {header('読書記録をシェア')}
       {hasCover ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
           <img
@@ -361,7 +348,6 @@ export default function handler(req: Request) {
     case 'wrapped':
       return renderWrapped(searchParams)
     case 'book':
-    case 'item':
       return renderBook(searchParams)
     default:
       return renderYear(searchParams)

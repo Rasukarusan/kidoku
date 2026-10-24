@@ -122,7 +122,7 @@ export const SearchModal: React.FC = () => {
   const handleGoToSheet = () => {
     onClose()
     if (session && successData) {
-      router.push(`/${encodeURIComponent(session.user.name)}/collections`)
+      router.push(`/${session.user.name}/sheets/${successData.sheetName}`)
     }
   }
 

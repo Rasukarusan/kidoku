@@ -1,16 +1,97 @@
-import type { GetServerSideProps } from 'next'
-import prisma from '@/libs/prisma'
-export default function LegacyBookRedirect() {
-  return null
+import { GetStaticPaths, GetStaticProps } from 'next'
+import BookPage from '@/features/books/components/BookPage'
+
+export default BookPage
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
+  }
 }
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-  const id = Number(params.bookId)
-  if (!Number.isSafeInteger(id) || id <= 0) return { notFound: true }
-  const item = await prisma.item.findUnique({
-    where: { id },
-    select: { itemTypeId: true },
-  })
-  return item?.itemTypeId === 'book'
-    ? { redirect: { destination: `/items/${id}`, permanent: true } }
-    : { notFound: true }
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  const bookId = params?.bookId as string
+
+  if (!bookId) {
+    return {
+      notFound: true,
+    }
+  }
+
+  try {
+    const { default: prisma, parse } = await import('@/libs/prisma')
+    const { mask } = await import('@/utils/string')
+    const dayjs = (await import('dayjs')).default
+
+    const book = await prisma.books.findFirst({
+      where: { id: Number(bookId) },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        sheet: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+          },
+        },
+      },
+    })
+
+    if (!book) {
+      // notFoundをrevalidateなしで返すとISRが404を恒久的にキャッシュしてしまう。
+      // 作成直後でまだ参照できないケースに備え、revalidateを付与して自己回復させる。
+      return {
+        notFound: true,
+        revalidate: 10,
+      }
+    }
+
+    // ISR: 非所有者向けのページを生成（所有者のメモはクライアントサイドで取得）
+    const sanitizedBook = { ...book }
+
+    if (!book.isPublicMemo) {
+      // 非公開メモの場合、メモ内容を除外
+      sanitizedBook.memo = null
+    } else {
+      // 公開メモの場合、マスキングを適用
+      sanitizedBook.memo = mask(book.memo || '')
+    }
+
+    const month = book.finished
+      ? dayjs(book.finished).format('M') + '月'
+      : dayjs().format('M') + '月'
+
+    await prisma.$disconnect()
+
+    return {
+      props: {
+        book: parse({
+          ...sanitizedBook,
+          month,
+          sheetId: book.sheetId,
+          sheet: book.sheet?.name ?? null,
+          likeCount: book._count?.likes ?? 0,
+        }),
+      },
+      revalidate: 60,
+    }
+  } catch (error) {
+    console.error('Error fetching book:', error)
+    // 一時的なDBエラー等で404を恒久キャッシュしないよう、revalidateを付与する。
+    return {
+      notFound: true,
+      revalidate: 10,
+    }
+  }
 }

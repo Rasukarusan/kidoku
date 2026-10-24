@@ -37,30 +37,25 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     const { default: prisma } = await import('@/libs/prisma')
 
     // 公開メモのある本（「書名+感想」検索の受け皿）
-    const books = await prisma.item.findMany({
+    const books = await prisma.books.findMany({
       where: { isPublicMemo: true },
-      select: { id: true, updatedAt: true },
-      orderBy: { updatedAt: 'desc' },
+      select: { id: true, updated: true },
+      orderBy: { updated: 'desc' },
       take: 20000,
     })
     for (const b of books) {
       entries.push({
-        loc: `${HOST}/items/${b.id}`,
-        lastmod: b.updatedAt ? new Date(b.updatedAt).toISOString() : undefined,
+        loc: `${HOST}/books/${b.id}`,
+        lastmod: b.updated ? new Date(b.updated).toISOString() : undefined,
         changefreq: 'weekly',
         priority: '0.8',
       })
     }
 
     // 公開本棚（各ユーザーのシート）
-    const sheets = await prisma.collection.findMany({
-      select: {
-        id: true,
-        name: true,
-        updatedAt: true,
-        user: { select: { name: true } },
-      },
-      orderBy: { updatedAt: 'desc' },
+    const sheets = await prisma.sheets.findMany({
+      select: { name: true, updated: true, user: { select: { name: true } } },
+      orderBy: { updated: 'desc' },
       take: 20000,
     })
     const seenUsers = new Set<string>()
@@ -70,14 +65,14 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
       if (!seenUsers.has(userName)) {
         seenUsers.add(userName)
         entries.push({
-          loc: `${HOST}/${encodePath(userName)}/collections`,
+          loc: `${HOST}/${encodePath(userName)}/sheets`,
           changefreq: 'weekly',
           priority: '0.6',
         })
       }
       entries.push({
-        loc: `${HOST}/${encodePath(userName)}/collections/${s.id}`,
-        lastmod: s.updatedAt ? new Date(s.updatedAt).toISOString() : undefined,
+        loc: `${HOST}/${encodePath(userName)}/sheets/${encodePath(s.name)}`,
+        lastmod: s.updated ? new Date(s.updated).toISOString() : undefined,
         changefreq: 'weekly',
         priority: '0.7',
       })
