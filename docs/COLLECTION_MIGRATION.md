@@ -32,6 +32,8 @@ DBワークフローも自動変更を廃止し、正規テーブルと互換ビ
 SQLは [sql/collection-model.sql](./sql/collection-model.sql)。
 MySQLのDDLはトランザクションで戻せない。途中失敗時はライターを停止したままバックアップから復元する。
 部分適用したDBへ移行を再実行しない。スクリプトは正規テーブルを検出すると再実行を拒否する。
+属性・所属・履歴のバックフィルまで完了した停止地点に限り、`--resume-after-backfill` で列構成と元データとの一致を検査してから再開できる。
+列やデータが想定と異なる場合は再開を拒否する。
 適用中の文番号は `.collection-migration-progress.json` に記録する。このファイルには秘密情報を保存しない。
 書き込み再開後は新しい記録が発生するため、移行前バックアップへの単純な復元は行わず、別途データ保全を含む復旧計画を立てる。
 
@@ -44,6 +46,7 @@ GitHub ActionsのDB検証ワークフローで、対象ブランチ、`environme
 別DBへの復元結果を全テーブルの件数・データハッシュで照合し、復元したDBで移行を検証する。
 暗号化バックアップをArtifactに保存し、接続先のデータがバックアップと一致することを確認してからPreview DBに適用する。
 APIの再デプロイで外部アクセスを再開する。
+検証付きの再開には `resume_after_backfill=true` を指定する。
 
 バックアップの復号には `openssl cms -decrypt -binary -inform DER -in preview.sql.cms -inkey private.pem -out preview.sql` を使用する。
 
