@@ -76,6 +76,7 @@ jobs:
             --image ${{ env.IMAGE }}:latest \
             --region ${{ env.REGION }} \
             --platform managed \
+            --ingress all \
             --allow-unauthenticated \
             --port 4000 \
             --memory 256Mi \
