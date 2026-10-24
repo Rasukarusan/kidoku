@@ -1,46 +1,57 @@
-name: DB Push
+name: DB Schema Verification
 
 on:
-  # main/master へのプッシュでスキーマが変更されたら Production DB に自動反映
+  # main/master のスキーマ変更時に Production DB の構成を確認する
   push:
     branches:
       - main
       - master
     paths:
-      - 'apps/web/prisma/schema.prisma'
-      - 'apps/api/prisma/schema.prisma'
-  # PR でスキーマが変更されたら Preview DB に自動反映
+      - "apps/web/prisma/schema.prisma"
+      - "apps/api/prisma/schema.prisma"
+  # PR のスキーマ変更時に Preview DB の構成を確認する
   # （フォークからの PR は Secrets にアクセスできないため対象外）
   pull_request:
     branches:
       - main
       - master
     paths:
-      - 'apps/web/prisma/schema.prisma'
-      - 'apps/api/prisma/schema.prisma'
+      - "apps/web/prisma/schema.prisma"
+      - "apps/api/prisma/schema.prisma"
   workflow_dispatch:
     inputs:
+      operation:
+        description: "検査またはPreview限定の移行"
+        type: choice
+        default: verify
+        options:
+          - verify
+          - migrate-preview
+      backup_certificate:
+        description: "バックアップ暗号化用の公開証明書（base64）"
+        type: string
+        required: false
+      resume_after_backfill:
+        description: "元データと構造を照合して属性移行後の地点から再開する"
+        type: boolean
+        default: false
       environment:
-        description: 'プッシュ先のデータベース環境'
+        description: "対象のデータベース環境"
         required: true
-        default: 'Production'
+        default: "Production"
         type: choice
         options:
           - Production
           - Preview
-      accept_data_loss:
-        description: 'データ損失を許容して push する（--accept-data-loss）'
-        required: false
-        default: false
-        type: boolean
 
-# 同一環境への db push が同時に走らないように直列化する
+# 同一環境のスキーマ確認を直列化する
 concurrency:
   group: db-push-${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.event_name == 'pull_request' && 'Preview' || 'Production' }}
   cancel-in-progress: false
 
 jobs:
   db-push:
+    if: ${{ inputs.operation != 'migrate-preview' }}
     runs-on: ubuntu-latest
     # push(main/master) → Production / pull_request → Preview / 手動実行 → 選択した環境
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.event_name == 'pull_request' && 'Preview' || 'Production' }}
@@ -59,8 +70,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma clients
@@ -68,14 +79,92 @@ jobs:
           pnpm --filter web exec prisma generate
           pnpm --filter api exec prisma generate
 
-      - name: Push schema to database
-        run: |
-          ARGS="--skip-generate"
-          if [ "${{ inputs.accept_data_loss }}" = "true" ]; then
-            ARGS="$ARGS --accept-data-loss"
-          fi
-          echo "prisma db push $ARGS"
-          pnpm --filter web exec prisma db push $ARGS
-          pnpm --filter api exec prisma db push $ARGS
+      # The collection migration renames live tables and creates compatibility
+      # views. `db push` would infer destructive drops and cannot manage the views.
+      # Apply reviewed SQL during maintenance; CI only verifies the result.
+      - name: Verify collection schema (read only)
+        run: node scripts/verify-collection-schema.mjs
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+  migrate-preview:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation == 'migrate-preview' && inputs.environment == 'Preview' }}
+    runs-on: ubuntu-latest
+    environment: Preview
+    permissions:
+      contents: read
+    services:
+      restore:
+        image: mysql:9.3
+        env:
+          MYSQL_ROOT_PASSWORD: restore-verification-only
+          MYSQL_DATABASE: restore_check
+        ports:
+          - 13306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -prestore-verification-only"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BACKUP_DIRECTORY: /tmp/kidoku-preview-backup
+      MIGRATION_FLAGS: ${{ inputs.resume_after_backfill && '--resume-after-backfill' || '' }}
+    steps:
+      - name: Require backup certificate
+        env:
+          BACKUP_CERTIFICATE: ${{ inputs.backup_certificate }}
+        run: test -n "$BACKUP_CERTIFICATE"
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter web exec prisma generate
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Restrict preview API during maintenance
+        run: gcloud run services update kidoku-api-preview --region asia-northeast1 --ingress internal
+      - run: sudo apt-get update -qq && sudo apt-get install -y mysql-client
+      - name: Preflight
+        run: node scripts/migrate-collections.mjs $MIGRATION_FLAGS
+      - name: Backup and verify restoration
+        run: node scripts/backup-preview-database.mjs
+        env:
+          RESTORE_DATABASE_URL: mysql://root:restore-verification-only@127.0.0.1:13306/restore_check
+          BACKUP_CERTIFICATE: ${{ inputs.backup_certificate }}
+      - name: Store encrypted backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-database-backup-${{ github.run_id }}
+          path: /tmp/kidoku-preview-backup/preview.sql.cms
+          if-no-files-found: error
+          retention-days: 30
+      - name: Rehearse migration on restored backup
+        run: |
+          node scripts/migrate-collections.mjs $MIGRATION_FLAGS --apply --writers-stopped --backup-verified
+          node scripts/verify-collection-schema.mjs
+        env:
+          DATABASE_URL: mysql://root:restore-verification-only@127.0.0.1:13306/restore_check
+      - name: Apply preview migration
+        run: |
+          node scripts/backup-preview-database.mjs --check-unchanged
+          node scripts/migrate-collections.mjs $MIGRATION_FLAGS --apply --writers-stopped --backup-verified
+          node scripts/verify-collection-schema.mjs
+      - name: Store migration progress
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preview-migration-progress-${{ github.run_id }}
+          path: .collection-migration-progress.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+      - name: Remove plaintext backup
+        if: always()
+        run: rm -f "$BACKUP_DIRECTORY/preview.sql" "$BACKUP_DIRECTORY/recovery.sql"

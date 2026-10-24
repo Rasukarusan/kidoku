@@ -96,9 +96,9 @@ fix_db() {
       # テーブルが存在するか確認
       TABLE_COUNT=$(docker exec kidoku_db mysql -u dev -ppass kidoku -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='kidoku'" 2>/dev/null || echo "0")
       if [ "$TABLE_COUNT" -eq 0 ] 2>/dev/null; then
-        yellow "テーブルが存在しません。Prisma db push を実行中..."
-        DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" pnpm --filter web exec prisma db push --skip-generate 2>"$LOG_DIR/prisma-push.log"
-        green "Prisma db push 完了"
+        yellow "テーブルが存在しません。空DBを初期化中..."
+        DATABASE_URL="mysql://dev:pass@localhost:13306/kidoku" node scripts/initialize-collection-database.mjs --apply 2>"$LOG_DIR/prisma-push.log"
+        green "コレクションDB初期化完了"
       fi
 
       # ユーザーが存在するか確認

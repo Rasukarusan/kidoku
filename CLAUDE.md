@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## コレクションモデル移行後のDB操作
+
+本・映画などの保存先は `collections` / `items` / `item_types` / `collection_items` / `item_logs` です。
+旧Book/Sheetモデルは読み取り用のSQLビューであり、保存は新しい正規モデルを通してください。
+以下の従来ガイドにある `prisma db push` によるスキーマ変更・自動修復は、このモデル移行には使用できません。
+空DBの作成は `pnpm --filter web db:initialize`、既存DBの移行は [docs/COLLECTION_MIGRATION.md](./docs/COLLECTION_MIGRATION.md) に従います。
+`db:push` スクリプトは互換上の名前を残していますが、現在はスキーマの読み取り検証のみ行います。
+
 ## 重要
 
 CIでlint・型チェック・テストが自動実行されます。
@@ -326,10 +334,10 @@ pnpm --filter web lighthouse
 
 #### APIデプロイワークフロー
 
-| ワークフロー | トリガー | デプロイ先 | GitHub Environment |
-|---|---|---|---|
-| `.github/workflows/deploy-api.yml` | main/master への push（`apps/api/**` 変更時） | Cloud Run サービス `kidoku-api`（本番） | `Production` |
-| `.github/workflows/deploy-api-preview.yml` | PR（main/master 宛て、`apps/api/**` 変更時） | Cloud Run サービス `kidoku-api-preview`（プレビュー） | `Preview` |
+| ワークフロー                               | トリガー                                      | デプロイ先                                            | GitHub Environment |
+| ------------------------------------------ | --------------------------------------------- | ----------------------------------------------------- | ------------------ |
+| `.github/workflows/deploy-api.yml`         | main/master への push（`apps/api/**` 変更時） | Cloud Run サービス `kidoku-api`（本番）               | `Production`       |
+| `.github/workflows/deploy-api-preview.yml` | PR（main/master 宛て、`apps/api/**` 変更時）  | Cloud Run サービス `kidoku-api-preview`（プレビュー） | `Preview`          |
 
 - プレビュー用APIは全PR共通の単一サービス `kidoku-api-preview` にデプロイされ、最新のデプロイで上書きされる
 - プレビュー用の Secrets（`DATABASE_URL`, `NEXTAUTH_SECRET`, `FRONTEND_URL` 等）は GitHub の `Preview` Environment に登録する
@@ -372,14 +380,14 @@ bash scripts/health-check.sh
 
 #### 実装時の必須チェック
 
-| 変更内容 | 必要なアクション |
-|---|---|
-| Prismaスキーマ変更 | `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の**両方**を更新 |
-| Prismaスキーマ変更 | `pnpm --filter web db:push && pnpm --filter api db:push` でDBに反映 |
-| Prismaスキーマ変更 | `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web prisma generate && PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api prisma generate` でクライアント再生成 |
-| GraphQLリゾルバー変更 | API側の変更が完了してからStep 4でサーバー再起動後に `pnpm --filter web codegen` で型を再生成 |
-| 新しいNestJSモジュール追加 | `app.module.ts` の imports に登録 |
-| ドメインモデル・ユースケース追加 | ユニットテスト(`*.spec.ts`)を作成 |
+| 変更内容                         | 必要なアクション                                                                                                                                                                |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prismaスキーマ変更               | `apps/web/prisma/schema.prisma` と `apps/api/prisma/schema.prisma` の**両方**を更新                                                                                             |
+| Prismaスキーマ変更               | `pnpm --filter web db:push && pnpm --filter api db:push` でDBに反映                                                                                                             |
+| Prismaスキーマ変更               | `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web prisma generate && PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api prisma generate` でクライアント再生成 |
+| GraphQLリゾルバー変更            | API側の変更が完了してからStep 4でサーバー再起動後に `pnpm --filter web codegen` で型を再生成                                                                                    |
+| 新しいNestJSモジュール追加       | `app.module.ts` の imports に登録                                                                                                                                               |
+| ドメインモデル・ユースケース追加 | ユニットテスト(`*.spec.ts`)を作成                                                                                                                                               |
 
 ### Step 3: 静的検証
 
@@ -479,16 +487,16 @@ git commit -m "feat: 機能の説明"
 
 個別に対処する場合:
 
-| 症状 | 原因 | 回復コマンド |
-|---|---|---|
-| `ECONNREFUSED :3000` | Webサーバー停止 | `bash scripts/auto-fix.sh web` |
-| `ECONNREFUSED :4000` | APIサーバー停止 | `bash scripts/auto-fix.sh api` |
-| `Can't reach database server` | MySQLコンテナ停止 | `bash scripts/auto-fix.sh db` |
-| `Table 'kidoku.xxx' doesn't exist` | db:push 漏れ | `pnpm --filter web db:push && pnpm --filter api db:push` |
-| `Unknown type "XxxInput"` | codegen 漏れ | `pnpm --filter web codegen` |
+| 症状                                  | 原因                 | 回復コマンド                                                                                                                                               |
+| ------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ECONNREFUSED :3000`                  | Webサーバー停止      | `bash scripts/auto-fix.sh web`                                                                                                                             |
+| `ECONNREFUSED :4000`                  | APIサーバー停止      | `bash scripts/auto-fix.sh api`                                                                                                                             |
+| `Can't reach database server`         | MySQLコンテナ停止    | `bash scripts/auto-fix.sh db`                                                                                                                              |
+| `Table 'kidoku.xxx' doesn't exist`    | db:push 漏れ         | `pnpm --filter web db:push && pnpm --filter api db:push`                                                                                                   |
+| `Unknown type "XxxInput"`             | codegen 漏れ         | `pnpm --filter web codegen`                                                                                                                                |
 | `Cannot find module '@prisma/client'` | prisma generate 漏れ | `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter web prisma generate && PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 pnpm --filter api prisma generate` |
-| dev-server起動しない | ポート競合 | `bash scripts/dev-server.sh stop && bash scripts/dev-server.sh start` |
-| Prismaスキーマ不一致 | 片方だけ編集した | `diff apps/web/prisma/schema.prisma apps/api/prisma/schema.prisma` で差分確認し両方を同期 |
+| dev-server起動しない                  | ポート競合           | `bash scripts/dev-server.sh stop && bash scripts/dev-server.sh start`                                                                                      |
+| Prismaスキーマ不一致                  | 片方だけ編集した     | `diff apps/web/prisma/schema.prisma apps/api/prisma/schema.prisma` で差分確認し両方を同期                                                                  |
 
 ## トラブルシューティング
 

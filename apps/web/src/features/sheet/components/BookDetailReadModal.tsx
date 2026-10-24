@@ -73,6 +73,7 @@ export const BookDetailReadModal: React.FC<Props> = ({
     {
       variables: { input: { bookId: Number(book.id) } },
       skip: status !== 'authenticated' || !canPurchase,
+      fetchPolicy: 'no-cache',
     }
   )
   const unlockedMemo: string | null | undefined = memoData?.purchasedBookMemo
@@ -199,7 +200,9 @@ export const BookDetailReadModal: React.FC<Props> = ({
               </div>
               <div>
                 <span className="font-semibold">読了日:</span>{' '}
-                {dayjs(book.finished).format('YYYY-MM-DD')}
+                {book.finished
+                  ? dayjs(book.finished).format('YYYY-MM-DD')
+                  : '未記録'}
               </div>
             </div>
           </div>

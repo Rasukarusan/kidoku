@@ -3,6 +3,7 @@ import { createHash } from 'crypto'
 import type { NextApiRequest } from 'next'
 import {
   authenticateMcp,
+  normalizeMcpScope,
   createAuthorizationCode,
   createConsent,
   exchangeToken,
@@ -42,6 +43,7 @@ const authorization = {
   codeChallenge: 'a'.repeat(43),
   resource: 'https://kidoku.example/api/mcp',
   state: 'client-state',
+  scope: 'books:read',
 }
 
 beforeEach(() => {
@@ -283,4 +285,42 @@ test('only accepts unexpired tokens for this resource, not PATs or ID tokens', a
     resource: authorization.resource,
   })
   await expect(authenticateMcp(request('a'.repeat(43)))).resolves.toBeNull()
+})
+
+test('refreshing a legacy grant cannot elevate it to all item types', async () => {
+  prisma.mcpGrant.updateMany.mockResolvedValue({ count: 0 })
+  await expect(
+    exchangeToken({
+      grant_type: 'refresh_token',
+      client_id: 'client-1',
+      refresh_token: 'legacy-refresh',
+      scope: 'items:read',
+    })
+  ).rejects.toThrow('更新トークン')
+  expect(prisma.mcpGrant.updateMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      where: expect.objectContaining({
+        scope: 'items:read',
+        refreshHash: hash('legacy-refresh'),
+      }),
+    })
+  )
+})
+
+test('new collection authorization binds its broader scope to consent and grant', async () => {
+  const auth = { ...authorization, scope: 'items:read' }
+  const consent = createConsent('user-1', auth)
+  expect(readConsent(consent, 'user-1').scope).toBe('items:read')
+  await createAuthorizationCode('user-1', auth)
+  expect(prisma.mcpGrant.create).toHaveBeenCalledWith(
+    expect.objectContaining({
+      data: expect.objectContaining({ scope: 'items:read', userId: 'user-1' }),
+    })
+  )
+})
+
+test('supports a requested scope set without broadening legacy book grants implicitly', () => {
+  expect(normalizeMcpScope('books:read')).toBe('books:read')
+  expect(normalizeMcpScope('books:read items:read')).toBe('items:read')
+  expect(() => normalizeMcpScope('items:read books:write')).toThrow()
 })

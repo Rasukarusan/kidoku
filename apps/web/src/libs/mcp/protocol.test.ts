@@ -5,6 +5,8 @@ jest.mock('@/libs/prisma', () => ({
   __esModule: true,
   default: {
     books: { count: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+    item: { count: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
+    collection: { findMany: jest.fn() },
     $transaction: jest.fn(),
   },
 }))
@@ -49,17 +51,21 @@ test('initializes, lists read-only tools and accepts notifications', async () =>
   })
   const list = await handleMcpRequest(
     { jsonrpc: '2.0', id: 2, method: 'tools/list' },
-    'user-1'
+    'user-1',
+    'items:read'
   )
   expect(list).toMatchObject({
     result: {
-      tools: [
+      tools: expect.arrayContaining([
+        expect.objectContaining({ name: 'list_items' }),
+        expect.objectContaining({ name: 'get_item' }),
+        expect.objectContaining({ name: 'list_collections' }),
         expect.objectContaining({
           name: 'list_books',
           annotations: expect.objectContaining({ readOnlyHint: true }),
         }),
         expect.objectContaining({ name: 'get_book' }),
-      ],
+      ]),
     },
   })
   await expect(
@@ -130,5 +136,74 @@ test.each([
 ])('rejects malformed JSON-RPC: %j', async (body) => {
   await expect(handleMcpRequest(body, 'user-1')).resolves.toMatchObject({
     error: { code: -32600 },
+  })
+})
+
+test('generic item lookup scopes private memos and histories to the authenticated owner', async () => {
+  prisma.item.findFirst.mockResolvedValue(null)
+  const result = await handleMcpRequest(
+    call('get_item', { id: 99 }),
+    'owner',
+    'items:read'
+  )
+  expect(prisma.item.findFirst).toHaveBeenCalledWith(
+    expect.objectContaining({ where: { userId: 'owner', id: 99 } })
+  )
+  expect(result).toMatchObject({ result: { isError: true } })
+})
+
+test('generic item listing carries type and collection filters without returning private memos', async () => {
+  prisma.$transaction.mockResolvedValue([
+    1,
+    [
+      {
+        id: 99,
+        itemTypeId: 'movie',
+        title: '映画',
+        attributes: { directors: ['監督'] },
+        collections: [{ collectionId: 10 }],
+      },
+    ],
+  ])
+  const result = await handleMcpRequest(
+    call('list_items', { itemTypeId: 'movie', collectionId: 10 }),
+    'owner',
+    'items:read'
+  )
+  expect(prisma.item.findMany).toHaveBeenCalledWith(
+    expect.objectContaining({
+      where: {
+        userId: 'owner',
+        itemTypeId: 'movie',
+        collections: { some: { collectionId: 10 } },
+      },
+      select: expect.not.objectContaining({ memo: true }),
+    })
+  )
+  expect(JSON.stringify(result)).toContain('movie')
+})
+
+test('legacy book grants cannot access generic private collection records', async () => {
+  const result = await handleMcpRequest(
+    call('get_item', { id: 99 }),
+    'owner',
+    'books:read'
+  )
+  expect(result).toMatchObject({
+    error: { message: 'items:read scope required' },
+  })
+  expect(prisma.item.findFirst).not.toHaveBeenCalled()
+  const list = await handleMcpRequest(
+    { jsonrpc: '2.0', id: 2, method: 'tools/list' },
+    'owner',
+    'books:read'
+  )
+  expect(list).toMatchObject({
+    result: {
+      tools: [
+        expect.objectContaining({ name: 'list_books' }),
+        expect.objectContaining({ name: 'get_book' }),
+      ],
+    },
   })
 })

@@ -12,8 +12,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter api exec prisma generate
       - run: pnpm --filter web exec prisma generate
@@ -26,8 +26,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter api exec prisma generate
       - run: pnpm --filter web exec prisma generate
@@ -40,8 +40,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter api exec prisma generate
       - run: pnpm --filter api test
@@ -53,8 +53,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web exec prisma generate
       - run: pnpm --filter web test
@@ -88,8 +88,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
       - run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma clients
@@ -97,10 +97,8 @@ jobs:
           pnpm --filter api exec prisma generate
           pnpm --filter web exec prisma generate
 
-      - name: Push schema to database
-        run: |
-          pnpm --filter web exec prisma db push --skip-generate --accept-data-loss
-          pnpm --filter api exec prisma db push --skip-generate --accept-data-loss
+      - name: Initialize canonical schema and compatibility views
+        run: node scripts/initialize-collection-database.mjs --apply
         env:
           DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
 
@@ -118,8 +116,8 @@ jobs:
           NEXTAUTH_SECRET: kidoku-ci-nextauth-secret
           NEXT_PUBLIC_HOST: http://localhost:3000
           NESTJS_GRAPHQL_ENDPOINT: http://localhost:4000/graphql
-          NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN: 'true'
-          NEXT_PUBLIC_FLAG_KIDOKU_1: 'true'
+          NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN: "true"
+          NEXT_PUBLIC_FLAG_KIDOKU_1: "true"
 
       - name: Install Playwright browsers
         run: pnpm --filter web exec playwright install chromium --with-deps
@@ -129,7 +127,7 @@ jobs:
         env:
           DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
           NEXTAUTH_SECRET: kidoku-ci-nextauth-secret
-          PORT: '4000'
+          PORT: "4000"
           MEILI_HOST: http://localhost:7700
           MEILI_MASTER_KEY: YourMasterKey
 
@@ -146,14 +144,14 @@ jobs:
       - name: Run E2E tests
         run: pnpm --filter web test:e2e
         env:
-          CI: 'true'
+          CI: "true"
           DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
           NEXTAUTH_SECRET: kidoku-ci-nextauth-secret
           NEXT_PUBLIC_HOST: http://localhost:3000
           NESTJS_GRAPHQL_ENDPOINT: http://localhost:4000/graphql
-          NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN: 'true'
+          NEXT_PUBLIC_ENABLE_BACKDOOR_LOGIN: "true"
           BACKDOOR_USER_EMAIL: test@example.com
-          NEXT_PUBLIC_FLAG_KIDOKU_1: 'true'
+          NEXT_PUBLIC_FLAG_KIDOKU_1: "true"
           MEILI_HOST: http://localhost:7700
           MEILI_MASTER_KEY: YourMasterKey
 

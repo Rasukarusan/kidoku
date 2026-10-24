@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -8,21 +9,21 @@ datasource db {
   relationMode = "prisma"
 }
 
-model sheets {
-  id      Int       @id @default(autoincrement()) @db.UnsignedInt
+view sheets {
+  id      Int       @unique @db.UnsignedInt
   userId  String    @map("user_id")
   name    String    @db.VarChar(120)
-  order   Int?      @default(1)
-  created DateTime? @default(now()) @db.DateTime(0)
-  updated DateTime? @default(now()) @db.DateTime(0)
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order   Int?
+  created DateTime? @db.DateTime(0)
+  updated DateTime? @db.DateTime(0)
+  user    User      @relation(fields: [userId], references: [id])
   books   books[]
 
-  @@unique([userId, name], map: "uniq_user_id_name")
+  @@map("legacy_sheets")
 }
 
-model books {
-  id               Int             @id @default(autoincrement()) @db.UnsignedInt
+view books {
+  id               Int             @unique @db.UnsignedInt
   userId           String          @map("user_id")
   sheetId          Int             @map("sheet_id")
   title            String          @db.VarChar(120)
@@ -31,18 +32,20 @@ model books {
   image            String          @db.VarChar(255)
   impression       String          @db.VarChar(5)
   memo             String          @db.MediumText
-  isPublicMemo     Boolean         @default(false) @map("is_public_memo")
-  isPurchasable    Boolean         @default(false) @map("is_purchasable")
+  isPublicMemo     Boolean         @map("is_public_memo")
+  isPurchasable    Boolean         @map("is_purchasable")
   price            String?         @db.VarChar(40)
   finished         DateTime?       @db.DateTime(0)
-  created          DateTime        @default(now()) @db.DateTime(0)
-  updated          DateTime        @default(now()) @db.DateTime(0)
-  sheet            sheets          @relation(fields: [sheetId], references: [id], onDelete: Cascade)
-  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  created          DateTime        @db.DateTime(0)
+  updated          DateTime        @db.DateTime(0)
+  sheet            sheets          @relation(fields: [sheetId], references: [id])
+  user             User            @relation(fields: [userId], references: [id])
   yearly_top_books YearlyTopBook[]
   likes            Like[]
   purchases        Purchase[]
   bookComments     BookComment[]
+
+  @@map("legacy_books")
 }
 
 model Account {
@@ -75,29 +78,32 @@ model Session {
 }
 
 model User {
-  mcpGrants        McpGrant[]
-  id               String           @id @default(cuid())
-  name             String?          @unique(map: "uniq_name")
-  email            String?          @unique
-  emailVerified    DateTime?        @map("email_verified")
-  image            String?
-  admin            Boolean          @default(false)
-  suiAddress       String?          @map("sui_address") @db.VarChar(80)
-  accounts         Account[]
-  sessions         Session[]
-  sheets           sheets[]
-  yearly_top_books YearlyTopBook[]
-  books            books[]
-  AiSummaries      AiSummaries[]
-  template_books   template_books[]
-  following          Follow[]       @relation("following")
-  followers          Follow[]       @relation("followers")
-  likes              Like[]
-  notifications      Notification[] @relation("notificationUser")
-  actorNotifications Notification[] @relation("notificationActor")
-  purchases          Purchase[]
-  bookComments       BookComment[]
-  memoTemplates      MemoTemplate[]
+  collections          Collection[]
+  items                Item[]
+  itemTemplates        ItemTemplate[]
+  mcpGrants            McpGrant[]
+  id                   String                @id @default(cuid())
+  name                 String?               @unique(map: "uniq_name")
+  email                String?               @unique
+  emailVerified        DateTime?             @map("email_verified")
+  image                String?
+  admin                Boolean               @default(false)
+  suiAddress           String?               @map("sui_address") @db.VarChar(80)
+  accounts             Account[]
+  sessions             Session[]
+  sheets               sheets[]
+  yearly_top_books     YearlyTopBook[]
+  books                books[]
+  AiSummaries          AiSummaries[]
+  template_books       template_books[]
+  following            Follow[]              @relation("following")
+  followers            Follow[]              @relation("followers")
+  likes                Like[]
+  notifications        Notification[]        @relation("notificationUser")
+  actorNotifications   Notification[]        @relation("notificationActor")
+  purchases            Purchase[]
+  bookComments         BookComment[]
+  memoTemplates        MemoTemplate[]
   personalAccessTokens PersonalAccessToken[]
   codexAuth            CodexAuth?
 
@@ -113,25 +119,26 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-model YearlyTopBook {
-  id      Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId  String   @map("user_id")
-  bookId  Int      @map("book_id")
-  order   Int      @default(1)
-  year    String   @db.VarChar(120)
-  created DateTime @default(now()) @db.DateTime(0)
-  updated DateTime @default(now()) @db.DateTime(0)
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+view YearlyTopBook {
+  collectionId Int      @map("collection_id") @db.UnsignedInt
+  id           Int      @unique @db.UnsignedInt
+  userId       String   @map("user_id")
+  bookId       Int      @map("item_id") @db.UnsignedInt
+  order        Int
+  year         String   @db.VarChar(120)
+  created      DateTime @db.DateTime(0)
+  updated      DateTime @db.DateTime(0)
+  user         User     @relation(fields: [userId], references: [id])
+  book         books    @relation(fields: [bookId], references: [id])
 
   @@unique([userId, order, year], map: "uniq_user_order_year")
-  @@map("yearly_top_books")
+  @@map("legacy_collection_highlights")
 }
 
 model AiSummaries {
   id       Int       @id @default(autoincrement()) @db.UnsignedInt
   userId   String    @map("user_id")
-  sheetId  Int @map("sheet_id")
+  sheetId  Int       @map("collection_id")
   analysis Json
   token    Int
   created  DateTime? @default(now()) @db.DateTime(0)
@@ -172,10 +179,10 @@ model Like {
   id          Int      @id @default(autoincrement()) @db.UnsignedInt
   userId      String?  @map("user_id")
   anonymousId String?  @map("anonymous_id") @db.VarChar(64)
-  bookId      Int      @map("book_id")
+  bookId      Int      @map("item_id") @db.UnsignedInt
   created     DateTime @default(now()) @db.DateTime(0)
   user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book        books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book        books    @relation(fields: [bookId], references: [id])
 
   @@unique([userId, bookId], map: "uniq_user_book")
   @@unique([anonymousId, bookId], map: "uniq_anon_book")
@@ -186,7 +193,7 @@ model Like {
 model Purchase {
   id               Int      @id @default(autoincrement()) @db.UnsignedInt
   userId           String   @map("user_id")
-  bookId           Int      @map("book_id")
+  bookId           Int      @map("item_id") @db.UnsignedInt
   txDigest         String   @unique @map("tx_digest") @db.VarChar(120)
   network          String   @default("testnet") @db.VarChar(20)
   amount           String   @db.VarChar(40)
@@ -194,7 +201,7 @@ model Purchase {
   recipientAddress String   @map("recipient_address") @db.VarChar(80)
   created          DateTime @default(now()) @db.DateTime(0)
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book             books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book             books    @relation(fields: [bookId], references: [id])
 
   @@unique([userId, bookId], map: "uniq_user_book_purchase")
   @@index([bookId])
@@ -207,7 +214,7 @@ model Notification {
   actorId          String?  @map("actor_id")
   actorAnonymousId String?  @map("actor_anonymous_id") @db.VarChar(64)
   type             String   @db.VarChar(20)
-  bookId           Int?     @map("book_id")
+  bookId           Int?     @map("item_id") @db.UnsignedInt
   read             Boolean  @default(false)
   created          DateTime @default(now()) @db.DateTime(0)
   user             User     @relation("notificationUser", fields: [userId], references: [id], onDelete: Cascade)
@@ -219,19 +226,21 @@ model Notification {
   @@map("notifications")
 }
 
-model template_books {
-  id             Int      @id @default(autoincrement()) @db.UnsignedInt
-  userId         String   @map("user_id")
-  name           String   @db.VarChar(120)
-  title          String   @db.VarChar(120)
-  author         String   @db.VarChar(120)
-  category       String   @db.VarChar(120)
-  image          String   @db.VarChar(255)
-  memo           String   @db.MediumText
-  isPublicMemo   Boolean  @default(false) @map("is_public_memo")
-  created        DateTime @default(now()) @db.DateTime(0)
-  updated        DateTime @default(now()) @db.DateTime(0)
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+view template_books {
+  id           Int      @unique @db.UnsignedInt
+  userId       String   @map("user_id")
+  name         String   @db.VarChar(120)
+  title        String   @db.VarChar(120)
+  author       String   @db.VarChar(120)
+  category     String   @db.VarChar(120)
+  image        String   @db.VarChar(255)
+  memo         String   @db.MediumText
+  isPublicMemo Boolean  @map("is_public_memo")
+  created      DateTime @db.DateTime(0)
+  updated      DateTime @db.DateTime(0)
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("legacy_template_books")
 }
 
 model PersonalAccessToken {
@@ -263,48 +272,168 @@ model MemoTemplate {
 
 model BookComment {
   id      Int      @id @default(autoincrement()) @db.UnsignedInt
-  bookId  Int      @map("book_id")
+  bookId  Int      @map("item_id") @db.UnsignedInt
   userId  String   @map("user_id")
   content String   @db.Text
   created DateTime @default(now()) @db.DateTime(0)
   updated DateTime @default(now()) @db.DateTime(0)
-  book    books    @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  book    books    @relation(fields: [bookId], references: [id])
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([bookId])
   @@index([userId])
-  @@map("book_comments")
+  @@map("item_comments")
 }
 
 // MCP clients use the existing Google/NextAuth login for user authentication.
 model McpClient {
-  id           String     @id @db.VarChar(64)
-  name         String     @db.VarChar(120)
-  redirectUris Json       @map("redirect_uris")
-  createdAt    DateTime   @default(now()) @map("created_at")
+  id           String   @id @db.VarChar(64)
+  name         String   @db.VarChar(120)
+  redirectUris Json     @map("redirect_uris")
+  createdAt    DateTime @default(now()) @map("created_at")
 
   @@map("mcp_clients")
 }
 
 model McpGrant {
-  id             String    @id @default(cuid())
+  scope             String    @default("books:read") @db.VarChar(40)
+  id                String    @id @default(cuid())
   // Either a dynamic registration id or a Client ID Metadata Document URL.
-  clientId       String    @map("client_id") @db.VarChar(255)
-  clientName     String    @map("client_name") @db.VarChar(120)
-  userId         String    @map("user_id")
-  codeHash       String?   @unique @map("code_hash") @db.VarChar(64)
-  codeChallengeHash String @map("code_challenge_hash") @db.VarChar(64)
-  redirectUriHash String @map("redirect_uri_hash") @db.VarChar(64)
-  resource       String    @db.VarChar(255)
-  codeExpiresAt  DateTime  @map("code_expires_at")
-  tokenHash      String?   @unique @map("token_hash") @db.VarChar(64)
-  tokenExpiresAt DateTime? @map("token_expires_at")
-  refreshHash    String?   @unique @map("refresh_hash") @db.VarChar(64)
-  expiresAt      DateTime  @map("expires_at")
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId          String    @map("client_id") @db.VarChar(255)
+  clientName        String    @map("client_name") @db.VarChar(120)
+  userId            String    @map("user_id")
+  codeHash          String?   @unique @map("code_hash") @db.VarChar(64)
+  codeChallengeHash String    @map("code_challenge_hash") @db.VarChar(64)
+  redirectUriHash   String    @map("redirect_uri_hash") @db.VarChar(64)
+  resource          String    @db.VarChar(255)
+  codeExpiresAt     DateTime  @map("code_expires_at")
+  tokenHash         String?   @unique @map("token_hash") @db.VarChar(64)
+  tokenExpiresAt    DateTime? @map("token_expires_at")
+  refreshHash       String?   @unique @map("refresh_hash") @db.VarChar(64)
+  expiresAt         DateTime  @map("expires_at")
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([clientId])
   @@index([userId])
   @@index([expiresAt])
   @@map("mcp_grants")
+}
+
+model Collection {
+  id          Int                   @id @default(autoincrement()) @db.UnsignedInt
+  userId      String                @map("user_id")
+  name        String                @db.VarChar(120)
+  description String                @db.Text
+  position    Int                   @default(1)
+  createdAt   DateTime              @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt   DateTime              @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       CollectionItem[]
+  highlights  CollectionHighlight[]
+
+  @@unique([userId, name], map: "uniq_user_id_name")
+  @@map("collections")
+}
+
+model ItemType {
+  key           String         @id @db.VarChar(40)
+  name          String         @db.VarChar(120)
+  schemaVersion Int            @default(1) @map("schema_version")
+  definition    Json
+  items         Item[]
+  templates     ItemTemplate[]
+
+  @@map("item_types")
+}
+
+model Item {
+  id                Int                   @id @default(autoincrement()) @db.UnsignedInt
+  userId            String                @map("user_id")
+  itemTypeId        String                @map("item_type_id") @db.VarChar(40)
+  title             String                @db.VarChar(120)
+  imageUrl          String                @default("/no-image.png") @map("image_url") @db.VarChar(255)
+  category          String                @default("") @db.VarChar(120)
+  rating            String                @default("-") @db.VarChar(5)
+  memo              String                @db.MediumText
+  isPublicMemo      Boolean               @default(false) @map("is_public_memo")
+  isPurchasable     Boolean               @default(false) @map("is_purchasable")
+  price             String?               @db.VarChar(40)
+  attributes        Json
+  attributesVersion Int                   @default(1) @map("attributes_version")
+  createdAt         DateTime              @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt         DateTime              @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
+  user              User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType          ItemType              @relation(fields: [itemTypeId], references: [key])
+  collections       CollectionItem[]
+  logs              ItemLog[]
+  highlights        CollectionHighlight[]
+
+  @@index([userId, itemTypeId])
+  @@index([itemTypeId])
+  @@map("items")
+}
+
+model CollectionItem {
+  collectionId Int        @map("collection_id") @db.UnsignedInt
+  itemId       Int        @map("item_id") @db.UnsignedInt
+  position     Int        @default(1)
+  addedAt      DateTime   @default(now()) @map("added_at") @db.DateTime(0)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  item         Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, itemId])
+  @@index([itemId])
+  @@map("collection_items")
+}
+
+model ItemLog {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  itemId     Int       @map("item_id") @db.UnsignedInt
+  kind       String    @db.VarChar(40)
+  occurredAt DateTime? @map("occurred_at") @db.DateTime(0)
+  memo       String    @db.MediumText
+  rating     String?   @db.VarChar(5)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
+  item       Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId, occurredAt])
+  @@map("item_logs")
+}
+
+model ItemTemplate {
+  id                Int      @id @default(autoincrement()) @db.UnsignedInt
+  userId            String   @map("user_id")
+  itemTypeId        String   @map("item_type_id") @db.VarChar(40)
+  name              String   @db.VarChar(120)
+  title             String   @db.VarChar(120)
+  category          String   @db.VarChar(120)
+  imageUrl          String   @map("image_url") @db.VarChar(255)
+  memo              String   @db.MediumText
+  isPublicMemo      Boolean  @default(false) @map("is_public_memo")
+  attributes        Json
+  attributesVersion Int      @default(1) @map("attributes_version")
+  createdAt         DateTime @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType          ItemType @relation(fields: [itemTypeId], references: [key])
+
+  @@index([userId, itemTypeId])
+  @@index([itemTypeId])
+  @@map("item_templates")
+}
+
+model CollectionHighlight {
+  id           Int        @id @default(autoincrement()) @db.UnsignedInt
+  collectionId Int        @map("collection_id") @db.UnsignedInt
+  itemId       Int        @map("item_id") @db.UnsignedInt
+  position     Int
+  createdAt    DateTime   @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt    DateTime   @default(now()) @updatedAt @map("updated_at") @db.DateTime(0)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  item         Item       @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, position], map: "collection_highlights_collection_position")
+  @@index([itemId])
+  @@map("collection_highlights")
 }

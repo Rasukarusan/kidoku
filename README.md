@@ -28,16 +28,16 @@
 
 ## 技術スタック
 
-| レイヤー | 技術 |
-|-------|------------|
-| モノレポ | Turborepo + pnpm workspaces |
+| レイヤー       | 技術                                           |
+| -------------- | ---------------------------------------------- |
+| モノレポ       | Turborepo + pnpm workspaces                    |
 | フロントエンド | Next.js 14, React 18, TypeScript, Tailwind CSS |
-| バックエンド | NestJS 11, GraphQL, DDDアーキテクチャ |
-| データベース | MySQL 9.3 + Prisma ORM |
-| 認証 | NextAuth.js (Google OAuth) |
-| 検索 | MeiliSearch (日本語最適化ビルド) |
-| AI | ChatGPT (Codex backend) |
-| 決済 | Stripe |
+| バックエンド   | NestJS 11, GraphQL, DDDアーキテクチャ          |
+| データベース   | MySQL 9.3 + Prisma ORM                         |
+| 認証           | NextAuth.js (Google OAuth)                     |
+| 検索           | MeiliSearch (日本語最適化ビルド)               |
+| AI             | ChatGPT (Codex backend)                        |
+| 決済           | Stripe                                         |
 
 ## プロジェクト構成
 
@@ -75,21 +75,25 @@ cp apps/api/.env.example apps/api/.env
 docker-compose up -d
 
 # データベースのセットアップ
-pnpm --filter web db:push
-pnpm --filter web prisma generate
-pnpm --filter api db:push
+pnpm --filter web exec prisma generate
+pnpm --filter api exec prisma generate
+# 新しい空DBだけを初期化（既存DBは変更しません）
+pnpm --filter web db:initialize
+pnpm --filter web db:check
 
 # 全ての開発サーバーを起動
 pnpm dev
 ```
 
+既存の本のDBから切り替える場合は、先に [コレクション移行手順](./docs/COLLECTION_MIGRATION.md) を確認してください。`prisma db push` での切り替えは行わないでください。
+
 ### アクセスURL
 
-| サービス | URL |
-|---------|-----|
-| Webアプリ | http://localhost:3000 |
+| サービス    | URL                           |
+| ----------- | ----------------------------- |
+| Webアプリ   | http://localhost:3000         |
 | GraphQL API | http://localhost:4000/graphql |
-| MeiliSearch | http://localhost:7700 |
+| MeiliSearch | http://localhost:7700         |
 
 ### 検索のセットアップ (MeiliSearch)
 
@@ -141,6 +145,7 @@ apps/api/src/
 **依存ルール**: `domain` は他層に依存しません。`application` は `domain` のみに依存します。`infrastructure` は `domain` のインターフェースを実装します。`presentation` は `application` を通して処理を実行します。
 
 詳細なアーキテクチャドキュメントは以下を参照してください。
+
 - [セキュリティ & 認証](./docs/SECURITY.md)
 - [管理者API & バッチ処理](./docs/ADMIN_API.md)
 - [MCP 接続と認証](./docs/MCP.md)

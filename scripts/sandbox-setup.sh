@@ -161,8 +161,8 @@ sed -i 's|^MEILI_HOST=.*|MEILI_HOST=http://localhost:7700|' "$PROJECT_ROOT/apps/
 # 6. Prisma スキーマを DB に反映（クライアント生成は Step 2.5 で実施済み）
 # ==============================================================================
 yellow "Prisma スキーマを DB に反映中..."
-DATABASE_URL="$DB_URL" pnpm --filter web exec prisma db push --skip-generate 2>"$LOG_DIR/prisma-push.log"
-green "Prisma db push 完了"
+DATABASE_URL="$DB_URL" node "$PROJECT_ROOT/scripts/initialize-collection-database.mjs" --apply --if-empty 2>"$LOG_DIR/prisma-push.log"
+green "コレクションDB初期化・確認完了"
 
 # ==============================================================================
 # 7. シードデータ投入

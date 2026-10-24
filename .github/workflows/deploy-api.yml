@@ -6,17 +6,17 @@ on:
       - main
       - master
     paths:
-      - 'apps/api/**'
-      - '.github/workflows/deploy-api.yml'
+      - "apps/api/**"
+      - ".github/workflows/deploy-api.yml"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'デプロイ環境'
+        description: "デプロイ環境"
         required: true
-        default: 'production'
+        default: "production"
         type: choice
         options:
-        - production
+          - production
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -28,7 +28,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: Production
-    
+
     permissions:
       contents: read
       id-token: write
@@ -36,6 +36,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # A table rename must be applied during maintenance before deploying code.
+      # Verify only; never run a destructive schema push from a deployment job.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter web exec prisma generate
+      - name: Verify collection migration before deployment
+        run: node scripts/verify-collection-schema.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2

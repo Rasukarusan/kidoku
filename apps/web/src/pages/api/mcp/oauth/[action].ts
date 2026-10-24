@@ -8,6 +8,8 @@ import {
   exchangeToken,
   hash,
   MCP_SCOPE,
+  MCP_SCOPES,
+  normalizeMcpScope,
   mcpUrls,
   OAuthError,
   readConsent,
@@ -34,9 +36,9 @@ export default async function handler(
       return res.json({
         resource,
         authorization_servers: [issuer],
-        scopes_supported: [MCP_SCOPE],
+        scopes_supported: MCP_SCOPES,
         bearer_methods_supported: ['header'],
-        resource_name: 'Kidoku 読書記録',
+        resource_name: 'Kidoku コレクション',
       })
     }
     if (req.method === 'GET' && action === 'metadata') {
@@ -51,7 +53,7 @@ export default async function handler(
         token_endpoint_auth_methods_supported: ['none'],
         revocation_endpoint_auth_methods_supported: ['none'],
         code_challenge_methods_supported: ['S256'],
-        scopes_supported: [MCP_SCOPE],
+        scopes_supported: MCP_SCOPES,
         client_id_metadata_document_supported: true,
         authorization_response_iss_parameter_supported: true,
       })
@@ -108,11 +110,14 @@ export default async function handler(
             body.response_types.some((type) => type !== 'code')))
       )
         throw new OAuthError('invalid_client_metadata', '未対応の認可方式です')
-      if (body.scope && body.scope !== MCP_SCOPE)
+      if (body.scope !== undefined && typeof body.scope !== 'string')
         throw new OAuthError(
           'invalid_client_metadata',
-          'books:read のみ利用できます'
+          'scope は文字列で指定してください'
         )
+      const scope = normalizeMcpScope(
+        typeof body.scope === 'string' && body.scope ? body.scope : MCP_SCOPE
+      )
       await removeUnusedRegistrations()
       const client = await prisma.mcpClient.create({
         data: {
@@ -131,7 +136,7 @@ export default async function handler(
         token_endpoint_auth_method: 'none',
         grant_types: ['authorization_code', 'refresh_token'],
         response_types: ['code'],
-        scope: MCP_SCOPE,
+        scope,
       })
     }
     if (action === 'authorize') {

@@ -11,7 +11,7 @@
     "analyze": "ANALYZE=true next build",
     "lighthouse": "lighthouse http://localhost:3000",
     "prisma:generate": "prisma generate",
-    "db:push": "prisma db push",
+    "db:push": "node ../../scripts/verify-collection-schema.mjs",
     "prisma:pull": "prisma db pull",
     "prisma:format": "prisma format",
     "deploy": "fly deploy --local-only",
@@ -22,7 +22,9 @@
     "test:c": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "db:check": "node ../../scripts/verify-collection-schema.mjs",
+    "db:initialize": "node ../../scripts/initialize-collection-database.mjs --apply"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

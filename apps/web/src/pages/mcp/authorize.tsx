@@ -11,6 +11,7 @@ import {
   OAuthError,
   validateAuthorization,
 } from '@/libs/mcp/oauth'
+import { MCP_SCOPE, MCP_ITEMS_SCOPE } from '@/libs/mcp/scopes'
 
 type Account = {
   name: string | null
@@ -19,6 +20,7 @@ type Account = {
 }
 
 type Props = {
+  scope?: string
   clientName?: string
   clientHost?: string | null
   consent?: string
@@ -28,7 +30,7 @@ type Props = {
   error?: string
 }
 
-const permissions = [
+const bookPermissions = [
   {
     title: '読書記録の一覧・検索',
     detail: 'タイトル・著者・メモで検索した結果',
@@ -74,6 +76,7 @@ const AccountCard: React.FC<{ account: Account }> = ({ account }) => (
 
 const McpAuthorize: NextPageWithLayout<Props> = ({
   clientName,
+  scope = MCP_SCOPE,
   clientHost,
   consent,
   account,
@@ -81,6 +84,19 @@ const McpAuthorize: NextPageWithLayout<Props> = ({
   callbackUrl,
   error,
 }) => {
+  const permissions =
+    scope === MCP_ITEMS_SCOPE
+      ? [
+          {
+            title: 'コレクションとアイテムの一覧・検索',
+            detail: '本・映画など全種類の属性と所属情報',
+          },
+          {
+            title: 'アイテムの詳細と履歴',
+            detail: '非公開を含むメモ全文・評価・読了や鑑賞などの履歴',
+          },
+        ]
+      : bookPermissions
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12 text-gray-800">
       <ConnectionIcons />
@@ -217,6 +233,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     return {
       props: {
         clientName: authorization.clientName,
+        scope: authorization.scope || MCP_SCOPE,
         clientHost,
         consent: createConsent(session.user.id, authorization),
         account: {

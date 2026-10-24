@@ -43,7 +43,7 @@ export const getStaticProps = async (ctx) => {
         isPurchasable: book.isPurchasable,
         price: book.price,
         sheetId: book.sheetId,
-        sheet: book.sheet.name,
+        sheet: book.sheet?.name ?? '',
       }
     })
   )
@@ -70,10 +70,10 @@ export const getStaticProps = async (ctx) => {
   // 年ごとの読書数
   const result = await prisma.$queryRaw<{ name: string; count: string }[]>`
     SELECT sheets.name as name, COUNT(*) AS count
-    FROM books
-    JOIN sheets ON sheets.id = books.sheet_id
+    FROM legacy_books books
+    JOIN legacy_sheets sheets ON sheets.id = books.sheet_id
     WHERE books.user_id = ${userId}
-    GROUP BY books.sheet_id
+    GROUP BY books.sheet_id, sheets.name, sheets.order
     ORDER BY sheets.order ASC;
   `
   const years: Year[] = result.map((sheet) => {

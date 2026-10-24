@@ -43,33 +43,33 @@ export class YearlyTopBookRepository implements IYearlyTopBookRepository {
     order: number,
     bookId: number,
   ): Promise<void> {
-    await this.prisma.yearlyTopBook.upsert({
-      create: {
-        year,
-        order,
-        user: { connect: { id: userId } },
-        book: { connect: { id: bookId } },
-      },
-      update: { book: { connect: { id: bookId } } },
+    const collection = await this.prisma.collection.findFirstOrThrow({
+      where: { userId, name: year },
+    });
+    const item = await this.prisma.item.findFirst({
       where: {
-        userId_order_year: {
-          year,
-          order,
-          userId,
-        },
+        id: bookId,
+        userId,
+        itemTypeId: 'book',
+        collections: { some: { collectionId: collection.id } },
       },
+    });
+    if (!item) throw new Error('コレクション内の本が見つかりません');
+    await this.prisma.collectionHighlight.upsert({
+      where: {
+        collectionId_position: { collectionId: collection.id, position: order },
+      },
+      create: { collectionId: collection.id, position: order, itemId: bookId },
+      update: { itemId: bookId },
     });
   }
 
   async delete(userId: string, year: string, order: number): Promise<void> {
-    await this.prisma.yearlyTopBook.delete({
-      where: {
-        userId_order_year: {
-          year,
-          order,
-          userId,
-        },
-      },
+    const collection = await this.prisma.collection.findFirstOrThrow({
+      where: { userId, name: year },
+    });
+    await this.prisma.collectionHighlight.deleteMany({
+      where: { collectionId: collection.id, position: order },
     });
   }
 }
