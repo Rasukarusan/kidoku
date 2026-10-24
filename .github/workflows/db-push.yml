@@ -32,6 +32,10 @@ on:
         description: "バックアップ暗号化用の公開証明書（base64）"
         type: string
         required: false
+      writers_stopped:
+        description: "Web・API・バッチなど全DBライターの停止を確認済み"
+        type: boolean
+        default: false
       resume_after_backfill:
         description: "元データと構造を照合して属性移行後の地点から再開する"
         type: boolean
@@ -113,10 +117,13 @@ jobs:
       SERVICE_NAME: ${{ inputs.environment == 'Production' && 'kidoku-api' || 'kidoku-api-preview' }}
       MIGRATION_FLAGS: ${{ inputs.resume_after_backfill && '--resume-after-backfill' || '' }}
     steps:
-      - name: Require backup certificate
+      - name: Require backup certificate and stopped writers
         env:
           BACKUP_CERTIFICATE: ${{ inputs.backup_certificate }}
-        run: test -n "$BACKUP_CERTIFICATE"
+          WRITERS_STOPPED: ${{ inputs.writers_stopped }}
+        run: |
+          test -n "$BACKUP_CERTIFICATE"
+          test "$WRITERS_STOPPED" = true
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
@@ -133,7 +140,14 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Restrict API during maintenance
         id: maintenance
-        run: gcloud run services update "$SERVICE_NAME" --region asia-northeast1 --ingress internal
+        run: |
+          ingress=$(gcloud run services describe "$SERVICE_NAME" --region asia-northeast1 --format=json | python3 -c 'import json,sys; print(json.load(sys.stdin)["metadata"]["annotations"].get("run.googleapis.com/ingress", "all"))')
+          case "$ingress" in
+            all|internal|internal-and-cloud-load-balancing) ;;
+            *) echo "Unexpected ingress setting" >&2; exit 1 ;;
+          esac
+          echo "ingress=$ingress" >> "$GITHUB_OUTPUT"
+          gcloud run services update "$SERVICE_NAME" --region asia-northeast1 --ingress internal
       - run: sudo apt-get update -qq && sudo apt-get install -y mysql-client
       - name: Preflight
         run: node scripts/migrate-collections.mjs $MIGRATION_FLAGS
@@ -174,4 +188,6 @@ jobs:
         run: rm -f "$BACKUP_DIRECTORY/preview.sql" "$BACKUP_DIRECTORY/recovery.sql"
       - name: Restore access if migration has not started
         if: ${{ always() && steps.maintenance.outcome == 'success' && steps.apply.outcome == 'skipped' }}
-        run: gcloud run services update "$SERVICE_NAME" --region asia-northeast1 --ingress all
+        env:
+          ORIGINAL_INGRESS: ${{ steps.maintenance.outputs.ingress }}
+        run: gcloud run services update "$SERVICE_NAME" --region asia-northeast1 --ingress "$ORIGINAL_INGRESS"
