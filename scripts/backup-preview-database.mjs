@@ -20,8 +20,16 @@ if (!directory || !process.env.DATABASE_URL)
 const source = new PrismaClient({
   datasources: { db: { url: process.env.DATABASE_URL } },
 });
-const normalize = (_, value) =>
-  typeof value === "bigint" ? value.toString() : value;
+const normalize = (_, value) => {
+  if (typeof value === "bigint") return value.toString();
+  if (value && typeof value === "object" && !Array.isArray(value))
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, value[key]]),
+    );
+  return value;
+};
 const quote = (name) => "`" + name.replaceAll("`", "``") + "`";
 
 async function manifest(client) {
@@ -112,8 +120,16 @@ try {
         closeSync(input);
       }
       const expected = await manifest(source);
-      if (JSON.stringify(expected) !== JSON.stringify(await manifest(restore)))
-        throw new Error("Restored data does not match source");
+      const restored = await manifest(restore);
+      if (JSON.stringify(expected) !== JSON.stringify(restored)) {
+        const different = Object.keys(expected).filter(
+          (name) =>
+            JSON.stringify(expected[name]) !== JSON.stringify(restored[name]),
+        );
+        throw new Error(
+          `Restored data does not match source: ${different.join(", ")}`,
+        );
+      }
       writeFileSync(
         join(directory, "manifest.json"),
         JSON.stringify(expected),
