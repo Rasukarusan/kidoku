@@ -33,6 +33,9 @@ importers:
       '@as-integrations/express5':
         specifier: ^1.1.2
         version: 1.1.2(@apollo/server@5.4.0(graphql@16.12.0))(express@5.2.1)
+      '@kidoku/reading-store':
+        specifier: workspace:*
+        version: link:../../packages/reading-store
       '@mysten/sui':
         specifier: ^1.18.0
         version: 1.45.2(typescript@5.8.2)
@@ -163,6 +166,9 @@ importers:
       '@emotion/styled':
         specifier: ^11.9.3
         version: 11.14.1(@emotion/react@11.14.0(@types/react@18.2.79)(react@18.3.1))(@types/react@18.2.79)(react@18.3.1)
+      '@kidoku/reading-store':
+        specifier: workspace:*
+        version: link:../../packages/reading-store
       '@mysten/dapp-kit':
         specifier: ^1.1.1
         version: 1.1.1(@mysten/sui@2.19.0(typescript@5.8.2))(@tanstack/react-query@5.101.0(react@18.3.1))(@types/react-dom@18.2.25)(@types/react@18.2.79)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.2)(use-sync-external-store@1.6.0(react@18.3.1))
@@ -413,6 +419,12 @@ importers:
       typescript-eslint:
         specifier: ^8.20.0
         version: 8.56.0(eslint@9.39.3(jiti@1.21.7))(typescript@5.9.3)
+
+  packages/reading-store:
+    dependencies:
+      '@prisma/client':
+        specifier: ^5.2.0
+        version: 5.22.0(prisma@5.22.0)
 
 packages:
 

@@ -104,8 +104,12 @@ export class NotificationRepository implements INotificationRepository {
     );
     const books =
       bookIds.length > 0
-        ? await this.prisma.books.findMany({
-            where: { id: { in: bookIds } },
+        ? await this.prisma.item.findMany({
+            where: {
+              id: { in: bookIds },
+              itemTypeId: 'book',
+              collections: { some: {} },
+            },
             select: { id: true, title: true },
           })
         : [];

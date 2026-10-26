@@ -1,3 +1,4 @@
+import { readBooks } from '@kidoku/reading-store'
 import prisma from '@/libs/prisma'
 import type { NextApiResponse, NextApiRequest } from 'next'
 import { del as blob_del, list, put } from '@vercel/blob'
@@ -10,7 +11,7 @@ const get = async (request: NextApiRequest, response: NextApiResponse) => {
 }
 
 const post = async (request: NextApiRequest, response: NextApiResponse) => {
-  const books = await prisma.books.findMany({ where: { sheetId: 9 } })
+  const books = await readBooks(prisma, { filter: { sheetId: 9 } })
   // const books = r.slice(0, 2)
   for (let i = 0; i < books.length; i++) {
     const book = books[i]

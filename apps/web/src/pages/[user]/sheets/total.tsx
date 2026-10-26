@@ -1,3 +1,4 @@
+import { readBooks, readSheets, readHighlights } from '@kidoku/reading-store'
 import { SheetTotalPage } from '@/features/sheet/components/SheetTotal/SheetTotalPage'
 import { Category, Year } from '@/features/sheet/types'
 import prisma, { parse } from '@/libs/prisma'
@@ -17,10 +18,7 @@ export const getStaticProps = async (ctx) => {
     }
   }
   const userId = user.id
-  const books = await prisma.books.findMany({
-    where: { userId },
-    include: { sheet: { select: { name: true } } },
-  })
+  const books = await readBooks(prisma, { filter: { userId } })
   // 全シート横断の書籍データ（カテゴリーフィルター表示用）
   // 公開ページのため、非公開メモは表示しない（[year].tsx と同様の整形）
   const booksData = parse(
@@ -67,41 +65,21 @@ export const getStaticProps = async (ctx) => {
     })
   })
 
-  // 年ごとの読書数
-  const result = await prisma.$queryRaw<{ name: string; count: string }[]>`
-    SELECT sheets.name as name, COUNT(*) AS count
-    FROM legacy_books books
-    JOIN legacy_sheets sheets ON sheets.id = books.sheet_id
-    WHERE books.user_id = ${userId}
-    GROUP BY books.sheet_id, sheets.name, sheets.order
-    ORDER BY sheets.order ASC;
-  `
-  const years: Year[] = result.map((sheet) => {
-    return { year: sheet.name, count: parseInt(sheet.count) }
-  })
-
-  const sheets = await prisma.sheets.findMany({
+  const sheets = await readSheets(prisma, {
     where: { userId },
-    orderBy: [{ order: 'desc' }],
+    orderBy: { position: 'desc' },
   })
+  const counts = new Map<number, number>()
+  for (const book of books)
+    counts.set(book.sheetId, (counts.get(book.sheetId) ?? 0) + 1)
+  const years: Year[] = [...sheets]
+    .reverse()
+    .filter((sheet) => counts.has(sheet.id))
+    .map((sheet) => ({ year: sheet.name, count: counts.get(sheet.id)! }))
 
-  const yearlyTopBooks = await prisma.yearlyTopBook.findMany({
-    where: { userId },
-    select: {
-      year: true,
-      order: true,
-      book: {
-        select: {
-          id: true,
-          title: true,
-          author: true,
-          image: true,
-          memo: true,
-          isPublicMemo: true,
-        },
-      },
-    },
-    orderBy: { year: 'desc' },
+  const yearlyTopBooks = await readHighlights(prisma, {
+    userId,
+    orderBy: { collection: { name: 'desc' } },
   })
   return {
     props: {

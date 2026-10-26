@@ -44,8 +44,8 @@ DBには実行コードを保存しない。外部検索・AI処理は許可済�
 
 画面URLは `/:user/sheets/:name`、`/:user/sheets/total`、`/books/:id`。
 検索・登録は本の検索モーダルを使用する。
-Book / Sheetの読み取りは `legacy_books` / `legacy_sheets` / `legacy_template_books` / `legacy_collection_highlights` のSQLビューで提供する。
-書き込みは汎用テーブルへ変換する。SQLビューへの書き込みは行わない。
+Book / Sheetの読み取りは共通パッケージ `@kidoku/reading-store` が汎用テーブルから画面用のデータを生成する。
+絞り込み・並び順・ページングはDBで処理する。書き込みも汎用テーブルを使用する。
 
 Book APIの対象は本に限定する。
 互換Bookのシートは所属IDの最小値、読了日は最後に追加した読了履歴を投影する。

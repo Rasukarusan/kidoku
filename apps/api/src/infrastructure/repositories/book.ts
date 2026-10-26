@@ -1,3 +1,4 @@
+import { readBooks, readBook } from '@kidoku/reading-store';
 import { CollectionRepository } from './collection';
 import { Prisma } from '@prisma/client';
 import { Attributes } from '../../domain/models/item';
@@ -18,51 +19,32 @@ export class BookRepository implements IBookRepository {
     userId: string,
     query: ReadingChatBookQuery,
   ): Promise<ReadingChatBook[]> {
-    const rows = await this.prisma.books.findMany({
-      where: {
+    const rows = await readBooks(this.prisma, {
+      filter: {
         userId,
-        ...(query.ids?.length ? { id: { in: query.ids } } : {}),
-        ...(query.finishedOnly ? { finished: { not: null } } : {}),
-        ...(query.finishedFrom || query.finishedTo
+        ...(query.ids?.length ? { id: query.ids } : {}),
+        finished: {
+          ...(query.finishedOnly ? { not: null } : {}),
+          gte: query.finishedFrom,
+          lte: query.finishedTo,
+        },
+        categories: query.categories?.length ? query.categories : undefined,
+        authors: query.authors?.length ? query.authors : undefined,
+        // メモ内のマスク対象を検索結果から推測できないよう、メモ検索はユースケースでマスク後に行う。
+        ...(query.searchText && !query.includeMemo
           ? {
-              finished: {
-                ...(query.finishedOnly ? { not: null } : {}),
-                ...(query.finishedFrom ? { gte: query.finishedFrom } : {}),
-                ...(query.finishedTo ? { lte: query.finishedTo } : {}),
+              search: {
+                text: query.searchText,
+                fields: ['title', 'author', 'category'],
               },
             }
           : {}),
-        ...(query.categories?.length
-          ? { category: { in: query.categories } }
-          : {}),
-        ...(query.authors?.length ? { author: { in: query.authors } } : {}),
-        // Memos can contain *masked* sections. Searching the raw DB value would
-        // leak that a hidden phrase exists through the result set, even if the
-        // phrase is redacted later. Memo-inclusive searches are therefore
-        // filtered only after server-side redaction in AskReadingChatUseCase.
-        ...(query.searchText && !query.includeMemo
-          ? {
-              OR: [
-                { title: { contains: query.searchText } },
-                { author: { contains: query.searchText } },
-                { category: { contains: query.searchText } },
-              ],
-            }
-          : {}),
-      },
-      select: {
-        title: true,
-        author: true,
-        category: true,
-        impression: true,
-        finished: true,
-        ...(query.includeMemo ? { memo: true } : {}),
       },
       orderBy:
         query.orderBy === 'title'
           ? { title: 'asc' }
           : { finished: query.orderBy === 'oldest' ? 'asc' : 'desc' },
-      take: query.limit,
+      limit: query.limit,
     });
 
     return rows.map((row) => ({
@@ -71,7 +53,7 @@ export class BookRepository implements IBookRepository {
       category: row.category,
       impression: row.impression,
       finished: row.finished,
-      ...('memo' in row ? { memo: row.memo } : {}),
+      ...(query.includeMemo ? { memo: row.memo } : {}),
     }));
   }
 
@@ -81,9 +63,7 @@ export class BookRepository implements IBookRepository {
       return null;
     }
 
-    const row = await this.prisma.books.findUnique({
-      where: { id: bookId },
-    });
+    const row = await readBook(this.prisma, { id: bookId });
 
     if (row) return this.toEntity(row);
     // An unassigned book still has stable purchase/comment references.
@@ -120,17 +100,13 @@ export class BookRepository implements IBookRepository {
   }
 
   async findByUserId(userId: string): Promise<Book[]> {
-    const rows = await this.prisma.books.findMany({
-      where: { userId },
-    });
+    const rows = await readBooks(this.prisma, { filter: { userId } });
 
     return rows.map((row) => this.toEntity(row));
   }
 
   async findBySheetId(sheetId: number): Promise<Book[]> {
-    const rows = await this.prisma.books.findMany({
-      where: { sheetId: sheetId },
-    });
+    const rows = await readBooks(this.prisma, { filter: { sheetId } });
 
     return rows.map((row) => this.toEntity(row));
   }
@@ -147,8 +123,8 @@ export class BookRepository implements IBookRepository {
       },
       select: { id: true },
     });
-    const rows = await this.prisma.books.findMany({
-      where: { id: { in: members.map((item) => item.id) }, userId },
+    const rows = await readBooks(this.prisma, {
+      filter: { id: members.map((item) => item.id), userId },
     });
     return rows.map((row) => this.toEntity({ ...row, sheetId }));
   }
@@ -310,19 +286,7 @@ export class BookRepository implements IBookRepository {
       sheetName: string;
     }>
   > {
-    const rows = await this.prisma.books.findMany({
-      select: {
-        id: true,
-        title: true,
-        author: true,
-        category: true,
-        image: true,
-        memo: true,
-        isPublicMemo: true,
-        user: { select: { name: true, image: true } },
-        sheet: { select: { name: true } },
-      },
-    });
+    const rows = await readBooks(this.prisma);
 
     return rows.map((row) => ({
       id: row.id.toString(),
@@ -355,20 +319,7 @@ export class BookRepository implements IBookRepository {
       return null;
     }
 
-    const row = await this.prisma.books.findUnique({
-      where: { id: bookId },
-      select: {
-        id: true,
-        title: true,
-        author: true,
-        category: true,
-        image: true,
-        memo: true,
-        isPublicMemo: true,
-        user: { select: { name: true, image: true } },
-        sheet: { select: { name: true } },
-      },
-    });
+    const row = await readBook(this.prisma, { id: bookId });
 
     if (!row) return null;
 
@@ -387,8 +338,8 @@ export class BookRepository implements IBookRepository {
   }
 
   async getCategories(userId: string): Promise<string[]> {
-    const rows = await this.prisma.books.findMany({
-      where: { userId },
+    const rows = await this.prisma.item.findMany({
+      where: { userId, itemTypeId: 'book', collections: { some: {} } },
       select: { category: true },
       distinct: ['category'],
     });

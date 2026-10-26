@@ -1,18 +1,15 @@
+import { readSheets } from '@kidoku/reading-store'
 import prisma from '@/libs/prisma'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
 export default SheetPage
 
 export async function getServerSideProps(context) {
   const { user: username } = context.params
-  const sheets = await prisma.sheets.findMany({
+  const sheets = await readSheets(prisma, {
     where: { user: { name: username } },
-    select: {
-      name: true,
-      user: { select: { name: true } },
-    },
     orderBy: [
       {
-        order: 'desc',
+        position: 'desc',
       },
     ],
   })

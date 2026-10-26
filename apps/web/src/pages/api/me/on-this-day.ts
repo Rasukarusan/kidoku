@@ -1,3 +1,4 @@
+import { readBooks } from '@kidoku/reading-store'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
@@ -18,16 +19,8 @@ export default async function handler(
   }
 
   try {
-    const books = await prisma.books.findMany({
-      where: { userId: session.user.id, finished: { not: null } },
-      select: {
-        id: true,
-        title: true,
-        author: true,
-        image: true,
-        memo: true,
-        finished: true,
-      },
+    const books = await readBooks(prisma, {
+      filter: { userId: session.user.id, finished: { not: null } },
       orderBy: { finished: 'desc' },
     })
 

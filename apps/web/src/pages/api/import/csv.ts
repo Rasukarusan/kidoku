@@ -1,3 +1,4 @@
+import { readSheets, readBooks } from '@kidoku/reading-store'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
@@ -93,9 +94,9 @@ export default async function handler(
     }
 
     // 既存シートを取得
-    const existingSheets = await prisma.sheets.findMany({
+    const existingSheets = await readSheets(prisma, {
       where: { userId },
-      orderBy: { order: 'asc' },
+      orderBy: { position: 'asc' },
     })
     const sheetIdByName = new Map(existingSheets.map((s) => [s.name, s.id]))
     let nextOrder =
@@ -104,10 +105,7 @@ export default async function handler(
         : 1
 
     // 既存の本（シートID+タイトル）で重複判定
-    const existingBooks = await prisma.books.findMany({
-      where: { userId },
-      select: { sheetId: true, title: true },
-    })
+    const existingBooks = await readBooks(prisma, { filter: { userId } })
     const existingKeys = new Set(
       existingBooks.map((b) => `${b.sheetId}\u0000${b.title}`)
     )
