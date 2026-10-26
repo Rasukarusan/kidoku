@@ -71,6 +71,7 @@ export const ISBNSearchResult: React.FC<Props> = ({ isbn, onSelectBook }) => {
           <p className="mb-4 text-sm text-gray-500">{error}</p>
           <ManualRegisterButton
             helpText="見つからない場合は手動で登録できます"
+            searchQuery={isbn}
             onSelectBook={onSelectBook}
           />
         </div>

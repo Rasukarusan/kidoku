@@ -61,6 +61,7 @@ export const Books: React.FC<Props> = ({ input, onSelectBook }) => {
           <div className="border-b border-gray-200 p-4">
             <ManualRegisterButton
               helpText="検索で見つからない本を手動で登録できます"
+              searchQuery={input}
               onSelectBook={onSelectBook}
             />
           </div>

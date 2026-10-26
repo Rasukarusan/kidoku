@@ -5,57 +5,11 @@ import { Attributes } from '../../domain/models/item';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { Book } from '../../domain/models/book';
-import {
-  IBookRepository,
-  ReadingChatBook,
-  ReadingChatBookQuery,
-} from '../../domain/repositories/book';
+import { IBookRepository } from '../../domain/repositories/book';
 
 @Injectable()
 export class BookRepository implements IBookRepository {
   constructor(private readonly prisma: PrismaService) {}
-
-  async findForReadingChat(
-    userId: string,
-    query: ReadingChatBookQuery,
-  ): Promise<ReadingChatBook[]> {
-    const rows = await readBooks(this.prisma, {
-      filter: {
-        userId,
-        ...(query.ids?.length ? { id: query.ids } : {}),
-        finished: {
-          ...(query.finishedOnly ? { not: null } : {}),
-          gte: query.finishedFrom,
-          lte: query.finishedTo,
-        },
-        categories: query.categories?.length ? query.categories : undefined,
-        authors: query.authors?.length ? query.authors : undefined,
-        // メモ内のマスク対象を検索結果から推測できないよう、メモ検索はユースケースでマスク後に行う。
-        ...(query.searchText && !query.includeMemo
-          ? {
-              search: {
-                text: query.searchText,
-                fields: ['title', 'author', 'category'],
-              },
-            }
-          : {}),
-      },
-      orderBy:
-        query.orderBy === 'title'
-          ? { title: 'asc' }
-          : { finished: query.orderBy === 'oldest' ? 'asc' : 'desc' },
-      limit: query.limit,
-    });
-
-    return rows.map((row) => ({
-      title: row.title,
-      author: row.author,
-      category: row.category,
-      impression: row.impression,
-      finished: row.finished,
-      ...(query.includeMemo ? { memo: row.memo } : {}),
-    }));
-  }
 
   async findById(id: string): Promise<Book | null> {
     const bookId = parseInt(id, 10);
