@@ -97,8 +97,13 @@ jobs:
           pnpm --filter api exec prisma generate
           pnpm --filter web exec prisma generate
 
-      - name: Initialize canonical schema and compatibility views
+      - name: Initialize canonical schema without views
         run: node scripts/initialize-collection-database.mjs --apply
+        env:
+          DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
+
+      - name: Verify reading queries without views
+        run: node --test packages/reading-store/integration.test.js
         env:
           DATABASE_URL: mysql://dev:pass@127.0.0.1:13306/kidoku
 

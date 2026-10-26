@@ -1,51 +1,11 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["views"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
-}
-
-view sheets {
-  id      Int       @unique @db.UnsignedInt
-  userId  String    @map("user_id")
-  name    String    @db.VarChar(120)
-  order   Int?
-  created DateTime? @db.DateTime(0)
-  updated DateTime? @db.DateTime(0)
-  user    User      @relation(fields: [userId], references: [id])
-  books   books[]
-
-  @@map("legacy_sheets")
-}
-
-view books {
-  id               Int             @unique @db.UnsignedInt
-  userId           String          @map("user_id")
-  sheetId          Int             @map("sheet_id")
-  title            String          @db.VarChar(120)
-  author           String          @db.VarChar(120)
-  category         String          @db.VarChar(120)
-  image            String          @db.VarChar(255)
-  impression       String          @db.VarChar(5)
-  memo             String          @db.MediumText
-  isPublicMemo     Boolean         @map("is_public_memo")
-  isPurchasable    Boolean         @map("is_purchasable")
-  price            String?         @db.VarChar(40)
-  finished         DateTime?       @db.DateTime(0)
-  created          DateTime        @db.DateTime(0)
-  updated          DateTime        @db.DateTime(0)
-  sheet            sheets          @relation(fields: [sheetId], references: [id])
-  user             User            @relation(fields: [userId], references: [id])
-  yearly_top_books YearlyTopBook[]
-  likes            Like[]
-  purchases        Purchase[]
-  bookComments     BookComment[]
-
-  @@map("legacy_books")
 }
 
 model Account {
@@ -91,11 +51,7 @@ model User {
   suiAddress           String?               @map("sui_address") @db.VarChar(80)
   accounts             Account[]
   sessions             Session[]
-  sheets               sheets[]
-  yearly_top_books     YearlyTopBook[]
-  books                books[]
   AiSummaries          AiSummaries[]
-  template_books       template_books[]
   following            Follow[]              @relation("following")
   followers            Follow[]              @relation("followers")
   likes                Like[]
@@ -117,22 +73,6 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verificationtokens")
-}
-
-view YearlyTopBook {
-  collectionId Int      @map("collection_id") @db.UnsignedInt
-  id           Int      @unique @db.UnsignedInt
-  userId       String   @map("user_id")
-  bookId       Int      @map("item_id") @db.UnsignedInt
-  order        Int
-  year         String   @db.VarChar(120)
-  created      DateTime @db.DateTime(0)
-  updated      DateTime @db.DateTime(0)
-  user         User     @relation(fields: [userId], references: [id])
-  book         books    @relation(fields: [bookId], references: [id])
-
-  @@unique([userId, order, year], map: "uniq_user_order_year")
-  @@map("legacy_collection_highlights")
 }
 
 model AiSummaries {
@@ -182,7 +122,7 @@ model Like {
   bookId      Int      @map("item_id") @db.UnsignedInt
   created     DateTime @default(now()) @db.DateTime(0)
   user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book        books    @relation(fields: [bookId], references: [id])
+  book        Item     @relation(fields: [bookId], references: [id])
 
   @@unique([userId, bookId], map: "uniq_user_book")
   @@unique([anonymousId, bookId], map: "uniq_anon_book")
@@ -201,7 +141,7 @@ model Purchase {
   recipientAddress String   @map("recipient_address") @db.VarChar(80)
   created          DateTime @default(now()) @db.DateTime(0)
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  book             books    @relation(fields: [bookId], references: [id])
+  book             Item     @relation(fields: [bookId], references: [id])
 
   @@unique([userId, bookId], map: "uniq_user_book_purchase")
   @@index([bookId])
@@ -224,23 +164,6 @@ model Notification {
   @@index([userId])
   @@index([actorId])
   @@map("notifications")
-}
-
-view template_books {
-  id           Int      @unique @db.UnsignedInt
-  userId       String   @map("user_id")
-  name         String   @db.VarChar(120)
-  title        String   @db.VarChar(120)
-  author       String   @db.VarChar(120)
-  category     String   @db.VarChar(120)
-  image        String   @db.VarChar(255)
-  memo         String   @db.MediumText
-  isPublicMemo Boolean  @map("is_public_memo")
-  created      DateTime @db.DateTime(0)
-  updated      DateTime @db.DateTime(0)
-  user         User     @relation(fields: [userId], references: [id])
-
-  @@map("legacy_template_books")
 }
 
 model PersonalAccessToken {
@@ -277,7 +200,7 @@ model BookComment {
   content String   @db.Text
   created DateTime @default(now()) @db.DateTime(0)
   updated DateTime @default(now()) @db.DateTime(0)
-  book    books    @relation(fields: [bookId], references: [id])
+  book    Item     @relation(fields: [bookId], references: [id])
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([bookId])
@@ -367,6 +290,9 @@ model Item {
   collections       CollectionItem[]
   logs              ItemLog[]
   highlights        CollectionHighlight[]
+  likes             Like[]
+  purchases         Purchase[]
+  bookComments      BookComment[]
 
   @@index([userId, itemTypeId])
   @@index([itemTypeId])

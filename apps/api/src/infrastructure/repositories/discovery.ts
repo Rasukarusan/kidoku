@@ -1,3 +1,4 @@
+import { readBooks } from '@kidoku/reading-store';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { IDiscoveryRepository } from '../../domain/repositories/discovery';
@@ -37,16 +38,8 @@ export class DiscoveryRepository implements IDiscoveryRepository {
     );
     const bookIds = grouped.map((g) => g.bookId);
 
-    const books = await this.prisma.books.findMany({
-      where: { id: { in: bookIds }, isPublicMemo: true },
-      select: {
-        id: true,
-        title: true,
-        author: true,
-        image: true,
-        user: { select: { name: true, image: true } },
-        sheet: { select: { name: true } },
-      },
+    const books = await readBooks(this.prisma, {
+      filter: { id: bookIds, isPublicMemo: true },
     });
     const bookMap = new Map(books.map((b) => [b.id, b]));
 
@@ -69,7 +62,8 @@ export class DiscoveryRepository implements IDiscoveryRepository {
   }
 
   async topReaders(limit = 10): Promise<TopReader[]> {
-    const grouped = await this.prisma.books.groupBy({
+    const grouped = await this.prisma.item.groupBy({
+      where: { itemTypeId: 'book', collections: { some: {} } },
       by: ['userId'],
       _count: { userId: true },
       orderBy: { _count: { userId: 'desc' } },
