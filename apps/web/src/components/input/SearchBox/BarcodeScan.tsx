@@ -12,7 +12,7 @@ interface Props {
   onSelectBook: (book: SearchResult) => void
 }
 
-export const BarcodeScan: React.FC<Props> = ({ onSelectBook }) => {
+export const BarcodeScan: React.FC<Props> = ({ input, onSelectBook }) => {
   const { data: session } = useSession()
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const [scanError, setScanError] = useState<string>('')
@@ -25,6 +25,7 @@ export const BarcodeScan: React.FC<Props> = ({ onSelectBook }) => {
           <div className="mb-4">
             <ManualRegisterButton
               helpText="バーコードが読み取れない本を手動で登録できます"
+              searchQuery={input}
               onSelectBook={onSelectBook}
             />
           </div>
