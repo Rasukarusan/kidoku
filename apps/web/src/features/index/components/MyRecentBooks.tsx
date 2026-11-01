@@ -33,33 +33,33 @@ export const MyRecentBooks: React.FC = () => {
 
   return (
     <section className="border-b border-gray-100">
-      <Container className="px-4 py-8">
-        <div className="mb-4 flex items-baseline justify-between">
+      <Container className="px-4 py-10 sm:py-12">
+        <div className="mb-6 flex items-baseline justify-between">
           <h2 className="text-lg font-bold text-gray-800">最近登録した本</h2>
         </div>
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex gap-6 overflow-x-auto pb-4 sm:gap-8">
           {data.books.map((book) => (
             <Link
               key={book.id}
               href={`/books/${book.id}`}
-              className="w-24 min-w-24 text-center"
+              className="w-28 shrink-0 text-center sm:w-32"
             >
               <img
-                className="mx-auto mb-2 h-32 w-24 rounded object-cover shadow-sm"
+                className="mx-auto mb-4 h-36 max-w-full rounded object-contain shadow-sm sm:h-40"
                 src={book.image}
                 alt={book.title}
               />
-              <div className="line-clamp-2 text-xs text-gray-700">
+              <div className="line-clamp-2 h-10 text-sm leading-5 text-gray-700">
                 {book.title}
               </div>
-              <div className="mt-1 text-[10px] text-gray-400">
+              <div className="mt-2 text-xs text-gray-400">
                 {getLastModified(book.created)}
               </div>
             </Link>
           ))}
         </div>
         {username && (
-          <div className="mt-2 text-right">
+          <div className="mt-4 text-right">
             <Link
               href={`/${username}/sheets`}
               className="text-xs text-blue-500 hover:underline"

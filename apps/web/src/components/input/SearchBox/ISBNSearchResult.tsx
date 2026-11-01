@@ -69,11 +69,13 @@ export const ISBNSearchResult: React.FC<Props> = ({ isbn, onSelectBook }) => {
       {error && !loading && (
         <div className="py-8 text-center">
           <p className="mb-4 text-sm text-gray-500">{error}</p>
-          <ManualRegisterButton
-            helpText="見つからない場合は手動で登録できます"
-            searchQuery={isbn}
-            onSelectBook={onSelectBook}
-          />
+          {session && (
+            <ManualRegisterButton
+              helpText="見つからない場合は手動で登録できます"
+              searchQuery={isbn}
+              onSelectBook={onSelectBook}
+            />
+          )}
         </div>
       )}
 

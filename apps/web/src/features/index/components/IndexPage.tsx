@@ -52,7 +52,7 @@ export const IndexPage: React.FC<Props> = ({ comments, mcpEndpoint }) => {
       {/* ヒーロー：淡々と記録する、を伝えるミニマルなファーストビュー */}
       <section className="border-b border-gray-100">
         <Container className="px-4 py-10 sm:py-16">
-          <div className="mx-auto max-w-xl text-center">
+          <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-2xl font-bold leading-relaxed tracking-wide text-gray-800 sm:text-3xl">
               読んだ本を、ただ記録する。
             </h1>
@@ -65,7 +65,7 @@ export const IndexPage: React.FC<Props> = ({ comments, mcpEndpoint }) => {
               </button>
             </div>
             <div className="mt-12">
-              <div className="mx-auto max-w-lg overflow-hidden rounded-lg bg-gray-900 shadow-sm">
+              <div className="overflow-hidden rounded-lg bg-gray-900 shadow-sm">
                 <div className="flex items-center border-b border-gray-700 pl-2 pr-1">
                   <div role="tablist" className="flex">
                     {mcpClients.map((client) => (
@@ -92,7 +92,7 @@ export const IndexPage: React.FC<Props> = ({ comments, mcpEndpoint }) => {
                     {copied ? <Check size={14} /> : <Copy size={14} />}
                   </button>
                 </div>
-                <code className="block break-all px-6 py-4 text-center font-mono text-sm text-gray-100">
+                <code className="block overflow-x-auto whitespace-nowrap px-6 py-4 text-left font-mono text-sm text-gray-100">
                   <span className="select-none text-gray-500">$ </span>
                   {mcpAddCommand}
                 </code>
