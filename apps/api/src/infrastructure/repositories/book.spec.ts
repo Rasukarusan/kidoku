@@ -25,7 +25,9 @@ it('preserves multiple authors and memberships during legacy memo edits', async 
     },
   };
   const prisma = {
-    $transaction: jest.fn((run: (value: typeof tx) => unknown) => run(tx)),
+    transactionForUser: jest.fn(
+      (_userId: string, run: (value: typeof tx) => unknown) => run(tx),
+    ),
   };
   const repository = new BookRepository(prisma as unknown as PrismaService);
   const book = Book.fromDatabase(

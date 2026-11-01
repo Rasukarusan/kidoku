@@ -1,5 +1,5 @@
 import { IMAGE_SIZE_ERROR, isImageTooLarge } from '@/utils/imageUpload'
-import prisma from '@/libs/prisma'
+import { randomUUID } from 'node:crypto'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
 import { NO_IMAGE } from '@/libs/constants'
@@ -14,6 +14,19 @@ export const config = {
       sizeLimit: '5mb',
     },
   },
+}
+
+const resolveBookImage = async (image: unknown, pathname: string) => {
+  if (image == null || image === '' || image === NO_IMAGE) return NO_IMAGE
+  if (typeof image !== 'string') throw new Error('画像の形式が不正です')
+  if (/^https?:\/\//i.test(image)) return image
+  const base64 = /^data:image\/[\w.+-]+;base64,([A-Za-z0-9+/]+={0,2})$/.exec(
+    image
+  )?.[1]
+  if (!base64) throw new Error('画像の形式が不正です')
+  const buffer = await bufferToWebp(Buffer.from(base64, 'base64'))
+  const { url } = await put(pathname, buffer, { access: 'public' })
+  return url
 }
 
 export default async (req, res) => {
@@ -57,7 +70,10 @@ export default async (req, res) => {
         isPublicMemo,
         finished: finished ? new Date(finished) : null,
       }
-      let finalImage = image === NO_IMAGE || image.includes('http') ? image : ''
+      const finalImage = await resolveBookImage(
+        image,
+        `books/${randomUUID()}.webp`
+      )
       data['image'] = finalImage
       const result = await graphqlClient.execute<{
         saveItem: { id: number }
@@ -93,23 +109,6 @@ export default async (req, res) => {
       )
       const book = { id: result.saveItem.id }
 
-      // 画像選択された場合はVercel Blobにアップロードする
-      if (image !== NO_IMAGE && !image.includes('http')) {
-        // 先頭の「data:image/png;base64,」部分を除き、Base64部分のみを取得
-        const base64Image = image.split(',')[1]
-        const imageBuffer = Buffer.from(base64Image, 'base64')
-        const buffer = await bufferToWebp(imageBuffer)
-        const { url } = await put(`${book.id}.webp`, buffer, {
-          access: 'public',
-        })
-        await prisma.item.update({
-          where: { id: book.id },
-          data: {
-            imageUrl: url,
-          },
-        })
-        finalImage = url
-      }
       // ISRキャッシュを再検証
       try {
         await res.revalidate(`/books/${book.id}`)
@@ -133,18 +132,7 @@ export default async (req, res) => {
           .json({ result: false, message: IMAGE_SIZE_ERROR })
       }
       const id = body.id
-      let imageUrl = body.image
-
-      // 画像選択された場合はVercel Blobにアップロードしてからレコード更新
-      if (imageUrl !== NO_IMAGE && !imageUrl.startsWith('http')) {
-        const base64Image = imageUrl.split(',')[1]
-        const imageBuffer = Buffer.from(base64Image, 'base64')
-        const buffer = await bufferToWebp(imageBuffer)
-        const { url } = await put(`${id}.webp`, buffer, {
-          access: 'public',
-        })
-        imageUrl = url
-      }
+      const imageUrl = await resolveBookImage(body.image, `${id}.webp`)
 
       // GraphQL mutation呼び出し
       await graphqlClient.execute(
