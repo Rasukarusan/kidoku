@@ -350,11 +350,18 @@ function aiAnalysis(aiSummary?: AiSummariesJson) {
   const analysis = Object.entries(AI_SUMMARY_FIELDS)
     .filter(([key]) => key !== 'character_summary')
     .sort(([, a], [, b]) => a.order - b.order)
-    .map(([key]) =>
-      aiSummary[key as AiSummaryFieldKey]
-        ? `${ansi.bold(ansi.cyan(`## ${AI_SUMMARY_FIELDS[key as AiSummaryFieldKey].title}`))}\n${sanitize(aiSummary[key as AiSummaryFieldKey] as string)}`
-        : ''
-    )
+    .map(([key, field]) => {
+      const body = aiSummary[key as AiSummaryFieldKey]
+      const summary = 'summaryKey' in field ? aiSummary[field.summaryKey] : ''
+      if (!body && !summary) return ''
+      return [
+        ansi.bold(ansi.cyan(`## ${field.title}`)),
+        summary ? ansi.bold(sanitize(summary)) : '',
+        body ? sanitize(body) : '',
+      ]
+        .filter(Boolean)
+        .join('\n')
+    })
     .filter(Boolean)
     .join('\n\n')
   return (

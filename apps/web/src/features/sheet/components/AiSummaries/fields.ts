@@ -18,18 +18,21 @@ export const AI_SUMMARY_FIELDS = {
     order: 0,
   },
   reading_trend_analysis: {
+    summaryKey: 'reading_trend_summary',
     title: '読書傾向',
     icon: IoIosAnalytics as IconType,
     maxLength: 400,
     order: 1,
   },
   sentiment_analysis: {
+    summaryKey: 'sentiment_summary',
     title: '感情分析',
     icon: MdOutlineSentimentSatisfied as IconType,
     maxLength: 400,
     order: 2,
   },
   hidden_theme_discovery: {
+    summaryKey: 'hidden_theme_summary',
     title: '無意識に追いかけているもの',
     titleByVersion: {
       1: 'もしもシナリオ',
@@ -39,6 +42,7 @@ export const AI_SUMMARY_FIELDS = {
     order: 3,
   },
   overall_feedback: {
+    summaryKey: 'overall_summary',
     title: 'まとめ',
     icon: IoSparklesSharp as IconType,
     maxLength: 400,

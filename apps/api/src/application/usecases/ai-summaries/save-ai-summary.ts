@@ -21,8 +21,22 @@ export class SaveAiSummaryUseCase {
       'hidden_theme_discovery',
       'overall_feedback',
     ];
-    const hasAllKeys = requiredKeys.every((key) => key in analysis);
-    if (!hasAllKeys) {
+    const hasAllKeys = requiredKeys.every(
+      (key) => typeof analysis[key] === 'string',
+    );
+    const summaryKeys = [
+      'reading_trend_summary',
+      'sentiment_summary',
+      'hidden_theme_summary',
+      'overall_summary',
+    ];
+    const hasValidSummaries = summaryKeys.every(
+      (key) => !(key in analysis) || typeof analysis[key] === 'string',
+    );
+    const hasValidPersonality =
+      !('personality_type' in analysis) ||
+      typeof analysis.personality_type === 'string';
+    if (!hasAllKeys || !hasValidSummaries || !hasValidPersonality) {
       throw new Error('Invalid analysis format');
     }
 
@@ -38,10 +52,12 @@ export class SaveAiSummaryUseCase {
       userId,
       parseInt(sheet.id, 10),
       {
-        _schemaVersion: 3,
-        // 読書性格タイプは旧フォーマットのペーストでも保存できるよう任意とする
         personality_type: '',
         ...analysis,
+        _schemaVersion: 4,
+        ...Object.fromEntries(
+          summaryKeys.map((key) => [key, analysis[key] ?? '']),
+        ),
       },
       0,
     );

@@ -10,10 +10,6 @@ interface Props {
   onShare: () => void
 }
 
-/**
- * MBTI診断風の読書性格タイプカード
- * キャラクター画像・タイプコード・タイプ名を診断結果のヒーローとして表示する
- */
 export const PersonalityCard: React.FC<Props> = ({
   type,
   characterSummary,
@@ -32,7 +28,9 @@ export const PersonalityCard: React.FC<Props> = ({
       }}
     >
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500">
-        あなたの読書性格タイプ
+        {/^[EI][SN][TF][JP]$/.test(type.code)
+          ? '読書記録から推定したMBTIタイプ'
+          : 'あなたの読書性格タイプ'}
       </h3>
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-8">
         {mode === 'normal' ? (

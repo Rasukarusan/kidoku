@@ -19,8 +19,12 @@ const collect = async (gen: AsyncGenerator<string>): Promise<string> => {
 };
 
 const analysisJson = {
-  personality_type: 'adventurer',
+  personality_type: 'INTP',
   character_summary: 'summary',
+  reading_trend_summary: 'trend headline',
+  sentiment_summary: 'sentiment headline',
+  hidden_theme_summary: 'theme headline',
+  overall_summary: 'feedback headline',
   reading_trend_analysis: 'trend',
   sentiment_analysis: 'sentiment',
   hidden_theme_discovery: 'theme',
@@ -72,6 +76,8 @@ describe('GenerateAiSummaryUseCase', () => {
     } as unknown as Sheet);
     mockBookRepo.findByUserIdAndSheetId.mockResolvedValue([
       {
+        title: 'テスト本',
+        isPublicMemo: true,
         category: '小説',
         memo: '面白かった*秘密の感想*',
         finished: new Date('2024-05-01'),
@@ -89,9 +95,8 @@ describe('GenerateAiSummaryUseCase', () => {
       'user-1',
       10,
       expect.objectContaining({
-        _schemaVersion: 3,
-        personality_type: 'adventurer',
-        overall_feedback: 'feedback',
+        _schemaVersion: 4,
+        ...analysisJson,
       }),
       123,
     );
@@ -101,6 +106,7 @@ describe('GenerateAiSummaryUseCase', () => {
     );
     // 非公開部分はマスクしてプロンプトに含める
     const prompt = mockAiChatGateway.streamJsonCompletion.mock.calls[0][1];
+    expect(prompt).toContain('テスト本');
     expect(prompt).toContain('面白かった***');
     expect(prompt).not.toContain('秘密の感想');
   });
@@ -130,21 +136,34 @@ describe('GenerateAiSummaryUseCase', () => {
     } as unknown as Sheet);
     mockBookRepo.findByUserIdAndSheetId.mockResolvedValue([
       {
+        title: 'テスト本',
+        isPublicMemo: true,
         category: '小説',
         memo: '対象',
         finished: new Date('2024-05-01'),
       } as unknown as Book,
       {
+        isPublicMemo: true,
         category: '技術書',
         memo: 'カテゴリ不一致',
         finished: new Date('2024-05-01'),
       } as unknown as Book,
       {
+        title: 'テスト本',
+        isPublicMemo: true,
         category: '小説',
         memo: '月不一致',
         finished: new Date('2024-06-01'),
       } as unknown as Book,
       {
+        category: '小説',
+        isPublicMemo: false,
+        memo: '非公開メモ',
+        finished: new Date('2024-05-01'),
+      } as unknown as Book,
+      {
+        title: 'テスト本',
+        isPublicMemo: true,
         category: '小説',
         memo: '未読了',
         finished: null,
@@ -159,6 +178,7 @@ describe('GenerateAiSummaryUseCase', () => {
     expect(prompt).not.toContain('カテゴリ不一致');
     expect(prompt).not.toContain('月不一致');
     expect(prompt).not.toContain('未読了');
+    expect(prompt).not.toContain('非公開メモ');
   });
 
   it('シートが存在しない場合はNotFoundExceptionを投げる', async () => {

@@ -31,22 +31,6 @@ export interface Migration {
   transformations: TransformationType[]
 }
 
-/**
- * スキーママイグレーション定義リスト
- *
- * 新しいスキーマバージョンを追加する際は、ここに変換ルールを追加する
- *
- * @example
- * // バージョン3を追加する場合
- * {
- *   from: 2,
- *   to: 3,
- *   transformations: [
- *     { type: 'add', key: 'new_feature', defaultValue: '' },
- *     { type: 'remove', key: 'deprecated_field' }
- *   ]
- * }
- */
 export const MIGRATIONS: Migration[] = [
   {
     from: 1,
@@ -65,6 +49,16 @@ export const MIGRATIONS: Migration[] = [
     transformations: [
       // 読書性格タイプ（MBTI風診断）。過去データは未診断のため空文字
       { type: 'add', key: 'personality_type', defaultValue: '' },
+    ],
+  },
+  {
+    from: 3,
+    to: 4,
+    transformations: [
+      { type: 'add', key: 'reading_trend_summary', defaultValue: '' },
+      { type: 'add', key: 'sentiment_summary', defaultValue: '' },
+      { type: 'add', key: 'hidden_theme_summary', defaultValue: '' },
+      { type: 'add', key: 'overall_summary', defaultValue: '' },
     ],
   },
 ]

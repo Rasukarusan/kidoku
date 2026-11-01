@@ -6,7 +6,7 @@ import { AiReGenerateButton } from './AiReGenerateButton'
 import useAiHelpers from './useAiHelpers'
 import { Confirm } from './Confirm'
 import { StepIndicator } from './StepIndicator'
-import { AI_SUMMARY_FIELDS, AiSummaryFieldKey } from './fields'
+import { AI_SUMMARY_FIELDS } from './fields'
 import { PersonalityCard } from './personality/PersonalityCard'
 import { findPersonalityType } from '@/libs/ai/personality/personality-types'
 import { CourseId } from '@/types/user'
@@ -47,7 +47,6 @@ export const AiSummaries: React.FC<Props> = ({
     summaries,
   } = useAiHelpers(sheet, aiSummaries, isMine)
 
-  // MBTI風の読書性格タイプ（未診断の過去データ・不明IDはundefined）
   const personalityType = findPersonalityType(json?.personality_type)
 
   if (error) {
@@ -121,7 +120,7 @@ export const AiSummaries: React.FC<Props> = ({
               showShare={isMine}
               onShare={() =>
                 shareToSns(
-                  `私の読書性格タイプは「${personalityType.name}」でした📚✨\n${
+                  `私の読書性格タイプは「${personalityType.code} / ${personalityType.name}」でした📚✨\n${
                     json.character_summary
                       ? `一言でいうと「${json.character_summary}」\n`
                       : ''
@@ -159,28 +158,24 @@ export const AiSummaries: React.FC<Props> = ({
             )
           )}
           <div className="mb-1 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {Object.keys(json)
+            {Object.entries(AI_SUMMARY_FIELDS)
               .filter(
-                (key) =>
-                  key !== 'id' &&
-                  key !== 'character_summary' &&
-                  key !== 'personality_type' &&
-                  !key.startsWith('_')
+                ([key, field]) =>
+                  'summaryKey' in field && (json[key] || json[field.summaryKey])
               )
-              .sort((a, b) => {
-                const orderA =
-                  AI_SUMMARY_FIELDS[a as AiSummaryFieldKey]?.order ?? 999
-                const orderB =
-                  AI_SUMMARY_FIELDS[b as AiSummaryFieldKey]?.order ?? 999
-                return orderA - orderB
-              })
-              .map((key) => {
+              .sort(([, a], [, b]) => a.order - b.order)
+              .map(([key, field]) => {
                 return (
                   <div key={key} className="rounded-md bg-ai-summary px-8 py-4">
                     <AiSummary
                       key={key}
                       jsonKey={key}
-                      text={json[key]}
+                      text={json[key] ?? ''}
+                      summary={
+                        'summaryKey' in field
+                          ? json[field.summaryKey]
+                          : undefined
+                      }
                       originalSchemaVersion={json._originalSchemaVersion}
                     />
                   </div>

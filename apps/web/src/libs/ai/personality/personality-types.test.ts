@@ -2,7 +2,6 @@ import {
   PERSONALITY_TYPES,
   PERSONALITY_TYPE_IDS,
   findPersonalityType,
-  personalityTypePromptList,
 } from './personality-types'
 import {
   personalityCharacterSvg,
@@ -10,13 +9,14 @@ import {
 } from './personality-character'
 
 describe('PERSONALITY_TYPES', () => {
-  it('idが重複していないこと', () => {
+  it('16タイプが定義され、idが重複していないこと', () => {
+    expect(PERSONALITY_TYPES).toHaveLength(16)
     expect(new Set(PERSONALITY_TYPE_IDS).size).toBe(PERSONALITY_TYPES.length)
   })
 
   it('全タイプに必須フィールドが定義されていること', () => {
     for (const type of PERSONALITY_TYPES) {
-      expect(type.id).toMatch(/^[a-z]+$/)
+      expect(type.id).toMatch(/^[EI][SN][TF][JP]$/)
       expect(type.code).toMatch(/^[A-Z]+$/)
       expect(type.name).not.toBe('')
       expect(type.tagline).not.toBe('')
@@ -29,6 +29,7 @@ describe('PERSONALITY_TYPES', () => {
 
 describe('findPersonalityType()', () => {
   it('idからタイプを取得できること', () => {
+    expect(findPersonalityType('INTP')?.code).toBe('INTP')
     expect(findPersonalityType('adventurer')?.name).toBe('物語の冒険家')
   })
 
@@ -37,15 +38,6 @@ describe('findPersonalityType()', () => {
     expect(findPersonalityType('')).toBeUndefined()
     expect(findPersonalityType(undefined)).toBeUndefined()
     expect(findPersonalityType(null)).toBeUndefined()
-  })
-})
-
-describe('personalityTypePromptList', () => {
-  it('全タイプのidと名前が含まれていること', () => {
-    for (const type of PERSONALITY_TYPES) {
-      expect(personalityTypePromptList).toContain(type.id)
-      expect(personalityTypePromptList).toContain(type.name)
-    }
   })
 })
 

@@ -9,7 +9,7 @@
 /**
  * 現在の最新スキーマバージョン
  */
-export const AI_SUMMARY_SCHEMA_VERSION = 3
+export const AI_SUMMARY_SCHEMA_VERSION = 4
 
 /**
  * スキーマバージョンごとのフィールド定義
@@ -43,6 +43,21 @@ export const AI_SUMMARY_SCHEMAS = {
       'reading_trend_analysis',
       'sentiment_analysis',
       'hidden_theme_discovery',
+      'overall_feedback',
+    ] as const,
+  },
+  4: {
+    version: 4,
+    fields: [
+      'personality_type',
+      'character_summary',
+      'reading_trend_summary',
+      'reading_trend_analysis',
+      'sentiment_summary',
+      'sentiment_analysis',
+      'hidden_theme_summary',
+      'hidden_theme_discovery',
+      'overall_summary',
       'overall_feedback',
     ] as const,
   },

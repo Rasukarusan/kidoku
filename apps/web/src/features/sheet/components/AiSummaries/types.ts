@@ -8,10 +8,14 @@ export type AiSummariesJson = {
   _schemaVersion?: number
   /** 元のスキーマバージョン（レガシー表示用） */
   _originalSchemaVersion?: number
-  /** 読書性格タイプのID（personality-types.tsで定義、未診断の過去データは空文字） */
+  /** MBTIタイプのコード。未判定は空文字。 */
   personality_type: string
   /** 一言でいうとこんな人 */
   character_summary: string
+  reading_trend_summary?: string
+  sentiment_summary?: string
+  hidden_theme_summary?: string
+  overall_summary?: string
   /** 読書傾向分析 */
   reading_trend_analysis: string
   /** 感情分析 */

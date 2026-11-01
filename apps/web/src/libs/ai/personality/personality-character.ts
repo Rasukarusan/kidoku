@@ -104,7 +104,7 @@ export const personalityCharacterSvg = (
       <line x1="120" y1="174" x2="120" y2="196" stroke="#8b5e34" stroke-width="3"/>
       <circle cx="74" cy="178" r="9" fill="${type.color}"/>
       <circle cx="166" cy="178" r="9" fill="${type.color}"/>
-      ${accessories[type.id] ?? ''}
+      ${accessories[type.accessory ?? type.id] ?? ''}
     </svg>`
     .replace(/\n\s*/g, ' ')
     .trim()
