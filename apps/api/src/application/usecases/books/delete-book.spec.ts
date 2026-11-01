@@ -57,6 +57,31 @@ describe('DeleteBookUseCase', () => {
 
     expect(mockBookRepo.delete).toHaveBeenCalledWith('1', 'user-1');
     expect(mockSearchRepo.deleteDocument).toHaveBeenCalledWith('1');
+    expect(
+      mockSearchRepo.deleteDocument.mock.invocationCallOrder[0],
+    ).toBeLessThan(mockBookRepo.delete.mock.invocationCallOrder[0]);
+  });
+
+  it('検索インデックスの削除に失敗した場合はDBの本を残して再試行できる', async () => {
+    mockBookRepo.findById.mockResolvedValue({ userId: 'user-1' } as Book);
+    const error = new Error('MeiliSearch unavailable');
+    mockSearchRepo.deleteDocument.mockRejectedValueOnce(error);
+
+    await expect(useCase.execute('user-1', '1')).rejects.toThrow(error);
+    expect(mockBookRepo.delete).not.toHaveBeenCalled();
+
+    await expect(useCase.execute('user-1', '1')).resolves.toBeUndefined();
+    expect(mockBookRepo.delete).toHaveBeenCalledTimes(1);
+    expect(mockBookRepo.delete).toHaveBeenCalledWith('1', 'user-1');
+  });
+
+  it('DBの削除に失敗した場合はエラーを返す', async () => {
+    mockBookRepo.findById.mockResolvedValue({ userId: 'user-1' } as Book);
+    const error = new Error('Database unavailable');
+    mockBookRepo.delete.mockRejectedValue(error);
+
+    await expect(useCase.execute('user-1', '1')).rejects.toThrow(error);
+    expect(mockSearchRepo.deleteDocument).toHaveBeenCalledWith('1');
   });
 
   it('書籍が見つからない場合はNotFoundExceptionを投げる', async () => {
@@ -65,6 +90,8 @@ describe('DeleteBookUseCase', () => {
     await expect(useCase.execute('user-1', '999')).rejects.toThrow(
       NotFoundException,
     );
+    expect(mockBookRepo.delete).not.toHaveBeenCalled();
+    expect(mockSearchRepo.deleteDocument).not.toHaveBeenCalled();
   });
 
   it('他ユーザーの書籍を削除しようとするとNotFoundExceptionを投げる', async () => {

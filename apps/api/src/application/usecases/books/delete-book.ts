@@ -20,9 +20,9 @@ export class DeleteBookUseCase {
       throw new NotFoundException('書籍が見つかりません');
     }
 
-    await this.bookRepository.delete(bookId, userId);
-
-    // MeiliSearchから削除
+    // 検索側の削除に失敗してもDBの本を残し、再試行できるようにする。
     await this.searchRepository.deleteDocument(bookId);
+
+    await this.bookRepository.delete(bookId, userId);
   }
 }
