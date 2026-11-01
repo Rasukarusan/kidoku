@@ -9,14 +9,17 @@ jest.mock('@/libs/prisma', () => ({
       findUnique: jest.fn(),
       update: jest.fn(),
     },
-    books: {
-      count: jest.fn(),
-      findMany: jest.fn(),
-    },
+
     $transaction: jest.fn(),
   },
 }))
 
+jest.mock('@kidoku/reading-store', () => ({
+  readBooks: jest.fn(),
+  readBook: jest.fn(),
+  countBooks: jest.fn(),
+}))
+const reading = jest.requireMock('@kidoku/reading-store')
 const prisma = jest.requireMock('@/libs/prisma').default
 
 const TOKEN = 'kidoku_pat_test'
@@ -60,15 +63,18 @@ describe('/api/v1/books', () => {
       userId: 'user-1',
     })
     prisma.personalAccessToken.update.mockResolvedValue({})
-    prisma.$transaction.mockResolvedValue([250, [mockBook(1), mockBook(2)]])
+    reading.countBooks.mockResolvedValue(250)
+    reading.readBooks.mockResolvedValue([mockBook(1), mockBook(2)])
+    prisma.$transaction.mockImplementation(async (callback) => callback(prisma))
   })
 
   it('デフォルトでpage=1, perPage=100で取得しメタ情報を返す', async () => {
     const res = mockRes()
     await handler(mockReq(), res)
 
-    expect(prisma.books.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ skip: 0, take: 100 })
+    expect(reading.readBooks).toHaveBeenCalledWith(
+      prisma,
+      expect.objectContaining({ offset: 0, limit: 100 })
     )
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith(
@@ -99,8 +105,9 @@ describe('/api/v1/books', () => {
     const res = mockRes()
     await handler(mockReq({ page: '3', perPage: '50' }), res)
 
-    expect(prisma.books.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ skip: 100, take: 50 })
+    expect(reading.readBooks).toHaveBeenCalledWith(
+      prisma,
+      expect.objectContaining({ offset: 100, limit: 50 })
     )
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ page: 3, perPage: 50, totalPages: 5 })
@@ -111,8 +118,9 @@ describe('/api/v1/books', () => {
     const res = mockRes()
     await handler(mockReq({ perPage: '9999' }), res)
 
-    expect(prisma.books.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ take: 200 })
+    expect(reading.readBooks).toHaveBeenCalledWith(
+      prisma,
+      expect.objectContaining({ limit: 200 })
     )
   })
 
@@ -121,7 +129,7 @@ describe('/api/v1/books', () => {
     await handler(mockReq({ page: 'abc' }), res)
 
     expect(res.status).toHaveBeenCalledWith(400)
-    expect(prisma.books.findMany).not.toHaveBeenCalled()
+    expect(reading.readBooks).not.toHaveBeenCalled()
   })
 
   it('無効なトークンは401を返す', async () => {

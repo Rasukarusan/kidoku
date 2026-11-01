@@ -12,12 +12,14 @@ WORKDIR /app
 # 依存関係ファイルをコピー
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/api/package.json ./apps/api/
+COPY packages/reading-store/package.json ./packages/reading-store/
 
 # ワークスペース全体の依存関係をインストール
 RUN pnpm install --frozen-lockfile
 
 # ソースコードをコピー
 COPY apps/api ./apps/api
+COPY packages/reading-store/index.js packages/reading-store/index.d.ts ./packages/reading-store/
 
 # NestJSアプリケーションをビルド（prisma generate含む）
 RUN pnpm --filter api run build
@@ -40,6 +42,7 @@ COPY --from=builder --chown=nestjs:nodejs /app/apps/api/node_modules ./apps/api/
 
 # ビルド済みのアプリケーションをコピー
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/dist ./apps/api/dist
+COPY --from=builder --chown=nestjs:nodejs /app/packages/reading-store ./packages/reading-store
 
 # ユーザーを切り替え
 USER nestjs

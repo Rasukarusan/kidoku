@@ -1,0 +1,10 @@
+{
+  "name": "@kidoku/reading-store",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "types": "index.d.ts",
+  "dependencies": {
+    "@prisma/client": "^5.2.0"
+  }
+}

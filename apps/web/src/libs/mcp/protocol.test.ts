@@ -4,12 +4,17 @@ import { handleMcpRequest } from './protocol'
 jest.mock('@/libs/prisma', () => ({
   __esModule: true,
   default: {
-    books: { count: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
     item: { count: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
     collection: { findMany: jest.fn() },
     $transaction: jest.fn(),
   },
 }))
+jest.mock('@kidoku/reading-store', () => ({
+  readBooks: jest.fn(),
+  readBook: jest.fn(),
+  countBooks: jest.fn(),
+}))
+const reading = jest.requireMock('@kidoku/reading-store')
 const prisma = jest.requireMock('@/libs/prisma').default
 const call = (name: string, args: unknown) => ({
   jsonrpc: '2.0',
@@ -77,36 +82,36 @@ test('initializes, lists read-only tools and accepts notifications', async () =>
 })
 
 test('list and search are scoped to the authenticated user, with pagination and no full memos', async () => {
-  prisma.$transaction.mockResolvedValue([1, [book]])
+  reading.countBooks.mockResolvedValue(1)
+  reading.readBooks.mockResolvedValue([book])
+  prisma.$transaction.mockImplementation(async (callback) => callback(prisma))
   const result = await handleMcpRequest(
     call('list_books', { page: 2, perPage: 10, query: '技術' }),
     'user-1'
   )
-  expect(prisma.books.findMany).toHaveBeenCalledWith(
+  expect(reading.readBooks).toHaveBeenCalledWith(
+    prisma,
     expect.objectContaining({
-      where: {
+      filter: {
         userId: 'user-1',
-        OR: [
-          { title: { contains: '技術' } },
-          { author: { contains: '技術' } },
-          { memo: { contains: '技術' } },
-        ],
+        search: { text: '技術', fields: ['title', 'author', 'memo'] },
       },
-      skip: 10,
-      take: 10,
+      offset: 10,
+      limit: 10,
     })
   )
   expect(JSON.stringify(result)).not.toContain('非公開のメモ')
 })
 
 test('get_book includes the owner in the DB lookup and returns the full memo', async () => {
-  prisma.books.findFirst.mockResolvedValue(book)
+  reading.readBook.mockResolvedValue(book)
   const result = await handleMcpRequest(call('get_book', { id: 1 }), 'user-1')
-  expect(prisma.books.findFirst).toHaveBeenCalledWith(
-    expect.objectContaining({ where: { userId: 'user-1', id: 1 } })
-  )
+  expect(reading.readBook).toHaveBeenCalledWith(prisma, {
+    userId: 'user-1',
+    id: 1,
+  })
   expect(JSON.stringify(result)).toContain('非公開のメモ')
-  prisma.books.findFirst.mockResolvedValue(null)
+  reading.readBook.mockResolvedValue(null)
   await expect(
     handleMcpRequest(call('get_book', { id: 2 }), 'user-1')
   ).resolves.toMatchObject({ result: { isError: true } })
@@ -124,8 +129,8 @@ test.each([
   await expect(handleMcpRequest(request, 'user-1')).resolves.toMatchObject({
     error: { code: -32602 },
   })
-  expect(prisma.books.findFirst).not.toHaveBeenCalled()
-  expect(prisma.books.findMany).not.toHaveBeenCalled()
+  expect(reading.readBook).not.toHaveBeenCalled()
+  expect(reading.readBooks).not.toHaveBeenCalled()
 })
 
 test.each([

@@ -1,3 +1,4 @@
+import { readTemplates } from '@kidoku/reading-store';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { TemplateBook } from '../../domain/models/template-book';
@@ -8,10 +9,7 @@ export class TemplateBookRepository implements ITemplateBookRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByUserId(userId: string): Promise<TemplateBook[]> {
-    const rows = await this.prisma.template_books.findMany({
-      where: { userId },
-      orderBy: { created: 'desc' },
-    });
+    const rows = await readTemplates(this.prisma, userId);
 
     return rows.map((row) => this.toEntity(row));
   }

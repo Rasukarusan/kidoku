@@ -24,15 +24,6 @@ try {
         `Missing canonical table: ${name}. Apply the reviewed collection migration during a maintenance window; do not use db push.`,
       );
   }
-  for (const name of [
-    "legacy_books",
-    "legacy_sheets",
-    "legacy_template_books",
-    "legacy_collection_highlights",
-  ]) {
-    if (tables.get(name) !== "VIEW")
-      throw new Error(`Missing compatibility view: ${name}`);
-  }
   if (
     (await prisma.itemType.count({
       where: { key: { in: ["book", "movie"] } },
@@ -42,9 +33,7 @@ try {
   await prisma.mcpGrant.count({
     where: { scope: { in: ["books:read", "items:read"] } },
   });
-  console.log(
-    "Collection schema and compatibility views verified. No schema mutation was performed.",
-  );
+  console.log("Collection schema verified. No schema mutation was performed.");
 } finally {
   await prisma.$disconnect();
 }

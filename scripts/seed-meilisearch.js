@@ -11,6 +11,8 @@ const { PrismaClient } = require(
   path.join(__dirname, '..', 'apps', 'web', 'node_modules', '@prisma', 'client')
 );
 
+const { readBooks } = require('../packages/reading-store');
+
 const MEILI_HOST = process.env.MEILI_HOST || 'http://localhost:7700';
 const MEILI_MASTER_KEY = process.env.MEILI_MASTER_KEY || 'YourMasterKey';
 const INDEX_NAME = 'books';
@@ -57,12 +59,7 @@ async function main() {
 
   try {
     // DBから全書籍データを取得（ユーザー・シート情報含む）
-    const books = await prisma.books.findMany({
-      include: {
-        user: { select: { name: true, image: true } },
-        sheet: { select: { name: true } },
-      },
-    });
+    const books = await readBooks(prisma);
 
     if (books.length === 0) {
       console.log('No books found in database. Run database seed first.');

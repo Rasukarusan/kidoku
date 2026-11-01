@@ -1,3 +1,4 @@
+import { readSheets } from '@kidoku/reading-store';
 import { CollectionRepository } from './collection';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
@@ -9,9 +10,9 @@ export class SheetRepository implements ISheetRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByUserId(userId: string): Promise<Sheet[]> {
-    const rows = await this.prisma.sheets.findMany({
+    const rows = await readSheets(this.prisma, {
       where: { userId },
-      orderBy: { order: 'desc' },
+      orderBy: { position: 'desc' },
     });
     return rows.map((row) =>
       Sheet.fromDatabase(
@@ -31,9 +32,10 @@ export class SheetRepository implements ISheetRepository {
       return null;
     }
 
-    const row = await this.prisma.sheets.findUnique({
+    const row = await readSheets(this.prisma, {
       where: { id: sheetId },
-    });
+      limit: 1,
+    }).then((rows) => rows[0] ?? null);
     if (!row) return null;
     return Sheet.fromDatabase(
       row.id.toString(),
@@ -46,10 +48,11 @@ export class SheetRepository implements ISheetRepository {
   }
 
   async findLastByUserId(userId: string): Promise<Sheet | null> {
-    const row = await this.prisma.sheets.findFirst({
+    const row = await readSheets(this.prisma, {
       where: { userId },
-      orderBy: { order: 'desc' },
-    });
+      orderBy: { position: 'desc' },
+      limit: 1,
+    }).then((rows) => rows[0] ?? null);
     if (!row) return null;
     return Sheet.fromDatabase(
       row.id.toString(),
@@ -65,9 +68,10 @@ export class SheetRepository implements ISheetRepository {
     userId: string,
     name: string,
   ): Promise<Sheet | null> {
-    const row = await this.prisma.sheets.findFirst({
+    const row = await readSheets(this.prisma, {
       where: { userId, name },
-    });
+      limit: 1,
+    }).then((rows) => rows[0] ?? null);
     if (!row) return null;
     return Sheet.fromDatabase(
       row.id.toString(),

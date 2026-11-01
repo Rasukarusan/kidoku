@@ -1,11 +1,14 @@
-import { Prisma } from '@prisma/client'
+import {
+  readBooks,
+  readBook,
+  countBooks,
+  BookFilter,
+  ReadingBook,
+} from '@kidoku/reading-store'
 import prisma from '@/libs/prisma'
 import type { Pagination } from '@/utils/pagination'
 
-const include = { sheet: { select: { name: true } } } as const
-type Book = Prisma.booksGetPayload<{ include: typeof include }>
-
-function serialize(book: Book) {
+function serialize(book: ReadingBook) {
   return {
     id: book.id,
     title: book.title,
@@ -25,24 +28,23 @@ export async function listPersonalBooks(
   { page, perPage }: Pagination,
   query?: string
 ) {
-  const where: Prisma.booksWhereInput = {
+  const filter: BookFilter = {
     userId,
-    ...(query && {
-      OR: ['title', 'author', 'memo'].map((field) => ({
-        [field]: { contains: query },
-      })),
-    }),
+    ...(query
+      ? { search: { text: query, fields: ['title', 'author', 'memo'] } }
+      : {}),
   }
-  const [total, books] = await prisma.$transaction([
-    prisma.books.count({ where }),
-    prisma.books.findMany({
-      where,
-      include,
-      orderBy: [{ finished: 'desc' }, { id: 'desc' }],
-      skip: (page - 1) * perPage,
-      take: perPage,
-    }),
-  ])
+  const [total, books] = await prisma.$transaction(async (tx) =>
+    Promise.all([
+      countBooks(tx, filter),
+      readBooks(tx, {
+        filter,
+        orderBy: [{ finished: 'desc' }, { id: 'desc' }],
+        offset: (page - 1) * perPage,
+        limit: perPage,
+      }),
+    ])
+  )
   return {
     total,
     page,
@@ -53,6 +55,6 @@ export async function listPersonalBooks(
 }
 
 export async function getPersonalBook(userId: string, id: number) {
-  const book = await prisma.books.findFirst({ where: { userId, id }, include })
+  const book = await readBook(prisma, { userId, id })
   return book ? serialize(book) : null
 }

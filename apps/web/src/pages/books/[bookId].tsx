@@ -1,3 +1,4 @@
+import { readBook } from '@kidoku/reading-store'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import BookPage from '@/features/books/components/BookPage'
 
@@ -24,29 +25,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     const { mask } = await import('@/utils/string')
     const dayjs = (await import('dayjs')).default
 
-    const book = await prisma.books.findFirst({
-      where: { id: Number(bookId) },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-        sheet: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
-      },
-    })
+    const book = await readBook(prisma, { id: Number(bookId) })
 
     if (!book) {
       // notFoundをrevalidateなしで返すとISRが404を恒久的にキャッシュしてしまう。

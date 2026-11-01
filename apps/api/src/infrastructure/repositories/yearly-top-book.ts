@@ -1,3 +1,4 @@
+import { readHighlights } from '@kidoku/reading-store';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import {
@@ -13,17 +14,7 @@ export class YearlyTopBookRepository implements IYearlyTopBookRepository {
     userId: string,
     year: string,
   ): Promise<YearlyTopBookWithBook[]> {
-    const rows = await this.prisma.yearlyTopBook.findMany({
-      where: { userId, year },
-      select: {
-        year: true,
-        order: true,
-        book: {
-          select: { id: true, title: true, author: true, image: true },
-        },
-      },
-      orderBy: { order: 'asc' },
-    });
+    const rows = await readHighlights(this.prisma, { userId, year });
 
     return rows.map((row) => ({
       year: row.year,

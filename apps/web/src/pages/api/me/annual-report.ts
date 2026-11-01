@@ -1,3 +1,4 @@
+import { readSheets, readBooks } from '@kidoku/reading-store'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
@@ -20,10 +21,9 @@ export default async function handler(
 
   try {
     const userId = session.user.id
-    const sheets = await prisma.sheets.findMany({
+    const sheets = await readSheets(prisma, {
       where: { userId },
-      orderBy: { order: 'asc' },
-      select: { id: true, name: true },
+      orderBy: { position: 'asc' },
     })
 
     const sheetName = req.query.sheet as string | undefined
@@ -33,17 +33,20 @@ export default async function handler(
 
     if (!sheet) {
       res.setHeader('Cache-Control', 'private, no-store')
-      return res.status(200).json({ sheets, report: null })
+      return res.status(200).json({
+        sheets: sheets.map(({ id, name }) => ({ id, name })),
+        report: null,
+      })
     }
 
-    const books = await prisma.books.findMany({
-      where: { userId, sheetId: sheet.id },
+    const books = await readBooks(prisma, {
+      filter: { userId, sheetId: sheet.id },
       orderBy: { finished: 'asc' },
     })
 
     res.setHeader('Cache-Control', 'private, no-store')
     return res.status(200).json({
-      sheets,
+      sheets: sheets.map(({ id, name }) => ({ id, name })),
       report: {
         sheetName: sheet.name,
         books: books.map((book) => ({

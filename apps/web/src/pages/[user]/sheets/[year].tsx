@@ -1,3 +1,4 @@
+import { readSheets, readBooks, readHighlights } from '@kidoku/reading-store'
 import prisma, { parse } from '@/libs/prisma'
 import dayjs from 'dayjs'
 import { SheetPage } from '@/features/sheet/components/SheetPage'
@@ -17,9 +18,9 @@ export async function getStaticProps(context) {
     }
   }
   const userId = user.id
-  const sheets = await prisma.sheets.findMany({
+  const sheets = await readSheets(prisma, {
     where: { userId },
-    orderBy: [{ order: 'desc' }],
+    orderBy: [{ position: 'desc' }],
   })
   const sheet = sheets.find((sheet) => sheet.name === year)
   if (!sheet) {
@@ -27,26 +28,10 @@ export async function getStaticProps(context) {
       notFound: true,
     }
   }
-  const books = await prisma.books.findMany({
-    where: {
+  const books = await readBooks(prisma, {
+    filter: {
       sheetId: sheet.id,
       userId,
-    },
-    select: {
-      id: true,
-      userId: true,
-      title: true,
-      author: true,
-      category: true,
-      image: true,
-      impression: true,
-      memo: true,
-      isPublicMemo: true,
-      isPurchasable: true,
-      price: true,
-      finished: true,
-      created: false,
-      updated: false,
     },
   })
   const data = books.map((book) => {
@@ -55,20 +40,22 @@ export async function getStaticProps(context) {
       : dayjs().format('M') + '月' // まだ読み終わっていない場合は今月とする
     const memo = book.isPublicMemo ? mask(book.memo) : ''
     return {
-      ...book,
+      id: book.id,
+      userId: book.userId,
+      title: book.title,
+      author: book.author,
+      category: book.category,
+      image: book.image,
+      impression: book.impression,
+      isPublicMemo: book.isPublicMemo,
+      isPurchasable: book.isPurchasable,
+      price: book.price,
+      finished: book.finished,
       month,
       memo,
     }
   })
-  const yearlyTopBooks = await prisma.yearlyTopBook.findMany({
-    where: { year, user: { name: username } },
-    select: {
-      year: true,
-      order: true,
-      book: { select: { id: true, title: true, author: true, image: true } },
-    },
-    orderBy: { order: 'asc' },
-  })
+  const yearlyTopBooks = await readHighlights(prisma, { year, username })
 
   const aiSummaries = await prisma.aiSummaries.findMany({
     where: { userId, sheetId: sheet.id },
@@ -86,7 +73,16 @@ export async function getStaticProps(context) {
       })),
       username,
       userId,
-      yearlyTopBooks,
+      yearlyTopBooks: yearlyTopBooks.map(({ year, order, book }) => ({
+        year,
+        order,
+        book: {
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          image: book.image,
+        },
+      })),
       aiSummaries: aiSummaries.map((v) => {
         // 汎用マイグレーション関数を使用して最新スキーマに変換
         // analysisはJSON文字列として保存されているのでパースが必要
@@ -104,11 +100,11 @@ export async function getStaticProps(context) {
 }
 export async function getStaticPaths() {
   const users = await prisma.user.findMany({
-    select: { name: true, sheets: { select: { name: true } } },
+    select: { name: true, collections: { select: { name: true } } },
   })
   const paths = users
     .map((user) => {
-      return user.sheets.map((sheet) => {
+      return user.collections.map((sheet) => {
         return { params: { user: user.name, year: sheet.name } }
       })
     })

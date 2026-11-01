@@ -16,8 +16,7 @@ try {
   if (tables.length) {
     if (
       process.argv.includes("--if-empty") &&
-      tables.some((row) => row.name === "items") &&
-      tables.some((row) => row.name === "legacy_books" && row.type === "VIEW")
+      tables.some((row) => row.name === "items" && row.type === "BASE TABLE")
     ) {
       console.log("Collection database already initialized; no changes made.");
     } else {
@@ -54,10 +53,8 @@ try {
         .filter(Boolean);
     const statements = [
       ...split(ddl),
-      ...split(migration).filter(
-        (statement) =>
-          statement.startsWith("INSERT INTO item_types") ||
-          statement.startsWith("CREATE VIEW legacy_"),
+      ...split(migration).filter((statement) =>
+        statement.startsWith("INSERT INTO item_types"),
       ),
     ];
     if (!process.argv.includes("--apply")) {
@@ -68,7 +65,7 @@ try {
       for (const statement of statements)
         await prisma.$executeRawUnsafe(statement);
       console.log(
-        "Empty database initialized with canonical tables, initial item types and compatibility views.",
+        "Empty database initialized with canonical tables and initial item types.",
       );
     }
   }

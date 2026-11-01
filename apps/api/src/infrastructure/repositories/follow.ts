@@ -1,3 +1,4 @@
+import { readBooks, countBooks } from '@kidoku/reading-store';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { IFollowRepository } from '../../domain/repositories/follow';
@@ -54,29 +55,15 @@ export class FollowRepository implements IFollowRepository {
     limit = 20,
     offset = 0,
   ): Promise<PaginatedResult<FeedBook>> {
-    const where = {
-      isPublicMemo: true,
-      user: { followers: { some: { followerId: userId } } },
-    };
+    const filter = { isPublicMemo: true, followingUserId: userId };
     const [results, total] = await Promise.all([
-      this.prisma.books.findMany({
-        where,
-        select: {
-          id: true,
-          title: true,
-          author: true,
-          memo: true,
-          image: true,
-          updated: true,
-          user: { select: { name: true, image: true } },
-          sheet: { select: { name: true } },
-          _count: { select: { likes: true } },
-        },
+      readBooks(this.prisma, {
+        filter,
         orderBy: { updated: 'desc' },
-        take: limit + 1,
-        skip: offset,
+        limit: limit + 1,
+        offset,
       }),
-      this.prisma.books.count({ where }),
+      countBooks(this.prisma, filter),
     ]);
 
     const hasMore = results.length > limit;

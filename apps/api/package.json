@@ -44,7 +44,8 @@
     "passport": "^0.7.0",
     "passport-custom": "^1.1.1",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "@kidoku/reading-store": "workspace:*"
   },
   "devDependencies": {
     "@kidoku/eslint-config": "workspace:*",

@@ -1,3 +1,4 @@
+import { readBooks, readBook } from '@kidoku/reading-store';
 import { CollectionRepository } from './collection';
 import { Prisma } from '@prisma/client';
 import { Attributes } from '../../domain/models/item';
@@ -16,9 +17,7 @@ export class BookRepository implements IBookRepository {
       return null;
     }
 
-    const row = await this.prisma.books.findUnique({
-      where: { id: bookId },
-    });
+    const row = await readBook(this.prisma, { id: bookId });
 
     if (row) return this.toEntity(row);
     // An unassigned book still has stable purchase/comment references.
@@ -55,17 +54,13 @@ export class BookRepository implements IBookRepository {
   }
 
   async findByUserId(userId: string): Promise<Book[]> {
-    const rows = await this.prisma.books.findMany({
-      where: { userId },
-    });
+    const rows = await readBooks(this.prisma, { filter: { userId } });
 
     return rows.map((row) => this.toEntity(row));
   }
 
   async findBySheetId(sheetId: number): Promise<Book[]> {
-    const rows = await this.prisma.books.findMany({
-      where: { sheetId: sheetId },
-    });
+    const rows = await readBooks(this.prisma, { filter: { sheetId } });
 
     return rows.map((row) => this.toEntity(row));
   }
@@ -82,8 +77,8 @@ export class BookRepository implements IBookRepository {
       },
       select: { id: true },
     });
-    const rows = await this.prisma.books.findMany({
-      where: { id: { in: members.map((item) => item.id) }, userId },
+    const rows = await readBooks(this.prisma, {
+      filter: { id: members.map((item) => item.id), userId },
     });
     return rows.map((row) => this.toEntity({ ...row, sheetId }));
   }
@@ -245,19 +240,7 @@ export class BookRepository implements IBookRepository {
       sheetName: string;
     }>
   > {
-    const rows = await this.prisma.books.findMany({
-      select: {
-        id: true,
-        title: true,
-        author: true,
-        category: true,
-        image: true,
-        memo: true,
-        isPublicMemo: true,
-        user: { select: { name: true, image: true } },
-        sheet: { select: { name: true } },
-      },
-    });
+    const rows = await readBooks(this.prisma);
 
     return rows.map((row) => ({
       id: row.id.toString(),
@@ -290,20 +273,7 @@ export class BookRepository implements IBookRepository {
       return null;
     }
 
-    const row = await this.prisma.books.findUnique({
-      where: { id: bookId },
-      select: {
-        id: true,
-        title: true,
-        author: true,
-        category: true,
-        image: true,
-        memo: true,
-        isPublicMemo: true,
-        user: { select: { name: true, image: true } },
-        sheet: { select: { name: true } },
-      },
-    });
+    const row = await readBook(this.prisma, { id: bookId });
 
     if (!row) return null;
 
@@ -322,8 +292,8 @@ export class BookRepository implements IBookRepository {
   }
 
   async getCategories(userId: string): Promise<string[]> {
-    const rows = await this.prisma.books.findMany({
-      where: { userId },
+    const rows = await this.prisma.item.findMany({
+      where: { userId, itemTypeId: 'book', collections: { some: {} } },
       select: { category: true },
       distinct: ['category'],
     });

@@ -1,3 +1,4 @@
+import { readBooks } from '@kidoku/reading-store'
 import { IndexPage } from '@/features/index/components/IndexPage'
 export default IndexPage
 
@@ -6,16 +7,10 @@ import { mask } from '@/utils/string'
 import { mcpUrls } from '@/libs/mcp/oauth'
 
 export const getStaticProps = async () => {
-  const books = await prisma.books.findMany({
-    include: {
-      user: { select: { name: true, image: true } },
-      sheet: {
-        select: { name: true },
-      },
-    },
-    where: { isPublicMemo: true },
+  const books = await readBooks(prisma, {
+    filter: { isPublicMemo: true },
     orderBy: [{ updated: 'desc' }],
-    take: 10,
+    limit: 10,
   })
   const comments = []
   parse(books).map((book) => {

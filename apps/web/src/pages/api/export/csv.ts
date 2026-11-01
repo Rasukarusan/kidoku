@@ -1,3 +1,4 @@
+import { readLibrary } from '@kidoku/reading-store'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
@@ -20,15 +21,7 @@ export default async function handler(
     const userId = session.user.id
 
     // ユーザーのシートと本のデータを取得
-    const sheets = await prisma.sheets.findMany({
-      where: { userId },
-      include: {
-        books: {
-          orderBy: { finished: 'desc' },
-        },
-      },
-      orderBy: { order: 'asc' },
-    })
+    const sheets = await readLibrary(prisma, userId)
 
     // CSVヘッダー
     const csvHeaders = [

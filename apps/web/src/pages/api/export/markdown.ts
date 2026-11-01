@@ -1,3 +1,4 @@
+import { readLibrary } from '@kidoku/reading-store'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
@@ -34,15 +35,7 @@ export default async function handler(
   }
 
   try {
-    const sheets = await prisma.sheets.findMany({
-      where: { userId: session.user.id },
-      include: {
-        books: {
-          orderBy: { finished: 'desc' },
-        },
-      },
-      orderBy: { order: 'asc' },
-    })
+    const sheets = await readLibrary(prisma, session.user.id)
 
     const zip = new JSZip()
     const usedNames = new Set<string>()

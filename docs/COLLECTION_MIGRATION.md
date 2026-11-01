@@ -4,18 +4,27 @@
 
 正規の保存先は `collections`, `items`, `item_types`, `collection_items`, `item_logs`, `item_templates`。
 本の既存ID・メモ・公開設定・価格・コメント・購入参照を保持する。
-旧PrismaモデルはSQLビューを読む互換層であり、ビューを更新するコードを追加してはいけない。
+読書画面とBook APIは共通の読取処理で正規テーブルを参照する。
 新規コードは正規モデルとコレクション用GraphQL APIを使用する。
 
-Prismaの両スキーマは同じ内容にする。`views` は既存APIとの互換用途で使う。
+Prismaの両スキーマは同じ内容にする。
 `prisma db push` はこの移行に使用しない。リネームを削除・新規作成として推測するため、データを失う。
-DBワークフローも自動変更を廃止し、正規テーブルと互換ビューの存在確認のみ行う。
+DBワークフローは正規テーブルと種類定義の検証のみ行う。
 
 ## 新しい空DBの作成
 
 両Prismaクライアントを生成し、`pnpm --filter web db:initialize` を実行する。
-正規テーブル、最初の種類定義、互換ビューを一緒に作成する。既存データがあるDBへの初期化は拒否する。
+正規テーブルと最初の種類定義を作成する。既存データがあるDBへの初期化は拒否する。
 以後は `pnpm --filter web db:check` でスキーマを確認する。
+
+## ビューの削除
+
+1. Web・API・バッチの全実行環境に、正規テーブルを読むコードをデプロイする。
+2. `node scripts/verify-collection-schema.mjs` と画面・APIの動作確認を実行する。
+3. [sql/drop-legacy-views.sql](./sql/drop-legacy-views.sql) を対象DBで実行する。
+
+削除対象は4つのビューのみ。正規テーブルとデータは保持する。
+ロールバックにはビューを参照しないバージョンを使用する。
 
 ## 既存環境への適用
 

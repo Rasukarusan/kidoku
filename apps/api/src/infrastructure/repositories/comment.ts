@@ -1,3 +1,4 @@
+import { readBooks, countBooks } from '@kidoku/reading-store';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { Comment } from '../../domain/models/comment';
@@ -13,24 +14,13 @@ export class CommentRepository implements ICommentRepository {
     offset = 0,
   ): Promise<PaginatedResult<Comment>> {
     const [results, total] = await Promise.all([
-      this.prisma.books.findMany({
-        where: { isPublicMemo: true },
-        select: {
-          id: true,
-          title: true,
-          memo: true,
-          image: true,
-          updated: true,
-          user: { select: { name: true, image: true } },
-          sheet: { select: { name: true } },
-        },
+      readBooks(this.prisma, {
+        filter: { isPublicMemo: true },
         orderBy: { updated: 'desc' },
-        take: limit + 1,
-        skip: offset,
+        limit: limit + 1,
+        offset: offset,
       }),
-      this.prisma.books.count({
-        where: { isPublicMemo: true },
-      }),
+      countBooks(this.prisma, { isPublicMemo: true }),
     ]);
 
     const hasMore = results.length > limit;
