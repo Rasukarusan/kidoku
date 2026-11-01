@@ -1,3 +1,4 @@
+import { useDeleteBook } from '@/features/books/hooks/useDeleteBook'
 import { useState, useEffect } from 'react'
 import { Book } from '@/types/book'
 import { BookDetailEditModal } from './BookDetailEditModal'
@@ -24,6 +25,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
 }) => {
   const [book, setBook] = useState<Book>(initialBook)
   const [loading, setLoading] = useState(false)
+  const { deleteBook, deleting } = useDeleteBook()
   const [hasDraft, setHasDraft] = useState(false)
   const { reward } = useReward('saveRewardId', 'balloons', {
     lifetime: 200,
@@ -124,33 +126,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
     setLoading(false)
   }
 
-  const handleDelete = async () => {
-    if (!confirm('この書籍を削除しますか？')) return
-
-    setLoading(true)
-    try {
-      const response = await fetch(`/api/books`, {
-        method: 'DELETE',
-        headers: {
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          id: book.id,
-        }),
-      })
-
-      if (response.ok) {
-        // 削除成功時にローカルストレージの下書きも削除
-        if (book.id) {
-          removeBookDraft(String(book.id))
-        }
-        onClose()
-      }
-    } catch (error) {
-      console.error('Error deleting book:', error)
-    }
-    setLoading(false)
-  }
+  const handleDelete = () => deleteBook(book, onClose)
 
   return (
     <div className="mx-auto max-w-3xl rounded-md bg-white">
@@ -174,7 +150,7 @@ export const BookDetailEditPage: React.FC<Props> = ({
         book={book}
         onClick={handleSave}
         setBook={(editBook: Book) => setBook({ ...editBook })}
-        loading={loading}
+        loading={loading || deleting}
         onDelete={handleDelete}
       />
       <span id="saveRewardId" className="flex justify-center"></span>

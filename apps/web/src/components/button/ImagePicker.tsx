@@ -1,3 +1,4 @@
+import { NO_IMAGE } from '@/libs/constants'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Modal } from '../layout/Modal'
 import { FaLink } from 'react-icons/fa'
@@ -12,6 +13,13 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   const [image, setImage] = useState(img)
   const [open, setOpen] = useState(false)
   const [pasteMessage, setPasteMessage] = useState('')
+  const [imageFailed, setImageFailed] = useState(false)
+  const showPlaceholder = !image || imageFailed
+  const previewImage = showPlaceholder ? NO_IMAGE : image
+
+  useEffect(() => {
+    setImageFailed(false)
+  }, [image])
 
   // ファイルをBase64に変換する共通関数
   const readFileAsBase64 = (file: File) => {
@@ -79,7 +87,7 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   }, [open, handlePaste])
 
   const onSubmit = async () => {
-    onImageLoad && onImageLoad(image)
+    onImageLoad && onImageLoad(image || NO_IMAGE)
     setOpen(false)
   }
 
@@ -90,10 +98,20 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
   return (
     <>
       <button
-        className="relative mr-4 w-1/3 hover:brightness-90"
+        type="button"
+        aria-label="画像を設定"
+        className="relative mr-4 block min-h-24 w-1/3 hover:brightness-90"
         onClick={() => setOpen(true)}
       >
-        <img className="mx-auto my-0 drop-shadow-lg" src={image} alt="" />
+        <img
+          className="mx-auto my-0 drop-shadow-lg"
+          src={previewImage}
+          alt=""
+          onError={() => setImageFailed(true)}
+        />
+        {showPlaceholder && (
+          <span className="block py-2 text-sm text-gray-500">画像を設定</span>
+        )}
         <input
           ref={ref}
           type="file"
@@ -135,7 +153,8 @@ export const ImagePicker: React.FC<Props> = ({ onImageLoad, img }) => {
           >
             <img
               className="mx-auto my-0 max-h-52 drop-shadow-lg"
-              src={image}
+              src={previewImage}
+              onError={() => setImageFailed(true)}
               alt=""
             />
             <input

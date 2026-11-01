@@ -18,6 +18,7 @@ import { getBookCategoriesQuery } from '@/features/books/api'
 
 interface Response {
   result: boolean
+  message?: string
 }
 
 interface Props {
@@ -82,7 +83,7 @@ export const TemplateAddModal: React.FC<Props> = ({
         return {
           result: false,
           message:
-            'テンプレートの登録に失敗しました。画像は3MBまで登録できます。',
+            'テンプレートの登録に失敗しました。時間をおいて再度お試しください。',
         }
       })
     setResponse(res)
@@ -222,7 +223,9 @@ export const TemplateAddModal: React.FC<Props> = ({
                 ) : (
                   <DangerAlert
                     open={!!response}
-                    text="テンプレートの登録に失敗しました"
+                    text={
+                      response.message || 'テンプレートの登録に失敗しました'
+                    }
                     onClose={() => {
                       setResponse(null)
                     }}

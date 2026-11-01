@@ -1,3 +1,4 @@
+import { IMAGE_SIZE_ERROR, isImageTooLarge } from '@/utils/imageUpload'
 import prisma from '@/libs/prisma'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
@@ -9,7 +10,8 @@ import { graphqlClient } from '@/libs/graphql/backend-client'
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '3mb',
+      // 3MiB の画像は Base64 で4MiBになる。JSONとメモの分も確保する。
+      sizeLimit: '5mb',
     },
   },
 }
@@ -25,7 +27,13 @@ export default async (req, res) => {
     const userId = session.user.id
 
     if (req.method === 'POST') {
-      const body = JSON.parse(req.body)
+      const body =
+        typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+      if (isImageTooLarge(body.image)) {
+        return res
+          .status(413)
+          .json({ result: false, message: IMAGE_SIZE_ERROR })
+      }
       const {
         title,
         author,
@@ -117,7 +125,13 @@ export default async (req, res) => {
         bookImage: finalImage,
       })
     } else if (req.method === 'PUT') {
-      const body = JSON.parse(req.body)
+      const body =
+        typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+      if (isImageTooLarge(body.image)) {
+        return res
+          .status(413)
+          .json({ result: false, message: IMAGE_SIZE_ERROR })
+      }
       const id = body.id
       let imageUrl = body.image
 
@@ -169,7 +183,8 @@ export default async (req, res) => {
 
       return res.status(200).json({ result: true, image: imageUrl })
     } else if (req.method === 'DELETE') {
-      const body = JSON.parse(req.body)
+      const body =
+        typeof req.body === 'string' ? JSON.parse(req.body) : req.body
       const id = body.id
 
       // GraphQL mutation呼び出し

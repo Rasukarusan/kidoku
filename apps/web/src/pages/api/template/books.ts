@@ -1,3 +1,4 @@
+import { IMAGE_SIZE_ERROR, isImageTooLarge } from '@/utils/imageUpload'
 import prisma from '@/libs/prisma'
 import { authOptions } from '@/pages/api/auth/[...nextauth]'
 import { getServerSession } from 'next-auth/next'
@@ -8,7 +9,8 @@ import { bufferToWebp } from '@/libs/sharp/bufferToWebp'
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '3mb',
+      // 3MiB の画像は Base64 で4MiBになる。JSONとメモの分も確保する。
+      sizeLimit: '5mb',
     },
   },
 }
@@ -28,7 +30,10 @@ export default async (req, res) => {
     const userId = session.user.id
 
     // POST: 画像アップロードを含むため、Prisma直接アクセスを維持
-    const body = JSON.parse(req.body)
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
+    if (isImageTooLarge(body.image)) {
+      return res.status(413).json({ result: false, message: IMAGE_SIZE_ERROR })
+    }
     const { name, title, author, image, category, isPublicMemo, memo } = body
     const data = {
       userId,
@@ -48,7 +53,7 @@ export default async (req, res) => {
 
     // 画像選択されたものはVercel Blobにアップロードする
     if (isImageSelected) {
-      const imageBuffer = Buffer.from(image, 'base64')
+      const imageBuffer = Buffer.from(image.split(',')[1], 'base64')
       const buffer = await bufferToWebp(imageBuffer)
       const { url } = await put(`template_${template.id}.webp`, buffer, {
         access: 'public',
