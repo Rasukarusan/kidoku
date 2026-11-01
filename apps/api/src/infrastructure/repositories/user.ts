@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { deleteOwnedItems } from '../database/delete-owned-items';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
@@ -70,23 +69,20 @@ export class UserRepository implements IUserRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.$transaction(
-      async (tx) => {
-        const items = await tx.item.findMany({
-          where: { userId: id },
-          select: { id: true },
-        });
-        await deleteOwnedItems(
-          tx,
-          id,
-          items.map((item) => item.id),
-        );
-        await tx.itemTemplate.deleteMany({ where: { userId: id } });
-        await tx.aiSummaries.deleteMany({ where: { userId: id } });
-        await tx.collection.deleteMany({ where: { userId: id } });
-        await tx.user.delete({ where: { id } });
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+    await this.prisma.transactionForUser(id, async (tx) => {
+      const items = await tx.item.findMany({
+        where: { userId: id },
+        select: { id: true },
+      });
+      await deleteOwnedItems(
+        tx,
+        id,
+        items.map((item) => item.id),
+      );
+      await tx.itemTemplate.deleteMany({ where: { userId: id } });
+      await tx.aiSummaries.deleteMany({ where: { userId: id } });
+      await tx.collection.deleteMany({ where: { userId: id } });
+      await tx.user.delete({ where: { id } });
+    });
   }
 }

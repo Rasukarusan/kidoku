@@ -59,8 +59,51 @@ jobs:
       - run: pnpm --filter web exec prisma generate
       - run: pnpm --filter web test
 
-  test-e2e:
+  test-tidb-transactions:
     runs-on: ubuntu-latest
+    services:
+      meilisearch:
+        image: getmeili/meilisearch:prototype-japanese-6
+        env:
+          MEILI_HTTP_ADDR: 0.0.0.0:7700
+          MEILI_MASTER_KEY: transaction-test-key
+        ports:
+          - 17700:7700
+    env:
+      DATABASE_URL: mysql://root@127.0.0.1:14000/kidoku_transactions_test
+      MEILI_HOST: http://127.0.0.1:17700
+      MEILI_MASTER_KEY: transaction-test-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter api exec prisma generate
+      - run: pnpm --filter web exec prisma generate
+      - name: Start isolated TiDB
+        run: |
+          docker run --detach --name tidb-transactions \
+            --publish 127.0.0.1:14000:4000 --publish 127.0.0.1:14080:10080 \
+            pingcap/tidb:v8.5.4 --store=unistore --path=/tmp/tidb
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:14080/status > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:14080/status > /dev/null
+      - name: Initialize test database
+        run: |
+          pnpm --filter api exec prisma db execute --url mysql://root@127.0.0.1:14000/test --stdin <<'SQL'
+          CREATE DATABASE kidoku_transactions_test;
+          SQL
+          node scripts/initialize-collection-database.mjs --apply
+      - name: Verify transactions and search projection
+        run: pnpm --filter api exec ts-node test/transactions.integration.ts
+
+  test-e2e:
+    runs-on: ubuntu-24.04
     services:
       db:
         image: mysql:9.3

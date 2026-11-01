@@ -53,39 +53,38 @@ export class CollectionRepository implements ICollectionRepository {
     userId: string,
     input: { id?: number; name: string; description: string },
   ) {
-    const row = input.id
-      ? await this.prisma.collection.update({
-          where: { id: input.id, userId },
-          data: { name: input.name, description: input.description },
-          include: {
-            _count: { select: { items: true } },
-            highlights: { select: { itemId: true, position: true } },
-          },
-        })
-      : await this.prisma.collection.create({
-          data: { userId, name: input.name, description: input.description },
-          include: {
-            _count: { select: { items: true } },
-            highlights: { select: { itemId: true, position: true } },
-          },
-        });
-    return { ...row, itemCount: row._count.items };
+    return this.prisma.transactionForUser(userId, async (tx) => {
+      const row = input.id
+        ? await tx.collection.update({
+            where: { id: input.id, userId },
+            data: { name: input.name, description: input.description },
+            include: {
+              _count: { select: { items: true } },
+              highlights: { select: { itemId: true, position: true } },
+            },
+          })
+        : await tx.collection.create({
+            data: { userId, name: input.name, description: input.description },
+            include: {
+              _count: { select: { items: true } },
+              highlights: { select: { itemId: true, position: true } },
+            },
+          });
+      return { ...row, itemCount: row._count.items };
+    });
   }
   async deleteCollection(userId: string, id: number) {
-    await this.prisma.$transaction(
-      async (tx) => {
-        if (!(await tx.collection.findFirst({ where: { id, userId } })))
-          throw new NotFoundException('コレクションが見つかりません');
-        // Deleting a collection only unlinks items. It never deletes the items.
-        await tx.collectionItem.deleteMany({ where: { collectionId: id } });
-        await tx.collectionHighlight.deleteMany({
-          where: { collectionId: id },
-        });
-        await tx.aiSummaries.deleteMany({ where: { userId, sheetId: id } });
-        await tx.collection.delete({ where: { id, userId } });
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+    await this.prisma.transactionForUser(userId, async (tx) => {
+      if (!(await tx.collection.findFirst({ where: { id, userId } })))
+        throw new NotFoundException('コレクションが見つかりません');
+      // Deleting a collection only unlinks items. It never deletes the items.
+      await tx.collectionItem.deleteMany({ where: { collectionId: id } });
+      await tx.collectionHighlight.deleteMany({
+        where: { collectionId: id },
+      });
+      await tx.aiSummaries.deleteMany({ where: { userId, sheetId: id } });
+      await tx.collection.delete({ where: { id, userId } });
+    });
   }
   async setHighlight(
     userId: string,
@@ -93,40 +92,35 @@ export class CollectionRepository implements ICollectionRepository {
     position: number,
     itemId: number | null,
   ) {
-    await this.prisma.$transaction(
-      async (tx) => {
-        if (
-          !(await tx.collection.findFirst({
-            where: { id: collectionId, userId },
-          }))
-        )
-          throw new NotFoundException('コレクションが見つかりません');
-        if (itemId === null) {
-          await tx.collectionHighlight.deleteMany({
-            where: { collectionId, position },
-          });
-          return;
-        }
-        if (
-          !(await tx.item.findFirst({
-            where: {
-              id: itemId,
-              userId,
-              collections: { some: { collectionId } },
-            },
-          }))
-        )
-          throw new NotFoundException(
-            'コレクション内のアイテムが見つかりません',
-          );
-        await tx.collectionHighlight.upsert({
-          where: { collectionId_position: { collectionId, position } },
-          create: { collectionId, position, itemId },
-          update: { itemId },
+    await this.prisma.transactionForUser(userId, async (tx) => {
+      if (
+        !(await tx.collection.findFirst({
+          where: { id: collectionId, userId },
+        }))
+      )
+        throw new NotFoundException('コレクションが見つかりません');
+      if (itemId === null) {
+        await tx.collectionHighlight.deleteMany({
+          where: { collectionId, position },
         });
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+        return;
+      }
+      if (
+        !(await tx.item.findFirst({
+          where: {
+            id: itemId,
+            userId,
+            collections: { some: { collectionId } },
+          },
+        }))
+      )
+        throw new NotFoundException('コレクション内のアイテムが見つかりません');
+      await tx.collectionHighlight.upsert({
+        where: { collectionId_position: { collectionId, position } },
+        create: { collectionId, position, itemId },
+        update: { itemId },
+      });
+    });
   }
 
   async items(userId: string, filter: ItemFilter) {
@@ -170,65 +164,59 @@ export class CollectionRepository implements ICollectionRepository {
     version: number,
     initialLog?: SaveLogInput,
   ) {
-    return this.prisma.$transaction(
-      async (tx) => {
-        if (
-          id &&
-          !(await tx.item.findFirst({
-            where: { id, userId, itemTypeId: input.itemTypeId },
-          }))
-        )
-          throw new NotFoundException('アイテムが見つかりません');
-        const ownedCount = await tx.collection.count({
-          where: { id: { in: input.collectionIds }, userId },
+    return this.prisma.transactionForUser(userId, async (tx) => {
+      if (
+        id &&
+        !(await tx.item.findFirst({
+          where: { id, userId, itemTypeId: input.itemTypeId },
+        }))
+      )
+        throw new NotFoundException('アイテムが見つかりません');
+      const ownedCount = await tx.collection.count({
+        where: { id: { in: input.collectionIds }, userId },
+      });
+      if (ownedCount !== input.collectionIds.length)
+        throw new NotFoundException('コレクションが見つかりません');
+      const { collectionIds, ...values } = input;
+      const data = {
+        ...values,
+        attributes: values.attributes as Prisma.InputJsonObject,
+        attributesVersion: version,
+      };
+      const row = id
+        ? await tx.item.update({ where: { id, userId }, data })
+        : await tx.item.create({ data: { ...data, userId } });
+      // Keep highlights consistent when an item leaves a collection.
+      await tx.collectionHighlight.deleteMany({
+        where: { itemId: row.id, collectionId: { notIn: collectionIds } },
+      });
+      await tx.collectionItem.deleteMany({
+        where: { itemId: row.id, collectionId: { notIn: collectionIds } },
+      });
+      if (collectionIds.length)
+        await tx.collectionItem.createMany({
+          data: collectionIds.map((collectionId) => ({
+            collectionId,
+            itemId: row.id,
+          })),
+          skipDuplicates: true,
         });
-        if (ownedCount !== input.collectionIds.length)
-          throw new NotFoundException('コレクションが見つかりません');
-        const { collectionIds, ...values } = input;
-        const data = {
-          ...values,
-          attributes: values.attributes as Prisma.InputJsonObject,
-          attributesVersion: version,
-        };
-        const row = id
-          ? await tx.item.update({ where: { id, userId }, data })
-          : await tx.item.create({ data: { ...data, userId } });
-        // Keep highlights consistent when an item leaves a collection.
-        await tx.collectionHighlight.deleteMany({
-          where: { itemId: row.id, collectionId: { notIn: collectionIds } },
-        });
-        await tx.collectionItem.deleteMany({
-          where: { itemId: row.id, collectionId: { notIn: collectionIds } },
-        });
-        if (collectionIds.length)
-          await tx.collectionItem.createMany({
-            data: collectionIds.map((collectionId) => ({
-              collectionId,
-              itemId: row.id,
-            })),
-            skipDuplicates: true,
-          });
-        if (initialLog)
-          await tx.itemLog.create({ data: { ...initialLog, itemId: row.id } });
-        return toItem(
-          await tx.item.findUniqueOrThrow({
-            where: { id: row.id },
-            include: itemInclude,
-          }),
-        );
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+      if (initialLog)
+        await tx.itemLog.create({ data: { ...initialLog, itemId: row.id } });
+      return toItem(
+        await tx.item.findUniqueOrThrow({
+          where: { id: row.id },
+          include: itemInclude,
+        }),
+      );
+    });
   }
   async deleteItem(userId: string, id: number) {
-    await this.prisma.$transaction(
-      async (tx) => {
-        if (!(await tx.item.findFirst({ where: { id, userId } })))
-          throw new NotFoundException('アイテムが見つかりません');
-        await deleteOwnedItems(tx, userId, [id]);
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+    await this.prisma.transactionForUser(userId, async (tx) => {
+      if (!(await tx.item.findFirst({ where: { id, userId } })))
+        throw new NotFoundException('アイテムが見つかりません');
+      await deleteOwnedItems(tx, userId, [id]);
+    });
   }
   async saveLog(
     userId: string,
@@ -236,25 +224,19 @@ export class CollectionRepository implements ICollectionRepository {
     id: number | undefined,
     input: SaveLogInput,
   ) {
-    return this.prisma.$transaction(
-      async (tx) => {
-        if (!(await tx.item.findFirst({ where: { id: itemId, userId } })))
-          throw new NotFoundException('アイテムが見つかりません');
-        return id
-          ? tx.itemLog.update({ where: { id, itemId }, data: input })
-          : tx.itemLog.create({ data: { ...input, itemId } });
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+    return this.prisma.transactionForUser(userId, async (tx) => {
+      if (!(await tx.item.findFirst({ where: { id: itemId, userId } })))
+        throw new NotFoundException('アイテムが見つかりません');
+      return id
+        ? tx.itemLog.update({ where: { id, itemId }, data: input })
+        : tx.itemLog.create({ data: { ...input, itemId } });
+    });
   }
   async deleteLog(userId: string, itemId: number, id: number) {
-    await this.prisma.$transaction(
-      async (tx) => {
-        if (!(await tx.item.findFirst({ where: { id: itemId, userId } })))
-          throw new NotFoundException('アイテムが見つかりません');
-        await tx.itemLog.delete({ where: { id, itemId } });
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+    await this.prisma.transactionForUser(userId, async (tx) => {
+      if (!(await tx.item.findFirst({ where: { id: itemId, userId } })))
+        throw new NotFoundException('アイテムが見つかりません');
+      await tx.itemLog.delete({ where: { id, itemId } });
+    });
   }
 }

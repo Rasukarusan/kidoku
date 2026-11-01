@@ -16,7 +16,9 @@ function setup() {
     aiSummaries: { deleteMany: jest.fn() },
   };
   const prisma = {
-    $transaction: jest.fn((run: (value: typeof tx) => unknown) => run(tx)),
+    transactionForUser: jest.fn(
+      (_userId: string, run: (value: typeof tx) => unknown) => run(tx),
+    ),
   };
   return {
     tx,

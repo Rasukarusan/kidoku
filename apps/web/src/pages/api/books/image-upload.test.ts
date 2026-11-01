@@ -4,6 +4,7 @@ import { parseBody } from 'next/dist/server/api-utils/node/parse-body'
 import bookHandler, { config as bookConfig } from './index'
 import templateHandler, { config as templateConfig } from '../template/books'
 import { IMAGE_SIZE_ERROR, MAX_IMAGE_BYTES } from '@/utils/imageUpload'
+import { NO_IMAGE } from '@/libs/constants'
 
 jest.mock('next-auth/next', () => ({
   getServerSession: jest.fn().mockResolvedValue({ user: { id: 'user-1' } }),
@@ -34,6 +35,7 @@ jest.mock('@vercel/blob', () => ({
 const prisma = jest.requireMock('@/libs/prisma').default
 const { graphqlClient } = jest.requireMock('@/libs/graphql/backend-client')
 const { bufferToWebp } = jest.requireMock('@/libs/sharp/bufferToWebp')
+const { put } = jest.requireMock('@vercel/blob')
 
 const response = () => {
   const res = { status: jest.fn(), json: jest.fn(), revalidate: jest.fn() }
@@ -67,6 +69,65 @@ const request = async (
 }
 
 beforeEach(() => jest.clearAllMocks())
+
+describe('book registration image consistency', () => {
+  const body = (image: unknown) => ({
+    method: 'POST',
+    body: { title: '本', image, sheet: { id: 1, name: '本棚' } },
+  })
+
+  it.each(['', null, undefined, NO_IMAGE])(
+    'registers an unset image (%s) without attempting an upload',
+    async (image) => {
+      const res = response()
+      await bookHandler(body(image), res)
+      expect(res.status).toHaveBeenCalledWith(200)
+      expect(bufferToWebp).not.toHaveBeenCalled()
+      expect(graphqlClient.execute.mock.calls[0][2].input.imageUrl).toBe(
+        NO_IMAGE
+      )
+    }
+  )
+
+  it('saves the uploaded image URL with the item before search indexing', async () => {
+    const res = response()
+    await bookHandler(body('data:image/png;base64,aW1hZ2U='), res)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(put.mock.invocationCallOrder[0]).toBeLessThan(
+      graphqlClient.execute.mock.invocationCallOrder[0]
+    )
+    expect(graphqlClient.execute.mock.calls[0][2].input.imageUrl).toBe(
+      'https://example.com/image.webp'
+    )
+    expect(prisma.item.update).not.toHaveBeenCalled()
+  })
+
+  it('does not register a book if image upload fails', async () => {
+    const log = jest.spyOn(console, 'error').mockImplementation(() => {})
+    put.mockRejectedValueOnce(new Error('upload unavailable'))
+    try {
+      const res = response()
+      await bookHandler(body('data:image/png;base64,aW1hZ2U='), res)
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(graphqlClient.execute).not.toHaveBeenCalled()
+    } finally {
+      log.mockRestore()
+    }
+  })
+
+  it('rejects a temporary browser blob URL before registering a book', async () => {
+    const log = jest.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      const res = response()
+      await bookHandler(body('blob:https://kidoku.net/temporary'), res)
+      expect(res.status).toHaveBeenCalledWith(400)
+      expect(graphqlClient.execute).not.toHaveBeenCalled()
+      expect(put).not.toHaveBeenCalled()
+    } finally {
+      log.mockRestore()
+    }
+  })
+})
 
 describe.each([
   ['book POST', bookHandler, bookConfig, 'POST'],

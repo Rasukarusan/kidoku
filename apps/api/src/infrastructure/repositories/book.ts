@@ -1,6 +1,5 @@
 import { readBooks, readBook } from '@kidoku/reading-store';
 import { CollectionRepository } from './collection';
-import { Prisma } from '@prisma/client';
 import { Attributes } from '../../domain/models/item';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
@@ -94,125 +93,122 @@ export class BookRepository implements IBookRepository {
   }
 
   async save(book: Book): Promise<Book> {
-    return this.prisma.$transaction(
-      async (tx) => {
-        const id = book.id === null ? undefined : Number(book.id);
-        const existing = id
-          ? await tx.item.findFirst({
-              where: { id, userId: book.userId, itemTypeId: 'book' },
-              include: { collections: { orderBy: { collectionId: 'asc' } } },
-            })
-          : null;
-        if (id && !existing) throw new Error('書籍が見つかりません');
-        if (book.sheetId > 0) {
-          const collection = await tx.collection.findFirst({
-            where: { id: book.sheetId, userId: book.userId },
-          });
-          if (!collection) throw new Error('コレクションが見つかりません');
-        } else if (!existing || existing.collections.length)
-          throw new Error('コレクションが見つかりません');
-        const previousAuthors = (existing?.attributes as Attributes | undefined)
-          ?.authors;
-        const keepAuthors =
-          Array.isArray(previousAuthors) &&
-          (book.author === previousAuthors[0] ||
-            book.author === previousAuthors.join('、'));
-        const data = {
-          title: book.title,
-          imageUrl: book.image,
-          category: book.category,
-          rating: book.impression,
-          memo: book.memo,
-          isPublicMemo: book.isPublicMemo,
-          isPurchasable: book.isPurchasable,
-          price: book.price,
-          attributes: {
-            ...((existing?.attributes as Attributes) ?? {}),
-            authors: keepAuthors
-              ? previousAuthors
-              : book.author
-                ? [book.author]
-                : [],
-          },
-        };
-        const saved = id
-          ? await tx.item.update({
-              where: { id, userId: book.userId, itemTypeId: 'book' },
-              data,
-            })
-          : await tx.item.create({
-              data: {
-                ...data,
-                userId: book.userId,
-                itemTypeId: 'book',
-                createdAt: book.created,
-                updatedAt: book.updated,
-              },
-            });
-        const oldPrimary = existing?.collections[0]?.collectionId;
-        if (
-          oldPrimary &&
-          oldPrimary !== book.sheetId &&
-          !existing?.collections.some(
-            (link) => link.collectionId === book.sheetId,
-          )
-        ) {
-          await tx.collectionItem.deleteMany({
-            where: { itemId: saved.id, collectionId: oldPrimary },
-          });
-          await tx.collectionHighlight.deleteMany({
-            where: { itemId: saved.id, collectionId: oldPrimary },
-          });
-        }
-        if (book.sheetId > 0)
-          await tx.collectionItem.upsert({
-            where: {
-              collectionId_itemId: {
-                collectionId: book.sheetId,
-                itemId: saved.id,
-              },
-            },
-            update: {},
-            create: { collectionId: book.sheetId, itemId: saved.id },
-          });
-        const latest = await tx.itemLog.findFirst({
-          where: { itemId: saved.id, kind: 'read' },
-          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    return this.prisma.transactionForUser(book.userId, async (tx) => {
+      const id = book.id === null ? undefined : Number(book.id);
+      const existing = id
+        ? await tx.item.findFirst({
+            where: { id, userId: book.userId, itemTypeId: 'book' },
+            include: { collections: { orderBy: { collectionId: 'asc' } } },
+          })
+        : null;
+      if (id && !existing) throw new Error('書籍が見つかりません');
+      if (book.sheetId > 0) {
+        const collection = await tx.collection.findFirst({
+          where: { id: book.sheetId, userId: book.userId },
         });
-        if (latest)
-          await tx.itemLog.update({
-            where: { id: latest.id },
-            data: { occurredAt: book.finished },
-          });
-        else if (book.finished)
-          await tx.itemLog.create({
+        if (!collection) throw new Error('コレクションが見つかりません');
+      } else if (!existing || existing.collections.length)
+        throw new Error('コレクションが見つかりません');
+      const previousAuthors = (existing?.attributes as Attributes | undefined)
+        ?.authors;
+      const keepAuthors =
+        Array.isArray(previousAuthors) &&
+        (book.author === previousAuthors[0] ||
+          book.author === previousAuthors.join('、'));
+      const data = {
+        title: book.title,
+        imageUrl: book.image,
+        category: book.category,
+        rating: book.impression,
+        memo: book.memo,
+        isPublicMemo: book.isPublicMemo,
+        isPurchasable: book.isPurchasable,
+        price: book.price,
+        attributes: {
+          ...((existing?.attributes as Attributes) ?? {}),
+          authors: keepAuthors
+            ? previousAuthors
+            : book.author
+              ? [book.author]
+              : [],
+        },
+      };
+      const saved = id
+        ? await tx.item.update({
+            where: { id, userId: book.userId, itemTypeId: 'book' },
+            data,
+          })
+        : await tx.item.create({
             data: {
-              itemId: saved.id,
-              kind: 'read',
-              occurredAt: book.finished,
-              memo: '',
+              ...data,
+              userId: book.userId,
+              itemTypeId: 'book',
+              createdAt: book.created,
+              updatedAt: book.updated,
             },
           });
-        return Book.fromDatabase(
-          saved.id.toString(),
-          book.userId,
-          book.sheetId,
-          book.title,
-          book.author,
-          book.category,
-          book.image,
-          book.impression,
-          book.memo,
-          book.isPublicMemo,
-          book.isPurchasable,
-          book.finished,
-          book.created,
-          book.updated,
-          book.price,
-        );
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+      const oldPrimary = existing?.collections[0]?.collectionId;
+      if (
+        oldPrimary &&
+        oldPrimary !== book.sheetId &&
+        !existing?.collections.some(
+          (link) => link.collectionId === book.sheetId,
+        )
+      ) {
+        await tx.collectionItem.deleteMany({
+          where: { itemId: saved.id, collectionId: oldPrimary },
+        });
+        await tx.collectionHighlight.deleteMany({
+          where: { itemId: saved.id, collectionId: oldPrimary },
+        });
+      }
+      if (book.sheetId > 0)
+        await tx.collectionItem.upsert({
+          where: {
+            collectionId_itemId: {
+              collectionId: book.sheetId,
+              itemId: saved.id,
+            },
+          },
+          update: {},
+          create: { collectionId: book.sheetId, itemId: saved.id },
+        });
+      const latest = await tx.itemLog.findFirst({
+        where: { itemId: saved.id, kind: 'read' },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      });
+      if (latest)
+        await tx.itemLog.update({
+          where: { id: latest.id },
+          data: { occurredAt: book.finished },
+        });
+      else if (book.finished)
+        await tx.itemLog.create({
+          data: {
+            itemId: saved.id,
+            kind: 'read',
+            occurredAt: book.finished,
+            memo: '',
+          },
+        });
+      return Book.fromDatabase(
+        saved.id.toString(),
+        book.userId,
+        book.sheetId,
+        book.title,
+        book.author,
+        book.category,
+        book.image,
+        book.impression,
+        book.memo,
+        book.isPublicMemo,
+        book.isPurchasable,
+        book.finished,
+        book.created,
+        book.updated,
+        book.price,
+      );
+    });
   }
 
   async delete(id: string, userId: string): Promise<void> {
