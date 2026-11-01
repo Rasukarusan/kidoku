@@ -103,7 +103,7 @@ jobs:
         run: pnpm --filter api exec ts-node test/transactions.integration.ts
 
   test-e2e:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       db:
         image: mysql:9.3
