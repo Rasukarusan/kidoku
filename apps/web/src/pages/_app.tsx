@@ -1,3 +1,4 @@
+import { BookDeleteNotice } from '@/features/books/components/BookDeleteNotice'
 import React from 'react'
 import Head from 'next/head'
 import { Analytics } from '@vercel/analytics/react'
@@ -45,6 +46,7 @@ export default function MyApp({
           <SessionProvider session={pageProps.session}>
             <StoreAccessToken />
             <LoadingTopBar />
+            <BookDeleteNotice />
             <UiModeProvider>
               {getLayout(<Component {...pageProps} />)}
               <Analytics />

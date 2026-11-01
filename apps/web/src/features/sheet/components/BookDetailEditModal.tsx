@@ -259,6 +259,7 @@ export const BookDetailEditModal: React.FC<Props> = ({
       <div className="mt-6 border-t border-gray-200 pt-4 text-center">
         <button
           className="text-xs text-gray-400 hover:text-red-500"
+          disabled={loading}
           onClick={onDelete}
         >
           この書籍を削除する

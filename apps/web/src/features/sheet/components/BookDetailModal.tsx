@@ -1,3 +1,4 @@
+import { useDeleteBook } from '@/features/books/hooks/useDeleteBook'
 import { Book } from '@/types/book'
 import { Modal } from '@/components/layout/Modal'
 import { useEffect, useState } from 'react'
@@ -25,6 +26,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
   const [currentBook, setCurrentBook] = useState<Book>(book)
   const [newBook, setNewBook] = useState<Book>(book)
   const [loading, setLoading] = useState(false)
+  const { deleteBook, deleting } = useDeleteBook()
   const [fetchBook] = useLazyQuery(getBookQuery, {
     fetchPolicy: 'network-only',
   })
@@ -145,26 +147,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
     apolloClient.refetchQueries({ include: ['GetBooks'] })
   }
 
-  const onDelete = async () => {
-    if (!confirm(`『${currentBook.title}』を削除してもよろしいですか？`)) return
-    type Result = {
-      result: boolean
-    }
-    const res: Result = await fetch(`/api/books`, {
-      method: 'DELETE',
-      body: JSON.stringify(currentBook),
-      headers: {
-        Accept: 'application/json',
-      },
-    }).then((res) => res.json())
-    if (res.result) {
-      // 削除成功時にローカルストレージの下書きも削除
-      if (currentBook?.id) {
-        removeBookDraft(String(currentBook.id))
-      }
-      onClose()
-    }
-  }
+  const onDelete = () => deleteBook(currentBook, onClose)
 
   if (!newBook) return null
 
@@ -199,7 +182,7 @@ export const BookDetailModal: React.FC<Props> = ({ book, open, onClose }) => {
           setBook={(editBook: Book) => {
             setNewBook({ ...editBook })
           }}
-          loading={loading}
+          loading={loading || deleting}
           onDelete={onDelete}
         />
       ) : (

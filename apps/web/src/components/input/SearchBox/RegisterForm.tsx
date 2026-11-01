@@ -45,6 +45,7 @@ const MarkdownEditor = dynamic(
 
 interface Response {
   result: boolean
+  message?: string
   bookTitle: string
   bookId: number
   sheetName: string
@@ -207,7 +208,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       .catch(() => {
         return {
           result: false,
-          message: '本の登録に失敗しました。画像は3MBまで登録できます。',
+          message: '本の登録に失敗しました。時間をおいて再度お試しください。',
         }
       })
     if (res.result) {
@@ -216,7 +217,10 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       apolloClient.refetchQueries({ include: ['GetBooks'] })
       onSuccess(res)
     } else {
-      setError('本の登録に失敗しました。画像は3MBまで登録できます。')
+      setError(
+        res.message ||
+          '本の登録に失敗しました。時間をおいて再度お試しください。'
+      )
     }
     setLoading(false)
   }
