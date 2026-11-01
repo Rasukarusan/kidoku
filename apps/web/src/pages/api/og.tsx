@@ -54,7 +54,6 @@ const renderAi = (params: URLSearchParams) => {
   const user = trim(params.get('user') ?? 'kidoku user', 24)
   const summary = trim(params.get('summary') ?? 'あなたの読書性格', 60)
   const sub = trim(params.get('sub') ?? '', 90)
-  // MBTI風の読書性格タイプ（キャラクター画像付きレイアウト）
   const personalityType = findPersonalityType(params.get('ptype'))
 
   if (personalityType) {

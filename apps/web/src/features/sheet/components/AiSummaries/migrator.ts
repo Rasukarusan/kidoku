@@ -85,7 +85,8 @@ export function migrateAnalysis(
   let migrated = { ...analysis }
 
   // 元のスキーマバージョンを保持（レガシー表示用）
-  migrated._originalSchemaVersion = currentVersion
+  migrated._originalSchemaVersion =
+    analysis._originalSchemaVersion ?? currentVersion
 
   // 現在のバージョンから最新バージョンまで順次マイグレーション
   for (

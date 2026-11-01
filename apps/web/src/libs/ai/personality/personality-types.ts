@@ -1,13 +1,8 @@
-/**
- * AI読書性格診断のタイプ定義（MBTI風）
- *
- * LLMが読書履歴から1タイプを分類し、タイプごとのキャラクター画像を表示する。
- * idはプロンプト・保存データ・キャラクターSVGで共通のキーとして使用する。
- */
 export type PersonalityFace = 'round' | 'closed' | 'sparkle'
 
 export type PersonalityType = {
   /** 保存データ・プロンプトで使う識別子 */
+  accessory?: string
   id: string
   /** MBTIのタイプコード風の英字コード */
   code: string
@@ -25,7 +20,7 @@ export type PersonalityType = {
   face: PersonalityFace
 }
 
-export const PERSONALITY_TYPES: PersonalityType[] = [
+const LEGACY_PERSONALITY_TYPES: PersonalityType[] = [
   {
     id: 'adventurer',
     code: 'ADVENTURER',
@@ -161,18 +156,190 @@ export const PERSONALITY_TYPES: PersonalityType[] = [
   },
 ]
 
-export const PERSONALITY_TYPE_IDS = PERSONALITY_TYPES.map((t) => t.id)
+export const PERSONALITY_TYPES: PersonalityType[] = [
+  {
+    id: 'ISTJ',
+    code: 'ISTJ',
+    name: '管理者',
+    tagline: '事実を積み重ね、着実に進める',
+    criteria: '具体的な事実と経験を重視し、計画的に判断する',
+    color: '#2563eb',
+    colorLight: '#dbeafe',
+    face: 'closed',
+    accessory: 'scholar',
+  },
+  {
+    id: 'ISFJ',
+    code: 'ISFJ',
+    name: '擁護者',
+    tagline: '身近な人を、静かに支える',
+    criteria: '具体的な経験を重視し、人への配慮と着実さを大切にする',
+    color: '#0891b2',
+    colorLight: '#cffafe',
+    face: 'round',
+    accessory: 'healer',
+  },
+  {
+    id: 'INFJ',
+    code: 'INFJ',
+    name: '提唱者',
+    tagline: '人の内面と、その先の意味を見つめる',
+    criteria: '内省を通して意味を探り、人の価値観と長期的な方向性を重視する',
+    color: '#0d9488',
+    colorLight: '#ccfbf1',
+    face: 'closed',
+    accessory: 'philosopher',
+  },
+  {
+    id: 'INTJ',
+    code: 'INTJ',
+    name: '建築家',
+    tagline: '仕組みを捉え、先を見通して組み立てる',
+    criteria: '抽象的な構造を捉え、論理と長期的な計画で判断する',
+    color: '#7c3aed',
+    colorLight: '#ede9fe',
+    face: 'closed',
+    accessory: 'strategist',
+  },
+  {
+    id: 'ISTP',
+    code: 'ISTP',
+    name: '巨匠',
+    tagline: '手を動かし、仕組みを確かめる',
+    criteria: '具体的な仕組みを論理的に理解し、状況に柔軟に対応する',
+    color: '#d97706',
+    colorLight: '#fef3c7',
+    face: 'round',
+    accessory: 'innovator',
+  },
+  {
+    id: 'ISFP',
+    code: 'ISFP',
+    name: '冒険家',
+    tagline: '自分の感覚で、今を味わう',
+    criteria: '身近な体験や自分の感覚を大切にし、柔軟に選択する',
+    color: '#c026d3',
+    colorLight: '#fae8ff',
+    face: 'sparkle',
+    accessory: 'curator',
+  },
+  {
+    id: 'INFP',
+    code: 'INFP',
+    name: '仲介者',
+    tagline: '自分の内側にある、大切なものを探す',
+    criteria: '内省と想像を通して、自分の価値観や可能性を探る',
+    color: '#059669',
+    colorLight: '#d1fae5',
+    face: 'closed',
+    accessory: 'dreamer',
+  },
+  {
+    id: 'INTP',
+    code: 'INTP',
+    name: '論理学者',
+    tagline: '問いをほどき、自分なりの答えを探す',
+    criteria: '抽象的な仕組みを論理的に掘り下げ、結論を柔軟に見直す',
+    color: '#6366f1',
+    colorLight: '#e0e7ff',
+    face: 'closed',
+    accessory: 'philosopher',
+  },
+  {
+    id: 'ESTP',
+    code: 'ESTP',
+    name: '起業家',
+    tagline: 'まず試し、その場で道を見つける',
+    criteria: '外の世界で具体的に試し、合理的かつ柔軟に行動する',
+    color: '#ea580c',
+    colorLight: '#ffedd5',
+    face: 'round',
+    accessory: 'adventurer',
+  },
+  {
+    id: 'ESFP',
+    code: 'ESFP',
+    name: 'エンターテイナー',
+    tagline: '人との体験に、楽しさを見つける',
+    criteria: '人と関わる具体的な体験を好み、感覚と気持ちで柔軟に行動する',
+    color: '#db2777',
+    colorLight: '#fce7f3',
+    face: 'sparkle',
+    accessory: 'challenger',
+  },
+  {
+    id: 'ENFP',
+    code: 'ENFP',
+    name: '運動家',
+    tagline: '出会いから、新しい可能性を広げる',
+    criteria: '人との関わりから可能性を広げ、価値観を重視して柔軟に動く',
+    color: '#16a34a',
+    colorLight: '#dcfce7',
+    face: 'sparkle',
+    accessory: 'wanderer',
+  },
+  {
+    id: 'ENTP',
+    code: 'ENTP',
+    name: '討論者',
+    tagline: '当たり前を問い直し、発想を広げる',
+    criteria: '対話を通して新しい概念を試し、論理的に別の可能性を探る',
+    color: '#9333ea',
+    colorLight: '#f3e8ff',
+    face: 'sparkle',
+    accessory: 'innovator',
+  },
+  {
+    id: 'ESTJ',
+    code: 'ESTJ',
+    name: '幹部',
+    tagline: '状況を整理し、実行につなげる',
+    criteria: '具体的な事実と合理性を重視し、周囲と計画的に物事を進める',
+    color: '#0284c7',
+    colorLight: '#e0f2fe',
+    face: 'round',
+    accessory: 'strategist',
+  },
+  {
+    id: 'ESFJ',
+    code: 'ESFJ',
+    name: '領事',
+    tagline: '人をつなぎ、安心できる場をつくる',
+    criteria: '人との関係や具体的な必要を重視し、協調して着実に行動する',
+    color: '#ca8a04',
+    colorLight: '#fef9c3',
+    face: 'round',
+    accessory: 'healer',
+  },
+  {
+    id: 'ENFJ',
+    code: 'ENFJ',
+    name: '主人公',
+    tagline: '人の可能性を見つけ、ともに進む',
+    criteria: '人の価値観と将来の可能性に関心を向け、周囲と方向性を定める',
+    color: '#0f766e',
+    colorLight: '#ccfbf1',
+    face: 'round',
+    accessory: 'empath',
+  },
+  {
+    id: 'ENTJ',
+    code: 'ENTJ',
+    name: '指揮官',
+    tagline: '目標を描き、実現までの道をつくる',
+    criteria: '外に働きかけ、論理と長期的な戦略で目標に向けて進める',
+    color: '#b45309',
+    colorLight: '#fef3c7',
+    face: 'round',
+    accessory: 'strategist',
+  },
+]
 
-/**
- * idからタイプ定義を取得する（未知のid・未設定はundefined）
- */
+export const PERSONALITY_TYPE_IDS = PERSONALITY_TYPES.map((type) => type.id)
+
 export const findPersonalityType = (
   id: string | undefined | null
-): PersonalityType | undefined => PERSONALITY_TYPES.find((t) => t.id === id)
-
-/**
- * プロンプトに埋め込むタイプ一覧（id: 名前 - 判定基準）
- */
-export const personalityTypePromptList = PERSONALITY_TYPES.map(
-  (t) => `  - ${t.id}（${t.name}）: ${t.criteria}`
-).join('\n')
+): PersonalityType | undefined =>
+  [...PERSONALITY_TYPES, ...LEGACY_PERSONALITY_TYPES].find(
+    (type) => type.id === id
+  )

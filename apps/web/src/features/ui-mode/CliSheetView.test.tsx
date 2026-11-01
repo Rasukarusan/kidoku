@@ -46,7 +46,8 @@ it('displays AI analysis within the terminal', () => {
       {...props}
       aiSummary={{
         id: 1,
-        personality_type: 'strategist',
+        personality_type: 'INTP',
+        reading_trend_summary: '種明かしに惹かれる',
         character_summary: '分析結果',
         reading_trend_analysis: '読書傾向の本文',
         sentiment_analysis: '',
@@ -56,7 +57,8 @@ it('displays AI analysis within the terminal', () => {
     />
   )
   type('ai')
-  expect(screen.getByRole('log').textContent).toContain('STRATEGIST')
+  expect(screen.getByRole('log').textContent).toContain('INTP')
+  expect(screen.getByRole('log').textContent).toContain('種明かしに惹かれる')
   expect(screen.getByRole('log').textContent).toContain('読書傾向の本文')
 })
 

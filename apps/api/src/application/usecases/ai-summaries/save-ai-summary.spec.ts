@@ -27,6 +27,13 @@ describe('SaveAiSummaryUseCase', () => {
     useCase = new SaveAiSummaryUseCase(mockAiSummaryRepo, mockSheetRepo);
   });
 
+  const emptySummaries = {
+    reading_trend_summary: '',
+    sentiment_summary: '',
+    hidden_theme_summary: '',
+    overall_summary: '',
+  };
+
   const validAnalysis = {
     character_summary: 'サマリー',
     reading_trend_analysis: 'トレンド分析',
@@ -56,7 +63,12 @@ describe('SaveAiSummaryUseCase', () => {
     expect(mockAiSummaryRepo.create).toHaveBeenCalledWith(
       'user-1',
       1,
-      { _schemaVersion: 3, personality_type: '', ...validAnalysis },
+      {
+        _schemaVersion: 4,
+        personality_type: '',
+        ...emptySummaries,
+        ...validAnalysis,
+      },
       0,
     );
   });
@@ -75,7 +87,11 @@ describe('SaveAiSummaryUseCase', () => {
 
     const analysisWithType = {
       ...validAnalysis,
-      personality_type: 'adventurer',
+      personality_type: 'INTP',
+      reading_trend_summary: '読書傾向のまとめ',
+      sentiment_summary: '感情のまとめ',
+      hidden_theme_summary: 'テーマのまとめ',
+      overall_summary: '総評のまとめ',
     };
 
     await useCase.execute('user-1', '2025', analysisWithType);
@@ -83,9 +99,19 @@ describe('SaveAiSummaryUseCase', () => {
     expect(mockAiSummaryRepo.create).toHaveBeenCalledWith(
       'user-1',
       1,
-      { _schemaVersion: 3, ...analysisWithType },
+      { _schemaVersion: 4, ...analysisWithType },
       0,
     );
+  });
+
+  it('まとめが文字列でない場合は保存しない', async () => {
+    await expect(
+      useCase.execute('user-1', '2025', {
+        ...validAnalysis,
+        reading_trend_summary: {},
+      }),
+    ).rejects.toThrow('Invalid analysis format');
+    expect(mockAiSummaryRepo.create).not.toHaveBeenCalled();
   });
 
   it('必須キーが不足している場合エラーになる', async () => {

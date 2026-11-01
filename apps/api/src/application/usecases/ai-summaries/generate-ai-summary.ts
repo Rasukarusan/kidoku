@@ -7,7 +7,7 @@ import { ISheetRepository } from '../../../domain/repositories/sheet';
 import { aiSummaryPrompt } from '../../../shared/ai/prompt';
 import { PERSONALITY_TYPE_IDS } from '../../../shared/ai/personality-types';
 
-const ANALYSIS_SCHEMA_VERSION = 3;
+const ANALYSIS_SCHEMA_VERSION = 4;
 
 /**
  * 読了本の感想からAI読書分析を生成し、DBに保存する。
@@ -48,12 +48,14 @@ export class GenerateAiSummaryUseCase {
           item.logs
             .filter(
               (log) =>
+                item.isPublicMemo &&
                 log.kind === 'read' &&
                 log.occurredAt &&
                 months.includes(log.occurredAt.getUTCMonth() + 1) &&
                 categories.includes(item.category),
             )
             .map((log) => ({
+              title: item.title,
               category: item.category,
               memo: [item.memo, log.memo]
                 .filter(Boolean)
@@ -65,11 +67,13 @@ export class GenerateAiSummaryUseCase {
       : (await this.bookRepository.findByUserIdAndSheetId(userId, sheetId))
           .filter(
             (book) =>
+              book.isPublicMemo &&
               book.finished &&
               months.includes(book.finished.getMonth() + 1) &&
               categories.includes(book.category),
           )
           .map((book) => ({
+            title: book.title,
             category: book.category,
             memo: book.memo.replace(/\*.*\*/g, '***'),
             finished: book.finished,
@@ -97,6 +101,10 @@ export class GenerateAiSummaryUseCase {
     const {
       personality_type,
       character_summary,
+      overall_summary,
+      hidden_theme_summary,
+      sentiment_summary,
+      reading_trend_summary,
       reading_trend_analysis,
       sentiment_analysis,
       hidden_theme_discovery,
@@ -117,12 +125,16 @@ export class GenerateAiSummaryUseCase {
           categories,
         },
         // 定義外のタイプIDが返ってきた場合は未診断扱いにする
-        personality_type: PERSONALITY_TYPE_IDS.includes(
-          personality_type as string,
+        personality_type: PERSONALITY_TYPE_IDS.some(
+          (id) => id === personality_type,
         )
           ? personality_type
           : '',
         character_summary,
+        overall_summary,
+        hidden_theme_summary,
+        sentiment_summary,
+        reading_trend_summary,
         reading_trend_analysis,
         sentiment_analysis,
         hidden_theme_discovery,
