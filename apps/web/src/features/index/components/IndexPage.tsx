@@ -56,13 +56,6 @@ export const IndexPage: React.FC<Props> = ({ comments, mcpEndpoint }) => {
             <h1 className="text-2xl font-bold leading-relaxed tracking-wide text-gray-800 sm:text-3xl">
               読んだ本を、ただ記録する。
             </h1>
-            <p className="mt-6 text-sm leading-loose text-gray-500 sm:text-base">
-              派手な機能も、難しい操作もいりません。
-              <br />
-              日々読み終えた本を、自分のペースで淡々と。
-              <br />
-              ずっと続けられる、シンプルな読書記録。
-            </p>
             <div className="mt-10">
               <button
                 onClick={handleStart}
