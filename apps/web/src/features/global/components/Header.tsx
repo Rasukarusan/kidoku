@@ -1,4 +1,3 @@
-import { useUiMode } from '@/features/ui-mode/UiModeProvider'
 import { useRouter } from 'next/router'
 import { Container } from '@/components/layout/Container'
 import React from 'react'
@@ -9,21 +8,16 @@ import { Logo } from '@/components/icon/Logo'
 import Link from 'next/link'
 import { useCachedSession } from '@/hooks/useCachedSession'
 import { useUnreadNotificationCount } from '@/features/social/hooks/useUnreadNotificationCount'
-import { UiModeSwitch } from '@/features/ui-mode/UiModeProvider'
 
 // レスポンシブヘッダー
 export const Header = () => {
-  const { mode } = useUiMode()
   const router = useRouter()
   const { session, status } = useCachedSession()
   const setOpenSidebar = useSetAtom(openNavSidebarAtom)
   const setOpenLoginModal = useSetAtom(openLoginModalAtom)
   const unreadCount = useUnreadNotificationCount()
 
-  if (
-    (mode === 'cli' && router.pathname.includes('/sheets/')) ||
-    router.asPath.startsWith('/auth/init')
-  ) {
+  if (router.asPath.startsWith('/auth/init')) {
     return null
   }
 
@@ -37,7 +31,6 @@ export const Header = () => {
           <div className="flex-1">
             <SearchBox />
           </div>
-          <UiModeSwitch />
           {session ? (
             <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
               <button

@@ -21,11 +21,9 @@ import { AiSummaries, AiSummariesJson } from './AiSummaries'
 import { IoMdCloseCircle } from 'react-icons/io'
 import { IoGrid } from 'react-icons/io5'
 import { twMerge } from 'tailwind-merge'
-import { useMutation, useQuery } from '@apollo/client'
-import { getBooksQuery, updateBookMemoMutation } from '@/features/books/api'
+import { useQuery } from '@apollo/client'
+import { getBooksQuery } from '@/features/books/api'
 import dayjs from 'dayjs'
-import { useUiMode } from '@/features/ui-mode/UiModeProvider'
-import { CliSheetView } from '@/features/ui-mode/CliSheetView'
 
 const CategoryPieChart = dynamic(
   () => import('./CategoryPieChart').then((mod) => mod.CategoryPieChart),
@@ -64,14 +62,10 @@ export const SheetPage: React.FC<Props> = ({
   aiSummaries,
 }) => {
   const router = useRouter()
-  const { mode: uiMode } = useUiMode()
   const { data: session } = useSession()
   // アクセスしているページが自分のページの場合、非公開メモも表示したいためクライアント側で改めて本データを取得する
   const { data: booksData } = useQuery(getBooksQuery, {
     variables: { input: { sheetName: year } },
-  })
-  const [updateBookMemo] = useMutation(updateBookMemoMutation, {
-    refetchQueries: [getBooksQuery],
   })
   const res = useMemo(
     () =>
@@ -249,33 +243,6 @@ export const SheetPage: React.FC<Props> = ({
       default:
         return sorted
     }
-  }
-
-  if (uiMode === 'cli') {
-    return (
-      <>
-        <NextSeo
-          title={`${username}/${year} | kidoku`}
-          description={monthlySummary}
-          openGraph={{ images: [{ url: ogImage, width: 1200, height: 630 }] }}
-          twitter={{ cardType: 'summary_large_image' }}
-        />
-        <CliSheetView
-          key={username}
-          aiSummary={latestAiSummary ?? undefined}
-          books={isMine ? res.books : data}
-          sheets={sheets}
-          year={year}
-          username={username}
-          canEdit={Boolean(isMine)}
-          onSaveMemo={async (bookId, memo) => {
-            await updateBookMemo({
-              variables: { input: { id: String(bookId), memo } },
-            })
-          }}
-        />
-      </>
-    )
   }
 
   if (data.length === 0) {

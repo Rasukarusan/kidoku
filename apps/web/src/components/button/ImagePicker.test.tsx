@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { ImagePicker } from './ImagePicker'
 import { NO_IMAGE } from '@/libs/constants'
