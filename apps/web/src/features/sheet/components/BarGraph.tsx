@@ -50,35 +50,24 @@ export const BarGraph: React.FC<Props> = ({
   setFilter,
 }) => {
   const data = useMemo(() => {
-    const months = {}
+    // 入力レコードの順序に関係なく、0冊の月も含めて1〜12月を表示する。
+    const months: Omit<Data, 'sum'>[] = Array.from({ length: 12 }, (_, i) => ({
+      name: `${i + 1}月`,
+      count: 0,
+      children: [],
+    }))
     records.forEach((record) => {
-      const name = record.month
-      const hasKey = name in months
-      if (hasKey) {
-        const v = months[name]
-        months[name] = {
-          ...v,
-          count: v.count + 1,
-          children: [...v.children, record],
-        }
-      } else {
-        months[name] = {
-          name,
-          count: 1,
-          children: [record],
-        }
+      const month = months.find((month) => month.name === record.month)
+      if (month) {
+        month.count += 1
+        month.children.push(record)
       }
     })
-    const data: Data[] = []
-    Object.keys(months).forEach((month, i) => {
-      const count = months[month].children.length
-      data.push({
-        ...months[month],
-        count,
-        sum: i === 0 ? count : data[i - 1].sum + count,
-      })
+    let sum = 0
+    return months.map((month): Data => {
+      sum += month.count
+      return { ...month, sum }
     })
-    return data
   }, [records])
 
   const onClick = (node, index) => {
@@ -103,7 +92,7 @@ export const BarGraph: React.FC<Props> = ({
           data={data}
           margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
         >
-          <XAxis dataKey="name" />
+          <XAxis dataKey="name" interval={0} tick={{ fontSize: 12 }} />
           <CartesianGrid stroke="#f5f5f5" />
           <Tooltip formatter={formatter} />
           <Bar dataKey="sum" barSize={30} onClick={onClick}>
