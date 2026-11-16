@@ -5,9 +5,6 @@ import { migrateAnalysis } from './migrator'
 
 jest.mock('./useAiHelpers')
 jest.mock('./Confirm', () => ({ Confirm: () => null }))
-jest.mock('@/features/ui-mode/UiModeProvider', () => ({
-  useUiMode: () => ({ mode: 'normal' }),
-}))
 
 const analysis = {
   id: 1,

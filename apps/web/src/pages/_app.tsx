@@ -16,7 +16,6 @@ import type { NextPageWithLayout } from '@/types/page'
 import { ApolloProvider } from '@apollo/client'
 import apolloClient from '@/libs/apollo'
 import { StoreAccessToken } from '@/features/global/components/StoreAccessToken'
-import { UiModeProvider } from '@/features/ui-mode/UiModeProvider'
 
 const defaultLayout = (page: ReactElement) => (
   <Layout>
@@ -47,10 +46,8 @@ export default function MyApp({
             <StoreAccessToken />
             <LoadingTopBar />
             <BookDeleteNotice />
-            <UiModeProvider>
-              {getLayout(<Component {...pageProps} />)}
-              <Analytics />
-            </UiModeProvider>
+            {getLayout(<Component {...pageProps} />)}
+            <Analytics />
           </SessionProvider>
         </ApolloProvider>
       </Provider>
